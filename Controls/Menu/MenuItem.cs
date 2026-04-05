@@ -16,7 +16,9 @@ namespace Junevy.Controls.Controls.Menu
             Id = new Guid();
         }
 
-
+        /// <summary>
+        /// The title of items
+        /// </summary>
         public string Title
         {
             get { return (string)GetValue(TitleProperty); }
