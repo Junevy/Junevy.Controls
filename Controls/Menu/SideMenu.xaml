@@ -1,0 +1,133 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:atch="clr-namespace:Junevy.Controls.AttachedProperties"
+    xmlns:cvt="clr-namespace:Junevy.Controls.Converters"
+    xmlns:local="clr-namespace:Junevy.Controls.Controls.Menu">
+
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Themes/IconFont.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <cvt:BoolToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+    <DataTemplate x:Key="DefaultSideMenuStyle" DataType="{x:Type local:MenuItem}">
+        <Grid Width="{Binding Width}" Height="{Binding Height}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition MaxWidth="10" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!--  指示器  -->
+            <Border
+                Grid.Column="0"
+                Height="{Binding FontSize}"
+                Margin="0,0,5,0"
+                Background="{StaticResource AppColor}"
+                CornerRadius="2"
+                Visibility="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+            <StackPanel Grid.Column="1" Orientation="{Binding Orientation}">
+                <!--  icon  -->
+                <ContentControl
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    Content="{Binding Icon}"
+                    FontFamily="{StaticResource IconFont}"
+                    FontSize="{Binding FontSize}"
+                    Foreground="{StaticResource TextFillColor}"
+                    Visibility="{Binding Icon, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                <!--  title  -->
+                <TextBlock
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    Background="Transparent"
+                    FontSize="{Binding FontSize}"
+                    Foreground="{StaticResource TextFillColor}"
+                    Text="{Binding Title}" />
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
+
+
+
+    <Style TargetType="{x:Type local:SideMenu}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+        <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
+        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
+
+        <!--  SideMenu容器  -->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:SideMenu}">
+                    <ScrollViewer
+                        Focusable="False"
+                        HorizontalScrollBarVisibility="Hidden"
+                        VerticalScrollBarVisibility="Hidden">
+                        <Border
+                            Background="{StaticResource SubBackground}"
+                            BorderBrush="{StaticResource BorderColor}"
+                            BorderThickness="1">
+                            <ItemsPresenter />
+                        </Border>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <!--  Items布局  -->
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:SideMenu}, Path=Orientation}" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <!--  Items 容器样式  -->
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="2" />
+                    <Setter Property="Background" Value="Transparent" />
+
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border
+                                    x:Name="Root"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="5">
+
+                                    <ContentPresenter />
+
+                                </Border>
+
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Root" Property="Background" Value="{StaticResource IndicatorColor}" />
+                                    </Trigger>
+
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Root" Property="Background" Value="{StaticResource IndicatorColor}" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
+
+        <Setter Property="ItemTemplate" Value="{StaticResource DefaultSideMenuStyle}" />
+    </Style>
+
+
+</ResourceDictionary>
