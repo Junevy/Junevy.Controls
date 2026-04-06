@@ -2,13 +2,19 @@
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace Junevy.Controls.Controls.Menu
 {
-    [TemplatePart(Name = "PART_SIDEMENU", Type = typeof(ListBox))]
+    //[TemplatePart(Name = "PART_SIDEMENU", Type = typeof(ListBox))]
     public class SideMenu : ListBox
     {
+
+        public enum Mode : byte
+        {
+            Horizontal = 0x01,
+            Vertical = 0x01 << 1
+        }
+
         static SideMenu()
         {
             DefaultStyleKeyProperty.OverrideMetadata(
@@ -34,19 +40,13 @@ namespace Junevy.Controls.Controls.Menu
             DependencyProperty.Register("Orientation", typeof(Orientation), typeof(MenuBase), new PropertyMetadata(Orientation.Vertical));
 
 
-
-
-        public int MyProperty
+        public Mode DisplayMode
         {
-            get { return (int)GetValue(MyPropertyProperty); }
-            set { SetValue(MyPropertyProperty, value); }
+            get { return (Mode)GetValue(DisplayModeProperty); }
+            set { SetValue(DisplayModeProperty, value); }
         }
-
-        // Using a DependencyProperty as the backing store for MyProperty.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty MyPropertyProperty =
-            DependencyProperty.Register("MyProperty", typeof(int), typeof(ownerclass), new PropertyMetadata(0));
-
-
+        public static readonly DependencyProperty DisplayModeProperty =
+            DependencyProperty.Register("DisplayMode", typeof(Mode), typeof(SideMenu), new PropertyMetadata(Mode.Horizontal));
 
 
         private void OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)

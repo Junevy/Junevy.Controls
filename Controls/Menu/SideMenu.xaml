@@ -5,7 +5,6 @@
     xmlns:cvt="clr-namespace:Junevy.Controls.Converters"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Menu">
 
-
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Themes/IconFont.xaml" />
@@ -13,8 +12,9 @@
 
     <cvt:BoolToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
+    <!--  horizontal mode / normal style  -->
     <DataTemplate x:Key="DefaultSideMenuStyle" DataType="{x:Type local:MenuItem}">
-        <Grid Width="{Binding Width}" Height="{Binding Height}">
+        <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MaxWidth="10" />
                 <ColumnDefinition Width="*" />
@@ -32,6 +32,8 @@
             <StackPanel Grid.Column="1" Orientation="{Binding Orientation}">
                 <!--  icon  -->
                 <ContentControl
+                    Width="{Binding FontSize}"
+                    Height="{Binding FontSize}"
                     Margin="5"
                     VerticalAlignment="Center"
                     Content="{Binding Icon}"
@@ -47,18 +49,71 @@
                     Background="Transparent"
                     FontSize="{Binding FontSize}"
                     Foreground="{StaticResource TextFillColor}"
-                    Text="{Binding Title}" />
+                    Text="{Binding Title}"
+                    Visibility="{Binding Title, Converter={StaticResource BooleanToVisibilityConverter}}" />
             </StackPanel>
         </Grid>
     </DataTemplate>
 
+    <!--  icon mode / vertical mode  -->
+    <DataTemplate x:Key="IconMenuStyle" DataType="{x:Type local:MenuItem}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition MaxWidth="10" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!--  指示器  -->
+            <Border
+                Grid.Column="0"
+                Height="{Binding FontSize}"
+                Margin="0,0,5,0"
+                Background="{StaticResource AppColor}"
+                CornerRadius="2"
+                Visibility="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
 
-    <Style TargetType="{x:Type local:SideMenu}">
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <!--  icon  -->
+                <ContentControl
+                    Grid.Row="0"
+                    Margin="0,5,5,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Content="{Binding Icon}"
+                    FontFamily="{StaticResource IconFont}"
+                    FontSize="{Binding FontSize}"
+                    Foreground="{StaticResource TextFillColor}"
+                    Visibility="{Binding Icon, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                <!--  title  -->
+                <TextBlock
+                    Grid.Row="1"
+                    Margin="0,0,5,5"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Foreground="{StaticResource TextFillColor}"
+                    Text="{Binding Title}"
+                    Visibility="{Binding Title, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            </Grid>
+        </Grid>
+    </DataTemplate>
+
+
+    <!--  style  -->
+    <Style x:Key="DefaultSideMenu" TargetType="{x:Type local:SideMenu}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
         <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
+        <Setter Property="Width" Value="150" />
+        <Setter Property="FontSize" Value="12" />
 
         <!--  SideMenu容器  -->
         <Setter Property="Template">
@@ -125,8 +180,20 @@
                 </Style>
             </Setter.Value>
         </Setter>
+    </Style>
 
-        <Setter Property="ItemTemplate" Value="{StaticResource DefaultSideMenuStyle}" />
+
+
+    <Style BasedOn="{StaticResource DefaultSideMenu}" TargetType="{x:Type local:SideMenu}">
+        <Style.Triggers>
+            <Trigger Property="DisplayMode" Value="Horizontal">
+                <Setter Property="ItemTemplate" Value="{StaticResource DefaultSideMenuStyle}" />
+            </Trigger>
+            <Trigger Property="DisplayMode" Value="Vertical">
+                <Setter Property="ItemTemplate" Value="{StaticResource IconMenuStyle}" />
+                <Setter Property="Width" Value="60" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
 

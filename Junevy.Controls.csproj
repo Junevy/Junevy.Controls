@@ -8,15 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Controls\Menu\SideMenu.xaml.Mode.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Themes\iconfont.ttf" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Controls\Menu\SideMenu.xaml.Mode.cs" />
   </ItemGroup>
 
   <ItemGroup>

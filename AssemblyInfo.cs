@@ -2,6 +2,7 @@
 using System.Windows.Markup;
 
 [assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.Menu")]
+[assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.Bar")]
 // 在文件末尾（其他 [assembly: ] 之后）添加：
 [assembly: ThemeInfo(
     ResourceDictionaryLocation.None,           // 主题特定资源字典的位置（通常用 None）

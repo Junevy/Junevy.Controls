@@ -5,6 +5,9 @@
         <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
 
+
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/SideMenu.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/ToolBar.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Bar/AppBar.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
