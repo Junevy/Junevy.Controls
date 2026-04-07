@@ -13,6 +13,7 @@ namespace Junevy.Controls.Controls.Menu
 
         public MenuItem()
         {
+            //this.IsChecked
             Id = new Guid();
         }
 
@@ -50,6 +51,14 @@ namespace Junevy.Controls.Controls.Menu
         public static readonly DependencyProperty TargetTypeProperty =
             DependencyProperty.Register("TargetType", typeof(Type), typeof(MenuItem));
 
+
+        public IEnumerable<MenuItem> Children
+        {
+            get { return (IEnumerable<MenuItem>)GetValue(ChildrenProperty); }
+            set { SetValue(ChildrenProperty, value); }
+        }
+        public static readonly DependencyProperty ChildrenProperty =
+            DependencyProperty.Register("Children", typeof(IEnumerable<MenuItem>), typeof(MenuItem));
 
     }
 }

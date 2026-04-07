@@ -1,7 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
-        <!--<ResourceDictionary Source="/Junevy.Controls;component/Themes/IconFont.xaml" />-->
-
+        <ResourceDictionary Source="/Junevy.Controls.Resources;component/Font/IconFont.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
 
@@ -9,5 +8,7 @@
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/SideMenu.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/ToolBar.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Bar/AppBar.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/TreeMenu.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/ToggleButton.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

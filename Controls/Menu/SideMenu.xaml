@@ -6,8 +6,8 @@
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Menu">
 
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Junevy.Controls.Resources;component/Font/IconFont.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
-        <ResourceDictionary Source="/Junevy.Controls;component/Themes/IconFont.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <cvt:BoolToVisibilityConverter x:Key="BooleanToVisibilityConverter" />

@@ -8,13 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Themes\iconfont.ttf" />
+    <ProjectReference Include="..\Junevy.Controls.Resources\Junevy.Controls.Resources.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Themes\iconfont.ttf">
+    <Page Update="Themes\Generic.xaml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
+    </Page>
   </ItemGroup>
 
 </Project>

@@ -6,8 +6,8 @@
     xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework">
 
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Junevy.Controls.Resources;component/Font/IconFont.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
-        <ResourceDictionary Source="/Junevy.Controls;component/Themes/IconFont.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
 
@@ -24,16 +24,15 @@
             </Grid.ColumnDefinitions>
 
             <!--  icon  -->
-            <Border Grid.Column="0">
-                <ContentControl
-                    Margin="8"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Content="{TemplateBinding Content}"
-                    FontFamily="{StaticResource IconFont}"
-                    FontSize="{TemplateBinding FontSize}"
-                    Foreground="{StaticResource TextFillColor}" />
-            </Border>
+            <ContentControl
+                Grid.Column="0"
+                Margin="8"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Content="{TemplateBinding Content}"
+                FontFamily="{StaticResource IconFont}"
+                FontSize="{TemplateBinding FontSize}"
+                Foreground="{StaticResource TextFillColor}" />
 
 
             <Grid Grid.Column="1">
@@ -62,8 +61,8 @@
                 <!--  tools bar  -->
                 <Grid Grid.Row="2">
                     <menu:ToolBar
-                        MaxHeight="35"
-                        Margin="0,0,0,2"
+                        MaxHeight="30"
+                        Margin="10,0,0,4"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Stretch"
                         Background="Transparent"
