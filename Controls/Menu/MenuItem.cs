@@ -13,6 +13,8 @@ namespace Junevy.Controls.Controls.Menu
 
         public MenuItem()
         {
+            //this.Padding
+            //this.Icon
             //this.IsChecked
             Id = new Guid();
         }

@@ -4,10 +4,15 @@
 
 
     <SolidColorBrush x:Key="SubBackground" Color="#f5f5f5 " />
-    <SolidColorBrush x:Key="BorderColor" Color="#d3d3d3" />
-    <SolidColorBrush x:Key="IndicatorColor" Color="#E8E8E8" />
+    <SolidColorBrush x:Key="BorderColor" Color="#D0D0D0" />
 
+    <SolidColorBrush x:Key="IndicatorColor" Color="#E8E8E8" />
     <SolidColorBrush x:Key="TextFillColor" Color=" #4F4F4F" />
+
+
+    <SolidColorBrush x:Key="ControlBackground" Color="#f8f8f8" />
+    <SolidColorBrush x:Key="ControlOveredBackground" Color="#E8E8E8" />
+    <SolidColorBrush x:Key="ControlPressedBackground" Color="#D8D8D8" />
 
 
 </ResourceDictionary>
