@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Markup;
 
 namespace Junevy.Controls.Controls.Menu
 {
@@ -23,6 +24,26 @@ namespace Junevy.Controls.Controls.Menu
             DependencyProperty.Register("Icon", typeof(object), typeof(TabMenuItem));
 
 
+        public static readonly DependencyProperty TargetTypeProperty =
+            DependencyProperty.Register("TargetType", typeof(Type), typeof(TabMenuItem), new PropertyMetadata(null, OnTargetTypeChanged));
+
+
+
+
+        //public Type Test
+        //{
+        //    get { return (Type)GetValue(TestProperty); }
+        //    set { SetValue(TestProperty, value); }
+        //}
+
+        //// Using a DependencyProperty as the backing store for Test.  This enables animation, styling, binding, etc...
+        //public static readonly DependencyProperty TestProperty =
+        //    DependencyProperty.Register("Test", typeof(Type), typeof(TabMenuItem), new PropertyMetadata(null));
+
+
+
+
+
         public Orientation Orientation
         {
             get { return (Orientation)GetValue(OrientationProperty); }
@@ -33,6 +54,23 @@ namespace Junevy.Controls.Controls.Menu
         {
             get { return (object)GetValue(IconProperty); }
             set { SetValue(IconProperty, value); }
+        }
+
+        public Type TargetType
+        {
+            get { return (Type)GetValue(TargetTypeProperty); }
+            set { SetValue(TargetTypeProperty, value); }
+        }
+
+        private static void OnTargetTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is TabMenuItem t)
+            {
+                //var p1 = t.GetUIParentCore();
+                //var p =  as TabMenu;
+
+                 var p = t.Parent;
+            }
         }
 
     }
