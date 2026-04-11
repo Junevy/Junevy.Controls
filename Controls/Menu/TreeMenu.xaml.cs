@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using Junevy.Controls.AttachedProperties;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Junevy.Controls.Controls.Menu
@@ -13,13 +14,16 @@ namespace Junevy.Controls.Controls.Menu
                 new FrameworkPropertyMetadata(typeof(TreeMenu)));
         }
 
-        public Orientation Orientation
+
+        public DisplayMode DisplayMode
         {
-            get { return (Orientation)GetValue(OrientationProperty); }
-            set { SetValue(OrientationProperty, value); }
+            get { return (DisplayMode)GetValue(DisplayModeProperty); }
+            set { SetValue(DisplayModeProperty, value); }
         }
-        public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(TreeMenu), new PropertyMetadata(Orientation.Horizontal));
+        public static readonly DependencyProperty DisplayModeProperty =
+            DependencyProperty.Register("DisplayMode", typeof(DisplayMode), typeof(TreeMenu), new PropertyMetadata(DisplayMode.Icon));
+
+
 
 
     }

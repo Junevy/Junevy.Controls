@@ -6,7 +6,6 @@
     xmlns:cvt="clr-namespace:Junevy.Controls.Converters"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Menu">
 
-
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
         <ResourceDictionary Source="/Junevy.Controls.Resources;component/Font/IconFont.xaml" />
@@ -15,67 +14,15 @@
 
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
 
-
-    <!--  <heade  -->
-
-    <DataTemplate x:Key="DefaultTabMenuItemTemplate" DataType="{x:Type local:TabMenuItem}">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition MaxWidth="10" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <!--  指示器  -->
-            <Border
-                Grid.Column="0"
-                Height="{Binding FontSize}"
-                Margin="0,0,5,0"
-                Background="{StaticResource AppColor}"
-                CornerRadius="2"
-                Visibility="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Converter={StaticResource BoolToVisibility}}" />
-
-            <StackPanel Grid.Column="1" Orientation="{Binding Orientation}">
-                <!--  icon  -->
-                <ContentControl
-                    Margin="5"
-                    VerticalAlignment="Center"
-                    Content="{Binding Icon}"
-                    Focusable="False"
-                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=(attach:Icon.FontFamily)}"
-                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=FontSize}"
-                    Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=Foreground}"
-                    Visibility="{Binding Icon, Converter={StaticResource BoolToVisibility}}" />
-
-                <!--  title  -->
-                <TextBlock
-                    Margin="5,0,20,0"
-                    VerticalAlignment="Center"
-                    Background="Transparent"
-                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=FontSize}"
-                    Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=Foreground}"
-                    Text="{Binding Header}"
-                    Visibility="{Binding Header, Converter={StaticResource BoolToVisibility}}" />
-
-
-                <bt:Button
-                    Margin="5,0,5,0"
-                    Content="&#xe639;"
-                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=FontSize}"
-                    Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=Foreground}"
-                    Template="{StaticResource NoBorderButtonTemplate}"
-                    Visibility="{Binding RelativeSource={RelativeSource AncestorType=bt:Button}, Path=(attach:AttachFuc.IsClosable)}" />
-            </StackPanel>
-        </Grid>
-    </DataTemplate>
-
-
     <!--  1. 先定义 TabItem 的样式（最重要！）  -->
-    <Style TargetType="{x:Type local:TabMenuItem}">
+    <Style x:Key="DefualtTabMenuItemStyle" TargetType="{x:Type local:TabMenuItem}">
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="MinHeight" Value="30" />
+        <Setter Property="MinWidth" Value="120" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Background" Value="{StaticResource SubBackground}" />
         <Setter Property="TextElement.FontSize" Value="12" />
@@ -87,21 +34,80 @@
                 <ControlTemplate TargetType="{x:Type local:TabMenuItem}">
                     <Border
                         x:Name="border"
-                        Margin="2,0,2,0"
+                        Margin="0,0,2,0"
                         Background="{TemplateBinding Background}"
-                        CornerRadius="8,8,0,0">
-                        <ContentPresenter
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            ContentSource="Header" />
+                        BorderBrush="{StaticResource BorderColor}"
+                        BorderThickness="1,1,1,0"
+                        CornerRadius="2,2,0,0">
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition MaxWidth="10" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+
+                            <!--  指示器  -->
+                            <Border
+                                Grid.Column="0"
+                                Margin="0,0,5,0"
+                                Background="{StaticResource AppColor}"
+                                CornerRadius="2"
+                                Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenuItem}, Path=IsSelected, Converter={StaticResource BoolToVisibility}}" />
+
+                            <Grid Grid.Column="1">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <!--  icon  -->
+                                <ContentControl
+                                    Grid.Column="0"
+                                    Margin="5"
+                                    VerticalAlignment="Center"
+                                    Content="{TemplateBinding Icon}"
+                                    Focusable="False"
+                                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=(attach:Icon.FontFamily)}"
+                                    FontSize="{TemplateBinding FontSize}"
+                                    Foreground="{TemplateBinding Foreground}"
+                                    Visibility="{TemplateBinding Icon,
+                                                                 Converter={StaticResource BoolToVisibility}}" />
+
+                                <!--  title  -->
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Margin="5,0,20,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="{TemplateBinding FontSize}"
+                                    Foreground="{TemplateBinding Foreground}"
+                                    Text="{TemplateBinding Header}"
+                                    Visibility="{TemplateBinding Header,
+                                                                 Converter={StaticResource BoolToVisibility}}" />
+
+                                <bt:Button
+                                    Grid.Column="2"
+                                    Height="{TemplateBinding Height}"
+                                    Margin="5,0,5,0"
+                                    HorizontalAlignment="Right"
+                                    Content="&#xe639;"
+                                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=(attach:Icon.FontFamily)}"
+                                    Foreground="{TemplateBinding Foreground}"
+                                    Template="{StaticResource NoBorderButtonTemplate}"
+                                    Visibility="Visible" />
+                            </Grid>
+                        </Grid>
                     </Border>
+
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{StaticResource SubBackground}" />
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource MainBackground}" />
                             <Setter TargetName="border" Property="TextElement.Foreground" Value="{StaticResource TextFillColor}" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{StaticResource IndicatorColor}" />
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource MainBackground}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -122,15 +128,13 @@
             </Setter.Value>
         </Setter>
 
-        <Setter Property="ItemTemplate" Value="{StaticResource DefaultTabMenuItemTemplate}" />
-
         <!--  标签页内容区模板（可选）  -->
         <Setter Property="ContentTemplate">
             <Setter.Value>
                 <DataTemplate>
                     <Border
                         Padding="20"
-                        Background="{StaticResource BorderColor}"
+                        Background="{StaticResource MainBackground}"
                         CornerRadius="0,8,8,8">
                         <ContentPresenter Content="{Binding Content}" />
                     </Border>
@@ -145,9 +149,7 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
-                            <!--  标签头区域  -->
                             <RowDefinition Height="*" />
-                            <!--  内容区域  -->
                         </Grid.RowDefinitions>
 
                         <!--  标签头  -->
@@ -155,14 +157,14 @@
                             <ItemsPresenter />
                         </ScrollViewer>
 
-                        <!--  选中标签的内容  -->
+                        <!--  内容  -->
                         <Border
                             Grid.Row="1"
-                            Background="{StaticResource SubBackground}"
-                            BorderBrush="#E0E0E0"
-                            BorderThickness="1"
+                            Background="{StaticResource MainBackground}"
+                            BorderBrush="{StaticResource BorderColor}"
+                            BorderThickness="1,0,1,1"
                             CornerRadius="0">
-                            <ContentPresenter Margin="10" ContentSource="SelectedContent" />
+                            <ContentPresenter Margin="0" ContentSource="SelectedContent" />
                         </Border>
                     </Grid>
                 </ControlTemplate>
@@ -170,4 +172,69 @@
         </Setter>
     </Style>
 
+
+
+    <!--  <heade  -->
+    <!--
+<ControlTemplate x:Key="DefaultTabMenuItemTemplate" TargetType="{x:Type local:TabMenuItem}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition MaxWidth="10" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+
+    -->
+    <!--  指示器  -->
+    <!--
+
+        <Border
+            Grid.Column="0"
+            Height="{Binding FontSize}"
+            Margin="0,0,5,0"
+            Background="{StaticResource AppColor}"
+            CornerRadius="2"
+            Visibility="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Converter={StaticResource BoolToVisibility}}" />
+
+        <StackPanel Grid.Column="1" Orientation="{Binding Orientation}">
+
+    -->
+    <!--  icon  -->
+    <!--
+
+            <ContentControl
+                Margin="5"
+                VerticalAlignment="Center"
+                Content="{Binding Icon}"
+                Focusable="False"
+                FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=(attach:Icon.FontFamily)}"
+                FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=FontSize}"
+                Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=Foreground}"
+                Visibility="{Binding Icon, Converter={StaticResource BoolToVisibility}}" />
+
+
+    -->
+    <!--  title  -->
+    <!--
+
+            <TextBlock
+                Margin="5,0,20,0"
+                VerticalAlignment="Center"
+                Background="Transparent"
+                FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=FontSize}"
+                Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=Foreground}"
+                Text="{Binding Header}"
+                Visibility="{Binding Header, Converter={StaticResource BoolToVisibility}}" />
+
+
+            <bt:Button
+                Margin="5,0,5,0"
+                Content="&#xe639;"
+                FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=FontSize}"
+                Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=Foreground}"
+                Template="{StaticResource NoBorderButtonTemplate}"
+                Visibility="{Binding RelativeSource={RelativeSource AncestorType=bt:Button}, Path=(attach:AttachFuc.IsClosable)}" />
+        </StackPanel>
+    </Grid>
+</ControlTemplate>-->
 </ResourceDictionary>

@@ -14,8 +14,46 @@
 
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
 
+
+    <Style x:Key="ExpanderTreeMenuTemplate" TargetType="TreeViewItem">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TreeViewItem">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <!--  展开按钮  -->
+                            <bt:ToggleButton
+                                x:Name="ItemsHost"
+                                Width="16"
+                                Height="16"
+                                ClickMode="Press"
+                                IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                Style="{StaticResource ExpanderButton}" />
+                            <Border
+                                x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="5">
+                                <ContentPresenter Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" />
+                            </Border>
+                        </StackPanel>
+                        <ItemsPresenter Margin="10,0,0,0" />
+                    </StackPanel>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasItems" Value="False">
+                            <Setter TargetName="ItemsHost" Property="Visibility" Value="Hidden" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                    <!--  没有子节点时隐藏按钮  -->
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     <HierarchicalDataTemplate
-        x:Key="DefaultTreeMenu"
+        x:Key="DefaultTreeMenuItemStyle"
         DataType="{x:Type local:MenuItem}"
         ItemsSource="{Binding Children}">
 
@@ -34,7 +72,7 @@
                 CornerRadius="2"
                 Visibility="Collapsed" />
 
-            <StackPanel Grid.Column="1" Orientation="{Binding Orientation}">
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <!--  icon  -->
                 <ContentControl
                     Margin="2,0,5,0"
@@ -67,6 +105,95 @@
         </HierarchicalDataTemplate.Triggers>
     </HierarchicalDataTemplate>
 
+
+    <Style x:Key="NormalTreeMenuTemplate" TargetType="TreeViewItem">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TreeViewItem">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <Border
+                            x:Name="Root"
+                            Grid.Row="0"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="5">
+                            <ContentPresenter Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" />
+                        </Border>
+
+                        <ItemsPresenter Grid.Row="1" Margin="10,0,0,0" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <HierarchicalDataTemplate
+        x:Key="IconTreeMenuItemStyle"
+        DataType="{x:Type local:MenuItem}"
+        ItemsSource="{Binding Children}">
+
+        <Grid x:Name="Root" Margin="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition MaxWidth="10" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!--  指示器  -->
+            <Border
+                Grid.Column="0"
+                Margin="5,0,5,0"
+                Background="{StaticResource AppColor}"
+                CornerRadius="2"
+                Visibility="Visible" />
+
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!--  icon  -->
+                <ContentControl
+                    Grid.Column="0"
+                    Margin="2,0,5,0"
+                    VerticalAlignment="Center"
+                    Content="{Binding Icon}"
+                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=(atc:Icon.FontFamily)}"
+                    FontSize="24"
+                    Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=Foreground}"
+                    Visibility="{Binding Icon, Converter={StaticResource BoolToVisibility}}" />
+
+                <!--  title  -->
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    Background="Transparent"
+                    FontSize="16"
+                    Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=Foreground}"
+                    Text="{Binding Title}"
+                    Visibility="{Binding Title, Converter={StaticResource BoolToVisibility}}" />
+
+            </Grid>
+        </Grid>
+
+        <HierarchicalDataTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Root" Property="Background" Value="{StaticResource IndicatorColor}" />
+            </Trigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=IsSelected}" Value="True">
+                <Setter TargetName="Root" Property="Background" Value="{StaticResource IndicatorColor}" />
+            </DataTrigger>
+        </HierarchicalDataTemplate.Triggers>
+    </HierarchicalDataTemplate>
+
+
     <Style TargetType="{x:Type local:TreeMenu}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
@@ -75,9 +202,10 @@
         <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
         <Setter Property="Width" Value="150" />
         <Setter Property="HorizontalAlignment" Value="Left" />
-        <Setter Property="HorizontalContentAlignment" Value="Left" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="TextElement.FontSize" Value="12" />
+        <Setter Property="TextElement.Foreground" Value="{StaticResource TextFillColor}" />
 
         <!--  TreeMenu的容器，定义TreeMenu的外观样式  -->
         <Setter Property="Template">
@@ -102,61 +230,18 @@
         <Setter Property="ItemsPanel">
             <Setter.Value>
                 <ItemsPanelTemplate>
-                    <VirtualizingStackPanel Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=Orientation}" />
+                    <!--<VirtualizingStackPanel HorizontalAlignment="Stretch" Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=Orientation}" />-->
+                    <Grid />
                 </ItemsPanelTemplate>
             </Setter.Value>
         </Setter>
 
-
-        <!--  每个 tree view item的样式  -->
-        <Setter Property="ItemContainerStyle">
-            <Setter.Value>
-                <Style TargetType="TreeViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
-                    <Setter Property="Padding" Value="0" />
-                    <Setter Property="Margin" Value="2" />
-                    <Setter Property="Background" Value="Transparent" />
-
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="TreeViewItem">
-
-                                <StackPanel>
-
-                                    <StackPanel Orientation="Horizontal">
-                                        <!--  展开按钮  -->
-                                        <bt:ToggleButton
-                                            x:Name="ItemsHost"
-                                            Width="16"
-                                            Height="16"
-                                            ClickMode="Press"
-                                            IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
-                                            Style="{StaticResource ExpanderButton}" />
-                                        <Border
-                                            x:Name="Root"
-                                            Background="{TemplateBinding Background}"
-                                            CornerRadius="5">
-                                            <ContentPresenter Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" />
-                                        </Border>
-                                    </StackPanel>
-                                    <ItemsPresenter Margin="10,0,0,0" />
-                                </StackPanel>
-
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="HasItems" Value="False">
-                                        <Setter TargetName="ItemsHost" Property="Visibility" Value="Hidden" />
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                                <!--  没有子节点时隐藏按钮  -->
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-
-                </Style>
-            </Setter.Value>
-        </Setter>
-
-        <Setter Property="ItemTemplate" Value="{StaticResource DefaultTreeMenu}" />
+        <Style.Triggers>
+            <Trigger Property="DisplayMode" Value="Icon">
+                <Setter Property="ItemTemplate" Value="{StaticResource IconTreeMenuItemStyle}" />
+                <Setter Property="ItemContainerStyle" Value="{StaticResource NormalTreeMenuTemplate}" />
+                <Setter Property="TextElement.FontSize" Value="14" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>

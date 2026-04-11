@@ -14,5 +14,9 @@
     <SolidColorBrush x:Key="ControlOveredBackground" Color="#E8E8E8" />
     <SolidColorBrush x:Key="ControlPressedBackground" Color="#D8D8D8" />
 
+    <SolidColorBrush x:Key="MainBackground" Color="#ffffff" />
+
+    <SolidColorBrush x:Key="Warn" Color="Tomato" />
+    <SolidColorBrush x:Key="DangerousOption" Color="IndianRed" />
 
 </ResourceDictionary>
