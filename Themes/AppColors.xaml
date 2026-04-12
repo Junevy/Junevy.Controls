@@ -8,6 +8,7 @@
 
     <SolidColorBrush x:Key="IndicatorColor" Color="#E8E8E8" />
     <SolidColorBrush x:Key="TextFillColor" Color=" #4F4F4F" />
+    <SolidColorBrush x:Key="SubTextFillColor" Color="#C0C0C0" />
 
 
     <SolidColorBrush x:Key="ControlBackground" Color="#f8f8f8" />

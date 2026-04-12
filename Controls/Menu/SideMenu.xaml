@@ -9,6 +9,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls.Resources;component/Font/IconFont.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <cvt:BoolToVisibilityConverter x:Key="BooleanToVisibilityConverter" />

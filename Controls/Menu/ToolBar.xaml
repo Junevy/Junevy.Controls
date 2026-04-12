@@ -9,6 +9,7 @@
 
         <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/SideMenu.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
 
@@ -41,6 +42,8 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="ItemTemplate" Value="{StaticResource ToolBarStyle}" />
         <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
 
         <Setter Property="Template">
             <Setter.Value>

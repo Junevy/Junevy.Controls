@@ -34,33 +34,12 @@ namespace Junevy.Controls.AttachedProperties
 
         private static void OnDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            //if (sender is not TreeViewItem item) return;
-            ////if (e.ClickCount != 2) return;
-
-
-            ////if (e.OriginalSource is not TreeView) return;
-
-            //if (!item.IsMouseOver) return;
-
-            //if (item.DataContext is TreeMenuItem ti)
-            //{
-            //    if (ti.IsLeaf)
-            //    {
-            //        ti.Command?.Execute(ti);
-            //    }
-            //    else
-            //    {
-            //        item.IsExpanded = !item.IsExpanded;
-            //    }
-            //}
-
-            //e.Handled = true;
-
             if (e.ClickCount != 2)
                 return;
 
             // 找到真正点击的 TreeViewItem
             var clickedItem = FindAncestor<TreeViewItem>(e.OriginalSource as DependencyObject);
+            var parent = FindAncestor<TreeMenu>(e.OriginalSource as DependencyObject);
 
             if (clickedItem == null)
                 return;
@@ -78,7 +57,8 @@ namespace Junevy.Controls.AttachedProperties
                 else
                 {
                     //if (vm.Command?.CanExecute(vm) == true)
-                        vm.Command?.Execute(vm);
+                    //    vm.Command?.Execute(vm);
+                    parent?.NavigateCommand?.Execute(vm);
                 }
             }
 
