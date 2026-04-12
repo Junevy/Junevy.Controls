@@ -36,7 +36,7 @@
         <Setter Property="FontSize" Value="15" />
         <Setter Property="Background" Value="{StaticResource SubBackground}" />
         <Setter Property="Foreground" Value="{StaticResource TextFillColor}" />
-        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrushColor}" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Center" />

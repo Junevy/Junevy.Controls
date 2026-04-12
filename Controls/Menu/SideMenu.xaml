@@ -129,7 +129,7 @@
                         VerticalScrollBarVisibility="Hidden">
                         <Border
                             Background="{StaticResource SubBackground}"
-                            BorderBrush="{StaticResource BorderColor}"
+                            BorderBrush="{StaticResource BorderBrushColor}"
                             BorderThickness="1">
                             <ItemsPresenter />
                         </Border>
