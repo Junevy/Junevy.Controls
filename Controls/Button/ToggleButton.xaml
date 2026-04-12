@@ -45,7 +45,7 @@
                 Width="{TemplateBinding Width}"
                 Height="{TemplateBinding Height}"
                 Padding="1"
-                BorderBrush="{StaticResource BorderColor}"
+                BorderBrush="{StaticResource BorderBrushColor}"
                 BorderThickness="1">
                 <Grid HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
@@ -104,7 +104,7 @@
             <Border
                 Grid.Column="0"
                 Padding="1"
-                BorderBrush="{StaticResource BorderColor}"
+                BorderBrush="{StaticResource BorderBrushColor}"
                 BorderThickness="1"
                 CornerRadius="{Binding RelativeSource={RelativeSource AncestorType=local:ToggleButton}, Path=(Border.CornerRadius)}">
 

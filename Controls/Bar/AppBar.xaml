@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:bt="clr-namespace:Junevy.Controls.Controls.Button"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Bar"
     xmlns:menu="clr-namespace:Junevy.Controls.Controls.Menu"
     xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework">
@@ -8,6 +9,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls.Resources;component/Font/IconFont.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/Button.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
 
@@ -20,7 +22,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MaxWidth="120" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition MaxWidth="135" />
+                <ColumnDefinition MaxWidth="120" />
             </Grid.ColumnDefinitions>
 
             <!--  icon  -->
@@ -55,7 +57,7 @@
                 <!--  seperator  -->
                 <Border
                     Grid.Row="1"
-                    BorderBrush="{StaticResource BorderColor}"
+                    BorderBrush="{StaticResource BorderBrushColor}"
                     BorderThickness="1" />
 
                 <!--  tools bar  -->
@@ -73,21 +75,53 @@
                 </Grid>
             </Grid>
 
-            <Grid Grid.Column="2">
-                <StackPanel Orientation="Horizontal">
-                    <Button
-                        Width="45"
-                        Content="△"
-                        FontSize="30" />
-                    <Button
-                        Width="45"
-                        Content="○"
-                        FontSize="30" />
-                    <Button
-                        Width="45"
-                        Content="×"
-                        FontSize="30" />
-                </StackPanel>
+            <Grid Grid.Column="2" WindowChrome.IsHitTestVisibleInChrome="True">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <bt:Button
+                    Grid.Column="0"
+                    Background="Red"
+                    Command="{x:Static SystemCommands.MinimizeWindowCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    Content="&#xe60e;"
+                    FontFamily="{StaticResource IconFont}"
+                    FontSize="20"
+                    Style="{StaticResource NoBorderButtonStyle}"
+                    WindowChrome.IsHitTestVisibleInChrome="True" />
+                <bt:Button
+                    Grid.Column="1"
+                    Command="{x:Static SystemCommands.MaximizeWindowCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    Content="&#xe691;"
+                    FontFamily="{StaticResource IconFont}"
+                    FontSize="20"
+                    WindowChrome.IsHitTestVisibleInChrome="True">
+                    <bt:Button.Style>
+                        <Style BasedOn="{StaticResource NoBorderButtonStyle}" TargetType="bt:Button">
+                            <Setter Property="Content" Value="&#xe691;" />
+                            <!--  默认最大化图标  -->
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                                    <Setter Property="Content" Value="&#xe772;" />
+                                    <!--  换成你的还原图标（请替换成正确的 Unicode）  -->
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </bt:Button.Style>
+                </bt:Button>
+                <bt:Button
+                    Grid.Column="2"
+                    Command="{x:Static SystemCommands.CloseWindowCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    Content="&#xe639;"
+                    FontFamily="{StaticResource IconFont}"
+                    FontSize="20"
+                    Style="{StaticResource NoBorderButtonStyle}" />
             </Grid>
         </Grid>
     </ControlTemplate>

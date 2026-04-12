@@ -41,7 +41,7 @@
                         x:Name="border"
                         Margin="0,0,2,0"
                         Background="{TemplateBinding Background}"
-                        BorderBrush="{StaticResource BorderColor}"
+                        BorderBrush="{StaticResource BorderBrushColor}"
                         BorderThickness="1,1,1,0"
                         CornerRadius="3,3,0,0">
 
@@ -178,7 +178,7 @@
                         <Border
                             Grid.Row="1"
                             Background="{StaticResource MainBackground}"
-                            BorderBrush="{StaticResource BorderColor}"
+                            BorderBrush="{StaticResource BorderBrushColor}"
                             BorderThickness="1,0,1,1"
                             CornerRadius="0">
                             <ContentPresenter Margin="0" ContentSource="SelectedContent" />

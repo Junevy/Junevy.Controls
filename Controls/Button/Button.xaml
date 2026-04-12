@@ -43,11 +43,11 @@
 
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource ControlOveredBackground}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource IndicatorColor}" />
             </Trigger>
 
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource ControlPressedBackground}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource PressedBackground}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -101,11 +101,11 @@
 
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource ControlOveredBackground}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource IndicatorColor}" />
             </Trigger>
 
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource ControlPressedBackground}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource PressedBackground}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -120,23 +120,25 @@
             MinHeight="{TemplateBinding MinHeight}"
             HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
             VerticalAlignment="{TemplateBinding VerticalAlignment}"
-            Background="Transparent">
+            Background="Transparent"
+            CornerRadius="3">
             <ContentPresenter
                 x:Name="ContentPresenter"
                 Margin="{StaticResource Margin}"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Content="{TemplateBinding Content}"
+                TextElement.FontFamily="{TemplateBinding FontFamily}"
                 TextElement.Foreground="{TemplateBinding Foreground}" />
         </Border>
 
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource Warn}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource WarnColor}" />
             </Trigger>
 
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource DangerousOption}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource DangerousOptionColor}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -144,7 +146,7 @@
     <Style x:Key="DefaultButtonStyle" TargetType="{x:Type local:Button}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
-        <Setter Property="Background" Value="{StaticResource ControlBackground}" />
+        <Setter Property="Background" Value="{StaticResource SubBackground}" />
         <Setter Property="Foreground" Value="{StaticResource TextFillColor}" />
         <Setter Property="Height" Value="35" />
         <Setter Property="HorizontalAlignment" Value="Left" />
@@ -153,7 +155,7 @@
         <Setter Property="Padding" Value="{StaticResource Padding}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Focusable" Value="False" />
-        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrushColor}" />
         <Setter Property="Border.CornerRadius" Value="{StaticResource CornerRadius}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="BorderThickness" Value="1" />
@@ -178,6 +180,8 @@
         BasedOn="{StaticResource DefaultButtonStyle}"
         TargetType="{x:Type local:Button}">
         <Setter Property="Template" Value="{StaticResource NoBorderButtonTemplate}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
     </Style>
 
 
