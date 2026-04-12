@@ -32,7 +32,6 @@ namespace Junevy.Controls.AttachedProperties
         {
             obj.SetValue(IsClosableProperty, value);
         }
-
     }
 
     public enum DisplayMode

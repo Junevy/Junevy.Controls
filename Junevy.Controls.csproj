@@ -8,6 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controls\Menu\MenuItem.NodeType.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Controls\Menu\MenuItem.NodeType.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Junevy.Controls.Resources\Junevy.Controls.Resources.csproj" />
   </ItemGroup>
 
@@ -15,6 +23,10 @@
     <Page Update="Themes\Generic.xaml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Interface\" />
   </ItemGroup>
 
 </Project>
