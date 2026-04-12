@@ -13,11 +13,13 @@ namespace Junevy.Controls.Controls.Menu
 
         public MenuItem()
         {
-            //this.Padding
-            //this.Icon
-            //this.IsChecked
             Id = new Guid();
         }
+        public static readonly DependencyProperty TitleProperty =
+            DependencyProperty.Register("Title", typeof(string), typeof(MenuItem), new PropertyMetadata(""));
+
+        public static readonly DependencyProperty OrientationProperty =
+            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(MenuItem), new PropertyMetadata(Orientation.Horizontal));
 
         /// <summary>
         /// The title of items
@@ -27,8 +29,7 @@ namespace Junevy.Controls.Controls.Menu
             get { return (string)GetValue(TitleProperty); }
             set { SetValue(TitleProperty, value); }
         }
-        public static readonly DependencyProperty TitleProperty =
-            DependencyProperty.Register("Title", typeof(string), typeof(MenuItem), new PropertyMetadata(""));
+
 
         /// <summary>
         /// MenuItem内元素的布局方向
@@ -38,13 +39,11 @@ namespace Junevy.Controls.Controls.Menu
             get { return (Orientation)GetValue(OrientationProperty); }
             set { SetValue(OrientationProperty, value); }
         }
-        public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(MenuItem), new PropertyMetadata(Orientation.Horizontal));
-
 
         /// <summary>
-        /// 导航目标的类型，必须是一个Page类型，导航时会创建这个类型的实例并显示在目标区域
+        /// 导航目标的类型，必须是一个Page或者UserControl类型，导航时会创建这个类型的实例并显示在目标区域
         /// </summary>
+        /// 
         public Type TargetType
         {
             get { return (Type)GetValue(TargetTypeProperty); }
@@ -52,15 +51,5 @@ namespace Junevy.Controls.Controls.Menu
         }
         public static readonly DependencyProperty TargetTypeProperty =
             DependencyProperty.Register("TargetType", typeof(Type), typeof(MenuItem));
-
-
-        public IEnumerable<MenuItem> Children
-        {
-            get { return (IEnumerable<MenuItem>)GetValue(ChildrenProperty); }
-            set { SetValue(ChildrenProperty, value); }
-        }
-        public static readonly DependencyProperty ChildrenProperty =
-            DependencyProperty.Register("Children", typeof(IEnumerable<MenuItem>), typeof(MenuItem));
-
     }
 }

@@ -38,22 +38,21 @@
                         Background="{TemplateBinding Background}"
                         BorderBrush="{StaticResource BorderColor}"
                         BorderThickness="1,1,1,0"
-                        CornerRadius="2,2,0,0">
+                        CornerRadius="3,3,0,0">
 
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition MaxWidth="10" />
+                                <ColumnDefinition Width="5" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-
 
                             <!--  指示器  -->
                             <Border
                                 Grid.Column="0"
-                                Margin="0,0,5,0"
                                 Background="{StaticResource AppColor}"
                                 CornerRadius="2"
-                                Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenuItem}, Path=IsSelected, Converter={StaticResource BoolToVisibility}}" />
+                                Visibility="{TemplateBinding IsSelected,
+                                                             Converter={StaticResource BoolToVisibility}}" />
 
                             <Grid Grid.Column="1">
 
