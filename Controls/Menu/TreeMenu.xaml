@@ -9,6 +9,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/ToggleButton.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
 
@@ -18,6 +19,8 @@
     <Style x:Key="DefaultTreeMenuTemplate" TargetType="TreeViewItem">
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
 
         <Setter Property="Template">
             <Setter.Value>
@@ -108,6 +111,9 @@
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="atc:ExpanderBehavior.Enable" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
+        <!--  <Setter Property="IsExpanded" Value="{Binding }"  -->
 
         <Setter Property="Template">
             <Setter.Value>
@@ -203,7 +209,7 @@
 
     <Style TargetType="{x:Type local:TreeMenu}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
         <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
         <Setter Property="Foreground" Value="{StaticResource TextFillColor}" />
         <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
@@ -243,6 +249,7 @@
                 </ItemsPanelTemplate>
             </Setter.Value>
         </Setter>
+
 
         <Style.Triggers>
             <Trigger Property="DisplayMode" Value="Icon">

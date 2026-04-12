@@ -1,6 +1,7 @@
 ﻿using Junevy.Controls.AttachedProperties;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Junevy.Controls.Controls.Menu
 {
@@ -13,6 +14,18 @@ namespace Junevy.Controls.Controls.Menu
                 typeof(TreeMenu),
                 new FrameworkPropertyMetadata(typeof(TreeMenu)));
         }
+
+
+        public ICommand NavigateCommand
+        {
+            get { return (ICommand)GetValue(NavigateCommandProperty); }
+            set { SetValue(NavigateCommandProperty, value); }
+        }
+        public static readonly DependencyProperty NavigateCommandProperty =
+            DependencyProperty.Register("NavigateCommand", typeof(ICommand), typeof(TreeMenu));
+
+
+
 
 
         public DisplayMode DisplayMode
