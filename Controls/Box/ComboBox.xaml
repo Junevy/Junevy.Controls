@@ -44,12 +44,11 @@
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Margin" Value="0,0,0,2" />
         <Setter Property="MinHeight" Value="30" />
+        <Setter Property="TextElement.Foreground" Value="{StaticResource TextFillColor}" />
         <Setter Property="Background" Value="{StaticResource MainBackground}" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template" Value="{StaticResource DefaultComboBoxItemTemplate}" />
     </Style>
-
-
 
 
 
