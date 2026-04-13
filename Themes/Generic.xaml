@@ -15,6 +15,7 @@
 
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Text/TextBox.xaml" />
 
-        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Check/CheckBox.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Box/CheckBox.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Box/ComboBox.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

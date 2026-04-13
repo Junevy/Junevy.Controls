@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Junevy.Controls.Controls.Check
+namespace Junevy.Controls.Controls.Box
 {
     public class CheckBox : System.Windows.Controls.CheckBox
     {

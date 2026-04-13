@@ -10,9 +10,7 @@
     </ResourceDictionary.MergedDictionaries>
 
 
-
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
-
     <Thickness x:Key="Margin">3,0,3,0</Thickness>
     <Thickness x:Key="Padding">5</Thickness>
     <CornerRadius x:Key="CornerRadius">3</CornerRadius>
@@ -31,13 +29,15 @@
             Background="{TemplateBinding Background}"
             BorderBrush="{TemplateBinding BorderBrush}"
             BorderThickness="{TemplateBinding BorderThickness}"
-            CornerRadius="{TemplateBinding Border.CornerRadius}">
+            CornerRadius="{TemplateBinding Border.CornerRadius}"
+            Opacity="1">
             <ContentPresenter
                 x:Name="ContentPresenter"
                 Margin="{StaticResource Margin}"
                 HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                 VerticalAlignment="{TemplateBinding VerticalAlignment}"
                 Content="{TemplateBinding Content}"
+                Opacity="1"
                 TextElement.Foreground="{TemplateBinding Foreground}" />
         </Border>
 
@@ -48,6 +48,12 @@
 
             <Trigger Property="IsPressed" Value="True">
                 <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource PressedBackground}" />
+            </Trigger>
+
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource SubBackground}" />
+                <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{StaticResource DisabledColor}" />
+                <Setter TargetName="ContentBorder" Property="Opacity" Value="0.9" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -107,6 +113,12 @@
             <Trigger Property="IsPressed" Value="True">
                 <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource PressedBackground}" />
             </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="ContentBorder" Property="Opacity" Value="0.9" />
+
+                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource SubBackground}" />
+                <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{StaticResource DisabledColor}" />
+            </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
@@ -140,6 +152,14 @@
             <Trigger Property="IsPressed" Value="True">
                 <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource DangerousOptionColor}" />
             </Trigger>
+
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="ContentBorder" Property="Opacity" Value="0.9" />
+
+                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource SubBackground}" />
+                <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{StaticResource DisabledColor}" />
+            </Trigger>
+
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
@@ -160,7 +180,6 @@
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Margin" Value="{StaticResource Margin}" />
-
         <Setter Property="Template" Value="{StaticResource IconButtonTemplate}" />
 
         <!--<Style.Triggers>
