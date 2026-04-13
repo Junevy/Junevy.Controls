@@ -53,7 +53,7 @@
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource SubBackground}" />
                 <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{StaticResource DisabledColor}" />
-                <Setter TargetName="ContentBorder" Property="Opacity" Value="0.9" />
+                <Setter TargetName="ContentBorder" Property="Opacity" Value="0.5" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -114,8 +114,7 @@
                 <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource PressedBackground}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="ContentBorder" Property="Opacity" Value="0.9" />
-
+                <Setter TargetName="ContentBorder" Property="Opacity" Value="0.5" />
                 <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource SubBackground}" />
                 <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{StaticResource DisabledColor}" />
             </Trigger>
@@ -154,8 +153,7 @@
             </Trigger>
 
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="ContentBorder" Property="Opacity" Value="0.9" />
-
+                <Setter TargetName="ContentBorder" Property="Opacity" Value="0.5" />
                 <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource SubBackground}" />
                 <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{StaticResource DisabledColor}" />
             </Trigger>
