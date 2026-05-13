@@ -11,11 +11,13 @@
 
 
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+    <cvt:IncreaseFontsizeConverter x:Key="IncreaseFontSize" />
     <Thickness x:Key="Margin">3,0,3,0</Thickness>
     <Thickness x:Key="Padding">5</Thickness>
     <CornerRadius x:Key="CornerRadius">3</CornerRadius>
 
 
+    <!--  normal button  -->
     <ControlTemplate x:Key="DefaultButtonTemplate" TargetType="{x:Type local:Button}">
         <Border
             x:Name="ContentBorder"
@@ -57,7 +59,6 @@
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
-
 
     <ControlTemplate x:Key="IconButtonTemplate" TargetType="{x:Type local:Button}">
         <Border
@@ -121,7 +122,6 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
-
     <ControlTemplate x:Key="NoBorderButtonTemplate" TargetType="{x:Type local:Button}">
         <Border
             x:Name="ContentBorder"
@@ -160,6 +160,7 @@
 
         </ControlTemplate.Triggers>
     </ControlTemplate>
+
 
     <Style x:Key="DefaultButtonStyle" TargetType="{x:Type local:Button}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -200,7 +201,6 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
     </Style>
-
 
     <Style BasedOn="{StaticResource DefaultButtonStyle}" TargetType="{x:Type Button}" />
     <Style BasedOn="{StaticResource DefaultButtonStyle}" TargetType="{x:Type local:Button}" />
