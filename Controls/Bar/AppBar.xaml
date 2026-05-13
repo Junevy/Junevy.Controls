@@ -20,7 +20,7 @@
             Background="{TemplateBinding Background}">
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition MaxWidth="120" />
+                <ColumnDefinition MaxWidth="50" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition MaxWidth="120" />
             </Grid.ColumnDefinitions>

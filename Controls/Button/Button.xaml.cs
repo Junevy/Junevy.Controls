@@ -1,5 +1,6 @@
 ﻿using Junevy.Controls.Controls.Menu;
 using System.Windows;
+using System.Windows.Media;
 
 namespace Junevy.Controls.Controls.Button
 {
@@ -14,17 +15,17 @@ namespace Junevy.Controls.Controls.Button
         }
 
 
-        public static readonly DependencyProperty IconProperty =
-            DependencyProperty.Register("Icon", typeof(object), typeof(Button));
+        //public static readonly DependencyProperty IconProperty =
+        //    DependencyProperty.Register("Icon", typeof(object), typeof(Button));
+
+        //public object Icon
+        //{
+        //    get { return (object)GetValue(IconProperty); }
+        //    set { SetValue(IconProperty, value); }
+        //}
 
 
-     
 
-        public object Icon
-        {
-            get { return (object)GetValue(IconProperty); }
-            set { SetValue(IconProperty, value); }
-        }
 
     }
 }

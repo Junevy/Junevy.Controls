@@ -8,6 +8,8 @@
     <SolidColorBrush x:Key="BorderBrushColor" Color=" #E8E8E8" />
     <SolidColorBrush x:Key="TextFillColor" Color=" #4F4F4F" />
     <SolidColorBrush x:Key="SubTextFillColor" Color="#C0C0C0" />
+    <SolidColorBrush x:Key="DarkTextFillColor" Color="#F0F6FF" />
+
     <SolidColorBrush x:Key="IndicatorColor" Color="#E8E8E8" />
     <SolidColorBrush x:Key="DangerousOptionColor" Color="IndianRed" />
     <SolidColorBrush x:Key="WarnColor" Color="Tomato" />
