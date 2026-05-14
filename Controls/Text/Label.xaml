@@ -158,6 +158,24 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
+    <ControlTemplate x:Key="NoBorderLabelTemplate" TargetType="{x:Type local:Label}">
+        <StackPanel Orientation="Horizontal">
+            <ContentControl
+                Margin="5,0,5,0"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                Content="{TemplateBinding Tag}"
+                FontFamily="{TemplateBinding FontFamily}"
+                FontSize="{TemplateBinding FontSize}"
+                Foreground="{TemplateBinding Foreground}" />
+            <ContentPresenter
+                Margin="0"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                RecognizesAccessKey="True" />
+        </StackPanel>
+    </ControlTemplate>
+
     <Style x:Key="BoxLabelStyle" TargetType="{x:Type local:Label}">
         <Setter Property="Background" Value="{StaticResource AppColor}" />
         <Setter Property="Foreground" Value="{StaticResource DarkTextFillColor}" />
@@ -169,10 +187,6 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template" Value="{StaticResource DefaultLabelTemplate}" />
         <Style.Triggers>
-            <!--<Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource SubAppColor}" />
-            </Trigger>-->
-
             <Trigger Property="DisplayMode" Value="0">
                 <Setter Property="Template" Value="{StaticResource ErrorLabelTemplate}" />
             </Trigger>
@@ -185,66 +199,48 @@
                 <Setter Property="Template" Value="{StaticResource WarningLabelTemplate}" />
             </Trigger>
 
+            <Trigger Property="DisplayMode" Value="10">
+                <Setter Property="Template" Value="{StaticResource NoBorderLabelTemplate}" />
+                <Setter Property="Foreground" Value="#FFDC2626" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="Content" Value="Error" />
+                <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
+                <Setter Property="Tag" Value="&#xe61a;" />
+            </Trigger>
+
+            <Trigger Property="DisplayMode" Value="-11">
+                <Setter Property="Template" Value="{StaticResource NoBorderLabelTemplate}" />
+                <Setter Property="Foreground" Value="#FFF59E0B" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="Content" Value="Warning" />
+                <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
+                <Setter Property="Tag" Value="&#xe932;" />
+            </Trigger>
+
+            <Trigger Property="DisplayMode" Value="11">
+                <Setter Property="Template" Value="{StaticResource NoBorderLabelTemplate}" />
+                <Setter Property="Foreground" Value="{StaticResource AppColor}" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="Content" Value="Notice" />
+                <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
+                <Setter Property="Tag" Value="&#xe651;" />
+            </Trigger>
+
             <Trigger Property="DisplayMode" Value="100">
                 <Setter Property="Template" Value="{StaticResource DefaultLabelTemplate}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
-
-    <!--  轮廓/描边标签  -->
-    <Style
-        x:Key="DefaultLabelStyle"
-        BasedOn="{StaticResource BoxLabelStyle}"
-        TargetType="{x:Type local:Label}">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{StaticResource AppColor}" />
-        <Setter Property="TextElement.FontSize" Value="8" />
-        <Setter Property="TextElement.Foreground" Value="{StaticResource DarkTextFillColor}" />
-
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:Label}">
-                    <Border
-                        x:Name="Bd"
-                        Padding="{TemplateBinding Padding}"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{StaticResource AppColor}"
-                        BorderThickness="1"
-                        CornerRadius="3"
-                        SnapsToDevicePixels="True">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="3*" />
-                            </Grid.ColumnDefinitions>
-
-                            <ContentControl
-                                Grid.Column="0"
-                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                Content="{Binding RelativeSource={RelativeSource AncestorType=local:Label}, Path=(atc:Icon.Icon)}"
-                                FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:Label}, Path=(atc:Icon.FontFamily)}"
-                                FontSize="{TemplateBinding FontSize}"
-                                Foreground="{TemplateBinding Foreground}" />
-
-                            <ContentPresenter
-                                Grid.Column="1"
-                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                RecognizesAccessKey="True" />
-                        </Grid>
-
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource SubAppColor}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
 
     <Style BasedOn="{StaticResource BoxLabelStyle}" TargetType="{x:Type local:Label}" />
     <Style BasedOn="{StaticResource BoxLabelStyle}" TargetType="Label" />

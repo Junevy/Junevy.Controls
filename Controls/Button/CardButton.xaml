@@ -66,12 +66,9 @@
                         FontSize="{TemplateBinding FontSize,
                                                    Converter={StaticResource IncreaseFontSize}}"
                         Foreground="{TemplateBinding MainColor}" />
-
-
                 </Grid>
 
                 <Grid Grid.Column="1">
-
                     <Grid.RowDefinitions>
                         <RowDefinition Height="2*" />
                         <RowDefinition Height="*" />
@@ -95,11 +92,11 @@
         </Border>
 
         <ControlTemplate.Triggers>
-            <!--<Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource IndicatorColor}" />
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="ContentBorder" Property="Opacity" Value="0.8" />
             </Trigger>
 
-            <Trigger Property="IsPressed" Value="True">
+            <!--<Trigger Property="IsPressed" Value="True">
                 <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource PressedBackground}" />
             </Trigger>-->
 
