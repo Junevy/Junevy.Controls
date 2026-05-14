@@ -14,16 +14,17 @@
 
 
     <DataTemplate x:Key="ToolBarStyle" DataType="{x:Type local:MenuItem}">
-        <Border>
+        <Grid MinWidth="40">
             <ContentControl
-                Margin="5"
+                Margin="0"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Content="{Binding Icon}"
                 FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:ToolBar}, Path=(atc:Icon.FontFamily)}"
-                FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:ToolBar}, Path=FontSize}"
-                Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:ToolBar}, Path=Foreground}" />
-        </Border>
+                FontSize="{Binding FontSize}"
+                Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:ToolBar}, Path=Foreground}"
+                ToolTip="{Binding ToolTip}" />
+        </Grid>
     </DataTemplate>
 
 
