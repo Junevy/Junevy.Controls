@@ -45,12 +45,6 @@
                         BorderThickness="1,1,1,0"
                         CornerRadius="3,3,0,0">
 
-                        <!--<Border.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="Edit Title" IsCheckable="False" />
-                            </ContextMenu>
-                        </Border.ContextMenu>-->
-
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="5" />

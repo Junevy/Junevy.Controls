@@ -23,6 +23,7 @@
                 FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:ToolBar}, Path=(atc:Icon.FontFamily)}"
                 FontSize="{Binding FontSize}"
                 Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:ToolBar}, Path=Foreground}"
+                IsEnabled="{Binding IsEnabled}"
                 ToolTip="{Binding ToolTip}" />
         </Grid>
     </DataTemplate>
