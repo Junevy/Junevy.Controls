@@ -73,7 +73,8 @@
                         BorderBrush="Transparent"
                         BorderThickness="0"
                         FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
-                        IsEnabled="False"
+                        Foreground="{TemplateBinding Foreground}"
+                        IsEnabled="{TemplateBinding IsEnabled}"
                         ItemsSource="{TemplateBinding Items}"
                         Orientation="Horizontal" />
                 </Grid>
@@ -135,5 +136,19 @@
         <Setter Property="Background" Value="{StaticResource SubBackground}" />
         <Setter Property="Template" Value="{StaticResource DefaultAppBar}" />
         <Setter Property="atc:Icon.FontFamily" Value="{StaticResource IconFont}" />
+
+        <!--<Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.7" />
+            </Trigger>
+        -->
+        <!--<Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="Red" />
+            </Trigger>-->
+        <!--<DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="False">
+                <Setter Property="Foreground" Value="Red" />
+            </DataTrigger>-->
+        <!--
+        </Style.Triggers>-->
     </Style>
 </ResourceDictionary>
