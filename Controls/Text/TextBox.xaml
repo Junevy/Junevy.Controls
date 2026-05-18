@@ -127,8 +127,8 @@
     <ControlTemplate x:Key="NoBorderTextBoxTemplate_WPF" TargetType="TextBox">
         <Border
             x:Name="TextBoxHost"
-            BorderBrush="{StaticResource BorderBrushColor}"
             Padding="5"
+            BorderBrush="{StaticResource BorderBrushColor}"
             BorderThickness="0,0,0,0">
             <ScrollViewer
                 x:Name="PART_ContentHost"
@@ -165,6 +165,6 @@
 
 
     <Style BasedOn="{StaticResource DefaultTextBoxStyle}" TargetType="{x:Type local:TextBox}" />
-    <Style BasedOn="{StaticResource DefaultTextBoxStyle}" TargetType="TextBox" />
+    <!--<Style BasedOn="{StaticResource DefaultTextBoxStyle}" TargetType="TextBox" />-->
 
 </ResourceDictionary>

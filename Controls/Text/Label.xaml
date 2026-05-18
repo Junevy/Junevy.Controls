@@ -243,5 +243,5 @@
 
 
     <Style BasedOn="{StaticResource BoxLabelStyle}" TargetType="{x:Type local:Label}" />
-    <Style BasedOn="{StaticResource BoxLabelStyle}" TargetType="Label" />
+    <!--<Style BasedOn="{StaticResource BoxLabelStyle}" TargetType="Label" />-->
 </ResourceDictionary>

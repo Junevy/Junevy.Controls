@@ -157,7 +157,6 @@
                 <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource SubBackground}" />
                 <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{StaticResource DisabledColor}" />
             </Trigger>
-
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
@@ -180,16 +179,6 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Margin" Value="{StaticResource Margin}" />
         <Setter Property="Template" Value="{StaticResource IconButtonTemplate}" />
-
-        <!--<Style.Triggers>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:AttachFuc.DispalyMode)}" Value="Icon">
-                <Setter Property="Template" Value="{StaticResource IconButtonTemplate}" />
-            </DataTrigger>
-
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:AttachFuc.DispalyMode)}" Value="Normal">
-                <Setter Property="Template" Value="{StaticResource DefaultButtonTemplate}" />
-            </DataTrigger>
-        </Style.Triggers>-->
     </Style>
 
 
@@ -202,7 +191,7 @@
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
     </Style>
 
-    <Style BasedOn="{StaticResource DefaultButtonStyle}" TargetType="{x:Type Button}" />
+    <!--<Style BasedOn="{StaticResource DefaultButtonStyle}" TargetType="{x:Type Button}" />-->
     <Style BasedOn="{StaticResource DefaultButtonStyle}" TargetType="{x:Type local:Button}" />
 
 
