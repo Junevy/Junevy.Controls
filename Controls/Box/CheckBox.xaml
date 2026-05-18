@@ -95,5 +95,5 @@
     </Style>
 
     <Style BasedOn="{StaticResource DefaultCheckBoxStyle}" TargetType="{x:Type local:CheckBox}" />
-    <Style BasedOn="{StaticResource DefaultCheckBoxStyle}" TargetType="CheckBox" />
+    <!--<Style BasedOn="{StaticResource DefaultCheckBoxStyle}" TargetType="CheckBox" />-->
 </ResourceDictionary>

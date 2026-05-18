@@ -207,5 +207,5 @@
 
 
     <Style BasedOn="{StaticResource DefaultComboBoxStyle}" TargetType="{x:Type local:ComboBox}" />
-    <Style BasedOn="{StaticResource DefaultComboBoxStyle}" TargetType="ComboBox" />
+    <!--<Style BasedOn="{StaticResource DefaultComboBoxStyle}" TargetType="ComboBox" />-->
 </ResourceDictionary>
