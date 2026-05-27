@@ -43,7 +43,7 @@
                         <RowDefinition Height="2*" />
                     </Grid.RowDefinitions>
 
-
+                    <!--  details  -->
                     <ContentControl
                         Grid.Row="0"
                         HorizontalAlignment="Left"
@@ -68,6 +68,7 @@
                         Foreground="{TemplateBinding MainColor}" />
                 </Grid>
 
+                <!--  icon  -->
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="2*" />
