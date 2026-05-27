@@ -21,7 +21,7 @@
             Background="{TemplateBinding Background}">
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition MaxWidth="50" />
+                <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition MaxWidth="120" />
             </Grid.ColumnDefinitions>
@@ -29,18 +29,19 @@
             <!--  icon  -->
             <ContentControl
                 Grid.Column="0"
+                Width="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
+                Height="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
                 Margin="8"
-                HorizontalAlignment="Center"
+                HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                Content="{TemplateBinding Content}"
-                FontFamily="{TemplateBinding FontFamily}"
-                FontSize="{TemplateBinding FontSize}"
+                Content="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.Icon)}"
+                FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
+                FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
                 Foreground="{StaticResource TextFillColor}" />
-
 
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
-                    <RowDefinition MaxHeight="45" />
+                    <RowDefinition Height="auto" />
                     <RowDefinition MaxHeight="1" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
@@ -48,12 +49,12 @@
                 <!--  title  -->
                 <Grid Grid.Row="0">
                     <TextBlock
-                        Margin="10,3,0,3"
+                        Margin="0,3,0,3"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         FontSize="{TemplateBinding FontSize}"
                         Foreground="{StaticResource TextFillColor}"
-                        Text="{TemplateBinding WindowTitle}" />
+                        Text="{TemplateBinding Content}" />
                 </Grid>
 
                 <!--  seperator  -->
@@ -65,16 +66,12 @@
                 <!--  tools bar  -->
                 <Grid Grid.Row="2">
                     <menu:ToolBar
-                        MinHeight="30"
-                        Margin="10,0,0,0"
+                        Width="auto"
+                        Margin="0,3,0,3"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
-                        Background="Transparent"
-                        BorderBrush="Transparent"
                         BorderThickness="0"
                         FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
-                        Foreground="{TemplateBinding Foreground}"
-                        IsEnabled="{TemplateBinding IsEnabled}"
                         ItemsSource="{TemplateBinding Items}"
                         Orientation="Horizontal" />
                 </Grid>
@@ -131,8 +128,30 @@
         </Grid>
     </ControlTemplate>
 
+    <ControlTemplate x:Key="SimpleAppBar" TargetType="{x:Type local:AppBar}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <ContentControl
+                Grid.Column="0"
+                Width="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
+                Height="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
+                Margin="15,8,15,8"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Content="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.Icon)}"
+                FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
+                Foreground="{TemplateBinding Foreground}" />
+
+        </Grid>
+    </ControlTemplate>
+
     <Style TargetType="{x:Type local:AppBar}">
-        <Setter Property="Height" Value="50" />
+        <Setter Property="Height" Value="60" />
         <Setter Property="Background" Value="{StaticResource SubBackground}" />
         <Setter Property="Template" Value="{StaticResource DefaultAppBar}" />
         <Setter Property="atc:Icon.FontFamily" Value="{StaticResource IconFont}" />
