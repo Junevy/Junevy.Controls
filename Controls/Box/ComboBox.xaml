@@ -89,7 +89,7 @@
                         FontSize="{TemplateBinding FontSize}"
                         Foreground="{StaticResource SubTextFillColor}"
                         IsHitTestVisible="False"
-                        Text="Select the item..."
+                        Text="{TemplateBinding PlaceHolder}"
                         Visibility="Collapsed" />
 
 
@@ -188,8 +188,8 @@
     <!--  ComboBox 主样式  -->
     <Style x:Key="DefaultComboBoxStyle" TargetType="{x:Type local:ComboBox}">
         <Setter Property="MinHeight" Value="30" />
-        <Setter Property="Width" Value="150" />
-        <Setter Property="MinWidth" Value="150" />
+        <!--<Setter Property="Width" Value="150" />-->
+        <Setter Property="MinWidth" Value="50" />
         <Setter Property="Padding" Value="12,0,0,0" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Foreground" Value="{StaticResource TextFillColor}" />
