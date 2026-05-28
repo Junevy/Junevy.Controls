@@ -85,6 +85,8 @@
 
                 <ContentControl
                     Grid.Column="0"
+                    Width="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.IconSize)}"
+                    Height="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.IconSize)}"
                     Margin="{StaticResource Margin}"
                     VerticalAlignment="{TemplateBinding VerticalAlignment}"
                     VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -92,7 +94,8 @@
                     Focusable="False"
                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.FontFamily)}"
                     TextElement.FontSize="{TemplateBinding FontSize}"
-                    TextElement.Foreground="{TemplateBinding Foreground}" />
+                    TextElement.Foreground="{TemplateBinding Foreground}"
+                    Visibility="Collapsed" />
                 <ContentPresenter
                     x:Name="ContentPresenter"
                     Grid.Column="1"
@@ -100,6 +103,7 @@
                     HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                     VerticalAlignment="{TemplateBinding VerticalAlignment}"
                     Content="{TemplateBinding Content}"
+                    TextElement.FontSize="{TemplateBinding FontSize}"
                     TextElement.Foreground="{TemplateBinding Foreground}"
                     Visibility="{TemplateBinding Content,
                                                  Converter={StaticResource BoolToVisibility}}" />
@@ -166,7 +170,7 @@
         <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
         <Setter Property="Background" Value="{StaticResource SubBackground}" />
         <Setter Property="Foreground" Value="{StaticResource TextFillColor}" />
-        <Setter Property="Height" Value="35" />
+        <Setter Property="Height" Value="30" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
