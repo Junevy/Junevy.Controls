@@ -18,6 +18,9 @@ namespace Junevy.Controls.AttachedProperties
         public static readonly DependencyProperty IconSizeProperty =
             DependencyProperty.RegisterAttached("IconSize", typeof(int), typeof(Icon), new PropertyMetadata(14));
 
+        public static readonly DependencyProperty IconForegroundProperty =
+            DependencyProperty.RegisterAttached("IconForeground", typeof(Brush), typeof(Icon), new PropertyMetadata(Brushes.Gray));
+
 
         private static void OnIconChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -59,6 +62,17 @@ namespace Junevy.Controls.AttachedProperties
         public static void SetIconSize(DependencyObject obj, int value)
         {
             obj.SetValue(IconSizeProperty, value);
+        }
+
+
+        public static Brush GetIconForeground(DependencyObject obj)
+        {
+            return (Brush)obj.GetValue(IconForegroundProperty);
+        }
+
+        public static void SetIconForeground(DependencyObject obj, Brush value)
+        {
+            obj.SetValue(IconForegroundProperty, value);
         }
     }
 }
