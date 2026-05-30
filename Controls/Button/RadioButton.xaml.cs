@@ -3,13 +3,13 @@ using System.Windows;
 
 namespace Junevy.Controls.Controls.Button
 {
-    public class ToggleButton : System.Windows.Controls.Primitives.ToggleButton
+    public class RadioButton : System.Windows.Controls.RadioButton
     {
-        static ToggleButton()
+        static RadioButton()
         {
             DefaultStyleKeyProperty.OverrideMetadata(
-                typeof(Junevy.Controls.Controls.Button.ToggleButton),
-                new FrameworkPropertyMetadata(typeof(Junevy.Controls.Controls.Button.ToggleButton)));
+                typeof(RadioButton),
+                new FrameworkPropertyMetadata(typeof(RadioButton)));
         }
 
         public ShapeMode DisplayMode
@@ -18,8 +18,8 @@ namespace Junevy.Controls.Controls.Button
             set { SetValue(DisplayModeProperty, value); }
         }
         public static readonly DependencyProperty DisplayModeProperty =
-            DependencyProperty.Register("DisplayMode", typeof(ShapeMode), typeof(ToggleButton), new PropertyMetadata(ShapeMode.Rectangular));
+            DependencyProperty.Register("DisplayMode", typeof(ShapeMode), typeof(RadioButton), new PropertyMetadata(ShapeMode.Circular));
+
+
     }
-
-
 }

@@ -11,6 +11,7 @@
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/TreeMenu.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/ToggleButton.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/Button.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/RadioButton.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/TabMenu.xaml" />
 
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Text/TextBox.xaml" />
