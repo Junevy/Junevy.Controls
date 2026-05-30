@@ -90,8 +90,6 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="TextElement.Foreground" Value="{StaticResource TextFillColor}" />
         <Setter Property="atc:Icon.FontFamily" Value="{StaticResource IconFont}" />
-
-
     </Style>
 
     <Style BasedOn="{StaticResource DefaultCheckBoxStyle}" TargetType="{x:Type local:CheckBox}" />

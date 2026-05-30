@@ -12,8 +12,6 @@
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
     <QuadraticEase x:Key="EaseOut" EasingMode="EaseOut" />
 
-
-
     <ControlTemplate x:Key="ExpanderControlTemplate" TargetType="{x:Type local:ToggleButton}">
         <Border x:Name="Host">
             <ContentControl
