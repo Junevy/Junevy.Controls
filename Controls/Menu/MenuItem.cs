@@ -13,7 +13,8 @@ namespace Junevy.Controls.Controls.Menu
 
         public MenuItem()
         {
-            Id = new Guid();
+            Id = Guid.NewGuid();
+            //this.Command
         }
 
         /// <summary>
