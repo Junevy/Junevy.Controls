@@ -70,6 +70,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+
     <HierarchicalDataTemplate
         x:Key="DefaultTreeMenuItemStyle"
         DataType="{x:Type local:TreeMenuItem}"
@@ -106,14 +107,12 @@
         </HierarchicalDataTemplate.Triggers>
     </HierarchicalDataTemplate>
 
-
     <Style x:Key="IconTreeMenuTemplate" TargetType="TreeViewItem">
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="atc:ExpanderBehavior.Enable" Value="True" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
-        <!--  <Setter Property="IsExpanded" Value="{Binding }"  -->
 
         <Setter Property="Template">
             <Setter.Value>
@@ -163,6 +162,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
     <HierarchicalDataTemplate
         x:Key="IconTreeMenuItemStyle"
         DataType="{x:Type local:TreeMenuItem}"
@@ -205,7 +205,6 @@
             </DataTrigger>
         </HierarchicalDataTemplate.Triggers>
     </HierarchicalDataTemplate>
-
 
     <Style TargetType="{x:Type local:TreeMenu}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />

@@ -105,7 +105,6 @@
         </Grid>
     </DataTemplate>
 
-
     <!--  style  -->
     <Style x:Key="DefaultSideMenu" TargetType="{x:Type local:SideMenu}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -166,9 +165,7 @@
                                     x:Name="Root"
                                     Background="{TemplateBinding Background}"
                                     CornerRadius="5">
-
                                     <ContentPresenter />
-
                                 </Border>
 
                                 <ControlTemplate.Triggers>
@@ -187,8 +184,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-
 
     <Style BasedOn="{StaticResource DefaultSideMenu}" TargetType="{x:Type local:SideMenu}">
         <Style.Triggers>

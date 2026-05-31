@@ -8,58 +8,60 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls.Resources;component/Font/IconFont.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
-        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/SideMenu.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/Button.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
+    <Style TargetType="{x:Type local:ToolBarItem}">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{StaticResource TextFillColor}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:ToolBarItem}">
+                    <Border
+                        x:Name="Root"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="4">
+                        <StackPanel
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Orientation="{TemplateBinding DisplayOrientation}">
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontFamily="{TemplateBinding FontFamily}"
+                                FontSize="{TemplateBinding FontSize}"
+                                Foreground="{TemplateBinding Foreground}"
+                                Text="{TemplateBinding Icon}" />
+                        </StackPanel>
+                    </Border>
 
-    <DataTemplate x:Key="ToolBarStyle" DataType="{x:Type local:MenuItem}">
-        <bt:Button
-            Width="{Binding Width}"
-            Height="{Binding Height}"
-            MinWidth="{Binding MinWidth}"
-            MinHeight="{Binding MinHeight}"
-            Margin="5,0,5,0"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Background="Transparent"
-            Command="{Binding Command}"
-            CommandParameter="{Binding CommandParameter}"
-            Content="{Binding Icon}"
-            FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:ToolBar}, Path=(atc:Icon.FontFamily)}"
-            FontSize="{Binding FontSize}"
-            Foreground="{Binding Foreground}"
-            ToolTip="{Binding ToolTip}">
-
-            <bt:Button.Template>
-                <ControlTemplate>
-                    <ContentPresenter
-                        x:Name="ContentPresenter"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Content="{Binding RelativeSource={RelativeSource AncestorType=bt:Button}, Path=Content}"
-                        TextElement.FontFamily="{TemplateBinding FontFamily}"
-                        TextElement.Foreground="{TemplateBinding Foreground}" />
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{StaticResource IndicatorColor}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.7" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
-            </bt:Button.Template>
-        </bt:Button>
-    </DataTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
-
-    <Style
-        x:Key="DefaultToolMenu"
-        BasedOn="{StaticResource DefaultSideMenu}"
-        TargetType="{x:Type local:ToolBar}">
+    <Style x:Key="DefaultToolMenu" TargetType="{x:Type local:ToolBar}">
         <Setter Property="FontSize" Value="15" />
+        <Setter Property="Width" Value="220" />
         <Setter Property="Background" Value="{StaticResource SubBackground}" />
         <Setter Property="Foreground" Value="{StaticResource TextFillColor}" />
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrushColor}" />
         <Setter Property="HorizontalAlignment" Value="Left" />
-        <Setter Property="ItemTemplate" Value="{StaticResource ToolBarStyle}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
 
         <Setter Property="Template">
             <Setter.Value>
@@ -80,32 +82,12 @@
             </Setter.Value>
         </Setter>
 
-        <Setter Property="ItemContainerStyle">
+        <!--  Items布局  -->
+        <Setter Property="ItemsPanel">
             <Setter.Value>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="Padding" Value="0" />
-                    <Setter Property="Margin" Value="2" />
-                    <Setter Property="Background" Value="Transparent" />
-
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="ListBoxItem">
-                                <Border
-                                    x:Name="Root"
-                                    Background="{TemplateBinding Background}"
-                                    CornerRadius="5">
-                                    <ContentPresenter />
-                                </Border>
-
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="Root" Property="Background" Value="{StaticResource IndicatorColor}" />
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="{Binding RelativeSource={RelativeSource AncestorType=local:ToolBar}, Path=Orientation}" />
+                </ItemsPanelTemplate>
             </Setter.Value>
         </Setter>
 
@@ -117,5 +99,4 @@
     </Style>
 
     <Style BasedOn="{StaticResource DefaultToolMenu}" TargetType="{x:Type local:ToolBar}" />
-
 </ResourceDictionary>

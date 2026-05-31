@@ -1,39 +1,29 @@
-﻿using System.Collections.ObjectModel;
+﻿using Junevy.Controls.Controls.Menu;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Markup;
 
 namespace Junevy.Controls.Controls.Bar
 {
-    [ContentProperty("Items")]
-    public class AppBar : ContentControl
+    //[ContentProperty("Items")]
+    //[TemplatePart(Name = "PART_TOOLBAR", Type = typeof(ToolBar))]
+
+    public class AppBar : System.Windows.Controls.ContentControl
     {
         static AppBar()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(AppBar), new FrameworkPropertyMetadata(typeof(AppBar)));
         }
 
-        //public AppBar()
-        //{
-        //    this.Items = new();
-        //}
-
-        public IEnumerable<MenuItem> Items
+        public ToolBar ToolBar
         {
-            get { return (IEnumerable<MenuItem>)GetValue(ItemsProperty); }
-            set { SetValue(ItemsProperty, value); }
+            get => (ToolBar)GetValue(ToolBarProperty);
+            set => SetValue(ToolBarProperty, value);
         }
-        public static readonly DependencyProperty ItemsProperty =
-            DependencyProperty.Register("Items", typeof(IEnumerable<MenuItem>), typeof(AppBar));
 
-
-        //public string WindowTitle
-        //{
-        //    get { return (string)GetValue(WindowTitleProperty); }
-        //    set { SetValue(WindowTitleProperty, value); }
-        //}
-        //public static readonly DependencyProperty WindowTitleProperty =
-        //    DependencyProperty.Register("WindowTitle", typeof(string), typeof(AppBar), new PropertyMetadata("WindowTitle"));
+        public static readonly DependencyProperty ToolBarProperty =
+            DependencyProperty.Register(
+                nameof(ToolBar),
+                typeof(ToolBar),
+                typeof(AppBar));
 
     }
 }
