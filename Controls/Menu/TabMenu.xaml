@@ -8,7 +8,6 @@
     xmlns:tb="clr-namespace:Junevy.Controls.Controls.Text">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
         <ResourceDictionary Source="/Junevy.Controls.Resources;component/Font/IconFont.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/Button.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
@@ -27,13 +26,13 @@
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="Background" Value="{StaticResource SubBackground}" />
+        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceBrush}" />
         <Setter Property="TextElement.FontSize" Value="12" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
 
-        <Setter Property="TextElement.Foreground" Value="{StaticResource TextFillColor}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:TabMenuItem}">
@@ -41,7 +40,7 @@
                         x:Name="border"
                         Margin="0,0,2,0"
                         Background="{TemplateBinding Background}"
-                        BorderBrush="{StaticResource BorderBrushColor}"
+                        BorderBrush="{DynamicResource Theme.BorderBrush}"
                         BorderThickness="1,1,1,0"
                         CornerRadius="3,3,0,0">
 
@@ -54,7 +53,7 @@
                             <!--  指示器  -->
                             <Border
                                 Grid.Column="0"
-                                Background="{StaticResource AppColor}"
+                                Background="{DynamicResource Theme.PrimaryBrush}"
                                 CornerRadius="2"
                                 Visibility="{TemplateBinding IsSelected,
                                                              Converter={StaticResource BoolToVisibility}}" />
@@ -110,11 +109,11 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{StaticResource MainBackground}" />
-                            <Setter TargetName="border" Property="TextElement.Foreground" Value="{StaticResource TextFillColor}" />
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.BackgroundBrush}" />
+                            <Setter TargetName="border" Property="TextElement.Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{StaticResource MainBackground}" />
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.BackgroundBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -145,7 +144,7 @@
                 <DataTemplate>
                     <Border
                         Padding="20"
-                        Background="{StaticResource MainBackground}"
+                        Background="{DynamicResource Theme.BackgroundBrush}"
                         CornerRadius="0,8,8,8">
                         <ContentPresenter Content="{Binding Content}" />
                     </Border>
@@ -171,8 +170,8 @@
                         <!--  内容  -->
                         <Border
                             Grid.Row="1"
-                            Background="{StaticResource MainBackground}"
-                            BorderBrush="{StaticResource BorderBrushColor}"
+                            Background="{DynamicResource Theme.BackgroundBrush}"
+                            BorderBrush="{DynamicResource Theme.BorderBrush}"
                             BorderThickness="1,0,1,1"
                             CornerRadius="0">
                             <ContentPresenter Margin="0" ContentSource="SelectedContent" />

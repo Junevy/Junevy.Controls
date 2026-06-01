@@ -6,6 +6,10 @@ namespace Junevy.Controls.Controls.Menu
 {
     public class TabMenuItem : TabItem
     {
+        private TextBox? headerTextBox;
+
+        public Guid Id { get; } = Guid.NewGuid();
+
         static TabMenuItem()
         {
             DefaultStyleKeyProperty.OverrideMetadata(
@@ -13,40 +17,39 @@ namespace Junevy.Controls.Controls.Menu
                 new FrameworkPropertyMetadata(typeof(TabMenuItem)));
         }
 
-        private TextBox textBox;
-
-        public Guid Id { get; } = Guid.NewGuid();
-
-        public TabMenuItem()
+        public override void OnApplyTemplate()
         {
-            this.Loaded += OnTabMenuItemLoaded;
-            //Id = new Guid();
-        }
-
-        private void OnTabMenuItemDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (e.Handled) return;
-            textBox.IsHitTestVisible = true;  // 编辑时恢复命中测试
-            textBox.IsReadOnly = false;
-        }
-
-        private void OnTabMenuItemLoaded(object sender, RoutedEventArgs e)
-        {
-            if (sender is TabMenuItem item)
+            if (headerTextBox != null)
             {
-                if (item.Template?.FindName("PART_EditHeaderTextBox", item) is System.Windows.Controls.TextBox textBox)
-                {
-                    this.textBox = textBox;
-
-                    textBox.IsReadOnly = true;
-                    textBox.IsHitTestVisible = false; // 初始状态穿透事件
-
-                    textBox.MouseDoubleClick += TextBox_DoubleClick;
-                    textBox.LostFocus += TextBox_LostFocus;
-                }
-
-                item.MouseDoubleClick += OnTabMenuItemDoubleClick;
+                headerTextBox.MouseDoubleClick -= TextBox_DoubleClick;
+                headerTextBox.LostFocus -= TextBox_LostFocus;
             }
+
+            base.OnApplyTemplate();
+
+            headerTextBox = GetTemplateChild("PART_EditHeaderTextBox") as TextBox;
+            if (headerTextBox == null)
+            {
+                return;
+            }
+
+            headerTextBox.IsReadOnly = true;
+            headerTextBox.IsHitTestVisible = false;
+            headerTextBox.MouseDoubleClick += TextBox_DoubleClick;
+            headerTextBox.LostFocus += TextBox_LostFocus;
+        }
+
+        protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
+        {
+            if (!e.Handled && headerTextBox != null)
+            {
+                headerTextBox.IsHitTestVisible = true;
+                headerTextBox.IsReadOnly = false;
+                headerTextBox.Focus();
+                headerTextBox.SelectAll();
+            }
+
+            base.OnMouseDoubleClick(e);
         }
 
         private void TextBox_DoubleClick(object sender, MouseButtonEventArgs e)
@@ -59,7 +62,7 @@ namespace Junevy.Controls.Controls.Menu
             if (sender is TextBox textBox)
             {
                 textBox.IsReadOnly = true;
-                textBox.IsHitTestVisible = false; // 失去焦点后恢复穿透
+                textBox.IsHitTestVisible = false;
             }
         }
 

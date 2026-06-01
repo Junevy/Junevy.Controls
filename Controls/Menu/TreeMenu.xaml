@@ -7,7 +7,6 @@
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Menu">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/ToggleButton.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
@@ -78,11 +77,11 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Root" Property="Background" Value="{StaticResource IndicatorColor}" />
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.SurfaceHoverBrush}" />
                         </Trigger>
 
                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=IsSelected}" Value="True">
-                            <Setter TargetName="Root" Property="Background" Value="{StaticResource IndicatorColor}" />
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.SurfaceHoverBrush}" />
                         </DataTrigger>
 
                         <Trigger Property="Icon" Value="{x:Null}">
@@ -183,7 +182,7 @@
                             <Border
                                 x:Name="Indicator"
                                 Grid.Column="0"
-                                Background="{StaticResource AppColor}"
+                                Background="{DynamicResource Theme.PrimaryBrush}"
                                 CornerRadius="1"
                                 Visibility="Collapsed" />
 
@@ -222,7 +221,7 @@
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
         <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
-        <Setter Property="Foreground" Value="{StaticResource TextFillColor}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
         <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
         <Setter Property="Width" Value="150" />
         <Setter Property="HorizontalAlignment" Value="Left" />
@@ -230,7 +229,7 @@
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
         <Setter Property="TextElement.FontSize" Value="12" />
-        <Setter Property="TextElement.Foreground" Value="{StaticResource TextFillColor}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
 
         <Setter Property="Template">
             <Setter.Value>
@@ -240,8 +239,8 @@
                         HorizontalScrollBarVisibility="Hidden"
                         VerticalScrollBarVisibility="Hidden">
                         <Border
-                            Background="{StaticResource SubBackground}"
-                            BorderBrush="{StaticResource BorderBrushColor}"
+                            Background="{DynamicResource Theme.SurfaceBrush}"
+                            BorderBrush="{DynamicResource Theme.BorderBrush}"
                             BorderThickness="1">
                             <ItemsPresenter />
                         </Border>
@@ -271,3 +270,4 @@
     </Style>
 
 </ResourceDictionary>
+

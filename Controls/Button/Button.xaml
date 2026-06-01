@@ -6,7 +6,6 @@
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Button">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
 
@@ -46,16 +45,16 @@
 
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource IndicatorColor}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.SurfaceHoverBrush}" />
             </Trigger>
 
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource PressedBackground}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.SurfacePressedBrush}" />
             </Trigger>
 
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource SubBackground}" />
-                <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{StaticResource DisabledColor}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.SurfaceBrush}" />
+                <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{DynamicResource Theme.DisabledBorderBrush}" />
                 <Setter TargetName="ContentBorder" Property="Opacity" Value="0.5" />
             </Trigger>
         </ControlTemplate.Triggers>
@@ -124,15 +123,15 @@
 
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource IndicatorColor}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.SurfaceHoverBrush}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource PressedBackground}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.SurfacePressedBrush}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="ContentBorder" Property="Opacity" Value="0.5" />
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource SubBackground}" />
-                <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{StaticResource DisabledColor}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.SurfaceBrush}" />
+                <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{DynamicResource Theme.DisabledBorderBrush}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -160,17 +159,17 @@
 
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource WarnColor}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.WarningBrush}" />
             </Trigger>
 
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource DangerousOptionColor}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.DangerBrush}" />
             </Trigger>
 
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="ContentBorder" Property="Opacity" Value="0.5" />
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource SubBackground}" />
-                <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{StaticResource DisabledColor}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.SurfaceBrush}" />
+                <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{DynamicResource Theme.DisabledBorderBrush}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -179,8 +178,8 @@
     <Style x:Key="DefaultButtonStyle" TargetType="{x:Type local:Button}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
-        <Setter Property="Background" Value="{StaticResource SubBackground}" />
-        <Setter Property="Foreground" Value="{StaticResource TextFillColor}" />
+        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
         <Setter Property="Height" Value="30" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Center" />
@@ -188,7 +187,7 @@
         <Setter Property="Padding" Value="{StaticResource Padding}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Focusable" Value="False" />
-        <Setter Property="BorderBrush" Value="{StaticResource BorderBrushColor}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.BorderBrush}" />
         <Setter Property="Border.CornerRadius" Value="{StaticResource CornerRadius}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="BorderThickness" Value="1" />

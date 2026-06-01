@@ -1,4 +1,3 @@
-﻿using System.Diagnostics.Eventing.Reader;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -10,10 +9,14 @@ namespace Junevy.Controls.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null)
+            {
                 return Visibility.Collapsed;
+            }
 
-            else if (string.IsNullOrEmpty(value as string))
+            if (string.IsNullOrEmpty(value as string))
+            {
                 return Visibility.Collapsed;
+            }
 
             return Visibility.Visible;
         }

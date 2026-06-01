@@ -6,7 +6,6 @@
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Button">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <Thickness x:Key="Margin">3,0,3,0</Thickness>
@@ -98,12 +97,12 @@
             </Trigger>
 
             <!--<Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource PressedBackground}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.SurfacePressedBrush}" />
             </Trigger>-->
 
             <!--<Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource SubBackground}" />
-                <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{StaticResource DisabledColor}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.SurfaceBrush}" />
+                <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{DynamicResource Theme.DisabledBorderBrush}" />
                 <Setter TargetName="ContentBorder" Property="Opacity" Value="0.5" />
             </Trigger>-->
         </ControlTemplate.Triggers>
@@ -113,8 +112,8 @@
     <Style x:Key="DefaultButtonStyle" TargetType="{x:Type local:CardButton}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
-        <Setter Property="Background" Value="{StaticResource SubBackground}" />
-        <Setter Property="Foreground" Value="{StaticResource TextFillColor}" />
+        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
         <!--<Setter Property="Height" Value="80" />-->
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
@@ -122,7 +121,7 @@
         <Setter Property="Padding" Value="{StaticResource Padding}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Focusable" Value="False" />
-        <Setter Property="BorderBrush" Value="{StaticResource BorderBrushColor}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.BorderBrush}" />
         <Setter Property="Border.CornerRadius" Value="{StaticResource CornerRadius}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="BorderThickness" Value="1" />

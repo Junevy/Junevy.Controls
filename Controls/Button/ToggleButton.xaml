@@ -5,7 +5,6 @@
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Button">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.xaml" />
         <ResourceDictionary Source="/Junevy.Controls.Resources;component/Font/IconFont.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
@@ -20,12 +19,12 @@
                 Content="{TemplateBinding Content}"
                 FontFamily="{TemplateBinding FontFamily}"
                 FontSize="{TemplateBinding FontSize}"
-                Foreground="{StaticResource AppColor}" />
+                Foreground="{DynamicResource Theme.PrimaryBrush}" />
         </Border>
 
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseCaptured" Value="True">
-                <Setter TargetName="Host" Property="Background" Value="{StaticResource IndicatorColor}" />
+                <Setter TargetName="Host" Property="Background" Value="{DynamicResource Theme.SurfaceHoverBrush}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -44,7 +43,7 @@
                 Width="{TemplateBinding Width}"
                 Height="{TemplateBinding Height}"
                 Padding="1"
-                BorderBrush="{StaticResource ControlsForeground}"
+                BorderBrush="{DynamicResource Theme.BorderStrongBrush}"
                 BorderThickness="1"
                 CornerRadius="3"
                 Opacity="1">
@@ -57,7 +56,7 @@
                     <Border
                         x:Name="Left"
                         Grid.Column="0"
-                        Background="{StaticResource AppColor}"
+                        Background="{DynamicResource Theme.PrimaryBrush}"
                         CornerRadius="3">
                         <ContentControl />
                     </Border>
@@ -86,24 +85,24 @@
         <ControlTemplate.Triggers>
             <Trigger Property="IsChecked" Value="True">
                 <Setter TargetName="Left" Property="Background" Value="Transparent" />
-                <Setter TargetName="Right" Property="Background" Value="{StaticResource AppColor}" />
+                <Setter TargetName="Right" Property="Background" Value="{DynamicResource Theme.PrimaryBrush}" />
             </Trigger>
 
             <Trigger Property="IsChecked" Value="False">
-                <Setter TargetName="Left" Property="Background" Value="{StaticResource ControlsForeground}" />
+                <Setter TargetName="Left" Property="Background" Value="{DynamicResource Theme.BorderStrongBrush}" />
                 <Setter TargetName="Right" Property="Background" Value="Transparent" />
             </Trigger>
 
             <!--  Hover  -->
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ToggleHost" Property="BorderBrush" Value="{StaticResource BoderIndicatorcolor}" />
-                <Setter TargetName="ToggleHost" Property="Background" Value="{StaticResource SubAppColor}" />
+                <Setter TargetName="ToggleHost" Property="BorderBrush" Value="{DynamicResource Theme.PrimaryHoverBrush}" />
+                <Setter TargetName="ToggleHost" Property="Background" Value="{DynamicResource Theme.PrimarySubtleBrush}" />
             </Trigger>
 
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="ToggleHost" Property="BorderBrush" Value="{StaticResource DisabledColor}" />
-                <Setter TargetName="ToggleHost" Property="Background" Value="{StaticResource DisabledBackgroundColor}" />
-                <Setter Property="Foreground" Value="{StaticResource SubTextFillColor}" />
+                <Setter TargetName="ToggleHost" Property="BorderBrush" Value="{DynamicResource Theme.DisabledBorderBrush}" />
+                <Setter TargetName="ToggleHost" Property="Background" Value="{DynamicResource Theme.DisabledSurfaceBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.TextSecondaryBrush}" />
                 <Setter Property="Opacity" Value="0.8" />
             </Trigger>
 
@@ -112,9 +111,9 @@
                     <Condition Property="IsChecked" Value="True" />
                     <Condition Property="IsEnabled" Value="False" />
                 </MultiTrigger.Conditions>
-                <Setter TargetName="ToggleHost" Property="Background" Value="{StaticResource DisabledColor}" />
-                <Setter TargetName="ToggleHost" Property="BorderBrush" Value="{StaticResource DisabledBackgroundColor}" />
-                <Setter TargetName="Right" Property="Background" Value="{StaticResource SubTextFillColor}" />
+                <Setter TargetName="ToggleHost" Property="Background" Value="{DynamicResource Theme.DisabledBorderBrush}" />
+                <Setter TargetName="ToggleHost" Property="BorderBrush" Value="{DynamicResource Theme.DisabledSurfaceBrush}" />
+                <Setter TargetName="Right" Property="Background" Value="{DynamicResource Theme.TextSecondaryBrush}" />
                 <Setter Property="Opacity" Value="0.8" />
             </MultiTrigger>
         </ControlTemplate.Triggers>
@@ -132,7 +131,7 @@
                 x:Name="ToggleHost"
                 Grid.Column="0"
                 Padding="1"
-                BorderBrush="{StaticResource ControlsForeground}"
+                BorderBrush="{DynamicResource Theme.BorderStrongBrush}"
                 BorderThickness="1"
                 CornerRadius="{Binding RelativeSource={RelativeSource AncestorType=local:ToggleButton}, Path=(Border.CornerRadius)}"
                 Opacity="1">
@@ -146,7 +145,7 @@
                     <Border
                         x:Name="Left"
                         Grid.Column="0"
-                        Background="{StaticResource AppColor}"
+                        Background="{DynamicResource Theme.PrimaryBrush}"
                         CornerRadius="{Binding RelativeSource={RelativeSource AncestorType=local:ToggleButton}, Path=(Border.CornerRadius)}">
                         <ContentControl />
                     </Border>
@@ -177,24 +176,24 @@
         <ControlTemplate.Triggers>
             <Trigger Property="IsChecked" Value="True">
                 <Setter TargetName="Left" Property="Background" Value="Transparent" />
-                <Setter TargetName="Right" Property="Background" Value="{StaticResource AppColor}" />
+                <Setter TargetName="Right" Property="Background" Value="{DynamicResource Theme.PrimaryBrush}" />
             </Trigger>
 
             <Trigger Property="IsChecked" Value="False">
-                <Setter TargetName="Left" Property="Background" Value="{StaticResource ControlsForeground}" />
+                <Setter TargetName="Left" Property="Background" Value="{DynamicResource Theme.BorderStrongBrush}" />
                 <Setter TargetName="Right" Property="Background" Value="Transparent" />
             </Trigger>
 
             <!--  Hover  -->
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ToggleHost" Property="BorderBrush" Value="{StaticResource BoderIndicatorcolor}" />
-                <Setter TargetName="ToggleHost" Property="Background" Value="{StaticResource SubAppColor}" />
+                <Setter TargetName="ToggleHost" Property="BorderBrush" Value="{DynamicResource Theme.PrimaryHoverBrush}" />
+                <Setter TargetName="ToggleHost" Property="Background" Value="{DynamicResource Theme.PrimarySubtleBrush}" />
             </Trigger>
 
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="ToggleHost" Property="BorderBrush" Value="{StaticResource DisabledColor}" />
-                <Setter TargetName="ToggleHost" Property="Background" Value="{StaticResource DisabledBackgroundColor}" />
-                <Setter Property="Foreground" Value="{StaticResource SubTextFillColor}" />
+                <Setter TargetName="ToggleHost" Property="BorderBrush" Value="{DynamicResource Theme.DisabledBorderBrush}" />
+                <Setter TargetName="ToggleHost" Property="Background" Value="{DynamicResource Theme.DisabledSurfaceBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.TextSecondaryBrush}" />
                 <Setter Property="Opacity" Value="0.8" />
             </Trigger>
 
@@ -203,9 +202,9 @@
                     <Condition Property="IsChecked" Value="True" />
                     <Condition Property="IsEnabled" Value="False" />
                 </MultiTrigger.Conditions>
-                <Setter TargetName="ToggleHost" Property="Background" Value="{StaticResource DisabledColor}" />
-                <Setter TargetName="ToggleHost" Property="BorderBrush" Value="{StaticResource DisabledBackgroundColor}" />
-                <Setter TargetName="Right" Property="Background" Value="{StaticResource SubTextFillColor}" />
+                <Setter TargetName="ToggleHost" Property="Background" Value="{DynamicResource Theme.DisabledBorderBrush}" />
+                <Setter TargetName="ToggleHost" Property="BorderBrush" Value="{DynamicResource Theme.DisabledSurfaceBrush}" />
+                <Setter TargetName="Right" Property="Background" Value="{DynamicResource Theme.TextSecondaryBrush}" />
                 <Setter Property="Opacity" Value="0.8" />
 
             </MultiTrigger>
@@ -236,7 +235,7 @@
                     Data="M 0 0 L 5 5 L 10 0"
                     Fill="Transparent"
                     RenderTransformOrigin="0.5,0.5"
-                    Stroke="{StaticResource SubTextFillColor}"
+                    Stroke="{DynamicResource Theme.TextSecondaryBrush}"
                     StrokeEndLineCap="Round"
                     StrokeLineJoin="Round"
                     StrokeStartLineCap="Round"
@@ -278,7 +277,7 @@
             </Trigger>
 
             <Trigger Property="IsChecked" Value="True">
-                <Setter TargetName="Arrow" Property="Stroke" Value="{StaticResource SubTextFillColor}" />
+                <Setter TargetName="Arrow" Property="Stroke" Value="{DynamicResource Theme.TextSecondaryBrush}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -286,7 +285,7 @@
 
     <Style x:Key="DefaultToggleButton" TargetType="{x:Type local:ToggleButton}">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{StaticResource AppColor}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.PrimaryBrush}" />
         <Setter Property="Margin" Value="5,5,0,5" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
@@ -297,7 +296,7 @@
         <Setter Property="Width" Value="40" />
         <Setter Property="Height" Value="20" />
         <Setter Property="Border.CornerRadius" Value="10" />
-        <Setter Property="TextElement.Foreground" Value="{StaticResource TextFillColor}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
     </Style>
 
 
