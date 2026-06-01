@@ -11,6 +11,5 @@ namespace Junevy.Controls.Controls.Button
                 typeof(Button),
                 new FrameworkPropertyMetadata(typeof(Button)));
         }
-
     }
 }

@@ -1,40 +1,31 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
-
 
 namespace Junevy.Controls.Controls.Menu
 {
-    public class MenuItem : System.Windows.Controls.MenuItem
+    public class MenuItem : ContentControl
     {
-        /// <summary>
-        /// Guid，唯一标识
-        /// </summary>
-        public Guid Id { get; }
-
-        public MenuItem()
+        static MenuItem()
         {
-            Id = Guid.NewGuid();
-            //this.Command
+            DefaultStyleKeyProperty.OverrideMetadata(
+                typeof(MenuItem),
+                new FrameworkPropertyMetadata(typeof(MenuItem)));
         }
 
-        /// <summary>
-        /// The title of items
-        /// </summary>
+        public Guid Id { get; } = Guid.NewGuid();
+
         public static readonly DependencyProperty TitleProperty =
             DependencyProperty.Register("Title", typeof(string), typeof(MenuItem), new PropertyMetadata(""));
 
-        /// <summary>
-        /// MenuItem内元素的布局方向
-        /// </summary>
+        public static readonly DependencyProperty IconProperty =
+            DependencyProperty.Register("Icon", typeof(object), typeof(MenuItem));
+
         public static readonly DependencyProperty OrientationProperty =
             DependencyProperty.Register("Orientation", typeof(Orientation), typeof(MenuItem), new PropertyMetadata(Orientation.Horizontal));
 
-        /// <summary>
-        /// 导航目标的类型，必须是一个Page或者UserControl类型，导航时会创建这个类型的实例并显示在目标区域
-        /// </summary>
         public static readonly DependencyProperty TargetTypeProperty =
             DependencyProperty.Register("TargetType", typeof(Type), typeof(MenuItem));
-
 
         public string Title
         {
@@ -42,6 +33,11 @@ namespace Junevy.Controls.Controls.Menu
             set { SetValue(TitleProperty, value); }
         }
 
+        public object Icon
+        {
+            get { return (object)GetValue(IconProperty); }
+            set { SetValue(IconProperty, value); }
+        }
 
         public Orientation Orientation
         {
@@ -49,12 +45,10 @@ namespace Junevy.Controls.Controls.Menu
             set { SetValue(OrientationProperty, value); }
         }
 
-
         public Type TargetType
         {
             get { return (Type)GetValue(TargetTypeProperty); }
             set { SetValue(TargetTypeProperty, value); }
         }
-
     }
 }
