@@ -65,7 +65,10 @@
 
                 <!--  tools bar  -->
                 <Grid Grid.Row="2">
-                    <ContentPresenter Content="{TemplateBinding ToolBar}" />
+                    <ContentPresenter
+                        Margin="3"
+                        VerticalAlignment="Top"
+                        Content="{TemplateBinding ToolBar}" />
                 </Grid>
             </Grid>
 
@@ -143,7 +146,7 @@
     </ControlTemplate>
 
     <Style TargetType="{x:Type local:AppBar}">
-        <Setter Property="Height" Value="60" />
+        <Setter Property="Height" Value="70" />
         <Setter Property="Background" Value="{StaticResource SubBackground}" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template" Value="{StaticResource DefaultAppBar}" />

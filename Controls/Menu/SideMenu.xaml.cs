@@ -1,6 +1,5 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
 namespace Junevy.Controls.Controls.Menu
@@ -8,7 +7,6 @@ namespace Junevy.Controls.Controls.Menu
     //[TemplatePart(Name = "PART_SIDEMENU", Type = typeof(ListBox))]
     public class SideMenu : ListBox
     {
-
         public enum Mode : byte
         {
             Horizontal = 0x01,
@@ -37,7 +35,7 @@ namespace Junevy.Controls.Controls.Menu
             set { SetValue(OrientationProperty, value); }
         }
         public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(MenuBase), new PropertyMetadata(Orientation.Vertical));
+            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(SideMenu), new PropertyMetadata(Orientation.Vertical));
 
 
         public Mode DisplayMode

@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -6,14 +6,21 @@ namespace Junevy.Controls.Controls.Menu
 {
     public class TabMenuItem : TabItem
     {
+        static TabMenuItem()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(
+                typeof(TabMenuItem),
+                new FrameworkPropertyMetadata(typeof(TabMenuItem)));
+        }
+
         private TextBox textBox;
 
-        public Guid Id { get; }
+        public Guid Id { get; } = Guid.NewGuid();
 
         public TabMenuItem()
         {
             this.Loaded += OnTabMenuItemLoaded;
-            Id = new Guid();
+            //Id = new Guid();
         }
 
         private void OnTabMenuItemDoubleClick(object sender, MouseButtonEventArgs e)

@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace Junevy.Controls.AttachedProperties
@@ -26,9 +27,22 @@ namespace Junevy.Controls.AttachedProperties
         {
             if (d is FrameworkElement element)
             {
-                bool b = e.NewValue != null || (e.NewValue is string s && string.IsNullOrEmpty(s));
-                element.Visibility = b ? Visibility.Visible : Visibility.Collapsed;
+                bool b = e.NewValue == null || (e.NewValue is string s && string.IsNullOrEmpty(s));
+                element.Visibility = b ? Visibility.Collapsed : Visibility.Visible;
+                //element.child
             }
+
+            //if (d is Control c)
+            //{
+            //    if (c.Template == null) return;
+            //    var el = c.Template.FindName("PART_ICON", c);
+
+            //    if (el == null) return;
+            //    var cc = el as Control;
+            //    if (cc == null) return;
+            //    bool b = e.NewValue == null || (e.NewValue is string s && string.IsNullOrEmpty(s));
+            //    cc.Visibility = b ? Visibility.Visible : Visibility.Visible;
+            //}
         }
 
         public static object GetIcon(DependencyObject obj)

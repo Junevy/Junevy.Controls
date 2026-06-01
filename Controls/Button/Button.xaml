@@ -11,6 +11,7 @@
 
 
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+    <cvt:NullToCollapsedConverter x:Key="NullToVisibility" />
     <cvt:IncreaseFontsizeConverter x:Key="IncreaseFontSize" />
     <Thickness x:Key="Margin">3,0,3,0</Thickness>
     <Thickness x:Key="Padding">5</Thickness>
@@ -61,6 +62,11 @@
     </ControlTemplate>
 
     <ControlTemplate x:Key="IconButtonTemplate" TargetType="{x:Type local:Button}">
+
+        <!--
+            HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+            VerticalAlignment="{TemplateBinding VerticalAlignment}"
+        -->
         <Border
             x:Name="ContentBorder"
             Width="{TemplateBinding Width}"
@@ -68,8 +74,6 @@
             MinWidth="{TemplateBinding MinWidth}"
             MinHeight="{TemplateBinding MinHeight}"
             Padding="{TemplateBinding Padding}"
-            HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-            VerticalAlignment="{TemplateBinding VerticalAlignment}"
             Background="{TemplateBinding Background}"
             BorderBrush="{TemplateBinding BorderBrush}"
             BorderThickness="{TemplateBinding BorderThickness}"
@@ -83,25 +87,33 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
+                <!--
+                    VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                -->
                 <ContentControl
+                    x:Name="PART_ICON"
                     Grid.Column="0"
                     Width="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.IconSize)}"
                     Height="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.IconSize)}"
                     Margin="{StaticResource Margin}"
-                    VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                    VerticalAlignment="Center"
                     Content="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.Icon)}"
                     Focusable="False"
                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.FontFamily)}"
                     TextElement.FontSize="{TemplateBinding FontSize}"
                     TextElement.Foreground="{TemplateBinding Foreground}"
                     Visibility="Collapsed" />
+                <!--
+                    HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                    VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                -->
                 <ContentPresenter
                     x:Name="ContentPresenter"
                     Grid.Column="1"
                     Margin="{StaticResource Margin}"
-                    HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                    VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
                     Content="{TemplateBinding Content}"
                     TextElement.FontSize="{TemplateBinding FontSize}"
                     TextElement.Foreground="{TemplateBinding Foreground}"
@@ -114,7 +126,6 @@
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource IndicatorColor}" />
             </Trigger>
-
             <Trigger Property="IsPressed" Value="True">
                 <Setter TargetName="ContentBorder" Property="Background" Value="{StaticResource PressedBackground}" />
             </Trigger>
