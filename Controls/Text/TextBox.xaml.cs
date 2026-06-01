@@ -1,9 +1,10 @@
-﻿using System.Windows;
-
+using System.Windows;
 namespace Junevy.Controls.Controls.Text
 {
     public class TextBox : System.Windows.Controls.TextBox
     {
+        private System.Windows.Controls.Button? closeButton;
+
         static TextBox()
         {
             DefaultStyleKeyProperty.OverrideMetadata(
@@ -11,25 +12,26 @@ namespace Junevy.Controls.Controls.Text
                 new FrameworkPropertyMetadata(typeof(TextBox)));
         }
 
-
-        public TextBox()
+        public override void OnApplyTemplate()
         {
-            this.Loaded += TextBox_Loaded;
-        }
-
-        private void TextBox_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (sender is TextBox textBox)
+            if (closeButton != null)
             {
-                if (textBox.Template?.FindName("PART_CloseButton", textBox) is System.Windows.Controls.Button closeButton)
-                    closeButton.Click += ClearTextBoxText;
+                closeButton.Click -= ClearTextBoxText;
+            }
+
+            base.OnApplyTemplate();
+
+            closeButton = GetTemplateChild("PART_CloseButton") as System.Windows.Controls.Button;
+            if (closeButton != null)
+            {
+                closeButton.Click += ClearTextBoxText;
             }
         }
 
         private void ClearTextBoxText(object sender, RoutedEventArgs e)
         {
-            this.Clear();
-            this.Focus();
+            Clear();
+            Focus();
         }
     }
 }

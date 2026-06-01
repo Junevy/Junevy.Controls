@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,13 +13,13 @@ public class ImageViewer : Control
 {
     private const string PART_Image = "PART_Image";
 
-    private System.Windows.Controls.Image? _image;
+    private System.Windows.Controls.Image? imageElement;
 
-    private MatrixTransform _transform = new();
+    private MatrixTransform transform = new();
 
-    private Point _lastPoint;
+    private Point lastPoint;
 
-    private bool _isPanning;
+    private bool isPanning;
 
     static ImageViewer()
     {
@@ -67,39 +67,39 @@ public class ImageViewer : Control
     {
         base.OnApplyTemplate();
 
-        _image = GetTemplateChild(PART_Image)
+        imageElement = GetTemplateChild(PART_Image)
             as System.Windows.Controls.Image;
 
-        if (_image != null)
+        if (imageElement != null)
         {
-            _image.RenderTransform = _transform;
-            _image.RenderTransformOrigin = new Point(0, 0);
+            imageElement.RenderTransform = transform;
+            imageElement.RenderTransformOrigin = new Point(0, 0);
         }
     }
 
     protected override void OnMouseWheel(MouseWheelEventArgs e)
     {
-        if (_image == null)
+        if (imageElement == null)
             return;
 
         double scale = e.Delta > 0 ? 1.2 : 0.8;
 
-        Point p = e.GetPosition(_image);
+        Point p = e.GetPosition(imageElement);
 
-        Matrix matrix = _transform.Matrix;
+        Matrix matrix = transform.Matrix;
 
         matrix.ScaleAt(scale, scale, p.X, p.Y);
 
-        _transform.Matrix = matrix;
+        transform.Matrix = matrix;
 
         e.Handled = true;
     }
 
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
     {
-        _isPanning = true;
+        isPanning = true;
 
-        _lastPoint = e.GetPosition(this);
+        lastPoint = e.GetPosition(this);
 
         CaptureMouse();
 
@@ -110,7 +110,7 @@ public class ImageViewer : Control
 
     protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
     {
-        _isPanning = false;
+        isPanning = false;
 
         ReleaseMouseCapture();
 
@@ -121,27 +121,27 @@ public class ImageViewer : Control
 
     protected override void OnMouseMove(MouseEventArgs e)
     {
-        if (!_isPanning)
+        if (!isPanning)
             return;
 
         Point current = e.GetPosition(this);
 
-        Vector delta = current - _lastPoint;
+        Vector delta = current - lastPoint;
 
-        Matrix matrix = _transform.Matrix;
+        Matrix matrix = transform.Matrix;
 
         matrix.Translate(delta.X, delta.Y);
 
-        _transform.Matrix = matrix;
+        transform.Matrix = matrix;
 
-        _lastPoint = current;
+        lastPoint = current;
 
         base.OnMouseMove(e);
     }
 
     public void ActualSize()
     {
-        _transform.Matrix = Matrix.Identity;
+        transform.Matrix = Matrix.Identity;
     }
 
     public void FitToWindow()
@@ -149,7 +149,7 @@ public class ImageViewer : Control
         if (Source == null)
             return;
 
-        if (_image == null)
+        if (imageElement == null)
             return;
 
         double scaleX =
@@ -181,7 +181,7 @@ public class ImageViewer : Control
             offsetX,
             offsetY);
 
-        _transform.Matrix = matrix;
+        transform.Matrix = matrix;
     }
 
     private ContextMenu CreateContextMenu()
