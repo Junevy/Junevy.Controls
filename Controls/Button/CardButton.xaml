@@ -5,13 +5,13 @@
     xmlns:cvt="clr-namespace:Junevy.Controls.Converters"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Button">
 
-    <ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary.MergedDictionaries />
 
     <Thickness x:Key="Margin">3,0,3,0</Thickness>
     <Thickness x:Key="Padding">5</Thickness>
     <CornerRadius x:Key="CornerRadius">3</CornerRadius>
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+    <cvt:NullToCollapsedConverter x:Key="NullToVisibility" />
     <cvt:IncreaseFontsizeConverter x:Key="IncreaseFontSize" />
 
     <!--  card button  -->
@@ -84,7 +84,8 @@
                             FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:CardButton}, Path=(atc:Icon.FontFamily)}"
                             FontSize="{TemplateBinding FontSize,
                                                        Converter={StaticResource IncreaseFontSize}}"
-                            Foreground="{TemplateBinding MainColor}" />
+                            Foreground="{TemplateBinding MainColor}"
+                            Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:CardButton}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
                     </Grid>
 
                 </Grid>

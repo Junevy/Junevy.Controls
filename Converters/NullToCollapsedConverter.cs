@@ -13,10 +13,17 @@ namespace Junevy.Controls.Converters
                 return Visibility.Collapsed;
             }
 
-            if (string.IsNullOrEmpty(value as string))
-            {
-                return Visibility.Collapsed;
-            }
+            //if (value is string str)
+            //{
+            //    if (string.IsNullOrEmpty(str))
+            //    {
+            //        return Visibility.Collapsed;
+            //    }
+            //}
+            //if (string.IsNullOrEmpty(value as string))
+            //{
+            //    return Visibility.Collapsed;
+            //}
 
             return Visibility.Visible;
         }

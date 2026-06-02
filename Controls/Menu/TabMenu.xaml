@@ -95,7 +95,6 @@
 
                                 <bt:Button
                                     Grid.Column="2"
-                                    Height="{TemplateBinding Height}"
                                     Margin="5,0,5,0"
                                     HorizontalAlignment="Right"
                                     Content="&#xe639;"

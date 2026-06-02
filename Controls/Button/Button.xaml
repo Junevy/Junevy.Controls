@@ -5,8 +5,7 @@
     xmlns:cvt="clr-namespace:Junevy.Controls.Converters"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Button">
 
-    <ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary.MergedDictionaries />
 
 
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
@@ -102,7 +101,7 @@
                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.FontFamily)}"
                     TextElement.FontSize="{TemplateBinding FontSize}"
                     TextElement.Foreground="{TemplateBinding Foreground}"
-                    Visibility="Collapsed" />
+                    Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
                 <!--
                     HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                     VerticalAlignment="{TemplateBinding VerticalAlignment}"

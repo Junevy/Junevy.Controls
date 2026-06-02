@@ -6,6 +6,8 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/ToggleButton.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.Dark.xaml" />
+
     </ResourceDictionary.MergedDictionaries>
 
     <ControlTemplate x:Key="DefaultComboBoxItemTemplate" TargetType="ComboBoxItem">

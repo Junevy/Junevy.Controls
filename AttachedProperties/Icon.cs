@@ -7,7 +7,54 @@ namespace Junevy.Controls.AttachedProperties
     public class Icon
     {
         public static readonly DependencyProperty IconProperty =
-            DependencyProperty.RegisterAttached("Icon", typeof(object), typeof(Icon), new PropertyMetadata(null, OnIconChanged));
+            DependencyProperty.RegisterAttached("Icon", typeof(object), typeof(Icon), new PropertyMetadata(null));
+
+        // private static void OnIconPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        // {
+        //     if (d is FrameworkElement element)
+        //     {
+        //         bool isEmpty = IsIconValueEmpty(e.NewValue);
+        //         ApplyIconHostVisibility(element, isEmpty);
+        //     }
+        // }
+
+        // private static bool IsIconValueEmpty(object value)
+        // {
+        //     return value == null || (value is string s && string.IsNullOrEmpty(s));
+        // }
+
+        // private static void ApplyIconHostVisibility(FrameworkElement element, bool collapse)
+        // {
+        //     var visibility = collapse ? Visibility.Collapsed : Visibility.Visible;
+
+        //     if (element.IsLoaded)
+        //     {
+        //         SetIconHostVisibility(element, visibility);
+        //     }
+        //     else
+        //     {
+        //         RoutedEventHandler handler = null;
+        //         handler = (s, _) =>
+        //         {
+        //             if (s is FrameworkElement fe)
+        //             {
+        //                 fe.Loaded -= handler;
+        //                 bool isEmpty = IsIconValueEmpty(fe.GetValue(IconProperty));
+        //                 SetIconHostVisibility(fe, isEmpty ? Visibility.Collapsed : Visibility.Visible);
+        //             }
+        //         };
+        //         element.Loaded += handler;
+        //     }
+        // }
+
+        // private static void SetIconHostVisibility(FrameworkElement element, Visibility visibility)
+        // {
+        //     if (element.Template?.FindName("PART_IconHost", element) is FrameworkElement iconHost)
+        //     {
+        //         // element.temp
+        //         iconHost.Visibility = visibility;
+        //     }
+        // }
 
         public static readonly DependencyProperty FontFamilyProperty =
             DependencyProperty.RegisterAttached("FontFamily", typeof(FontFamily), typeof(Icon),
@@ -21,29 +68,6 @@ namespace Junevy.Controls.AttachedProperties
 
         public static readonly DependencyProperty IconForegroundProperty =
             DependencyProperty.RegisterAttached("IconForeground", typeof(Brush), typeof(Icon), new PropertyMetadata(Brushes.Gray));
-
-
-        private static void OnIconChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is FrameworkElement element)
-            {
-                bool b = e.NewValue == null || (e.NewValue is string s && string.IsNullOrEmpty(s));
-                element.Visibility = b ? Visibility.Collapsed : Visibility.Visible;
-                //element.child
-            }
-
-            //if (d is Control c)
-            //{
-            //    if (c.Template == null) return;
-            //    var el = c.Template.FindName("PART_ICON", c);
-
-            //    if (el == null) return;
-            //    var cc = el as Control;
-            //    if (cc == null) return;
-            //    bool b = e.NewValue == null || (e.NewValue is string s && string.IsNullOrEmpty(s));
-            //    cc.Visibility = b ? Visibility.Visible : Visibility.Visible;
-            //}
-        }
 
         public static object GetIcon(DependencyObject obj)
         {
