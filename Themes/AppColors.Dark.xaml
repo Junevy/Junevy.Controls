@@ -2,15 +2,15 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- 程序主背景色 -->
-    <Color x:Key="Theme.BackgroundColor">#0B1220</Color>
+    <Color x:Key="Theme.BackgroundColor">#0A1020</Color>
     <!-- 卡片和控件主表面色 -->
-    <Color x:Key="Theme.SurfaceColor">#111A2B</Color>
+    <Color x:Key="Theme.SurfaceColor">#111A2E</Color>
     <!-- 次级表面色 -->
-    <Color x:Key="Theme.SurfaceAltColor">#162133</Color>
+    <Color x:Key="Theme.SurfaceAltColor">#16223A</Color>
     <!-- 悬浮态背景色 -->
-    <Color x:Key="Theme.SurfaceHoverColor">#1A2940</Color>
+    <Color x:Key="Theme.SurfaceHoverColor">#1B2A47</Color>
     <!-- 按下态背景色 -->
-    <Color x:Key="Theme.SurfacePressedColor">#223451</Color>
+    <Color x:Key="Theme.SurfacePressedColor">#23395B</Color>
     <!-- 选中态背景色 -->
     <Color x:Key="Theme.SurfaceSelectedColor">#1B3152</Color>
     <!-- 主品牌色 -->
@@ -20,29 +20,29 @@
     <!-- 主品牌按下色 -->
     <Color x:Key="Theme.PrimaryPressedColor">#2563EB</Color>
     <!-- 主品牌浅底色 -->
-    <Color x:Key="Theme.PrimarySubtleColor">#15263F</Color>
+    <Color x:Key="Theme.PrimarySubtleColor">#152849</Color>
     <!-- 辅助强调色 -->
     <Color x:Key="Theme.SecondaryColor">#A78BFA</Color>
     <!-- 常规边框色 -->
-    <Color x:Key="Theme.BorderColor">#24344D</Color>
+    <Color x:Key="Theme.BorderColor">#1F2D45</Color>
     <!-- 强调边框色 -->
-    <Color x:Key="Theme.BorderStrongColor">#38506E</Color>
+    <Color x:Key="Theme.BorderStrongColor">#324867</Color>
     <!-- 焦点高亮色 -->
     <Color x:Key="Theme.FocusColor">#93C5FD</Color>
     <!-- 主文本色 -->
-    <Color x:Key="Theme.TextPrimaryColor">#E5EEF9</Color>
+    <Color x:Key="Theme.TextPrimaryColor">#E6EEF9</Color>
     <!-- 次文本色 -->
-    <Color x:Key="Theme.TextSecondaryColor">#A5B4C7</Color>
+    <Color x:Key="Theme.TextSecondaryColor">#9FB1CC</Color>
     <!-- 弱化文本色 -->
-    <Color x:Key="Theme.TextTertiaryColor">#7E90A8</Color>
+    <Color x:Key="Theme.TextTertiaryColor">#6B7E99</Color>
     <!-- 主色背景上的文本色 -->
     <Color x:Key="Theme.TextOnPrimaryColor">#08111F</Color>
     <!-- 禁用背景色 -->
-    <Color x:Key="Theme.DisabledSurfaceColor">#162131</Color>
+    <Color x:Key="Theme.DisabledSurfaceColor">#15203A</Color>
     <!-- 禁用边框色 -->
-    <Color x:Key="Theme.DisabledBorderColor">#223149</Color>
+    <Color x:Key="Theme.DisabledBorderColor">#22314D</Color>
     <!-- 禁用文本色 -->
-    <Color x:Key="Theme.DisabledForegroundColor">#72839A</Color>
+    <Color x:Key="Theme.DisabledForegroundColor">#5E718C</Color>
     <!-- 成功状态色 -->
     <Color x:Key="Theme.SuccessColor">#4ADE80</Color>
     <!-- 成功悬浮色 -->
@@ -56,7 +56,7 @@
     <!-- 危险悬浮色 -->
     <Color x:Key="Theme.DangerHoverColor">#EF4444</Color>
     <!-- 阴影颜色 -->
-    <Color x:Key="Theme.ShadowColor">#50040A13</Color>
+    <Color x:Key="Theme.ShadowColor">#80000000</Color>
 
     <SolidColorBrush x:Key="Theme.BackgroundBrush" Color="{StaticResource Theme.BackgroundColor}" />
     <SolidColorBrush x:Key="Theme.SurfaceBrush" Color="{StaticResource Theme.SurfaceColor}" />
