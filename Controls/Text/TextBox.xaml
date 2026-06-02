@@ -9,9 +9,11 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/Button.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.Dark.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+    <cvt:NullToCollapsedConverter x:Key="NullToCollapsed" />
 
     <ControlTemplate x:Key="DefaultTextBoxTemplate" TargetType="{x:Type local:TextBox}">
         <Grid>
@@ -21,7 +23,7 @@
                 Background="{TemplateBinding Background}"
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="{StaticResource Theme.ControlCornerRadius}"
+                CornerRadius="{StaticResource Theme.ControlCornerRadius}"
                 SnapsToDevicePixels="True"
                 UseLayoutRounding="True">
 
@@ -33,6 +35,7 @@
                     </Grid.ColumnDefinitions>
 
                     <ContentControl
+                        x:Name="PART_ICON"
                         Grid.Column="0"
                         Margin="10,0,0,0"
                         VerticalAlignment="Center"
@@ -40,7 +43,8 @@
                         Focusable="False"
                         FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TextBox}, Path=(atc:Icon.FontFamily)}"
                         TextElement.FontSize="{TemplateBinding FontSize}"
-                        TextElement.Foreground="{TemplateBinding Foreground}" />
+                        TextElement.Foreground="{TemplateBinding Foreground}"
+                        Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
 
                     <ScrollViewer
                         x:Name="PART_ContentHost"
@@ -83,6 +87,11 @@
         </Grid>
 
         <ControlTemplate.Triggers>
+
+            <!--<Trigger Property="" Value="{x:Null}">
+                <Setter TargetName="PART_ICON" Property="Visibility" Value="Collapsed" />
+            </Trigger>-->
+
             <!--  当 Text 为空 且 未获得焦点 时显示占位符  -->
             <MultiTrigger>
                 <MultiTrigger.Conditions>

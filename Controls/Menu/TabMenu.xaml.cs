@@ -12,17 +12,6 @@ namespace Junevy.Controls.Controls.Menu
                 new FrameworkPropertyMetadata(typeof(TabMenu)));
         }
 
-
-        //public ICommand CloseCommand
-        //{
-        //    get { return (ICommand)GetValue(CloseCommandProperty); }
-        //    set { SetValue(CloseCommandProperty, value); }
-        //}
-        //public static readonly DependencyProperty CloseCommandProperty =
-        //    DependencyProperty.Register("CloseCommand", typeof(ICommand), typeof(TabMenu));
-
-
-
         public Orientation Orientation
         {
             get { return (Orientation)GetValue(OrientationProperty); }

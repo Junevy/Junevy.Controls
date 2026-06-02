@@ -1,4 +1,3 @@
-using System;
 using System.Windows;
 
 namespace Junevy.Controls.Themes;
@@ -21,7 +20,9 @@ public static class ThemeManager
 
     public static void ApplyTheme(ResourceDictionary resources, AppTheme theme)
     {
-        ArgumentNullException.ThrowIfNull(resources);
+        //ArgumentNullException.ThrowIfNull(resources);
+        if (resources == null)
+            throw new ArgumentNullException(nameof(resources));
 
         Uri targetUri = GetThemeUri(theme);
         ResourceDictionary targetDictionary = new() { Source = targetUri };
