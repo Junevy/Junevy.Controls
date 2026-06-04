@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Collections.ObjectModel;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -9,6 +12,13 @@ namespace Junevy.Controls.Controls.Menu
 {
     public class TabMenu : TabControl
     {
+        public static readonly RoutedCommand CloseTabCommand = new(nameof(CloseTabCommand), typeof(TabMenu));
+        //public static readonly RoutedCommand TestCommand = new(nameof(TestCommand), typeof(TabMenu));
+
+        public event EventHandler<TabCloseEventArgs>? TabClosing;
+
+        public event EventHandler<TabCloseEventArgs>? TabClosed;
+
         static TabMenu()
         {
             DefaultStyleKeyProperty.OverrideMetadata(
@@ -19,9 +29,13 @@ namespace Junevy.Controls.Controls.Menu
         public TabMenu()
         {
             CommandBindings.Add(new CommandBinding(CloseTabCommand, OnCloseTabCommand, OnCanCloseTabCommand));
+            //CommandBindings.Add(new CommandBinding(TestCommand, OnTest, OnCanCloseTabCommand));
         }
 
-        public static readonly RoutedCommand CloseTabCommand = new(nameof(CloseTabCommand), typeof(TabMenu));
+        //private void OnTest(object sender, ExecutedRoutedEventArgs e)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         public static readonly DependencyProperty CanCloseLastTabProperty =
             DependencyProperty.Register(nameof(CanCloseLastTab), typeof(bool), typeof(TabMenu), new PropertyMetadata(true));
@@ -32,9 +46,6 @@ namespace Junevy.Controls.Controls.Menu
             set { SetValue(CanCloseLastTabProperty, value); }
         }
 
-        public event EventHandler<TabCloseEventArgs>? TabClosing;
-
-        public event EventHandler<TabCloseEventArgs>? TabClosed;
 
         public void CloseTab(TabMenuItem? tabItem)
         {
@@ -62,6 +73,12 @@ namespace Junevy.Controls.Controls.Menu
                     return;
                 }
 
+                if (tabItem.IsEditing)
+                {
+                    e.CanExecute = false;
+                    return;
+                }
+
                 if (!CanCloseLastTab && Items.Count <= 1)
                 {
                     e.CanExecute = false;
@@ -82,8 +99,11 @@ namespace Junevy.Controls.Controls.Menu
             try
             {
                 TabMenuItem? tabItem = ResolveTabItem(e);
-                if (tabItem is null)
+                if (tabItem is null) return;
+
+                if (tabItem.IsEditing)
                 {
+                    e.Handled = true;
                     return;
                 }
 
@@ -105,13 +125,16 @@ namespace Junevy.Controls.Controls.Menu
                     return;
                 }
 
+
                 if (!Items.Contains(tabItem))
                 {
                     return;
                 }
 
+                //if (ItemsSource.)
+
                 TabCloseEventArgs args = new(tabItem);
-                RaiseTabClosing(args);
+                RaiseTabClosing(args);  // �����ر����¼�
                 if (args.Cancel)
                 {
                     return;
@@ -134,6 +157,11 @@ namespace Junevy.Controls.Controls.Menu
             }
         }
 
+        /// <summary>
+        /// ִ��tabmenuItem�Ĺر�Command
+        /// </summary>
+        /// <param name="tabItem"></param>
+        /// <param name="args"></param>
         private void PerformClose(TabMenuItem tabItem, TabCloseEventArgs args)
         {
             try
@@ -151,9 +179,28 @@ namespace Junevy.Controls.Controls.Menu
                     }
                 }
 
-                Items.Remove(tabItem);
-                CleanupTabItem(tabItem);
-                RaiseTabClosed(args);
+                if (ItemsSource == null)
+                {
+                    Items.Remove(tabItem);
+                }
+                else
+                {
+                    var context = tabItem.DataContext;
+                    if (context == null) return;
+
+                    Type type = context.GetType();
+                    PropertyInfo[] property = type.GetProperties();
+                    foreach (PropertyInfo prop in property)
+                    {
+                        if (prop.PropertyType.GetInterfaces().Any(i => i == typeof (IList<TabMenuItem>)))
+                        {
+                            if (prop.GetValue(context) is IList<TabMenuItem> items && items.Contains(tabItem))
+                                items.Remove(tabItem); break;
+                        }
+                    }
+                }
+                CleanupTabItem(tabItem);    // ������Դ
+                RaiseTabClosed(args);   // Raise �رպ��¼�
             }
             catch (Exception ex)
             {
@@ -161,6 +208,10 @@ namespace Junevy.Controls.Controls.Menu
             }
         }
 
+        /// <summary>
+        /// Raise tabmenu item�ر����¼�
+        /// </summary>
+        /// <param name="args">�ر��¼�����</param>
         private void RaiseTabClosing(TabCloseEventArgs args)
         {
             EventHandler<TabCloseEventArgs>? handler = TabClosing;
@@ -207,9 +258,14 @@ namespace Junevy.Controls.Controls.Menu
             }
         }
 
-        private static TabMenuItem? ResolveTabItem(ExecutedRoutedEventArgs e)
+        /// <summary>
+        /// ���¼�������Command Parameter�л�ȡTabMenuItem���󣨵�ǰ�رն���
+        /// </summary>
+        /// <param name="e">����CommandʱЯ�����¼����� <see cref="ExecutedRoutedEventArgs"/></param>
+        /// <returns></returns>
+        private static TabMenuItem? ResolveTabItem(RoutedEventArgs e)
         {
-            if (e.Parameter is TabMenuItem param)
+            if (GetCommandParameter(e) is TabMenuItem param)
             {
                 return param;
             }
@@ -225,6 +281,16 @@ namespace Junevy.Controls.Controls.Menu
             }
 
             return null;
+        }
+
+        private static object? GetCommandParameter(RoutedEventArgs e)
+        {
+            return e switch
+            {
+                ExecutedRoutedEventArgs executed => executed.Parameter,
+                CanExecuteRoutedEventArgs canExecute => canExecute.Parameter,
+                _ => null
+            };
         }
 
         private static T? FindAncestor<T>(DependencyObject? current) where T : DependencyObject
@@ -273,6 +339,9 @@ namespace Junevy.Controls.Controls.Menu
         }
     }
 
+    /// <summary>
+    /// Tabmenu Item �ر��¼�����
+    /// </summary>
     public class TabCloseEventArgs : RoutedEventArgs
     {
         public TabMenuItem Tab { get; }

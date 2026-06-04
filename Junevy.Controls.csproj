@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <!--<TargetFramework>net8.0-windows</TargetFramework>-->
-	  <TargetFrameworks>net8.0-windows;net48</TargetFrameworks>
-    <Nullable>enable</Nullable>
-	  <LangVersion>12</LangVersion>
-    <UseWPF>true</UseWPF>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<!--<TargetFramework>net8.0-windows</TargetFramework>-->
+		<TargetFrameworks>net8.0-windows;net48</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<LangVersion>12</LangVersion>
+		<UseWPF>true</UseWPF>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
 		<Reference Include="System.Xaml" />
@@ -15,23 +15,23 @@
 		<Reference Include="PresentationCore" />
 		<Reference Include="PresentationFramework" />
 	</ItemGroup>
-	
-  <ItemGroup>
-    <Compile Remove="Controls\Menu\MenuItem.NodeType.cs" />
-  </ItemGroup>
 
-  <ItemGroup>
-    <None Include="Controls\Menu\MenuItem.NodeType.cs" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Controls\Menu\MenuItem.NodeType.cs" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Junevy.Controls.Resources\Junevy.Controls.Resources.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="Controls\Menu\MenuItem.NodeType.cs" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="Themes\Generic.xaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Junevy.Controls.Resources\Junevy.Controls.Resources.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Update="Themes\Generic.xaml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Page>
+	</ItemGroup>
 
 </Project>
