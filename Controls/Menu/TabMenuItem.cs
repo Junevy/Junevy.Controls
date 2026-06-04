@@ -1,12 +1,17 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace Junevy.Controls.Controls.Menu
 {
     public class TabMenuItem : TabItem
     {
         private TextBox? headerTextBox;
+        private System.Windows.Controls.Button? closeButton;
+        private bool _isEditing;
+
+        public bool IsEditing => _isEditing;
 
         public Guid Id { get; } = Guid.NewGuid();
 
@@ -25,6 +30,11 @@ namespace Junevy.Controls.Controls.Menu
                 headerTextBox.LostFocus -= TextBox_LostFocus;
             }
 
+            if (closeButton != null)
+            {
+                closeButton.MouseDoubleClick -= CloseButton_MouseDoubleClick;
+            }
+
             base.OnApplyTemplate();
 
             headerTextBox = GetTemplateChild("PART_EditHeaderTextBox") as TextBox;
@@ -37,19 +47,36 @@ namespace Junevy.Controls.Controls.Menu
             headerTextBox.IsHitTestVisible = false;
             headerTextBox.MouseDoubleClick += TextBox_DoubleClick;
             headerTextBox.LostFocus += TextBox_LostFocus;
+
+            closeButton = GetTemplateChild("PART_CloseButton") as System.Windows.Controls.Button;
+            if (closeButton != null)
+            {
+                closeButton.MouseDoubleClick += CloseButton_MouseDoubleClick;
+            }
         }
 
         protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
         {
             if (!e.Handled && headerTextBox != null)
             {
+                e.Handled = true;
+                _isEditing = true;
                 headerTextBox.IsHitTestVisible = true;
                 headerTextBox.IsReadOnly = false;
-                headerTextBox.Focus();
-                headerTextBox.SelectAll();
+
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    headerTextBox.Focus();
+                    headerTextBox.SelectAll();
+                }), DispatcherPriority.Input);
             }
 
             base.OnMouseDoubleClick(e);
+        }
+
+        private void CloseButton_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true;
         }
 
         private void TextBox_DoubleClick(object sender, MouseButtonEventArgs e)
@@ -63,6 +90,7 @@ namespace Junevy.Controls.Controls.Menu
             {
                 textBox.IsReadOnly = true;
                 textBox.IsHitTestVisible = false;
+                _isEditing = false;
             }
         }
 

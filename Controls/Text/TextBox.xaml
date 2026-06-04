@@ -120,7 +120,7 @@
     <ControlTemplate x:Key="NoBorderTextBoxTemplate" TargetType="{x:Type local:TextBox}">
         <Border
             x:Name="TextBoxHost"
-            BorderBrush="{DynamicResource Theme.BorderBrush}"
+            BorderBrush="{DynamicResource Theme.PrimaryBrush}"
             BorderThickness="0">
             <ScrollViewer
                 x:Name="PART_ContentHost"
