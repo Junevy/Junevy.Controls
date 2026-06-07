@@ -44,7 +44,7 @@
                         FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TextBox}, Path=(atc:Icon.FontFamily)}"
                         TextElement.FontSize="{TemplateBinding FontSize}"
                         TextElement.Foreground="{TemplateBinding Foreground}"
-                        Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
+                        Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:TextBox}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
 
                     <ScrollViewer
                         x:Name="PART_ContentHost"
