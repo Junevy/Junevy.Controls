@@ -9,21 +9,33 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/Button.xaml" />
-        <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.Dark.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
     <cvt:NullToCollapsedConverter x:Key="NullToCollapsed" />
 
+    <Style
+        x:Key="TextBoxCloseButtonStyle"
+        BasedOn="{StaticResource NoBorderButtonStyle}"
+        TargetType="{x:Type bt:Button}">
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Focusable" Value="False" />
+    </Style>
+
     <ControlTemplate x:Key="DefaultTextBoxTemplate" TargetType="{x:Type local:TextBox}">
         <Grid>
-            <!--  外层 Border  -->
+            <!--  澶栧眰 Border  -->
             <Border
                 x:Name="Border"
                 Background="{TemplateBinding Background}"
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
-                CornerRadius="{StaticResource Theme.ControlCornerRadius}"
+                CornerRadius="{TemplateBinding Border.CornerRadius}"
                 SnapsToDevicePixels="True"
                 UseLayoutRounding="True">
 
@@ -54,7 +66,7 @@
                         HorizontalScrollBarVisibility="Hidden"
                         VerticalScrollBarVisibility="Hidden" />
 
-                    <!--  占位符 TextBlock  -->
+                    <!--  鍗犱綅绗?TextBlock  -->
                     <TextBlock
                         x:Name="PlaceholderText"
                         Grid.Column="1"
@@ -72,13 +84,15 @@
                     <bt:Button
                         x:Name="PART_CloseButton"
                         Grid.Column="2"
-                        Height="{TemplateBinding Height}"
+                        Width="28"
                         Margin="0"
                         HorizontalAlignment="Right"
+                        VerticalAlignment="Stretch"
                         Content="&#xe639;"
+                        FontSize="{TemplateBinding FontSize}"
                         FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TextBox}, Path=(atc:Icon.FontFamily)}"
                         Foreground="{TemplateBinding Foreground}"
-                        Template="{StaticResource NoBorderButtonTemplate}"
+                        Style="{StaticResource TextBoxCloseButtonStyle}"
                         Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:TextBox}, Path=(atc:AttachFuc.IsClosable), Converter={StaticResource BoolToVisibility}}" />
                 </Grid>
             </Border>
@@ -92,7 +106,7 @@
                 <Setter TargetName="PART_ICON" Property="Visibility" Value="Collapsed" />
             </Trigger>-->
 
-            <!--  当 Text 为空 且 未获得焦点 时显示占位符  -->
+            <!--  褰?Text 涓虹┖ 涓?鏈幏寰楃劍鐐?鏃舵樉绀哄崰浣嶇  -->
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="Text" Value="" />
@@ -101,7 +115,7 @@
                 <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible" />
             </MultiTrigger>
 
-            <!--  焦点时边框高亮（现代感）  -->
+            <!--  鐒︾偣鏃惰竟妗嗛珮浜紙鐜颁唬鎰燂級  -->
             <Trigger Property="IsFocused" Value="True">
                 <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Theme.PrimaryBrush}" />
                 <Setter TargetName="Border" Property="BorderThickness" Value="1" />
@@ -109,9 +123,16 @@
             </Trigger>
 
 
-            <!--  鼠标悬停时轻微变化  -->
+            <!--  榧犳爣鎮仠鏃惰交寰彉鍖? -->
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Theme.BorderStrongBrush}" />
+            </Trigger>
+
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="Border" Property="Background" Value="{DynamicResource Theme.DisabledSurfaceBrush}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Theme.DisabledBorderBrush}" />
+                <Setter TargetName="PlaceholderText" Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -160,7 +181,8 @@
         <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.BorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="{StaticResource Theme.ControlPadding}" />
+        <Setter Property="Border.CornerRadius" Value="{DynamicResource Theme.ControlCornerRadius}" />
+        <Setter Property="Padding" Value="{DynamicResource Theme.ControlPadding}" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="SnapsToDevicePixels" Value="True" />

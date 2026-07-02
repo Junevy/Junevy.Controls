@@ -1,4 +1,4 @@
-﻿<ResourceDictionary
+<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
@@ -24,7 +24,7 @@
                     <Border
                         x:Name="Root"
                         Background="{TemplateBinding Background}"
-                        CornerRadius="5">
+                        CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
                         <Grid>
                             <StackPanel x:Name="NormalLayout" Orientation="Horizontal">
                                 <ContentControl
@@ -137,7 +137,7 @@
                                 x:Name="Root"
                                 Grid.Column="1"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="5">
+                                CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
                                 <ContentPresenter Content="{TemplateBinding Header}" />
                             </Border>
                         </Grid>
@@ -183,14 +183,14 @@
                                 x:Name="Indicator"
                                 Grid.Column="0"
                                 Background="{DynamicResource Theme.PrimaryBrush}"
-                                CornerRadius="1"
+                                CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
                                 Visibility="Collapsed" />
 
                             <Border
                                 x:Name="Root"
                                 Grid.Column="1"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="5">
+                                CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
                                 <ContentPresenter Content="{TemplateBinding Header}" />
                             </Border>
                         </Grid>
@@ -241,7 +241,8 @@
                         <Border
                             Background="{DynamicResource Theme.SurfaceBrush}"
                             BorderBrush="{DynamicResource Theme.BorderBrush}"
-                            BorderThickness="1">
+                            BorderThickness="1"
+                            CornerRadius="{DynamicResource Theme.ControlCornerRadius}">
                             <ItemsPresenter />
                         </Border>
                     </ScrollViewer>

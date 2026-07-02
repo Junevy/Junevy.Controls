@@ -1,4 +1,4 @@
-﻿<ResourceDictionary
+<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
@@ -6,6 +6,7 @@
 
 
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <DataTemplate x:Key="DefaultRadioButtonDataTemplate">
@@ -17,7 +18,7 @@
             x:Name="RootBorder"
             Padding="5,3"
             Background="Transparent"
-            CornerRadius="3">
+            CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -33,7 +34,7 @@
                     Background="Transparent"
                     BorderBrush="{DynamicResource Theme.BorderStrongBrush}"
                     BorderThickness="1.5"
-                    CornerRadius="3">
+                    CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
 
                     <!--  勾选图标  -->
                     <TextBlock
@@ -42,7 +43,7 @@
                         VerticalAlignment="Center"
                         FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:RadioButton}, Path=(atc:Icon.FontFamily)}"
                         FontSize="12"
-                        Foreground="{DynamicResource Theme.BackgroundBrush}"
+                        Foreground="{DynamicResource Theme.TextOnPrimaryBrush}"
                         Opacity="0"
                         Text="&#xe981;" />
                 </Border>
@@ -80,8 +81,8 @@
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.DisabledBorderBrush}" />
                 <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.DisabledSurfaceBrush}" />
-                <Setter TargetName="CheckMark" Property="Foreground" Value="{DynamicResource Theme.DisabledSurfaceBrush}" />
-                <Setter Property="Foreground" Value="{DynamicResource Theme.TextSecondaryBrush}" />
+                <Setter TargetName="CheckMark" Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -92,7 +93,7 @@
             x:Name="RootBorder"
             Padding="5,3"
             Background="Transparent"
-            CornerRadius="3">
+            CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -117,7 +118,7 @@
                         VerticalAlignment="Center"
                         FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:RadioButton}, Path=(atc:Icon.FontFamily)}"
                         FontSize="12"
-                        Foreground="{DynamicResource Theme.BackgroundBrush}"
+                        Foreground="{DynamicResource Theme.TextOnPrimaryBrush}"
                         Opacity="0"
                         Text="&#xe981;" />
                 </Border>
@@ -155,8 +156,8 @@
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.DisabledBorderBrush}" />
                 <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.DisabledSurfaceBrush}" />
-                <Setter TargetName="CheckMark" Property="Foreground" Value="{DynamicResource Theme.DisabledSurfaceBrush}" />
-                <Setter Property="Foreground" Value="{DynamicResource Theme.TextSecondaryBrush}" />
+                <Setter TargetName="CheckMark" Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -170,7 +171,8 @@
         <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="Focusable" Value="False" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
+        <Setter Property="Border.CornerRadius" Value="{DynamicResource Theme.SmallCornerRadius}" />
         <Setter Property="ContentTemplate" Value="{StaticResource DefaultRadioButtonDataTemplate}" />
 
         <Style.Triggers>

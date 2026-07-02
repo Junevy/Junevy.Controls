@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.DataGrid">
 
-    <!--  表头样式  -->
+    <!--  琛ㄥご鏍峰紡  -->
     <Style x:Key="SimpleColumnHeaderStyle" TargetType="DataGridColumnHeader">
         <Setter Property="Background" Value="{DynamicResource Theme.SurfaceAltBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
@@ -28,7 +28,7 @@
         </Setter>
     </Style>
 
-    <!--  单元格样式  -->
+    <!--  鍗曞厓鏍兼牱寮? -->
     <Style x:Key="SimpleCellStyle" TargetType="DataGridCell">
         <Setter Property="Background" Value="{DynamicResource Theme.SurfaceBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
@@ -58,7 +58,7 @@
         </Style.Triggers>
     </Style>
 
-    <!--  行样式与悬停时改变背景  -->
+    <!--  琛屾牱寮忎笌鎮仠鏃舵敼鍙樿儗鏅? -->
     <Style x:Key="SimpleRowStyle" TargetType="DataGridRow">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -73,9 +73,14 @@
         </Style.Triggers>
     </Style>
 
-    <!--  DataGrid 样式  -->
+    <!--  DataGrid 鏍峰紡  -->
     <Style x:Key="SimpleDataGridStyle" TargetType="DataGrid">
         <Setter Property="GridLinesVisibility" Value="None" />
+        <Setter Property="EnableRowVirtualization" Value="True" />
+        <Setter Property="EnableColumnVirtualization" Value="True" />
+        <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
+        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
+        <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
         <Setter Property="HeadersVisibility" Value="Column" />
         <Setter Property="RowHeaderWidth" Value="0" />
         <Setter Property="ColumnHeaderStyle" Value="{StaticResource SimpleColumnHeaderStyle}" />
@@ -88,12 +93,10 @@
         <Setter Property="CanUserAddRows" Value="False" />
         <Setter Property="CanUserDeleteRows" Value="False" />
         <Setter Property="CanUserResizeRows" Value="False" />
-        <Setter Property="AutoGenerateColumns" Value="False" />
         <Setter Property="SelectionMode" Value="Single" />
         <Setter Property="SelectionUnit" Value="FullRow" />
-        <Setter Property="IsReadOnly" Value="True" />
     </Style>
 
-    <Style BasedOn="{StaticResource SimpleDataGridStyle}" TargetType="DataGrid" />
+    <Style BasedOn="{StaticResource SimpleDataGridStyle}" TargetType="{x:Type local:DataGrid}" />
 
 </ResourceDictionary>

@@ -6,13 +6,14 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls.Resources;component/Font/IconFont.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <ControlTemplate x:Key="DefaultCheckBoxTemplate" TargetType="{x:Type local:CheckBox}">
         <Grid Background="Transparent">
             <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
 
-                <!--  外框  -->
+                <!--  澶栨  -->
                 <Border
                     x:Name="CheckBorder"
                     Width="18"
@@ -20,21 +21,21 @@
                     Background="Transparent"
                     BorderBrush="{DynamicResource Theme.BorderStrongBrush}"
                     BorderThickness="1.5"
-                    CornerRadius="3">
+                    CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
 
-                    <!--  勾选图标  -->
+                    <!--  鍕鹃€夊浘鏍? -->
                     <TextBlock
                         x:Name="CheckMark"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:CheckBox}, Path=(atc:Icon.FontFamily)}"
                         FontSize="12"
-                        Foreground="{DynamicResource Theme.BackgroundBrush}"
+                        Foreground="{DynamicResource Theme.TextOnPrimaryBrush}"
                         Opacity="0"
                         Text="&#xe611;" />
                 </Border>
 
-                <!--  文字  -->
+                <!--  鏂囧瓧  -->
                 <ContentPresenter
                     Margin="8,0,0,0"
                     VerticalAlignment="Center"
@@ -72,8 +73,8 @@
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.DisabledBorderBrush}" />
                 <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.DisabledSurfaceBrush}" />
-                <Setter TargetName="CheckMark" Property="Foreground" Value="{DynamicResource Theme.DisabledSurfaceBrush}" />
-                <Setter Property="Foreground" Value="{DynamicResource Theme.TextSecondaryBrush}" />
+                <Setter TargetName="CheckMark" Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
             </Trigger>
 
         </ControlTemplate.Triggers>
@@ -84,6 +85,8 @@
         <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
+        <Setter Property="Border.CornerRadius" Value="{DynamicResource Theme.SmallCornerRadius}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template" Value="{StaticResource DefaultCheckBoxTemplate}" />
         <Setter Property="Background" Value="Transparent" />

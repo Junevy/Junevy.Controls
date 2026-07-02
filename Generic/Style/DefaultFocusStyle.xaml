@@ -4,12 +4,12 @@
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Rectangle
-                        RadiusX="4"
-                        RadiusY="4"
+                    <Border
+                        BorderBrush="{DynamicResource Theme.FocusBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(Border.CornerRadius)}"
                         SnapsToDevicePixels="True"
-                        Stroke="{DynamicResource Theme.FocusBrush}"
-                        StrokeThickness="1" />
+                        UseLayoutRounding="True" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

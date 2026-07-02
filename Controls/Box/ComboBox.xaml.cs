@@ -17,7 +17,7 @@ namespace Junevy.Controls.Controls.Box
             set { SetValue(PlaceHolderProperty, value); }
         }
         public static readonly DependencyProperty PlaceHolderProperty =
-            DependencyProperty.Register(nameof(PlaceHolder), typeof(string), typeof(ComboBox), new PropertyMetadata("Select a item..."));
+            DependencyProperty.Register(nameof(PlaceHolder), typeof(string), typeof(ComboBox), new PropertyMetadata("Select an item..."));
 
 
     }

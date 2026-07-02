@@ -21,7 +21,7 @@ namespace Junevy.Controls.Controls.Text
             set { SetValue(TitleProperty, value); }
         }
         public static readonly DependencyProperty TitleProperty =
-            DependencyProperty.Register("Title", typeof(string), typeof(TextTitle));
+            DependencyProperty.Register(nameof(Title), typeof(string), typeof(TextTitle), new PropertyMetadata(string.Empty));
 
     }
 }

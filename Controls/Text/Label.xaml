@@ -7,8 +7,6 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls.Resources;component/Font/IconFont.xaml" />
-        <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.Dark.xaml" />
-
     </ResourceDictionary.MergedDictionaries>
 
 
@@ -19,7 +17,7 @@
             x:Name="Bd"
             Padding="{TemplateBinding Padding}"
             Background="{TemplateBinding Background}"
-            CornerRadius="{StaticResource Theme.SmallCornerRadius}"
+            CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
             SnapsToDevicePixels="True">
             <StackPanel Orientation="Horizontal">
 
@@ -46,7 +44,7 @@
             x:Name="Bd"
             Padding="{TemplateBinding Padding}"
             Background="{DynamicResource Theme.DangerBrush}"
-            CornerRadius="{StaticResource Theme.SmallCornerRadius}"
+            CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
             SnapsToDevicePixels="True">
             <StackPanel Orientation="Horizontal">
 
@@ -77,7 +75,7 @@
             x:Name="Bd"
             Padding="{TemplateBinding Padding}"
             Background="{DynamicResource Theme.SuccessBrush}"
-            CornerRadius="{StaticResource Theme.SmallCornerRadius}"
+            CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
             SnapsToDevicePixels="True">
             <StackPanel Orientation="Horizontal">
                 <ContentControl
@@ -107,7 +105,7 @@
             x:Name="Bd"
             Padding="{TemplateBinding Padding}"
             Background="{DynamicResource Theme.WarningBrush}"
-            CornerRadius="{StaticResource Theme.SmallCornerRadius}"
+            CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
             SnapsToDevicePixels="True">
             <StackPanel Orientation="Horizontal">
 
@@ -138,7 +136,7 @@
             x:Name="Bd"
             Padding="{TemplateBinding Padding}"
             Background="{DynamicResource Theme.PrimaryBrush}"
-            CornerRadius="{StaticResource Theme.SmallCornerRadius}"
+            CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
             SnapsToDevicePixels="True">
             <StackPanel Orientation="Horizontal">
                 <ContentControl

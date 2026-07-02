@@ -11,13 +11,17 @@ namespace Junevy.Controls.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if(value != null && value is not bool)
-                return Visibility.Visible;
+            if (value == null)
+            {
+                return Visibility.Collapsed;
+            }
 
-            if (value == null) return Visibility.Collapsed;
-
-            var boolValue = (bool)value;
-            return boolValue ? Visibility.Visible : Visibility.Collapsed;
+            return value switch
+            {
+                bool boolValue => boolValue ? Visibility.Visible : Visibility.Collapsed,
+                string text => string.IsNullOrWhiteSpace(text) ? Visibility.Collapsed : Visibility.Visible,
+                _ => Visibility.Visible
+            };
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

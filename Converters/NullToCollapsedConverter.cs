@@ -8,22 +8,10 @@ namespace Junevy.Controls.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null)
+            if (value == null || (value is string text && string.IsNullOrWhiteSpace(text)))
             {
                 return Visibility.Collapsed;
             }
-
-            //if (value is string str)
-            //{
-            //    if (string.IsNullOrEmpty(str))
-            //    {
-            //        return Visibility.Collapsed;
-            //    }
-            //}
-            //if (string.IsNullOrEmpty(value as string))
-            //{
-            //    return Visibility.Collapsed;
-            //}
 
             return Visibility.Visible;
         }

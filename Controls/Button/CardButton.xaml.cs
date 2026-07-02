@@ -12,13 +12,13 @@ namespace Junevy.Controls.Controls.Button
                 new FrameworkPropertyMetadata(typeof(CardButton)));
         }
 
-        public SolidColorBrush MainColor
+        public Brush MainColor
         {
-            get { return (SolidColorBrush)GetValue(MainColorProperty); }
+            get { return (Brush)GetValue(MainColorProperty); }
             set { SetValue(MainColorProperty, value); }
         }
         public static readonly DependencyProperty MainColorProperty =
-            DependencyProperty.Register("MainColor", typeof(SolidColorBrush), typeof(CardButton), new PropertyMetadata(Brushes.Purple));
+            DependencyProperty.Register(nameof(MainColor), typeof(Brush), typeof(CardButton), new PropertyMetadata(Brushes.DodgerBlue));
 
 
 
@@ -29,7 +29,7 @@ namespace Junevy.Controls.Controls.Button
             set { SetValue(TitleProperty, value); }
         }
         public static readonly DependencyProperty TitleProperty =
-            DependencyProperty.Register("Title", typeof(object), typeof(CardButton), new PropertyMetadata(""));
+            DependencyProperty.Register(nameof(Title), typeof(object), typeof(CardButton), new PropertyMetadata(""));
 
 
 

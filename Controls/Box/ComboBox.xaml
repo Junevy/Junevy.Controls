@@ -6,8 +6,6 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/ToggleButton.xaml" />
-        <ResourceDictionary Source="/Junevy.Controls;component/Themes/AppColors.Dark.xaml" />
-
     </ResourceDictionary.MergedDictionaries>
 
     <ControlTemplate x:Key="DefaultComboBoxItemTemplate" TargetType="ComboBoxItem">
@@ -16,7 +14,7 @@
             Margin="{TemplateBinding Margin}"
             Padding="{TemplateBinding Padding}"
             Background="{TemplateBinding Background}"
-            CornerRadius="3">
+            CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
             <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
         </Border>
 
@@ -41,7 +39,6 @@
 
 
     <Style x:Key="DefaultComboBoxItemStyle" TargetType="ComboBoxItem">
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Margin" Value="0,0,0,2" />
         <Setter Property="MinHeight" Value="30" />
@@ -55,13 +52,13 @@
 
     <ControlTemplate x:Key="DefaultComboBoxTemplate" TargetType="{x:Type local:ComboBox}">
         <Grid>
-            <!--  主体边框  -->
+            <!--  涓讳綋杈规  -->
             <Border
                 x:Name="MainBorder"
                 Background="{TemplateBinding Background}"
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
-                CornerRadius="{StaticResource Theme.ControlCornerRadius}"
+                CornerRadius="{TemplateBinding Border.CornerRadius}"
                 SnapsToDevicePixels="True">
 
                 <Grid>
@@ -70,7 +67,7 @@
                         <ColumnDefinition Width="30" />
                     </Grid.ColumnDefinitions>
 
-                    <!--  选中内容显示  -->
+                    <!--  閫変腑鍐呭鏄剧ず  -->
                     <ContentPresenter
                         x:Name="ContentSite"
                         Grid.Column="0"
@@ -81,7 +78,7 @@
                         ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
                         IsHitTestVisible="False" />
 
-                    <!--  占位文字  -->
+                    <!--  鍗犱綅鏂囧瓧  -->
                     <TextBlock
                         x:Name="Placeholder"
                         Grid.Column="0"
@@ -94,7 +91,7 @@
                         Visibility="Collapsed" />
 
 
-                    <!--  Toggle 按钮（覆盖整个区域）  -->
+                    <!--  Toggle 鎸夐挳锛堣鐩栨暣涓尯鍩燂級  -->
                     <bt:ToggleButton
                         x:Name="ToggleButton"
                         Grid.ColumnSpan="2"
@@ -106,24 +103,24 @@
                 </Grid>
             </Border>
 
-            <!--  焦点高亮边框  -->
+            <!--  鐒︾偣楂樹寒杈规  -->
             <Border
                 x:Name="FocusBorder"
                 BorderThickness="1"
-                CornerRadius="{StaticResource Theme.ControlCornerRadius}"
+                CornerRadius="{TemplateBinding Border.CornerRadius}"
                 IsHitTestVisible="False"
                 Opacity="0">
 
                 <Border.BorderBrush>
-                    <SolidColorBrush Opacity="0.45" Color="{StaticResource Theme.FocusColor}" />
+                    <SolidColorBrush Opacity="0.45" Color="{DynamicResource Theme.FocusColor}" />
                 </Border.BorderBrush>
                 <Border.Effect>
-                    <StaticResource ResourceKey="Theme.PopupShadow" />
+                    <DynamicResource ResourceKey="Theme.PopupShadow" />
                 </Border.Effect>
 
             </Border>
 
-            <!--  下拉弹出层  -->
+            <!--  涓嬫媺寮瑰嚭灞? -->
             <Popup
                 x:Name="Popup"
                 MinHeight="50"
@@ -145,9 +142,12 @@
                         Background="{DynamicResource Theme.BackgroundBrush}"
                         BorderBrush="{DynamicResource Theme.BorderBrush}"
                         BorderThickness="1"
-                        CornerRadius="{StaticResource Theme.ControlCornerRadius}">
-                        <ScrollViewer Margin="0,4" SnapsToDevicePixels="True">
-                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                        CornerRadius="{TemplateBinding Border.CornerRadius}">
+                        <ScrollViewer
+                            Margin="0,4"
+                            CanContentScroll="True"
+                            SnapsToDevicePixels="True">
+                            <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
                         </ScrollViewer>
                     </Border>
                 </Grid>
@@ -155,26 +155,28 @@
         </Grid>
 
         <ControlTemplate.Triggers>
-            <!--  无选中项时显示占位文字  -->
+            <!--  鏃犻€変腑椤规椂鏄剧ず鍗犱綅鏂囧瓧  -->
             <Trigger Property="SelectedItem" Value="{x:Null}">
                 <Setter TargetName="Placeholder" Property="Visibility" Value="Visible" />
             </Trigger>
 
-            <!--  鼠标悬停  -->
+            <!--  榧犳爣鎮仠  -->
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource Theme.BorderStrongBrush}" />
             </Trigger>
 
-            <!--  展开状态  -->
+            <!--  灞曞紑鐘舵€? -->
             <Trigger Property="IsDropDownOpen" Value="True">
                 <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource Theme.PrimaryBrush}" />
                 <Setter TargetName="FocusBorder" Property="Opacity" Value="1" />
             </Trigger>
 
-            <!--  禁用状态  -->
+            <!--  绂佺敤鐘舵€? -->
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="MainBorder" Property="Background" Value="{DynamicResource Theme.DisabledSurfaceBrush}" />
                 <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource Theme.DisabledBorderBrush}" />
+                <Setter TargetName="ContentSite" Property="Opacity" Value="0.55" />
+                <Setter TargetName="Placeholder" Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
                 <Setter Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
                 <Setter Property="Cursor" Value="Arrow" />
             </Trigger>
@@ -182,7 +184,7 @@
     </ControlTemplate>
 
 
-    <!--  ComboBox 主样式  -->
+    <!--  ComboBox 涓绘牱寮? -->
     <Style x:Key="DefaultComboBoxStyle" TargetType="{x:Type local:ComboBox}">
         <Setter Property="MinHeight" Value="30" />
         <!--<Setter Property="Width" Value="150" />-->
@@ -193,6 +195,8 @@
         <Setter Property="Background" Value="{DynamicResource Theme.SurfaceBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.BorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Border.CornerRadius" Value="{DynamicResource Theme.ControlCornerRadius}" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource DefaultComboBoxItemStyle}" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
