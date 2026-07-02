@@ -6,6 +6,9 @@ namespace Junevy.Controls.AttachedProperties
 {
     public class AttachFuc
     {
+        public static readonly DependencyProperty DisplayModeProperty =
+            DependencyProperty.RegisterAttached("DisplayMode", typeof(DisplayMode), typeof(AttachFuc), new PropertyMetadata(DisplayMode.Normal));
+
         public static readonly DependencyProperty DispalyModeProperty =
             DependencyProperty.RegisterAttached("DispalyMode", typeof(DisplayMode), typeof(AttachFuc), new PropertyMetadata(DisplayMode.Normal));
 
@@ -47,6 +50,16 @@ namespace Junevy.Controls.AttachedProperties
         public static void SetDispalyMode(DependencyObject obj, DisplayMode value)
         {
             obj.SetValue(DispalyModeProperty, value);
+        }
+
+        public static DisplayMode GetDisplayMode(DependencyObject obj)
+        {
+            return (DisplayMode)obj.GetValue(DisplayModeProperty);
+        }
+
+        public static void SetDisplayMode(DependencyObject obj, DisplayMode value)
+        {
+            obj.SetValue(DisplayModeProperty, value);
         }
 
 

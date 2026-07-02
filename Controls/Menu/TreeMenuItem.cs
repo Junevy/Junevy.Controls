@@ -12,6 +12,11 @@ namespace Junevy.Controls.Controls.Menu
                 new FrameworkPropertyMetadata(typeof(TreeMenuItem)));
         }
 
+        public TreeMenuItem()
+        {
+            Childrens = new ObservableCollection<TreeMenuItem>();
+        }
+
         public bool IsLeaf => Childrens == null || Childrens.Count == 0;
 
         public static readonly DependencyProperty ChildrensProperty =

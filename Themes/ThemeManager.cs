@@ -20,34 +20,15 @@ public static class ThemeManager
 
     public static void ApplyTheme(ResourceDictionary resources, AppTheme theme)
     {
-        //ArgumentNullException.ThrowIfNull(resources);
         if (resources == null)
             throw new ArgumentNullException(nameof(resources));
 
         Uri targetUri = GetThemeUri(theme);
-        ResourceDictionary targetDictionary = new() { Source = targetUri };
-        var dictionaries = resources.MergedDictionaries;
-
-        for (int i = 0; i < dictionaries.Count; i++)
+        if (!ReplaceThemeDictionary(resources, targetUri))
         {
-            ResourceDictionary dictionary = dictionaries[i];
-            Uri? source = dictionary.Source;
-            if (source == null)
-            {
-                continue;
-            }
-
-            if (!IsThemeDictionary(source))
-            {
-                continue;
-            }
-
-            dictionaries[i] = targetDictionary;
-            CurrentTheme = theme;
-            return;
+            resources.MergedDictionaries.Add(CreateDictionary(targetUri));
         }
 
-        dictionaries.Insert(0, targetDictionary);
         CurrentTheme = theme;
     }
 
@@ -75,6 +56,32 @@ public static class ThemeManager
             || path.EndsWith("Themes\\AppColors.Dark.xaml", StringComparison.OrdinalIgnoreCase);
     }
 
+    private static bool ReplaceThemeDictionary(ResourceDictionary resources, Uri targetUri)
+    {
+        bool replaced = false;
+        var dictionaries = resources.MergedDictionaries;
+
+        for (int i = 0; i < dictionaries.Count; i++)
+        {
+            ResourceDictionary dictionary = dictionaries[i];
+            Uri? source = dictionary.Source;
+
+            if (source != null && IsThemeDictionary(source))
+            {
+                dictionaries[i] = CreateDictionary(targetUri);
+                replaced = true;
+                continue;
+            }
+
+            if (ReplaceThemeDictionary(dictionary, targetUri))
+            {
+                replaced = true;
+            }
+        }
+
+        return replaced;
+    }
+
     private static Uri GetThemeUri(AppTheme theme)
     {
         return theme switch
@@ -87,5 +94,10 @@ public static class ThemeManager
     private static Uri CreateUri(string fileName)
     {
         return new Uri($"/Junevy.Controls;component/Themes/{fileName}", UriKind.Relative);
+    }
+
+    private static ResourceDictionary CreateDictionary(Uri source)
+    {
+        return new ResourceDictionary { Source = source };
     }
 }

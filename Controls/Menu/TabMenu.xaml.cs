@@ -1,6 +1,5 @@
 using System.Collections;
-using System.Collections.ObjectModel;
-using System.Reflection;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -13,7 +12,6 @@ namespace Junevy.Controls.Controls.Menu
     public class TabMenu : TabControl
     {
         public static readonly RoutedCommand CloseTabCommand = new(nameof(CloseTabCommand), typeof(TabMenu));
-        //public static readonly RoutedCommand TestCommand = new(nameof(TestCommand), typeof(TabMenu));
 
         public event EventHandler<TabCloseEventArgs>? TabClosing;
 
@@ -29,23 +27,16 @@ namespace Junevy.Controls.Controls.Menu
         public TabMenu()
         {
             CommandBindings.Add(new CommandBinding(CloseTabCommand, OnCloseTabCommand, OnCanCloseTabCommand));
-            //CommandBindings.Add(new CommandBinding(TestCommand, OnTest, OnCanCloseTabCommand));
         }
-
-        //private void OnTest(object sender, ExecutedRoutedEventArgs e)
-        //{
-        //    throw new NotImplementedException();
-        //}
 
         public static readonly DependencyProperty CanCloseLastTabProperty =
             DependencyProperty.Register(nameof(CanCloseLastTab), typeof(bool), typeof(TabMenu), new PropertyMetadata(true));
 
         public bool CanCloseLastTab
         {
-            get { return (bool)GetValue(CanCloseLastTabProperty); }
-            set { SetValue(CanCloseLastTabProperty, value); }
+            get => (bool)GetValue(CanCloseLastTabProperty);
+            set => SetValue(CanCloseLastTabProperty, value);
         }
-
 
         public void CloseTab(TabMenuItem? tabItem)
         {
@@ -54,7 +45,7 @@ namespace Junevy.Controls.Controls.Menu
                 throw new ArgumentNullException(nameof(tabItem));
             }
 
-            if (!Items.Contains(tabItem))
+            if (!ContainsTab(tabItem))
             {
                 return;
             }
@@ -67,25 +58,9 @@ namespace Junevy.Controls.Controls.Menu
             try
             {
                 TabMenuItem? tabItem = ResolveTabItem(e);
-                if (tabItem is null)
-                {
-                    e.CanExecute = false;
-                    return;
-                }
-
-                if (tabItem.IsEditing)
-                {
-                    e.CanExecute = false;
-                    return;
-                }
-
-                if (!CanCloseLastTab && Items.Count <= 1)
-                {
-                    e.CanExecute = false;
-                    return;
-                }
-
-                e.CanExecute = true;
+                e.CanExecute = tabItem is not null
+                    && !tabItem.IsEditing
+                    && (CanCloseLastTab || Items.Count > 1);
             }
             catch (Exception ex)
             {
@@ -99,7 +74,10 @@ namespace Junevy.Controls.Controls.Menu
             try
             {
                 TabMenuItem? tabItem = ResolveTabItem(e);
-                if (tabItem is null) return;
+                if (tabItem is null)
+                {
+                    return;
+                }
 
                 if (tabItem.IsEditing)
                 {
@@ -125,16 +103,13 @@ namespace Junevy.Controls.Controls.Menu
                     return;
                 }
 
-
-                if (!Items.Contains(tabItem))
+                if (!ContainsTab(tabItem))
                 {
                     return;
                 }
 
-                //if (ItemsSource.)
-
                 TabCloseEventArgs args = new(tabItem);
-                RaiseTabClosing(args);  // �����ر����¼�
+                RaiseTabClosing(args);
                 if (args.Cancel)
                 {
                     return;
@@ -157,18 +132,15 @@ namespace Junevy.Controls.Controls.Menu
             }
         }
 
-        /// <summary>
-        /// ִ��tabmenuItem�Ĺر�Command
-        /// </summary>
-        /// <param name="tabItem"></param>
-        /// <param name="args"></param>
         private void PerformClose(TabMenuItem tabItem, TabCloseEventArgs args)
         {
             try
             {
+                object itemToRemove = GetItemForTab(tabItem);
+
                 if (tabItem.IsSelected && Items.Count > 1)
                 {
-                    int index = Items.IndexOf(tabItem);
+                    int index = Items.IndexOf(itemToRemove);
                     if (index >= 0)
                     {
                         int newIndex = index > 0 ? index - 1 : Math.Min(1, Items.Count - 1);
@@ -179,28 +151,17 @@ namespace Junevy.Controls.Controls.Menu
                     }
                 }
 
-                if (ItemsSource == null)
+                if (!RemoveItem(itemToRemove))
                 {
-                    Items.Remove(tabItem);
+                    return;
                 }
-                else
-                {
-                    var context = tabItem.DataContext;
-                    if (context == null) return;
 
-                    Type type = context.GetType();
-                    PropertyInfo[] property = type.GetProperties();
-                    foreach (PropertyInfo prop in property)
-                    {
-                        if (prop.PropertyType.GetInterfaces().Any(i => i == typeof (IList<TabMenuItem>)))
-                        {
-                            if (prop.GetValue(context) is IList<TabMenuItem> items && items.Contains(tabItem))
-                                items.Remove(tabItem); break;
-                        }
-                    }
+                if (ReferenceEquals(itemToRemove, tabItem))
+                {
+                    CleanupTabItem(tabItem);
                 }
-                CleanupTabItem(tabItem);    // ������Դ
-                RaiseTabClosed(args);   // Raise �رպ��¼�
+
+                RaiseTabClosed(args);
             }
             catch (Exception ex)
             {
@@ -208,10 +169,6 @@ namespace Junevy.Controls.Controls.Menu
             }
         }
 
-        /// <summary>
-        /// Raise tabmenu item�ر����¼�
-        /// </summary>
-        /// <param name="args">�ر��¼�����</param>
         private void RaiseTabClosing(TabCloseEventArgs args)
         {
             EventHandler<TabCloseEventArgs>? handler = TabClosing;
@@ -258,11 +215,6 @@ namespace Junevy.Controls.Controls.Menu
             }
         }
 
-        /// <summary>
-        /// ���¼�������Command Parameter�л�ȡTabMenuItem���󣨵�ǰ�رն���
-        /// </summary>
-        /// <param name="e">����CommandʱЯ�����¼����� <see cref="ExecutedRoutedEventArgs"/></param>
-        /// <returns></returns>
         private static TabMenuItem? ResolveTabItem(RoutedEventArgs e)
         {
             if (GetCommandParameter(e) is TabMenuItem param)
@@ -275,12 +227,9 @@ namespace Junevy.Controls.Controls.Menu
                 return source;
             }
 
-            if (e.OriginalSource is DependencyObject original)
-            {
-                return FindAncestor<TabMenuItem>(original);
-            }
-
-            return null;
+            return e.OriginalSource is DependencyObject original
+                ? FindAncestor<TabMenuItem>(original)
+                : null;
         }
 
         private static object? GetCommandParameter(RoutedEventArgs e)
@@ -306,6 +255,52 @@ namespace Junevy.Controls.Controls.Menu
             }
 
             return null;
+        }
+
+        private bool ContainsTab(TabMenuItem tabItem)
+        {
+            return Items.Contains(tabItem) || ItemContainerGenerator.ItemFromContainer(tabItem) != DependencyProperty.UnsetValue;
+        }
+
+        private object GetItemForTab(TabMenuItem tabItem)
+        {
+            object item = ItemContainerGenerator.ItemFromContainer(tabItem);
+            return item == DependencyProperty.UnsetValue ? tabItem : item;
+        }
+
+        private bool RemoveItem(object item)
+        {
+            if (ItemsSource == null)
+            {
+                Items.Remove(item);
+                return true;
+            }
+
+            if (ItemsSource is IList list)
+            {
+                if (!list.Contains(item))
+                {
+                    return false;
+                }
+
+                list.Remove(item);
+                return true;
+            }
+
+            var removeMethod = ItemsSource.GetType()
+                .GetMethods()
+                .FirstOrDefault(method =>
+                    method.Name == "Remove"
+                    && method.GetParameters() is { Length: 1 } parameters
+                    && parameters[0].ParameterType.IsInstanceOfType(item));
+
+            if (removeMethod == null)
+            {
+                return false;
+            }
+
+            object? result = removeMethod.Invoke(ItemsSource, new[] { item });
+            return result is not bool removed || removed;
         }
 
         private static void CleanupTabItem(TabMenuItem tabItem)
@@ -339,9 +334,6 @@ namespace Junevy.Controls.Controls.Menu
         }
     }
 
-    /// <summary>
-    /// Tabmenu Item �ر��¼�����
-    /// </summary>
     public class TabCloseEventArgs : RoutedEventArgs
     {
         public TabMenuItem Tab { get; }
@@ -349,7 +341,6 @@ namespace Junevy.Controls.Controls.Menu
         public bool Cancel { get; set; }
 
         public TabCloseEventArgs(TabMenuItem tab)
-            : base()
         {
             Tab = tab ?? throw new ArgumentNullException(nameof(tab));
         }

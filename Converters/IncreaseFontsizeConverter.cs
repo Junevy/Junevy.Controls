@@ -7,16 +7,24 @@ namespace Junevy.Controls.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value is null)
+            {
+                return 20d;
+            }
+
             try
             {
-                var fontSize = (int)value;
+                double increase = 5d;
+                if (parameter is string text && double.TryParse(text, NumberStyles.Float, culture, out double parsed))
+                {
+                    increase = parsed;
+                }
 
-                fontSize += 5;
-                return fontSize;
+                return System.Convert.ToDouble(value, culture) + increase;
             }
             catch
             {
-                return 20;
+                return 20d;
             }
         }
 

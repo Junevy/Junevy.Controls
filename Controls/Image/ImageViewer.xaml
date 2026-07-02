@@ -3,9 +3,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Image">
 
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Junevy.Controls.Resources;component/Pictures/Image.xaml" />
+    </ResourceDictionary.MergedDictionaries>
 
     <Style TargetType="{x:Type local:ImageViewer}">
         <Setter Property="Background" Value="{DynamicResource Theme.BackgroundBrush}" />
+        <Setter Property="Focusable" Value="True" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ImageViewer}">
@@ -14,12 +18,12 @@
                         BorderBrush="{DynamicResource Theme.BorderBrush}"
                         BorderThickness="1"
                         ClipToBounds="True"
-                        CornerRadius="8">
+                        CornerRadius="{DynamicResource Theme.LargeCornerRadius}">
                         <Grid>
-                            <!--  背景图  -->
                             <Image
+                                x:Name="BackgroundPattern"
                                 Opacity="0.25"
-                                Source="{StaticResource whiteCheckBoard}"
+                                Source="{TemplateBinding BackgroundImage}"
                                 Stretch="UniformToFill" />
                             <Image
                                 x:Name="PART_Image"
@@ -30,8 +34,12 @@
                                 Source="{TemplateBinding Source}"
                                 Stretch="Uniform" />
                         </Grid>
-
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="BackgroundImage" Value="{x:Null}">
+                            <Setter TargetName="BackgroundPattern" Property="Source" Value="{StaticResource whiteCheckBoard}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
