@@ -16,13 +16,13 @@
         <Setter Property="Width" Value="40" />
         <Setter Property="Height" Value="32" />
         <Setter Property="Margin" Value="0" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
     </Style>
 
     <Style x:Key="CloseCaptionButtonStyle" BasedOn="{StaticResource CaptionButtonStyle}" TargetType="{x:Type bt:Button}">
-        <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type bt:Button}">
@@ -39,12 +39,12 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.DangerBrush}" />
-                            <Setter Property="Foreground" Value="{DynamicResource Theme.TextOnPrimaryBrush}" />
+                            <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Status.Danger}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.OnAccent}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.DangerHoverBrush}" />
-                            <Setter Property="Foreground" Value="{DynamicResource Theme.TextOnPrimaryBrush}" />
+                            <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Status.DangerHover}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.OnAccent}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.5" />
@@ -79,7 +79,7 @@
                 Content="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.Icon)}"
                 FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
                 FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
-                Foreground="{DynamicResource Theme.TextPrimaryBrush}" />
+                Foreground="{DynamicResource Theme.Brush.Text.Primary}" />
 
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
@@ -95,14 +95,14 @@
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         FontSize="{TemplateBinding FontSize}"
-                        Foreground="{DynamicResource Theme.TextPrimaryBrush}"
+                        Foreground="{DynamicResource Theme.Brush.Text.Primary}"
                         Text="{TemplateBinding Content}" />
                 </Grid>
 
                 <!--  seperator  -->
                 <Border
                     Grid.Row="1"
-                    BorderBrush="{DynamicResource Theme.BorderBrush}"
+                    BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
                     BorderThickness="1" />
 
                 <!--  tools bar  -->
@@ -193,7 +193,7 @@
 
     <Style TargetType="{x:Type local:AppBar}">
         <Setter Property="Height" Value="70" />
-        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceBrush}" />
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template" Value="{StaticResource DefaultAppBar}" />
         <Setter Property="atc:Icon.FontFamily" Value="{StaticResource IconFont}" />

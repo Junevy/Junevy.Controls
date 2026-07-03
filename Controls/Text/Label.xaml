@@ -43,7 +43,7 @@
         <Border
             x:Name="Bd"
             Padding="{TemplateBinding Padding}"
-            Background="{DynamicResource Theme.DangerBrush}"
+            Background="{DynamicResource Theme.Brush.Status.Danger}"
             CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
             SnapsToDevicePixels="True">
             <StackPanel Orientation="Horizontal">
@@ -65,7 +65,7 @@
         </Border>
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.DangerHoverBrush}" />
+                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.Brush.Status.DangerHover}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -74,7 +74,7 @@
         <Border
             x:Name="Bd"
             Padding="{TemplateBinding Padding}"
-            Background="{DynamicResource Theme.SuccessBrush}"
+            Background="{DynamicResource Theme.Brush.Status.Success}"
             CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
             SnapsToDevicePixels="True">
             <StackPanel Orientation="Horizontal">
@@ -95,7 +95,7 @@
         </Border>
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.SuccessHoverBrush}" />
+                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.Brush.Status.SuccessHover}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -104,7 +104,7 @@
         <Border
             x:Name="Bd"
             Padding="{TemplateBinding Padding}"
-            Background="{DynamicResource Theme.WarningBrush}"
+            Background="{DynamicResource Theme.Brush.Status.Warning}"
             CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
             SnapsToDevicePixels="True">
             <StackPanel Orientation="Horizontal">
@@ -126,7 +126,7 @@
         </Border>
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.WarningHoverBrush}" />
+                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.Brush.Status.WarningHover}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -135,7 +135,7 @@
         <Border
             x:Name="Bd"
             Padding="{TemplateBinding Padding}"
-            Background="{DynamicResource Theme.PrimaryBrush}"
+            Background="{DynamicResource Theme.Brush.Accent.Primary}"
             CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
             SnapsToDevicePixels="True">
             <StackPanel Orientation="Horizontal">
@@ -156,7 +156,7 @@
         </Border>
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.PrimaryHoverBrush}" />
+                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.Brush.Accent.PrimaryHover}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -180,8 +180,8 @@
     </ControlTemplate>
 
     <Style x:Key="BoxLabelStyle" TargetType="{x:Type local:Label}">
-        <Setter Property="Background" Value="{DynamicResource Theme.PrimaryBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.TextOnPrimaryBrush}" />
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.OnAccent}" />
         <Setter Property="FontSize" Value="8" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Padding" Value="2,2" />
@@ -204,7 +204,7 @@
 
             <Trigger Property="DisplayMode" Value="10">
                 <Setter Property="Template" Value="{StaticResource NoBorderLabelTemplate}" />
-                <Setter Property="Foreground" Value="{DynamicResource Theme.DangerBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Status.Danger}" />
                 <Setter Property="Margin" Value="0" />
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="VerticalAlignment" Value="Center" />
@@ -216,7 +216,7 @@
 
             <Trigger Property="DisplayMode" Value="-11">
                 <Setter Property="Template" Value="{StaticResource NoBorderLabelTemplate}" />
-                <Setter Property="Foreground" Value="{DynamicResource Theme.WarningBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Status.Warning}" />
                 <Setter Property="Margin" Value="0" />
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="VerticalAlignment" Value="Center" />
@@ -228,7 +228,7 @@
 
             <Trigger Property="DisplayMode" Value="11">
                 <Setter Property="Template" Value="{StaticResource NoBorderLabelTemplate}" />
-                <Setter Property="Foreground" Value="{DynamicResource Theme.PrimaryBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
                 <Setter Property="Margin" Value="0" />
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="VerticalAlignment" Value="Center" />

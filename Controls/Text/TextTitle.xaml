@@ -37,7 +37,7 @@
     <Style TargetType="{x:Type local:TextTitle}">
         <Setter Property="FontSize" Value="14" />
         <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="Template" Value="{StaticResource DefaultTextTitleStyle}" />
     </Style>
 

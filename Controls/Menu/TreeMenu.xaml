@@ -15,8 +15,7 @@
 
     <Style TargetType="{x:Type local:TreeMenuItem}">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
 
         <Setter Property="Template">
             <Setter.Value>
@@ -77,11 +76,11 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.SurfaceHoverBrush}" />
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
                         </Trigger>
 
                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=IsSelected}" Value="True">
-                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.SurfaceHoverBrush}" />
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
                         </DataTrigger>
 
                         <Trigger Property="Icon" Value="{x:Null}">
@@ -110,8 +109,7 @@
     <Style x:Key="DefaultTreeMenuTemplate" TargetType="TreeViewItem">
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="ItemsSource" Value="{Binding Header.Childrens, RelativeSource={RelativeSource Self}}" />
 
         <Setter Property="Template">
@@ -165,8 +163,7 @@
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="atc:ExpanderBehavior.Enable" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="ItemsSource" Value="{Binding Header.Childrens, RelativeSource={RelativeSource Self}}" />
 
         <Setter Property="Template">
@@ -182,7 +179,7 @@
                             <Border
                                 x:Name="Indicator"
                                 Grid.Column="0"
-                                Background="{DynamicResource Theme.PrimaryBrush}"
+                                Background="{DynamicResource Theme.Brush.Accent.Primary}"
                                 CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
                                 Visibility="Collapsed" />
 
@@ -218,10 +215,9 @@
     </Style>
 
     <Style TargetType="{x:Type local:TreeMenu}">
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
         <Setter Property="Width" Value="150" />
         <Setter Property="HorizontalAlignment" Value="Left" />
@@ -229,7 +225,7 @@
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
         <Setter Property="TextElement.FontSize" Value="12" />
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
 
         <Setter Property="Template">
             <Setter.Value>
@@ -239,8 +235,8 @@
                         HorizontalScrollBarVisibility="Hidden"
                         VerticalScrollBarVisibility="Hidden">
                         <Border
-                            Background="{DynamicResource Theme.SurfaceBrush}"
-                            BorderBrush="{DynamicResource Theme.BorderBrush}"
+                            Background="{DynamicResource Theme.Brush.Surface.Base}"
+                            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
                             BorderThickness="1"
                             CornerRadius="{DynamicResource Theme.ControlCornerRadius}">
                             <ItemsPresenter />

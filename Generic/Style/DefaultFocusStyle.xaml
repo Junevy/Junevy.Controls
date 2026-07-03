@@ -5,7 +5,7 @@
             <Setter.Value>
                 <ControlTemplate>
                     <Border
-                        BorderBrush="{DynamicResource Theme.FocusBrush}"
+                        BorderBrush="{DynamicResource Theme.Brush.Border.Focus}"
                         BorderThickness="1"
                         CornerRadius="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(Border.CornerRadius)}"
                         SnapsToDevicePixels="True"
