@@ -75,7 +75,7 @@
                         HorizontalAlignment="Left"
                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                         FontSize="{TemplateBinding FontSize}"
-                        Foreground="{DynamicResource Theme.TextSecondaryBrush}"
+                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
                         IsHitTestVisible="False"
                         Text="{TemplateBinding Tag}"
                         Visibility="Collapsed" />
@@ -117,22 +117,22 @@
 
             <!--  鐒︾偣鏃惰竟妗嗛珮浜紙鐜颁唬鎰燂級  -->
             <Trigger Property="IsFocused" Value="True">
-                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Theme.PrimaryBrush}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
                 <Setter TargetName="Border" Property="BorderThickness" Value="1" />
-                <Setter TargetName="Border" Property="Background" Value="{DynamicResource Theme.SurfaceAltBrush}" />
+                <Setter TargetName="Border" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
             </Trigger>
 
 
             <!--  榧犳爣鎮仠鏃惰交寰彉鍖? -->
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Theme.BorderStrongBrush}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Strong}" />
             </Trigger>
 
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="Border" Property="Background" Value="{DynamicResource Theme.DisabledSurfaceBrush}" />
-                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Theme.DisabledBorderBrush}" />
-                <Setter TargetName="PlaceholderText" Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
-                <Setter Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
+                <Setter TargetName="Border" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
+                <Setter TargetName="PlaceholderText" Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -141,7 +141,7 @@
     <ControlTemplate x:Key="NoBorderTextBoxTemplate" TargetType="{x:Type local:TextBox}">
         <Border
             x:Name="TextBoxHost"
-            BorderBrush="{DynamicResource Theme.PrimaryBrush}"
+            BorderBrush="{DynamicResource Theme.Brush.Accent.Primary}"
             BorderThickness="0">
             <ScrollViewer
                 x:Name="PART_ContentHost"
@@ -157,7 +157,7 @@
         <Border
             x:Name="TextBoxHost"
             Padding="5"
-            BorderBrush="{DynamicResource Theme.BorderBrush}"
+            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
             BorderThickness="0">
             <ScrollViewer
                 x:Name="PART_ContentHost"
@@ -177,9 +177,9 @@
 
 
     <Style x:Key="DefaultTextBoxStyle" TargetType="{x:Type local:TextBox}">
-        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Theme.BorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Border.CornerRadius" Value="{DynamicResource Theme.ControlCornerRadius}" />
         <Setter Property="Padding" Value="{DynamicResource Theme.ControlPadding}" />
@@ -187,8 +187,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="atc:AttachFuc.IsClosable" Value="True" />
         <Setter Property="Template" Value="{StaticResource DefaultTextBoxTemplate}" />
     </Style>

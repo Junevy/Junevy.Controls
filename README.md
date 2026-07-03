@@ -45,17 +45,34 @@ xmlns:jvBox="clr-namespace:Junevy.Controls.Controls.Box;assembly=Junevy.Controls
 
 ## Themes
 
-Theme resources are defined as reusable keys such as:
+Theme resources follow semantic design-token naming. Prefer the new keys below for new controls and applications:
 
-- `Theme.BackgroundBrush`
-- `Theme.SurfaceBrush`
-- `Theme.PrimaryBrush`
-- `Theme.BorderBrush`
-- `Theme.FocusBrush`
+- `Theme.Brush.Background.App`: application and page background.
+- `Theme.Brush.Surface.Base`: default panel, card, and control background.
+- `Theme.Brush.Surface.Raised`: elevated containers.
+- `Theme.Brush.Surface.Sunken`: inset areas such as input focus backgrounds.
+- `Theme.Brush.Surface.Hover`: hover state.
+- `Theme.Brush.Surface.Pressed`: pressed state.
+- `Theme.Brush.Surface.Selected`: selected state.
+- `Theme.Brush.Text.Primary`: primary text.
+- `Theme.Brush.Text.Secondary`: secondary text.
+- `Theme.Brush.Text.Tertiary`: low-emphasis text.
+- `Theme.Brush.Border.Default`: standard border.
+- `Theme.Brush.Border.Strong`: emphasized border.
+- `Theme.Brush.Border.Focus`: keyboard and focus indication.
+- `Theme.Brush.Accent.Primary`: brand and primary action color.
+- `Theme.Brush.Status.Success`: success state.
+- `Theme.Brush.Status.Warning`: warning state.
+- `Theme.Brush.Status.Danger`: danger or error state.
+- `Theme.Brush.ScrollBar.Thumb`: scrollbar thumb.
+- `Theme.Brush.ScrollBar.ThumbHover`: scrollbar thumb on hover.
+- `Theme.Brush.Overlay.Backdrop`: modal/dialog backdrop.
 - `Theme.ControlCornerRadius`
 - `Theme.ControlPadding`
 
-`Themes/AppColors.xaml` should load only the default palette. Runtime theme switching should replace the active theme dictionary instead of merging light and dark dictionaries at the same time.
+All resource keys use the semantic `Theme.Brush.*` / `Theme.Color.*` convention. No legacy aliases — every key has a single, semantic name.
+
+`Themes/AppColors.xaml` loads the default (Light) palette. Use `ThemeManager.ApplyTheme(AppTheme.Dark)` for runtime theme switching. The manager replaces the active theme dictionary; never merge both themes at the same time.
 
 ## Controls
 

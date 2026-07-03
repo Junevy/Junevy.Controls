@@ -26,7 +26,7 @@
                 Grid.Column="0"
                 Height="{Binding FontSize}"
                 Margin="0,0,5,0"
-                Background="{DynamicResource Theme.PrimaryBrush}"
+                Background="{DynamicResource Theme.Brush.Accent.Primary}"
                 CornerRadius="2"
                 Visibility="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
@@ -67,7 +67,7 @@
                 Grid.Column="0"
                 Height="{Binding FontSize}"
                 Margin="0,0,5,0"
-                Background="{DynamicResource Theme.PrimaryBrush}"
+                Background="{DynamicResource Theme.Brush.Accent.Primary}"
                 CornerRadius="2"
                 Visibility="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
@@ -114,7 +114,7 @@
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="FontSize" Value="12" />
 
         <!--  SideMenu容器  -->
@@ -126,8 +126,8 @@
                         HorizontalScrollBarVisibility="Hidden"
                         VerticalScrollBarVisibility="Hidden">
                         <Border
-                            Background="{DynamicResource Theme.SurfaceBrush}"
-                            BorderBrush="{DynamicResource Theme.BorderBrush}"
+                            Background="{DynamicResource Theme.Brush.Surface.Base}"
+                            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
                             BorderThickness="1">
                             <ItemsPresenter />
                         </Border>
@@ -169,11 +169,11 @@
 
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.SurfaceHoverBrush}" />
+                                        <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
                                     </Trigger>
 
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.SurfaceHoverBrush}" />
+                                        <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>

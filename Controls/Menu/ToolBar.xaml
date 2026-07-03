@@ -17,7 +17,7 @@
         <Setter Property="Height" Value="40" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ToolBarItem}">
@@ -41,7 +41,7 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.SurfaceHoverBrush}" />
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="Root" Property="Opacity" Value="0.7" />
@@ -56,9 +56,9 @@
         <Setter Property="FontSize" Value="15" />
         <Setter Property="MinHeight" Value="42" />
         <Setter Property="Margin" Value="0" />
-        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Theme.BorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />

@@ -21,18 +21,18 @@
 
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource Theme.SurfaceBrush}" />
+                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
             </Trigger>
             <Trigger Property="IsSelected" Value="True">
-                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource Theme.PrimarySubtleBrush}" />
-                <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
+                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource Theme.Brush.Accent.PrimarySubtle}" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
             </Trigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="IsSelected" Value="True" />
                     <Condition Property="IsMouseOver" Value="True" />
                 </MultiTrigger.Conditions>
-                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource Theme.PrimarySubtleBrush}" />
+                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource Theme.Brush.Accent.PrimarySubtle}" />
             </MultiTrigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -42,8 +42,8 @@
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Margin" Value="0,0,0,2" />
         <Setter Property="MinHeight" Value="30" />
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
-        <Setter Property="Background" Value="{DynamicResource Theme.BackgroundBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Background.App}" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template" Value="{StaticResource DefaultComboBoxItemTemplate}" />
     </Style>
@@ -85,7 +85,7 @@
                         Margin="{TemplateBinding Padding}"
                         VerticalAlignment="Center"
                         FontSize="{TemplateBinding FontSize}"
-                        Foreground="{DynamicResource Theme.TextSecondaryBrush}"
+                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
                         IsHitTestVisible="False"
                         Text="{TemplateBinding PlaceHolder}"
                         Visibility="Collapsed" />
@@ -112,7 +112,7 @@
                 Opacity="0">
 
                 <Border.BorderBrush>
-                    <SolidColorBrush Opacity="0.45" Color="{DynamicResource Theme.FocusColor}" />
+                    <SolidColorBrush Opacity="0.45" Color="{DynamicResource Theme.Color.Border.Focus}" />
                 </Border.BorderBrush>
                 <Border.Effect>
                     <DynamicResource ResourceKey="Theme.PopupShadow" />
@@ -139,8 +139,8 @@
                     <Border
                         x:Name="DropDownBorder"
                         Margin="0,4,0,0"
-                        Background="{DynamicResource Theme.BackgroundBrush}"
-                        BorderBrush="{DynamicResource Theme.BorderBrush}"
+                        Background="{DynamicResource Theme.Brush.Background.App}"
+                        BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
                         BorderThickness="1"
                         CornerRadius="{TemplateBinding Border.CornerRadius}">
                         <ScrollViewer
@@ -162,22 +162,22 @@
 
             <!--  榧犳爣鎮仠  -->
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource Theme.BorderStrongBrush}" />
+                <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Strong}" />
             </Trigger>
 
             <!--  灞曞紑鐘舵€? -->
             <Trigger Property="IsDropDownOpen" Value="True">
-                <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource Theme.PrimaryBrush}" />
+                <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
                 <Setter TargetName="FocusBorder" Property="Opacity" Value="1" />
             </Trigger>
 
             <!--  绂佺敤鐘舵€? -->
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="MainBorder" Property="Background" Value="{DynamicResource Theme.DisabledSurfaceBrush}" />
-                <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource Theme.DisabledBorderBrush}" />
+                <Setter TargetName="MainBorder" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
+                <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
                 <Setter TargetName="ContentSite" Property="Opacity" Value="0.55" />
-                <Setter TargetName="Placeholder" Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
-                <Setter Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
+                <Setter TargetName="Placeholder" Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
                 <Setter Property="Cursor" Value="Arrow" />
             </Trigger>
         </ControlTemplate.Triggers>
@@ -191,9 +191,9 @@
         <Setter Property="MinWidth" Value="50" />
         <Setter Property="Padding" Value="12,0,0,0" />
         <Setter Property="FontSize" Value="13" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
-        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Theme.BorderBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Border.CornerRadius" Value="{DynamicResource Theme.ControlCornerRadius}" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />

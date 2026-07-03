@@ -5,9 +5,9 @@
 
     <!--  琛ㄥご鏍峰紡  -->
     <Style x:Key="SimpleColumnHeaderStyle" TargetType="DataGridColumnHeader">
-        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceAltBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Theme.BorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="0,0,0,1" />
         <Setter Property="Padding" Value="12,8" />
         <Setter Property="FontWeight" Value="SemiBold" />
@@ -30,9 +30,9 @@
 
     <!--  鍗曞厓鏍兼牱寮? -->
     <Style x:Key="SimpleCellStyle" TargetType="DataGridCell">
-        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Theme.BorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="0,0,0,1" />
         <Setter Property="Padding" Value="12,8" />
         <Setter Property="FontSize" Value="13" />
@@ -52,8 +52,8 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="{DynamicResource Theme.PrimarySubtleBrush}" />
-                <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
+                <Setter Property="Background" Value="{DynamicResource Theme.Brush.Accent.PrimarySubtle}" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -65,10 +65,10 @@
         <Setter Property="MinHeight" Value="36" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{DynamicResource Theme.SurfaceHoverBrush}" />
+                <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
             </Trigger>
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="{DynamicResource Theme.PrimarySubtleBrush}" />
+                <Setter Property="Background" Value="{DynamicResource Theme.Brush.Accent.PrimarySubtle}" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -86,9 +86,9 @@
         <Setter Property="ColumnHeaderStyle" Value="{StaticResource SimpleColumnHeaderStyle}" />
         <Setter Property="CellStyle" Value="{StaticResource SimpleCellStyle}" />
         <Setter Property="RowStyle" Value="{StaticResource SimpleRowStyle}" />
-        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Theme.BorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CanUserAddRows" Value="False" />
         <Setter Property="CanUserDeleteRows" Value="False" />

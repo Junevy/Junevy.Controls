@@ -32,7 +32,7 @@
                     Width="18"
                     Height="18"
                     Background="Transparent"
-                    BorderBrush="{DynamicResource Theme.BorderStrongBrush}"
+                    BorderBrush="{DynamicResource Theme.Brush.Border.Strong}"
                     BorderThickness="1.5"
                     CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
 
@@ -43,7 +43,7 @@
                         VerticalAlignment="Center"
                         FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:RadioButton}, Path=(atc:Icon.FontFamily)}"
                         FontSize="12"
-                        Foreground="{DynamicResource Theme.TextOnPrimaryBrush}"
+                        Foreground="{DynamicResource Theme.Brush.Text.OnAccent}"
                         Opacity="0"
                         Text="&#xe981;" />
                 </Border>
@@ -56,14 +56,14 @@
         <ControlTemplate.Triggers>
             <!--  Hover  -->
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.PrimaryBrush}" />
+                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
                 <Setter TargetName="CheckBorder" Property="Background" Value="Transparent" />
             </Trigger>
 
             <!--  Checked  -->
             <Trigger Property="IsChecked" Value="True">
-                <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.PrimaryBrush}" />
-                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.PrimaryHoverBrush}" />
+                <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
+                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.PrimaryHover}" />
                 <Setter TargetName="CheckMark" Property="Opacity" Value="1" />
             </Trigger>
 
@@ -73,16 +73,16 @@
                     <Condition Property="IsChecked" Value="True" />
                     <Condition Property="IsMouseOver" Value="True" />
                 </MultiTrigger.Conditions>
-                <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.PrimaryHoverBrush}" />
-                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.PrimaryHoverBrush}" />
+                <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.Brush.Accent.PrimaryHover}" />
+                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.PrimaryHover}" />
             </MultiTrigger>
 
             <!--  Disabled  -->
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.DisabledBorderBrush}" />
-                <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.DisabledSurfaceBrush}" />
-                <Setter TargetName="CheckMark" Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
-                <Setter Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
+                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
+                <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
+                <Setter TargetName="CheckMark" Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -107,7 +107,7 @@
                     Width="18"
                     Height="18"
                     Background="Transparent"
-                    BorderBrush="{DynamicResource Theme.BorderStrongBrush}"
+                    BorderBrush="{DynamicResource Theme.Brush.Border.Strong}"
                     BorderThickness="1.5"
                     CornerRadius="45">
 
@@ -118,7 +118,7 @@
                         VerticalAlignment="Center"
                         FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:RadioButton}, Path=(atc:Icon.FontFamily)}"
                         FontSize="12"
-                        Foreground="{DynamicResource Theme.TextOnPrimaryBrush}"
+                        Foreground="{DynamicResource Theme.Brush.Text.OnAccent}"
                         Opacity="0"
                         Text="&#xe981;" />
                 </Border>
@@ -131,14 +131,14 @@
         <ControlTemplate.Triggers>
             <!--  Hover  -->
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.PrimaryBrush}" />
+                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
                 <Setter TargetName="CheckBorder" Property="Background" Value="Transparent" />
             </Trigger>
 
             <!--  Checked  -->
             <Trigger Property="IsChecked" Value="True">
-                <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.PrimaryBrush}" />
-                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.PrimaryHoverBrush}" />
+                <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
+                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.PrimaryHover}" />
                 <Setter TargetName="CheckMark" Property="Opacity" Value="1" />
             </Trigger>
 
@@ -148,16 +148,16 @@
                     <Condition Property="IsChecked" Value="True" />
                     <Condition Property="IsMouseOver" Value="True" />
                 </MultiTrigger.Conditions>
-                <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.PrimaryHoverBrush}" />
-                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.PrimaryHoverBrush}" />
+                <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.Brush.Accent.PrimaryHover}" />
+                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.PrimaryHover}" />
             </MultiTrigger>
 
             <!--  Disabled  -->
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.DisabledBorderBrush}" />
-                <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.DisabledSurfaceBrush}" />
-                <Setter TargetName="CheckMark" Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
-                <Setter Property="Foreground" Value="{DynamicResource Theme.DisabledForegroundBrush}" />
+                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
+                <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
+                <Setter TargetName="CheckMark" Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -165,13 +165,12 @@
 
     <Style x:Key="DefaultRadioButtonStyle" TargetType="{x:Type local:RadioButton}">
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="TextElement.FontSize" Value="14" />
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.TextPrimaryBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="FocusVisualStyle" Value="{StaticResource DefaultControlFocusVisualStyle}" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="Border.CornerRadius" Value="{DynamicResource Theme.SmallCornerRadius}" />
         <Setter Property="ContentTemplate" Value="{StaticResource DefaultRadioButtonDataTemplate}" />
 
