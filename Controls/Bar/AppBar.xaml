@@ -12,7 +12,10 @@
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/Button.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <Style x:Key="CaptionButtonStyle" BasedOn="{StaticResource NoBorderButtonStyle}" TargetType="{x:Type bt:Button}">
+    <Style
+        x:Key="CaptionButtonStyle"
+        BasedOn="{StaticResource NoBorderButtonStyle}"
+        TargetType="{x:Type bt:Button}">
         <Setter Property="Width" Value="40" />
         <Setter Property="Height" Value="32" />
         <Setter Property="Margin" Value="0" />
@@ -21,21 +24,26 @@
         <Setter Property="BorderThickness" Value="0" />
     </Style>
 
-    <Style x:Key="CloseCaptionButtonStyle" BasedOn="{StaticResource CaptionButtonStyle}" TargetType="{x:Type bt:Button}">
+    <Style
+        x:Key="CloseCaptionButtonStyle"
+        BasedOn="{StaticResource CaptionButtonStyle}"
+        TargetType="{x:Type bt:Button}">
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type bt:Button}">
-                    <Border x:Name="ContentBorder"
-                            Width="{TemplateBinding Width}"
-                            Height="{TemplateBinding Height}"
-                            Background="{TemplateBinding Background}">
-                        <ContentPresenter HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"
-                                          Content="{TemplateBinding Content}"
-                                          TextElement.FontFamily="{TemplateBinding FontFamily}"
-                                          TextElement.FontSize="{TemplateBinding FontSize}"
-                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    <Border
+                        x:Name="ContentBorder"
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        Background="{TemplateBinding Background}">
+                        <ContentPresenter
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Content="{TemplateBinding Content}"
+                            TextElement.FontFamily="{TemplateBinding FontFamily}"
+                            TextElement.FontSize="{TemplateBinding FontSize}"
+                            TextElement.Foreground="{TemplateBinding Foreground}" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -124,47 +132,47 @@
 
                 <bt:Button
                     Grid.Column="0"
-                Command="{x:Static SystemCommands.MinimizeWindowCommand}"
-                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                Content="&#xe60e;"
-                FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
-                FontSize="18"
-                Style="{StaticResource CaptionButtonStyle}"
-                ToolTip="Minimize"
-                WindowChrome.IsHitTestVisibleInChrome="True" />
+                    Command="{x:Static SystemCommands.MinimizeWindowCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    Content="&#xe60e;"
+                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
+                    FontSize="18"
+                    Style="{StaticResource CaptionButtonStyle}"
+                    ToolTip="Minimize"
+                    WindowChrome.IsHitTestVisibleInChrome="True" />
                 <bt:Button
                     Grid.Column="1"
-                Command="{x:Static SystemCommands.MaximizeWindowCommand}"
-                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                Content="&#xe691;"
-                FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
-                FontSize="18"
-                ToolTip="Maximize"
-                WindowChrome.IsHitTestVisibleInChrome="True">
+                    Command="{x:Static SystemCommands.MaximizeWindowCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    Content="&#xe691;"
+                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
+                    FontSize="18"
+                    ToolTip="Maximize"
+                    WindowChrome.IsHitTestVisibleInChrome="True">
                     <bt:Button.Style>
-                    <Style BasedOn="{StaticResource CaptionButtonStyle}" TargetType="{x:Type bt:Button}">
-                        <Setter Property="Content" Value="&#xe691;" />
-                        <Setter Property="Command" Value="{x:Static SystemCommands.MaximizeWindowCommand}" />
-                        <Setter Property="ToolTip" Value="Maximize" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
-                                <Setter Property="Content" Value="&#xe772;" />
-                                <Setter Property="Command" Value="{x:Static SystemCommands.RestoreWindowCommand}" />
-                                <Setter Property="ToolTip" Value="Restore" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
+                        <Style BasedOn="{StaticResource CaptionButtonStyle}" TargetType="{x:Type bt:Button}">
+                            <Setter Property="Content" Value="&#xe691;" />
+                            <Setter Property="Command" Value="{x:Static SystemCommands.MaximizeWindowCommand}" />
+                            <Setter Property="ToolTip" Value="Maximize" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                                    <Setter Property="Content" Value="&#xe772;" />
+                                    <Setter Property="Command" Value="{x:Static SystemCommands.RestoreWindowCommand}" />
+                                    <Setter Property="ToolTip" Value="Restore" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
                     </bt:Button.Style>
                 </bt:Button>
                 <bt:Button
                     Grid.Column="2"
-                Command="{x:Static SystemCommands.CloseWindowCommand}"
-                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                Content="&#xe639;"
-                FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
-                FontSize="18"
-                Style="{StaticResource CloseCaptionButtonStyle}"
-                ToolTip="Close" />
+                    Command="{x:Static SystemCommands.CloseWindowCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    Content="&#xe639;"
+                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
+                    FontSize="18"
+                    Style="{StaticResource CloseCaptionButtonStyle}"
+                    ToolTip="Close" />
             </Grid>
         </Grid>
     </ControlTemplate>

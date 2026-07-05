@@ -75,17 +75,19 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
+
+                <!--  Height="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.IconSize)}"  -->
+
                 <ContentControl
                     x:Name="PART_ICON"
                     Grid.Column="0"
                     Width="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.IconSize)}"
-                    Height="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.IconSize)}"
                     Margin="{StaticResource Margin}"
                     VerticalAlignment="Center"
                     Content="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.Icon)}"
                     Focusable="False"
                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.FontFamily)}"
-                    TextElement.FontSize="{TemplateBinding FontSize}"
+                    TextElement.FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.IconSize)}"
                     TextElement.Foreground="{TemplateBinding Foreground}"
                     Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
                 <ContentPresenter
