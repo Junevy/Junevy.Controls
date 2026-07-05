@@ -33,15 +33,15 @@
     <ControlTemplate x:Key="SwitchToggleButton_Rect" TargetType="{x:Type local:ToggleButton}">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition MinWidth="40" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
 
             <Border
                 x:Name="ToggleHost"
                 Grid.Column="0"
-                Width="{TemplateBinding Width}"
-                Height="{TemplateBinding Height}"
+                Width="{TemplateBinding SwitchWidth}"
+                Height="{TemplateBinding SwitchHeight}"
                 Padding="1"
                 BorderBrush="{DynamicResource Theme.Brush.Border.Strong}"
                 BorderThickness="1"
@@ -124,13 +124,15 @@
     <ControlTemplate x:Key="SwitchToggleButton_Radius" TargetType="{x:Type local:ToggleButton}">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition MinWidth="40" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
 
             <Border
                 x:Name="ToggleHost"
                 Grid.Column="0"
+                Width="{TemplateBinding SwitchWidth}"
+                Height="{TemplateBinding SwitchHeight}"
                 Padding="1"
                 BorderBrush="{DynamicResource Theme.Brush.Border.Strong}"
                 BorderThickness="1"
@@ -293,8 +295,8 @@
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Template" Value="{StaticResource SwitchToggleButton_Radius}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="Width" Value="40" />
-        <Setter Property="Height" Value="20" />
+        <Setter Property="SwitchWidth" Value="40" />
+        <Setter Property="SwitchHeight" Value="20" />
         <Setter Property="Border.CornerRadius" Value="10" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
     </Style>
