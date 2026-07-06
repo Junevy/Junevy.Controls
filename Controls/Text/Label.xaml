@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Text">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Junevy.Controls.Resources;component/Font/IconFont.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Resources/Font/IconFont.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
 

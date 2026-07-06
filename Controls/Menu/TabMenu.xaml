@@ -8,7 +8,7 @@
     xmlns:tb="clr-namespace:Junevy.Controls.Controls.Text">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Junevy.Controls.Resources;component/Font/IconFont.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Resources/Font/IconFont.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/Button.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Text/TextBox.xaml" />
