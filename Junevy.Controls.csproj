@@ -27,6 +27,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Font\iconfont.ttf" />
 	  <None Remove="Resources\Pictures\Author.png" />
 	  <None Remove="Resources\Pictures\bullseye.png" />
 	  <None Remove="Resources\Pictures\camera.png" />
@@ -38,6 +39,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Resource Include="Resources\Font\iconfont.ttf" />
 	  <Resource Include="Resources\Pictures\Author.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Resource>
