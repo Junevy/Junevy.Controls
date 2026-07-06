@@ -13,7 +13,7 @@ The library targets:
 - Light and dark palettes in `Themes/AppColors.Light.xaml` and `Themes/AppColors.Dark.xaml`.
 - Keyboard-friendly focus visuals with rounded corners aligned to each control.
 - Reusable styles loaded through `Themes/Generic.xaml`.
-- Icon font resources provided by `Junevy.Controls.Resources`.
+- Icon font and image resources are embedded in `Junevy.Controls`.
 
 ## Quick Start
 

@@ -1,0 +1,9 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <BitmapImage x:Key="camera" UriSource="/Junevy.Controls;component/Resources/Pictures/camera.png" />
+    <BitmapImage x:Key="author" UriSource="/Junevy.Controls;component/Resources/Pictures/Author.png" />
+    <BitmapImage x:Key="bullseye" UriSource="/Junevy.Controls;component/Resources/Pictures/bullseye.png" />
+    <BitmapImage x:Key="whiteCheckBoard" UriSource="/Junevy.Controls;component/Resources/Pictures/whiteCheckBoard_big.png" />
+
+
+</ResourceDictionary>
