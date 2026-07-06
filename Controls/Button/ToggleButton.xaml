@@ -5,7 +5,7 @@
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Button">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Junevy.Controls.Resources;component/Font/IconFont.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Resources/Font/IconFont.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />

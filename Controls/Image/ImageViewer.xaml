@@ -4,7 +4,7 @@
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Image">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Junevy.Controls.Resources;component/Pictures/Image.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Resources/Pictures/Image.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <Style TargetType="{x:Type local:ImageViewer}">

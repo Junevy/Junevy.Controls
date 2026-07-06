@@ -120,7 +120,7 @@
 
             </Border>
 
-            <!--  涓嬫媺寮瑰嚭灞? -->
+            <!--  涓嬫媺寮瑰嚭灞?  -->
             <Popup
                 x:Name="Popup"
                 MinHeight="50"
@@ -165,13 +165,13 @@
                 <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Strong}" />
             </Trigger>
 
-            <!--  灞曞紑鐘舵€? -->
+            <!--  灞曞紑鐘舵€?  -->
             <Trigger Property="IsDropDownOpen" Value="True">
                 <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
                 <Setter TargetName="FocusBorder" Property="Opacity" Value="1" />
             </Trigger>
 
-            <!--  绂佺敤鐘舵€? -->
+            <!--  绂佺敤鐘舵€?  -->
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="MainBorder" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
                 <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
@@ -184,7 +184,7 @@
     </ControlTemplate>
 
 
-    <!--  ComboBox 涓绘牱寮? -->
+    <!--  ComboBox 涓绘牱寮?  -->
     <Style x:Key="DefaultComboBoxStyle" TargetType="{x:Type local:ComboBox}">
         <Setter Property="MinHeight" Value="30" />
         <!--<Setter Property="Width" Value="150" />-->

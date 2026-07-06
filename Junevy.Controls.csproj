@@ -27,7 +27,29 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Pictures\Author.png" />
+	  <None Remove="Resources\Pictures\bullseye.png" />
+	  <None Remove="Resources\Pictures\camera.png" />
+	  <None Remove="Resources\Pictures\whiteCheckBoard_big.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Include="Controls\Menu\MenuItem.NodeType.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Resources\Pictures\Author.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Resources\Pictures\bullseye.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Resources\Pictures\camera.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Resources\Pictures\whiteCheckBoard_big.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Resource>
 	</ItemGroup>
 
 
