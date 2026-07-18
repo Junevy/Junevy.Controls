@@ -20,8 +20,8 @@
     <Style x:Key="DefaultTabMenuItemStyle" TargetType="{x:Type local:TabMenuItem}">
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="MinHeight" Value="30" />
-        <Setter Property="MinWidth" Value="120" />
+        <Setter Property="MinHeight" Value="20" />
+        <!--<Setter Property="MinWidth" Value="120" />-->
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />

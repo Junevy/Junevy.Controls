@@ -109,6 +109,7 @@
     <Style x:Key="DefaultTreeMenuTemplate" TargetType="TreeViewItem">
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="atc:ExpanderBehavior.Enable" Value="True" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="ItemsSource" Value="{Binding Header.Childrens, RelativeSource={RelativeSource Self}}" />
 
@@ -232,6 +233,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:TreeMenu}">
                     <ScrollViewer
+                        CanContentScroll="True"
                         Focusable="False"
                         HorizontalScrollBarVisibility="Hidden"
                         VerticalScrollBarVisibility="Hidden">
@@ -250,7 +252,7 @@
         <Setter Property="ItemsPanel">
             <Setter.Value>
                 <ItemsPanelTemplate>
-                    <Grid />
+                    <VirtualizingStackPanel Orientation="Vertical" />
                 </ItemsPanelTemplate>
             </Setter.Value>
         </Setter>
