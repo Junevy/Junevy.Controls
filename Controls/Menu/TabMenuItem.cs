@@ -104,8 +104,6 @@ namespace Junevy.Controls.Controls.Menu
         public static readonly DependencyProperty IconProperty =
             DependencyProperty.Register("Icon", typeof(object), typeof(TabMenuItem));
 
-
-
         public Orientation Orientation
         {
             get { return (Orientation)GetValue(OrientationProperty); }
