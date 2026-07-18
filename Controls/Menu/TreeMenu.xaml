@@ -40,7 +40,7 @@
                                     Margin="5"
                                     VerticalAlignment="Center"
                                     Background="Transparent"
-                                    FontSize="{TemplateBinding FontSize}"
+                                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=FontSize}"
                                     Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=Foreground}"
                                     Text="{TemplateBinding Title}" />
                             </StackPanel>
@@ -54,11 +54,11 @@
                                 <ContentControl
                                     x:Name="IconModeIcon"
                                     Grid.Column="0"
-                                    Margin="10,10,5,10"
+                                    Margin="5,5,5,5"
                                     VerticalAlignment="Center"
                                     Content="{TemplateBinding Icon}"
                                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=(atc:Icon.FontFamily)}"
-                                    FontSize="24"
+                                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=(atc:Icon.IconSize)}"
                                     Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=Foreground}" />
 
                                 <TextBlock
@@ -67,7 +67,7 @@
                                     Margin="10"
                                     VerticalAlignment="Center"
                                     Background="Transparent"
-                                    FontSize="{TemplateBinding FontSize}"
+                                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=FontSize}"
                                     Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=Foreground}"
                                     Text="{TemplateBinding Title}" />
                             </Grid>
@@ -219,7 +219,8 @@
         <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
-        <Setter Property="Width" Value="150" />
+        <!--<Setter Property="Width" Value="150" />-->
+        <Setter Property="FontSize" Value="12" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
