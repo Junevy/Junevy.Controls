@@ -82,6 +82,21 @@ All resource keys use the semantic `Theme.Brush.*` / `Theme.Color.*` convention.
 - `TreeMenu`: Hierarchical navigation menu.
 - `TabMenu`: Tab navigation with editable tab headers.
 - `ToolBar`: Toolbar and toolbar item styles.
+- `ContextMenu`: Themed context menu with optional icons and nested submenus.
+
+Example:
+
+```xml
+<jv:ContextMenu>
+    <jv:ContextMenuItem Header="Open" Icon="&#xE001;" />
+    <jv:ContextMenuItem Header="Export">
+        <jv:ContextMenuItem Header="PNG" />
+        <jv:ContextMenuItem Header="JPEG" />
+    </jv:ContextMenuItem>
+</jv:ContextMenu>
+```
+
+`ContextMenuItem` uses WPF's native `Header`, `Icon`, `Command`, `InputGestureText`, and `Items` properties. Empty icons collapse their host column, so text starts at the same left edge whether an icon is supplied or not.
 
 ### Buttons
 

@@ -16,6 +16,15 @@
 
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
 
+    <DataTemplate x:Key="TabMenuSelectedContentTemplate">
+        <Border
+            Padding="20"
+            Background="{DynamicResource Theme.Brush.Background.App}"
+            CornerRadius="{DynamicResource Theme.LargeCornerRadius}">
+            <ContentPresenter Content="{Binding}" />
+        </Border>
+    </DataTemplate>
+
     <!--  1. 先定义 TabItem 的样式（最重要！）  -->
     <Style x:Key="DefaultTabMenuItemStyle" TargetType="{x:Type local:TabMenuItem}">
         <Setter Property="Padding" Value="0" />
@@ -138,20 +147,6 @@
             </Setter.Value>
         </Setter>
 
-        <!--  标签页内容区模板（可选）  -->
-        <Setter Property="ContentTemplate">
-            <Setter.Value>
-                <DataTemplate>
-                    <Border
-                        Padding="20"
-                        Background="{DynamicResource Theme.Brush.Background.App}"
-                        CornerRadius="{DynamicResource Theme.LargeCornerRadius}">
-                        <ContentPresenter Content="{Binding Content}" />
-                    </Border>
-                </DataTemplate>
-            </Setter.Value>
-        </Setter>
-
         <!--  最重要的：ControlTemplate 重写整体结构  -->
         <Setter Property="Template">
             <Setter.Value>
@@ -174,7 +169,10 @@
                             BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
                             BorderThickness="1,0,1,1"
                             CornerRadius="{DynamicResource Theme.LargeCornerRadius}">
-                            <ContentPresenter Margin="0" ContentSource="SelectedContent" />
+                            <ContentPresenter
+                                Margin="0"
+                                ContentSource="SelectedContent"
+                                ContentTemplate="{StaticResource TabMenuSelectedContentTemplate}" />
                         </Border>
                     </Grid>
                 </ControlTemplate>

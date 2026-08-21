@@ -74,6 +74,35 @@ namespace Junevy.Controls.Controls.Menu
             base.OnMouseDoubleClick(e);
         }
 
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
+            // The editable header TextBox and close button are inside the
+            // TabItem template. Explicitly select on a header click so the
+            // custom template cannot prevent the normal TabItem behavior.
+            if (!IsDescendantOfCloseButton(e.OriginalSource as DependencyObject))
+            {
+                IsSelected = true;
+            }
+
+            base.OnMouseLeftButtonDown(e);
+        }
+
+        private bool IsDescendantOfCloseButton(DependencyObject? source)
+        {
+            while (source is not null)
+            {
+                if (ReferenceEquals(source, closeButton))
+                {
+                    return true;
+                }
+
+                source = System.Windows.Media.VisualTreeHelper.GetParent(source)
+                    ?? System.Windows.LogicalTreeHelper.GetParent(source);
+            }
+
+            return false;
+        }
+
         private void CloseButton_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             e.Handled = true;
