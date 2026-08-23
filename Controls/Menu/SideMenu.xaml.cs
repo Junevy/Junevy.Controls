@@ -1,6 +1,6 @@
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace Junevy.Controls.Controls.Menu
 {
@@ -18,12 +18,6 @@ namespace Junevy.Controls.Controls.Menu
             DefaultStyleKeyProperty.OverrideMetadata(
                 typeof(SideMenu),
                 new FrameworkPropertyMetadata(typeof(SideMenu)));
-        }
-
-        public SideMenu()
-        {
-            this.SelectionMode = SelectionMode.Single;
-            this.SelectedIndex = 0;
         }
 
         /// <summary>
@@ -46,14 +40,27 @@ namespace Junevy.Controls.Controls.Menu
         public static readonly DependencyProperty DisplayModeProperty =
             DependencyProperty.Register("DisplayMode", typeof(Mode), typeof(SideMenu), new PropertyMetadata(Mode.Horizontal));
 
-
-        private void OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        /// <summary>
+        /// Optional fixed height for each menu item.  NaN keeps the natural
+        /// content height, while a value makes vertical menus predictable.
+        /// </summary>
+        public double ItemHeight
         {
-            if (sender is ScrollViewer sv)
-            {
-                sv.ScrollToHorizontalOffset(sv.HorizontalOffset - e.Delta / 3.0);
-                e.Handled = true;
-            }
+            get { return (double)GetValue(ItemHeightProperty); }
+            set { SetValue(ItemHeightProperty, value); }
+        }
+        public static readonly DependencyProperty ItemHeightProperty =
+            DependencyProperty.Register(
+                nameof(ItemHeight),
+                typeof(double),
+                typeof(SideMenu),
+                new PropertyMetadata(double.NaN),
+                IsValidItemHeight);
+
+        private static bool IsValidItemHeight(object value)
+        {
+            double height = (double)value;
+            return double.IsNaN(height) || (height >= 0 && !double.IsInfinity(height));
         }
     }
 }

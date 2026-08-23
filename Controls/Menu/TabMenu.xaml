@@ -16,16 +16,7 @@
 
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
 
-    <DataTemplate x:Key="TabMenuSelectedContentTemplate">
-        <Border
-            Padding="20"
-            Background="{DynamicResource Theme.Brush.Background.App}"
-            CornerRadius="{DynamicResource Theme.LargeCornerRadius}">
-            <ContentPresenter Content="{Binding}" />
-        </Border>
-    </DataTemplate>
-
-    <!--  1. 先定义 TabItem 的样式（最重要！）  -->
+    <!--  1. TabItem style  -->
     <Style x:Key="DefaultTabMenuItemStyle" TargetType="{x:Type local:TabMenuItem}">
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderThickness" Value="0" />
@@ -36,11 +27,11 @@
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="TextElement.FontSize" Value="12" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
 
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:TabMenuItem}">
@@ -97,7 +88,7 @@
                                     Foreground="{TemplateBinding Foreground}"
                                     IsReadOnly="True"
                                     Template="{StaticResource NoBorderTextBoxTemplate_WPF}"
-                                    Text="{TemplateBinding Header}"
+                                    Text="{Binding Header, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                     Visibility="{TemplateBinding Header,
                                                                  Converter={StaticResource BoolToVisibility}}" />
 
@@ -120,10 +111,13 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
-                            <Setter TargetName="border" Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -135,6 +129,8 @@
     <Style TargetType="{x:Type local:TabMenu}">
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="attach:AttachFuc.IsClosable" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Background.App}" />
 
         <Setter Property="ItemContainerStyle" Value="{StaticResource DefaultTabMenuItemStyle}" />
 
@@ -158,8 +154,10 @@
                         </Grid.RowDefinitions>
 
                         <!--  标签头  -->
-                        <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
-                            <ItemsPresenter />
+                        <ScrollViewer CanContentScroll="True"
+                                      HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollBarVisibility="Disabled">
+                            <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" />
                         </ScrollViewer>
 
                         <!--  内容  -->
@@ -170,9 +168,11 @@
                             BorderThickness="1,0,1,1"
                             CornerRadius="{DynamicResource Theme.LargeCornerRadius}">
                             <ContentPresenter
-                                Margin="0"
+                                Margin="20"
                                 ContentSource="SelectedContent"
-                                ContentTemplate="{StaticResource TabMenuSelectedContentTemplate}" />
+                                ContentTemplate="{TemplateBinding SelectedContentTemplate}"
+                                ContentTemplateSelector="{TemplateBinding SelectedContentTemplateSelector}"
+                                ContentStringFormat="{TemplateBinding SelectedContentStringFormat}" />
                         </Border>
                     </Grid>
                 </ControlTemplate>

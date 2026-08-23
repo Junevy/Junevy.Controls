@@ -38,6 +38,12 @@ namespace Junevy.Controls.Controls.Menu
             base.OnApplyTemplate();
 
             headerTextBox = GetTemplateChild("PART_EditHeaderTextBox") as TextBox;
+            closeButton = GetTemplateChild("PART_CloseButton") as System.Windows.Controls.Button;
+            if (closeButton != null)
+            {
+                closeButton.MouseDoubleClick += CloseButton_MouseDoubleClick;
+            }
+
             if (headerTextBox == null)
             {
                 return;
@@ -47,12 +53,6 @@ namespace Junevy.Controls.Controls.Menu
             headerTextBox.IsHitTestVisible = false;
             headerTextBox.MouseDoubleClick += TextBox_DoubleClick;
             headerTextBox.LostFocus += TextBox_LostFocus;
-
-            closeButton = GetTemplateChild("PART_CloseButton") as System.Windows.Controls.Button;
-            if (closeButton != null)
-            {
-                closeButton.MouseDoubleClick += CloseButton_MouseDoubleClick;
-            }
         }
 
         protected override void OnMouseDoubleClick(MouseButtonEventArgs e)

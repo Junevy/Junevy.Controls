@@ -29,6 +29,16 @@ namespace Junevy.Controls.Controls.Menu
             CommandBindings.Add(new CommandBinding(CloseTabCommand, OnCloseTabCommand, OnCanCloseTabCommand));
         }
 
+        protected override DependencyObject GetContainerForItemOverride()
+        {
+            return new TabMenuItem();
+        }
+
+        protected override bool IsItemItsOwnContainerOverride(object item)
+        {
+            return item is TabMenuItem;
+        }
+
         public static readonly DependencyProperty CanCloseLastTabProperty =
             DependencyProperty.Register(nameof(CanCloseLastTab), typeof(bool), typeof(TabMenu), new PropertyMetadata(true));
 
