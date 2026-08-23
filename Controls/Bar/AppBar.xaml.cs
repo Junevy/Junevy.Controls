@@ -13,9 +13,9 @@ namespace Junevy.Controls.Controls.Bar
             DefaultStyleKeyProperty.OverrideMetadata(typeof(AppBar), new FrameworkPropertyMetadata(typeof(AppBar)));
         }
 
-        public ToolBar ToolBar
+        public ToolBar? ToolBar
         {
-            get => (ToolBar)GetValue(ToolBarProperty);
+            get => (ToolBar?)GetValue(ToolBarProperty);
             set => SetValue(ToolBarProperty, value);
         }
 

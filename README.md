@@ -115,6 +115,8 @@ Example:
 
 - `Label`: Semantic label styles for normal, success, warning, and danger states.
 - `TextTitle`: Title text control.
+- `ListBox`: Theme-aware selectable list with virtualized scrolling.
+- `ListView`: Theme-aware list view with standard content and `GridView` layouts.
 - `DataGrid`: Themed data grid styles.
 - `ImageViewer`: Image display and viewing control.
 - `AppBar`: Application title bar style.

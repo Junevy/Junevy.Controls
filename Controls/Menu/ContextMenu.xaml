@@ -6,7 +6,28 @@
 
     <cvt:NullToCollapsedConverter x:Key="ContextMenuIconVisibility" />
 
+    <Style x:Key="JunevyContextMenuSeparatorStyle" TargetType="{x:Type Separator}">
+        <Setter Property="Margin" Value="8,4" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Separator}">
+                    <Border Height="1"
+                            Background="{DynamicResource Theme.Brush.Border.Default}"
+                            SnapsToDevicePixels="True" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="JunevyContextMenuItemStyle" TargetType="{x:Type MenuItem}">
+        <Style.Resources>
+            <Style TargetType="{x:Type Separator}"
+                   BasedOn="{StaticResource JunevyContextMenuSeparatorStyle}" />
+            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                             Color="{DynamicResource Theme.Color.Surface.Hover}" />
+            <SolidColorBrush x:Key="{x:Static SystemColors.MenuHighlightBrushKey}"
+                             Color="{DynamicResource Theme.Color.Surface.Hover}" />
+        </Style.Resources>
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
@@ -15,8 +36,11 @@
         <Setter Property="Margin" Value="2" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+        <!-- Keep generated items on this style at every submenu depth.  A
+             DynamicResource avoids binding a derived ContextMenuItem style to
+             a native MenuItem container. -->
         <Setter Property="ItemContainerStyle"
-                Value="{Binding RelativeSource={RelativeSource Self}, Path=Style}" />
+                Value="{DynamicResource JunevyContextMenuItemStyle}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type MenuItem}">
@@ -28,30 +52,46 @@
                             CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="IconColumn" Width="Auto" />
+                                <ColumnDefinition Width="24" />
                                 <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition x:Name="ArrowColumn" Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <ContentControl x:Name="IconPresenter" Grid.Column="0" Width="16" Height="16"
-                                            Margin="0,0,8,0" HorizontalContentAlignment="Center"
+                                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            HorizontalContentAlignment="Center"
                                             VerticalContentAlignment="Center"
                                             Content="{TemplateBinding Icon}"
                                             FontFamily="{DynamicResource IconFont}" FontSize="14"
                                             Foreground="{TemplateBinding Foreground}"
                                             Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Icon, Converter={StaticResource ContextMenuIconVisibility}}" />
+                            <TextBlock x:Name="CheckMark" Grid.Column="0"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontFamily="Segoe UI Symbol" FontSize="12"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       Text="&#x2713;" Visibility="Collapsed" />
                             <ContentPresenter Grid.Column="1" VerticalAlignment="Center"
                                               Content="{TemplateBinding Header}"
                                               ContentStringFormat="{TemplateBinding HeaderStringFormat}"
                                               ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}"
+                                              RecognizesAccessKey="True"
                                               TextElement.FontSize="{TemplateBinding FontSize}"
                                               TextElement.Foreground="{TemplateBinding Foreground}" />
-                            <Path x:Name="Arrow" Grid.Column="2" Width="6" Height="10" Margin="12,0,0,0"
+                            <TextBlock x:Name="InputGestureText" Grid.Column="2"
+                                       Margin="12,0,0,0" VerticalAlignment="Center"
+                                       FontSize="{TemplateBinding FontSize}"
+                                       Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                                       Text="{TemplateBinding InputGestureText}"
+                                       Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=InputGestureText, Converter={StaticResource ContextMenuIconVisibility}}" />
+                            <Path x:Name="Arrow" Grid.Column="3" Width="6" Height="10" Margin="12,0,0,0"
                                   HorizontalAlignment="Right" VerticalAlignment="Center"
                                   Data="M 0,0 L 4,5 L 0,10" Stroke="{TemplateBinding Foreground}"
-                                  StrokeThickness="1.4" Visibility="Collapsed" />
+                                  StrokeThickness="1.4" Visibility="Collapsed"
+                                  RenderTransformOrigin="0.5,0.5" />
                         </Grid>
                     </Border>
-                    <Popup x:Name="SubMenuPopup"
+                    <Popup x:Name="PART_Popup"
                            AllowsTransparency="True"
                            Focusable="False"
                            IsOpen="{TemplateBinding IsSubmenuOpen}"
@@ -64,19 +104,49 @@
                                 BorderThickness="1"
                                 CornerRadius="{DynamicResource Theme.ControlCornerRadius}"
                                 Effect="{DynamicResource Theme.PopupShadow}">
-                            <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" />
+                            <ScrollViewer x:Name="SubMenuScrollViewer"
+                                          Style="{DynamicResource {ComponentResourceKey TypeInTargetAssembly={x:Type FrameworkElement}, ResourceId=MenuScrollViewer}}">
+                                <Grid RenderOptions.ClearTypeHint="Enabled">
+                                    <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"
+                                                    KeyboardNavigation.TabNavigation="Cycle" />
+                                </Grid>
+                            </ScrollViewer>
                         </Border>
                     </Popup>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsHighlighted" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
                             <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                        </Trigger>
+                        <Trigger Property="IsSubmenuOpen" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Pressed}" />
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Pressed}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="IconPresenter" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
+                            <Setter TargetName="InputGestureText"
+                                    Property="Foreground"
+                                    Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
                         </Trigger>
                         <Trigger Property="HasItems" Value="True">
                             <Setter TargetName="Arrow" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="FlowDirection" Value="RightToLeft">
+                            <Setter TargetName="PART_Popup" Property="Placement" Value="Left" />
+                            <Setter TargetName="Arrow" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="-1" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -87,6 +157,15 @@
     <Style TargetType="{x:Type local:ContextMenuItem}" BasedOn="{StaticResource JunevyContextMenuItemStyle}" />
 
     <Style TargetType="{x:Type local:ContextMenu}">
+        <Style.Resources>
+            <!-- Submenu containers are native MenuItems.  Give them the same
+                 template explicitly so WPF cannot fall back to its blue
+                 system highlight when a nested item is selected. -->
+            <Style TargetType="{x:Type MenuItem}"
+                   BasedOn="{StaticResource JunevyContextMenuItemStyle}" />
+            <Style TargetType="{x:Type Separator}"
+                   BasedOn="{StaticResource JunevyContextMenuSeparatorStyle}" />
+        </Style.Resources>
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
@@ -101,7 +180,13 @@
                             BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="{DynamicResource Theme.ControlCornerRadius}"
                             Effect="{DynamicResource Theme.PopupShadow}">
-                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" />
+                        <ScrollViewer x:Name="ContextMenuScrollViewer"
+                                      Style="{DynamicResource {ComponentResourceKey TypeInTargetAssembly={x:Type FrameworkElement}, ResourceId=MenuScrollViewer}}">
+                            <Grid RenderOptions.ClearTypeHint="Enabled">
+                                <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"
+                                                KeyboardNavigation.TabNavigation="Cycle" />
+                            </Grid>
+                        </ScrollViewer>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

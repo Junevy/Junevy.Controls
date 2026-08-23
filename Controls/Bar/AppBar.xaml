@@ -87,7 +87,7 @@
                 Content="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.Icon)}"
                 FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
                 FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
-                Foreground="{DynamicResource Theme.Brush.Text.Primary}" />
+                Foreground="{TemplateBinding Foreground}" />
 
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
@@ -103,7 +103,7 @@
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         FontSize="{TemplateBinding FontSize}"
-                        Foreground="{DynamicResource Theme.Brush.Text.Primary}"
+                        Foreground="{TemplateBinding Foreground}"
                         Text="{TemplateBinding Content}" />
                 </Grid>
 

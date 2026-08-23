@@ -78,6 +78,23 @@
                         ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
                         IsHitTestVisible="False" />
 
+                    <!-- WPF's editable ComboBox contract.  Keeping this named
+                         PART lets keyboard input and Text binding work while
+                         preserving the custom visual style. -->
+                    <TextBox
+                        x:Name="PART_EditableTextBox"
+                        Grid.Column="0"
+                        Margin="{TemplateBinding Padding}"
+                        Padding="0"
+                        HorizontalContentAlignment="Left"
+                        VerticalContentAlignment="Center"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Foreground="{TemplateBinding Foreground}"
+                        IsReadOnly="{TemplateBinding IsReadOnly}"
+                        Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Visibility="Collapsed" />
+
                     <!--  鍗犱綅鏂囧瓧  -->
                     <TextBlock
                         x:Name="Placeholder"
@@ -94,7 +111,7 @@
                     <!--  Toggle 鎸夐挳锛堣鐩栨暣涓尯鍩燂級  -->
                     <bt:ToggleButton
                         x:Name="ToggleButton"
-                        Grid.ColumnSpan="2"
+                        Grid.Column="1"
                         HorizontalAlignment="Right"
                         ClickMode="Press"
                         Focusable="False"
@@ -158,6 +175,12 @@
             <!--  鏃犻€変腑椤规椂鏄剧ず鍗犱綅鏂囧瓧  -->
             <Trigger Property="SelectedItem" Value="{x:Null}">
                 <Setter TargetName="Placeholder" Property="Visibility" Value="Visible" />
+            </Trigger>
+
+            <Trigger Property="IsEditable" Value="True">
+                <Setter TargetName="ContentSite" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="Placeholder" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible" />
             </Trigger>
 
             <!--  榧犳爣鎮仠  -->
