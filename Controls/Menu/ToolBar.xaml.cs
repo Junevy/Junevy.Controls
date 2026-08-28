@@ -12,6 +12,19 @@ namespace Junevy.Controls.Controls.Menu
                 new FrameworkPropertyMetadata(typeof(ToolBar)));
         }
 
+        // Data items are hosted by the Junevy button container. Explicit
+        // ToolBarItem instances remain their own containers, as required by
+        // the ItemsControl contract.
+        protected override DependencyObject GetContainerForItemOverride()
+        {
+            return new ToolBarItem();
+        }
+
+        protected override bool IsItemItsOwnContainerOverride(object item)
+        {
+            return item is ToolBarItem;
+        }
+
         public Orientation Orientation
         {
             get { return (Orientation)GetValue(OrientationProperty); }
