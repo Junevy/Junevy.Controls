@@ -107,6 +107,11 @@
         </Setter>
 
         <Style.Triggers>
+            <!-- Horizontal toolbars are single-row controls. If their host gives them
+                 less height than the item row, a vertical thumb would appear at the end. -->
+            <Trigger Property="Orientation" Value="Horizontal">
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+            </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.5" />
             </Trigger>

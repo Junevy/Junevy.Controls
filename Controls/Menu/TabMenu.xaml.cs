@@ -42,10 +42,36 @@ namespace Junevy.Controls.Controls.Menu
         public static readonly DependencyProperty CanCloseLastTabProperty =
             DependencyProperty.Register(nameof(CanCloseLastTab), typeof(bool), typeof(TabMenu), new PropertyMetadata(true));
 
+        public static readonly DependencyProperty HeaderCornerRadiusProperty =
+            DependencyProperty.Register(
+                nameof(HeaderCornerRadius),
+                typeof(CornerRadius),
+                typeof(TabMenu),
+                new PropertyMetadata(new CornerRadius(4)));
+
+        public static readonly DependencyProperty ContentCornerRadiusProperty =
+            DependencyProperty.Register(
+                nameof(ContentCornerRadius),
+                typeof(CornerRadius),
+                typeof(TabMenu),
+                new PropertyMetadata(new CornerRadius(8)));
+
         public bool CanCloseLastTab
         {
             get => (bool)GetValue(CanCloseLastTabProperty);
             set => SetValue(CanCloseLastTabProperty, value);
+        }
+
+        public CornerRadius HeaderCornerRadius
+        {
+            get => (CornerRadius)GetValue(HeaderCornerRadiusProperty);
+            set => SetValue(HeaderCornerRadiusProperty, value);
+        }
+
+        public CornerRadius ContentCornerRadius
+        {
+            get => (CornerRadius)GetValue(ContentCornerRadiusProperty);
+            set => SetValue(ContentCornerRadiusProperty, value);
         }
 
         public void CloseTab(TabMenuItem? tabItem)
