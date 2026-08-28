@@ -9,7 +9,7 @@
 
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>Junevy.Controls</PackageId>
-		<Version>1.2.2</Version>
+		<Version>1.2.3</Version>
 		<Authors>Junevy</Authors>
 		<Company>Junevy</Company>
 		<Description>Junevy WPF Controls</Description>

@@ -14,13 +14,12 @@
 
     <cvt:NullToCollapsedConverter x:Key="ToolBarItemContentVisibility" />
 
-    <Style TargetType="{x:Type local:ToolBarItem}">
+    <Style x:Key="DefaultToolBarItemStyle" TargetType="{x:Type local:ToolBarItem}">
         <Setter Property="Width" Value="40" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Height" Value="40" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ToolBarItem}">
@@ -77,6 +76,8 @@
         </Setter>
     </Style>
 
+    <Style BasedOn="{StaticResource DefaultToolBarItemStyle}" TargetType="{x:Type local:ToolBarItem}" />
+
     <Style x:Key="DefaultToolMenu" TargetType="{x:Type local:ToolBar}">
         <Setter Property="FontSize" Value="15" />
         <Setter Property="MinHeight" Value="42" />
@@ -91,6 +92,7 @@
         <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource DefaultToolBarItemStyle}" />
 
         <Setter Property="Template">
             <Setter.Value>
