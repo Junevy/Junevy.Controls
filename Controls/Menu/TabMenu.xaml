@@ -41,7 +41,7 @@
                         Background="{TemplateBinding Background}"
                         BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
                         BorderThickness="1,1,1,0"
-                        CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
+                        CornerRadius="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=HeaderCornerRadius}">
 
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -53,7 +53,7 @@
                             <Border
                                 Grid.Column="0"
                                 Background="{DynamicResource Theme.Brush.Accent.Primary}"
-                                CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
+                                CornerRadius="2"
                                 Visibility="{TemplateBinding IsSelected,
                                                              Converter={StaticResource BoolToVisibility}}" />
 
@@ -131,6 +131,8 @@
         <Setter Property="attach:AttachFuc.IsClosable" Value="True" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Background.App}" />
+        <Setter Property="HeaderCornerRadius" Value="{DynamicResource Theme.SmallCornerRadius}" />
+        <Setter Property="ContentCornerRadius" Value="{DynamicResource Theme.LargeCornerRadius}" />
 
         <Setter Property="ItemContainerStyle" Value="{StaticResource DefaultTabMenuItemStyle}" />
 
@@ -166,7 +168,7 @@
                             Background="{DynamicResource Theme.Brush.Background.App}"
                             BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
                             BorderThickness="1,0,1,1"
-                            CornerRadius="{DynamicResource Theme.LargeCornerRadius}">
+                            CornerRadius="{TemplateBinding ContentCornerRadius}">
                             <ContentPresenter
                                 Margin="20"
                                 ContentSource="SelectedContent"
