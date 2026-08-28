@@ -75,6 +75,7 @@
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         Content="{TemplateBinding SelectionBoxItem}"
+                        ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
                         ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
                         IsHitTestVisible="False" />
 
@@ -139,7 +140,7 @@
 
             <!--  涓嬫媺寮瑰嚭灞?  -->
             <Popup
-                x:Name="Popup"
+                x:Name="PART_Popup"
                 MinHeight="50"
                 AllowsTransparency="True"
                 Focusable="False"

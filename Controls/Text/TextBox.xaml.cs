@@ -1,8 +1,10 @@
 using System.Windows;
 namespace Junevy.Controls.Controls.Text
 {
+    [TemplatePart(Name = PART_CloseButton, Type = typeof(System.Windows.Controls.Button))]
     public class TextBox : System.Windows.Controls.TextBox
     {
+        private const string PART_CloseButton = "PART_CloseButton";
         private System.Windows.Controls.Button? closeButton;
 
         static TextBox()
@@ -21,7 +23,7 @@ namespace Junevy.Controls.Controls.Text
 
             base.OnApplyTemplate();
 
-            closeButton = GetTemplateChild("PART_CloseButton") as System.Windows.Controls.Button;
+            closeButton = GetTemplateChild(PART_CloseButton) as System.Windows.Controls.Button;
             if (closeButton != null)
             {
                 closeButton.Click += ClearTextBoxText;

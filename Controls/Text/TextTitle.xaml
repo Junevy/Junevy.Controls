@@ -16,6 +16,9 @@
                 Grid.Column="0"
                 VerticalAlignment="Center"
                 Content="{TemplateBinding Content}"
+                ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                ContentTemplate="{TemplateBinding ContentTemplate}"
+                ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
                 FontFamily="{TemplateBinding FontFamily}"
                 FontSize="{TemplateBinding FontSize}"
                 Foreground="{TemplateBinding Foreground}" />
