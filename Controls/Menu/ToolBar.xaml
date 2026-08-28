@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
     xmlns:bt="clr-namespace:Junevy.Controls.Controls.Button"
+    xmlns:cvt="clr-namespace:Junevy.Controls.Converters"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Menu">
 
     <ResourceDictionary.MergedDictionaries>
@@ -10,6 +11,8 @@
         <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/Button.xaml" />
     </ResourceDictionary.MergedDictionaries>
+
+    <cvt:NullToCollapsedConverter x:Key="ToolBarItemContentVisibility" />
 
     <Style TargetType="{x:Type local:ToolBarItem}">
         <Setter Property="Width" Value="40" />
@@ -30,6 +33,7 @@
                             VerticalAlignment="Center"
                             Orientation="{TemplateBinding DisplayOrientation}">
                             <ContentControl
+                                x:Name="IconPresenter"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 HorizontalContentAlignment="Center"
@@ -40,7 +44,19 @@
                                 Foreground="{TemplateBinding Foreground}"
                                 TextElement.FontFamily="{TemplateBinding FontFamily}"
                                 TextElement.FontSize="{TemplateBinding FontSize}"
-                                TextElement.Foreground="{TemplateBinding Foreground}" />
+                                TextElement.Foreground="{TemplateBinding Foreground}"
+                                Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Icon, Converter={StaticResource ToolBarItemContentVisibility}}" />
+
+                            <ContentPresenter
+                                x:Name="ContentPresenter"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                ContentSource="Content"
+                                RecognizesAccessKey="True"
+                                TextElement.FontFamily="{TemplateBinding FontFamily}"
+                                TextElement.FontSize="{TemplateBinding FontSize}"
+                                TextElement.Foreground="{TemplateBinding Foreground}"
+                                Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content, Converter={StaticResource ToolBarItemContentVisibility}}" />
                         </StackPanel>
                     </Border>
 
