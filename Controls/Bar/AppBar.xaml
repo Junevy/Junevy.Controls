@@ -40,7 +40,8 @@
                         <ContentPresenter
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Content="{TemplateBinding Content}"
+                            ContentSource="Content"
+                            RecognizesAccessKey="True"
                             TextElement.FontFamily="{TemplateBinding FontFamily}"
                             TextElement.FontSize="{TemplateBinding FontSize}"
                             TextElement.Foreground="{TemplateBinding Foreground}" />
@@ -98,13 +99,14 @@
 
                 <!--  title  -->
                 <Grid Grid.Row="0">
-                    <TextBlock
+                    <ContentPresenter
                         Margin="0,3,0,3"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
-                        FontSize="{TemplateBinding FontSize}"
-                        Foreground="{TemplateBinding Foreground}"
-                        Text="{TemplateBinding Content}" />
+                        ContentSource="Content"
+                        RecognizesAccessKey="True"
+                        TextElement.FontSize="{TemplateBinding FontSize}"
+                        TextElement.Foreground="{TemplateBinding Foreground}" />
                 </Grid>
 
                 <!--  seperator  -->

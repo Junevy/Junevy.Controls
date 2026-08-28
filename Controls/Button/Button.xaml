@@ -33,7 +33,8 @@
                 Margin="{StaticResource Margin}"
                 HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                Content="{TemplateBinding Content}"
+                ContentSource="Content"
+                RecognizesAccessKey="True"
                 Opacity="1"
                 TextElement.Foreground="{TemplateBinding Foreground}" />
         </Border>
@@ -96,7 +97,8 @@
                     Margin="{StaticResource Margin}"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Content="{TemplateBinding Content}"
+                    ContentSource="Content"
+                    RecognizesAccessKey="True"
                     TextElement.FontSize="{TemplateBinding FontSize}"
                     TextElement.Foreground="{TemplateBinding Foreground}"
                     Visibility="{TemplateBinding Content,
@@ -131,7 +133,8 @@
                 Margin="{StaticResource Margin}"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                Content="{TemplateBinding Content}"
+                ContentSource="Content"
+                RecognizesAccessKey="True"
                 TextElement.FontFamily="{TemplateBinding FontFamily}"
                 TextElement.Foreground="{TemplateBinding Foreground}" />
         </Border>

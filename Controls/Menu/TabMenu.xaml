@@ -78,19 +78,31 @@
                                     Visibility="{TemplateBinding Icon,
                                                                  Converter={StaticResource BoolToVisibility}}" />
 
-                                <!--  title  -->
-                                <TextBox
-                                    x:Name="PART_EditHeaderTextBox"
-                                    Grid.Column="1"
-                                    Margin="5,0,20,0"
-                                    VerticalAlignment="Center"
-                                    FontSize="{TemplateBinding FontSize}"
-                                    Foreground="{TemplateBinding Foreground}"
-                                    IsReadOnly="True"
-                                    Template="{StaticResource NoBorderTextBoxTemplate_WPF}"
-                                    Text="{Binding Header, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                    Visibility="{TemplateBinding Header,
-                                                                 Converter={StaticResource BoolToVisibility}}" />
+                                <!-- Header display follows the standard WPF
+                                     HeaderedContentControl contract. -->
+                                <Grid Grid.Column="1" Margin="5,0,20,0">
+                                    <ContentPresenter
+                                        x:Name="PART_HeaderPresenter"
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        ContentSource="Header"
+                                        RecognizesAccessKey="True"
+                                        TextElement.FontFamily="{TemplateBinding FontFamily}"
+                                        TextElement.FontSize="{TemplateBinding FontSize}"
+                                        TextElement.FontStretch="{TemplateBinding FontStretch}"
+                                        TextElement.FontStyle="{TemplateBinding FontStyle}"
+                                        TextElement.FontWeight="{TemplateBinding FontWeight}"
+                                        TextElement.Foreground="{TemplateBinding Foreground}" />
+
+                                    <TextBox
+                                        x:Name="PART_EditHeaderTextBox"
+                                        VerticalAlignment="Center"
+                                        FontSize="{TemplateBinding FontSize}"
+                                        Foreground="{TemplateBinding Foreground}"
+                                        Template="{StaticResource NoBorderTextBoxTemplate_WPF}"
+                                        Text="{Binding Header, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                        Visibility="Collapsed" />
+                                </Grid>
 
                                 <bt:Button
                                     x:Name="PART_CloseButton"
@@ -111,6 +123,10 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
+                        </Trigger>
+                        <Trigger Property="IsEditing" Value="True">
+                            <Setter TargetName="PART_HeaderPresenter" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="PART_EditHeaderTextBox" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
@@ -170,7 +186,7 @@
                             BorderThickness="1,0,1,1"
                             CornerRadius="{TemplateBinding ContentCornerRadius}">
                             <ContentPresenter
-                                Margin="20"
+                                Margin="{TemplateBinding Padding}"
                                 ContentSource="SelectedContent"
                                 ContentTemplate="{TemplateBinding SelectedContentTemplate}"
                                 ContentTemplateSelector="{TemplateBinding SelectedContentTemplateSelector}"

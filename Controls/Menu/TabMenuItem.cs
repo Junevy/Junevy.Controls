@@ -5,13 +5,14 @@ using System.Windows.Threading;
 
 namespace Junevy.Controls.Controls.Menu
 {
+    [TemplatePart(Name = PART_EditHeaderTextBox, Type = typeof(TextBox))]
+    [TemplatePart(Name = PART_CloseButton, Type = typeof(System.Windows.Controls.Button))]
     public class TabMenuItem : TabItem
     {
+        private const string PART_EditHeaderTextBox = "PART_EditHeaderTextBox";
+        private const string PART_CloseButton = "PART_CloseButton";
         private TextBox? headerTextBox;
         private System.Windows.Controls.Button? closeButton;
-        private bool _isEditing;
-
-        public bool IsEditing => _isEditing;
 
         public Guid Id { get; } = Guid.NewGuid();
 
@@ -26,7 +27,6 @@ namespace Junevy.Controls.Controls.Menu
         {
             if (headerTextBox != null)
             {
-                headerTextBox.MouseDoubleClick -= TextBox_DoubleClick;
                 headerTextBox.LostFocus -= TextBox_LostFocus;
             }
 
@@ -37,8 +37,8 @@ namespace Junevy.Controls.Controls.Menu
 
             base.OnApplyTemplate();
 
-            headerTextBox = GetTemplateChild("PART_EditHeaderTextBox") as TextBox;
-            closeButton = GetTemplateChild("PART_CloseButton") as System.Windows.Controls.Button;
+            headerTextBox = GetTemplateChild(PART_EditHeaderTextBox) as TextBox;
+            closeButton = GetTemplateChild(PART_CloseButton) as System.Windows.Controls.Button;
             if (closeButton != null)
             {
                 closeButton.MouseDoubleClick += CloseButton_MouseDoubleClick;
@@ -49,20 +49,19 @@ namespace Junevy.Controls.Controls.Menu
                 return;
             }
 
-            headerTextBox.IsReadOnly = true;
-            headerTextBox.IsHitTestVisible = false;
-            headerTextBox.MouseDoubleClick += TextBox_DoubleClick;
             headerTextBox.LostFocus += TextBox_LostFocus;
         }
 
         protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
         {
-            if (!e.Handled && headerTextBox != null)
+            if (!e.Handled
+                && !IsEditing
+                && Header is string
+                && headerTextBox != null
+                && !IsDescendantOfCloseButton(e.OriginalSource as DependencyObject))
             {
                 e.Handled = true;
-                _isEditing = true;
-                headerTextBox.IsHitTestVisible = true;
-                headerTextBox.IsReadOnly = false;
+                SetValue(IsEditingPropertyKey, true);
 
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
@@ -72,19 +71,6 @@ namespace Junevy.Controls.Controls.Menu
             }
 
             base.OnMouseDoubleClick(e);
-        }
-
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-        {
-            // The editable header TextBox and close button are inside the
-            // TabItem template. Explicitly select on a header click so the
-            // custom template cannot prevent the normal TabItem behavior.
-            if (!IsDescendantOfCloseButton(e.OriginalSource as DependencyObject))
-            {
-                IsSelected = true;
-            }
-
-            base.OnMouseLeftButtonDown(e);
         }
 
         private bool IsDescendantOfCloseButton(DependencyObject? source)
@@ -108,20 +94,21 @@ namespace Junevy.Controls.Controls.Menu
             e.Handled = true;
         }
 
-        private void TextBox_DoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            e.Handled = true;
-        }
-
         private void TextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (sender is TextBox textBox)
-            {
-                textBox.IsReadOnly = true;
-                textBox.IsHitTestVisible = false;
-                _isEditing = false;
-            }
+            SetValue(IsEditingPropertyKey, false);
         }
+
+        private static readonly DependencyPropertyKey IsEditingPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(IsEditing),
+                typeof(bool),
+                typeof(TabMenuItem),
+                new PropertyMetadata(false));
+
+        public static readonly DependencyProperty IsEditingProperty = IsEditingPropertyKey.DependencyProperty;
+
+        public bool IsEditing => (bool)GetValue(IsEditingProperty);
 
         /// <summary>
         /// MenuItem内元素的布局方向

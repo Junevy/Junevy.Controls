@@ -137,7 +137,7 @@
                                 Grid.Column="1"
                                 Background="{TemplateBinding Background}"
                                 CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
-                                <ContentPresenter Content="{TemplateBinding Header}" />
+                                <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" />
                             </Border>
                         </Grid>
 
@@ -189,7 +189,7 @@
                                 Grid.Column="1"
                                 Background="{TemplateBinding Background}"
                                 CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
-                                <ContentPresenter Content="{TemplateBinding Header}" />
+                                <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" />
                             </Border>
                         </Grid>
 
