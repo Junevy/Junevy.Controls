@@ -14,13 +14,6 @@ namespace Junevy.Controls.Tests.Toolbox;
 [NonParallelizable]
 public sealed class ToolboxContainerTests
 {
-    private enum TriggerPayloadKind
-    {
-        Null,
-        Distinct,
-        SameAsGenerated
-    }
-
     [Test]
     public void ToolItem_FreshDragDataPreservesThePublicDependencyPropertyContract()
     {
@@ -118,76 +111,37 @@ public sealed class ToolboxContainerTests
         var second = new object();
 
         InvokePrepare(group, container, first);
-        AssertGeneratedPayloadSurvivesExternalCoercion(container, first);
+        AssertGeneratedPayload(container, first);
 
         InvokeClear(group, container, first);
         Assert.That(container.DragData, Is.Null);
 
         InvokePrepare(group, container, second);
-        AssertGeneratedPayloadSurvivesExternalCoercion(container, second);
+        AssertGeneratedPayload(container, second);
 
         InvokeClear(group, container, second);
         Assert.That(container.DragData, Is.Null);
     }
 
     [Test]
-    public void GeneratedContainer_ExternalCoercionKeepsEffectivePayloadAndOwnershipConsistent()
+    public void GeneratedContainer_RecordsGeneratedPayloadAsCurrentValue()
     {
         var group = new ToolboxItem();
         var payload = new object();
         var container = new ToolItem();
 
         InvokePrepare(group, container, payload);
-        AssertGeneratedPayloadSurvivesExternalCoercion(container, payload);
+        AssertGeneratedPayload(container, payload);
 
         Assert.Multiple(() =>
         {
-            Assert.That(GetPrivateField<bool>(container, "_ownsGeneratedDragData"), Is.True);
             Assert.That(GetPrivateField<object>(container, "_generatedDragData"), Is.SameAs(payload));
+            Assert.That(
+                DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty).IsCurrent,
+                Is.True);
         });
 
         InvokeClear(group, container, payload);
-        AssertGeneratedStateReleased(container);
-    }
-
-    [TestCase(1)]
-    [TestCase(2)]
-    [TestCase(3)]
-    public void GeneratedContainer_OperationFailureReleasesMarkerPayloadAndOperation(int operationValue)
-    {
-        var failureOperation = (ToolItem.GeneratedDragDataOperation)operationValue;
-        var payload = new object();
-        var nextPayload = new object();
-        var container = new ToolItem();
-
-        if (failureOperation != ToolItem.GeneratedDragDataOperation.ApplyState)
-        {
-            container.SetGeneratedDragData(payload);
-        }
-
-        container.GeneratedDragDataOperationCompletedForTest = operation =>
-        {
-            if (operation == failureOperation)
-            {
-                throw new InvalidOperationException("Injected generated DragData operation failure.");
-            }
-        };
-
-        if (failureOperation == ToolItem.GeneratedDragDataOperation.ApplyState)
-        {
-            Assert.Throws<InvalidOperationException>(() => container.SetGeneratedDragData(payload));
-        }
-        else
-        {
-            Assert.Throws<InvalidOperationException>(() => container.ClearGeneratedDragData(payload));
-        }
-
-        container.GeneratedDragDataOperationCompletedForTest = null;
-        AssertGeneratedStateReleased(container);
-
-        container.SetGeneratedDragData(nextPayload);
-        AssertGeneratedPayloadSurvivesExternalCoercion(container, nextPayload);
-        container.ClearGeneratedDragData(nextPayload);
         AssertGeneratedStateReleased(container);
     }
 
@@ -231,8 +185,6 @@ public sealed class ToolboxContainerTests
             container,
             ToolItem.DragDataProperty,
             new Binding(nameof(FrameworkElement.Tag)) { Source = source });
-        container.CoerceValue(ToolItem.DragDataProperty);
-
         InvokePrepare(group, container, new object());
 
         Assert.Multiple(() =>
@@ -257,25 +209,150 @@ public sealed class ToolboxContainerTests
     }
 
     [Test]
-    public void GeneratedContainer_DoesNotOverwritePreexistingCurrentNull()
+    public void GeneratedContainer_DoesNotOverwriteLocalNull()
     {
         var group = new ToolboxItem();
         var container = new ToolItem();
-        container.SetCurrentValue(ToolItem.DragDataProperty, null);
+        container.SetValue(ToolItem.DragDataProperty, null);
 
         InvokePrepare(group, container, new object());
 
-        ValueSource source = DependencyPropertyHelper.GetValueSource(
+        Assert.Multiple(() =>
+        {
+            Assert.That(container.DragData, Is.Null);
+            Assert.That(container.ReadLocalValue(ToolItem.DragDataProperty), Is.Null);
+            Assert.That(DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty).BaseValueSource,
+                Is.EqualTo(BaseValueSource.Local));
+        });
+    }
+
+    [Test]
+    public void GeneratedContainer_DoesNotOverwriteBindingToNull()
+    {
+        var group = new ToolboxItem();
+        var source = new TextBlock { Tag = null };
+        var container = new ToolItem();
+        BindingOperations.SetBinding(
+            container,
+            ToolItem.DragDataProperty,
+            new Binding(nameof(FrameworkElement.Tag)) { Source = source });
+
+        InvokePrepare(group, container, new object());
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(container.DragData, Is.Null);
+            Assert.That(BindingOperations.GetBindingExpression(container, ToolItem.DragDataProperty), Is.Not.Null);
+            Assert.That(DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty).IsExpression,
+                Is.True);
+        });
+    }
+
+    [Test]
+    public void GeneratedContainer_DoesNotOverwriteStyleNull()
+    {
+        var group = new ToolboxItem();
+        var container = new ToolItem();
+        var style = new Style(typeof(ToolItem));
+        style.Setters.Add(new Setter(ToolItem.DragDataProperty, null));
+        container.Style = style;
+
+        InvokePrepare(group, container, new object());
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(container.DragData, Is.Null);
+            Assert.That(DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty).BaseValueSource,
+                Is.EqualTo(BaseValueSource.Style));
+        });
+    }
+
+    [Test]
+    public void GeneratedContainer_DoesNotOverwriteActiveStyleTrigger()
+    {
+        var group = new ToolboxItem();
+        var container = new ToolItem { Tag = "active" };
+        var triggerPayload = new object();
+        var style = new Style(typeof(ToolItem));
+        var trigger = new Trigger
+        {
+            Property = FrameworkElement.TagProperty,
+            Value = "active"
+        };
+        trigger.Setters.Add(new Setter(ToolItem.DragDataProperty, triggerPayload));
+        style.Triggers.Add(trigger);
+        container.Style = style;
+
+        InvokePrepare(group, container, new object());
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(container.DragData, Is.SameAs(triggerPayload));
+            Assert.That(DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty).BaseValueSource,
+                Is.EqualTo(BaseValueSource.StyleTrigger));
+        });
+    }
+
+    [Test]
+    public void BaseTypedCurrentNullAtMetadataDefaultAllowsGeneratedFallback()
+    {
+        var group = new ToolboxItem();
+        var generatedPayload = new object();
+        var container = new ToolItem();
+        DependencyObject baseTypedContainer = container;
+        baseTypedContainer.SetCurrentValue(ToolItem.DragDataProperty, null);
+
+        ValueSource beforePrepare = DependencyPropertyHelper.GetValueSource(
+            container,
+            ToolItem.DragDataProperty);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(container.DragData, Is.Null);
+            Assert.That(beforePrepare.BaseValueSource, Is.EqualTo(BaseValueSource.Default));
+            Assert.That(beforePrepare.IsCurrent, Is.False);
+            Assert.That(beforePrepare.IsCoerced, Is.False);
+        });
+
+        InvokePrepare(group, container, generatedPayload);
+
+        ValueSource afterPrepare = DependencyPropertyHelper.GetValueSource(
             container,
             ToolItem.DragDataProperty);
         Assert.Multiple(() =>
         {
-            Assert.That(container.DragData, Is.Null);
-            Assert.That(source.IsCurrent, Is.True);
-            Assert.That(GetPrivateField<bool>(container, "_ownsGeneratedDragData"), Is.False);
-            Assert.That(GetPrivateField<object?>(container, "_generatedDragData"), Is.Null);
-            Assert.That(GetPrivateField<object?>(container, "_generatedStateMarker"), Is.Null);
+            Assert.That(container.DragData, Is.SameAs(generatedPayload));
+            Assert.That(afterPrepare.BaseValueSource, Is.EqualTo(BaseValueSource.Default));
+            Assert.That(afterPrepare.IsCurrent, Is.True);
+            Assert.That(GetPrivateField<object>(container, "_generatedDragData"), Is.SameAs(generatedPayload));
         });
+    }
+
+    [Test]
+    public void GeneratedContainer_UsesOnlyPublicDragDataLocalState()
+    {
+        var group = new ToolboxItem();
+        var payload = new object();
+        var container = new ToolItem();
+
+        InvokePrepare(group, container, payload);
+
+        LocalValueEnumerator localValues = container.GetLocalValueEnumerator();
+        bool foundDragData = false;
+        while (localValues.MoveNext())
+        {
+            if (localValues.Current.Property == ToolItem.DragDataProperty)
+            {
+                foundDragData = true;
+                Assert.That(localValues.Current.Value, Is.SameAs(payload));
+            }
+        }
+
+        Assert.That(foundDragData, Is.True);
+        AssertGeneratedPayload(container, payload);
+
+        InvokeClear(group, container, payload);
+        AssertGeneratedStateReleased(container);
     }
 
     [Test]
@@ -285,14 +362,12 @@ public sealed class ToolboxContainerTests
         var payload = new object();
         var container = new ToolItem();
         InvokePrepare(group, container, payload);
-        AssertGeneratedPayloadSurvivesExternalCoercion(container, payload);
+        AssertGeneratedPayload(container, payload);
         var source = new TextBlock { Tag = payload };
         BindingOperations.SetBinding(
             container,
             ToolItem.DragDataProperty,
             new Binding(nameof(FrameworkElement.Tag)) { Source = source });
-        container.CoerceValue(ToolItem.DragDataProperty);
-
         InvokeClear(group, container, payload);
 
         Assert.Multiple(() =>
@@ -309,10 +384,8 @@ public sealed class ToolboxContainerTests
         var payload = new object();
         var container = new ToolItem();
         InvokePrepare(group, container, payload);
-        AssertGeneratedPayloadSurvivesExternalCoercion(container, payload);
+        AssertGeneratedPayload(container, payload);
         container.DragData = payload;
-        container.CoerceValue(ToolItem.DragDataProperty);
-
         InvokeClear(group, container, payload);
 
         Assert.That(container.DragData, Is.SameAs(payload));
@@ -320,47 +393,40 @@ public sealed class ToolboxContainerTests
     }
 
     [Test]
-    public void GeneratedContainer_ClearPreservesLaterCurrentValueWithTheSamePayload()
+    public void GeneratedContainer_ClearPreservesLaterDistinctCurrentValue()
     {
         var group = new ToolboxItem();
-        var payload = new object();
+        var generatedPayload = new object();
+        var currentPayload = new object();
         var container = new ToolItem();
-        InvokePrepare(group, container, payload);
-        AssertGeneratedPayloadSurvivesExternalCoercion(container, payload);
-        container.SetCurrentValue(ToolItem.DragDataProperty, payload);
-        container.CoerceValue(ToolItem.DragDataProperty);
+        InvokePrepare(group, container, generatedPayload);
+        AssertGeneratedPayload(container, generatedPayload);
+        container.SetCurrentValue(ToolItem.DragDataProperty, currentPayload);
 
-        InvokeClear(group, container, payload);
+        InvokeClear(group, container, generatedPayload);
 
         ValueSource source = DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty);
         Assert.Multiple(() =>
         {
-            Assert.That(container.DragData, Is.SameAs(payload));
+            Assert.That(container.DragData, Is.SameAs(currentPayload));
             Assert.That(source.IsCurrent, Is.True);
+            Assert.That(GetPrivateField<object?>(container, "_generatedDragData"), Is.Null);
         });
     }
 
     [Test]
-    public void GeneratedContainer_ClearPreservesLaterStyleWithTheSamePayloadAfterExternalCoercion()
+    public void GeneratedContainer_ClearRevealsLaterStyleValue()
     {
         var group = new ToolboxItem();
         var payload = new object();
         var container = new ToolItem();
         InvokePrepare(group, container, payload);
-        AssertGeneratedPayloadSurvivesExternalCoercion(container, payload);
+        AssertGeneratedPayload(container, payload);
         var style = new Style(typeof(ToolItem));
         style.Setters.Add(new Setter(ToolItem.DragDataProperty, payload));
 
         container.Style = style;
-        container.CoerceValue(ToolItem.DragDataProperty);
-
-        ValueSource beforeClear = DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty);
-        Assert.Multiple(() =>
-        {
-            Assert.That(container.DragData, Is.SameAs(payload));
-            Assert.That(beforeClear.BaseValueSource, Is.EqualTo(BaseValueSource.Style));
-            Assert.That(beforeClear.IsCoerced, Is.False);
-        });
+        Assert.That(container.DragData, Is.SameAs(payload));
 
         InvokeClear(group, container, payload);
         ValueSource afterClear = DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty);
@@ -372,61 +438,6 @@ public sealed class ToolboxContainerTests
         });
     }
 
-    [TestCase(0)]
-    [TestCase(1)]
-    [TestCase(2)]
-    public void GeneratedContainer_InitiallyInactiveStyleTriggerTakesPrecedenceWhenActivated(
-        int payloadKindValue)
-    {
-        var payloadKind = (TriggerPayloadKind)payloadKindValue;
-        var group = new ToolboxItem();
-        var generatedPayload = new object();
-        object? triggerPayload = CreateTriggerPayload(payloadKind, generatedPayload);
-        var container = new ToolItem
-        {
-            Style = CreateDragDataTriggerStyle(triggerPayload)
-        };
-
-        InvokePrepare(group, container, generatedPayload);
-        AssertGeneratedPayloadSurvivesExternalCoercion(container, generatedPayload);
-
-        ActivateDragDataTrigger(container);
-
-        AssertTriggerPayloadOwnsDragData(container, triggerPayload);
-        container.CoerceValue(ToolItem.DragDataProperty);
-        AssertTriggerPayloadOwnsDragData(container, triggerPayload);
-
-        InvokeClear(group, container, generatedPayload);
-        AssertTriggerPayloadOwnsDragData(container, triggerPayload);
-    }
-
-    [TestCase(0)]
-    [TestCase(1)]
-    [TestCase(2)]
-    public void GeneratedContainer_LaterInactiveStyleTriggerTakesPrecedenceWhenActivated(
-        int payloadKindValue)
-    {
-        var payloadKind = (TriggerPayloadKind)payloadKindValue;
-        var group = new ToolboxItem();
-        var generatedPayload = new object();
-        object? triggerPayload = CreateTriggerPayload(payloadKind, generatedPayload);
-        var container = new ToolItem();
-
-        InvokePrepare(group, container, generatedPayload);
-        AssertGeneratedPayloadSurvivesExternalCoercion(container, generatedPayload);
-        container.Style = CreateDragDataTriggerStyle(triggerPayload);
-        AssertGeneratedPayloadSurvivesExternalCoercion(container, generatedPayload);
-
-        ActivateDragDataTrigger(container);
-
-        AssertTriggerPayloadOwnsDragData(container, triggerPayload);
-        container.CoerceValue(ToolItem.DragDataProperty);
-        AssertTriggerPayloadOwnsDragData(container, triggerPayload);
-
-        InvokeClear(group, container, generatedPayload);
-        AssertTriggerPayloadOwnsDragData(container, triggerPayload);
-    }
-
     [Test]
     public void GeneratedContainer_LaterLocalNullTakesEffectAndSurvivesClear()
     {
@@ -434,11 +445,9 @@ public sealed class ToolboxContainerTests
         var payload = new object();
         var container = new ToolItem();
         InvokePrepare(group, container, payload);
-        AssertGeneratedPayloadSurvivesExternalCoercion(container, payload);
+        AssertGeneratedPayload(container, payload);
 
         container.DragData = null;
-        container.CoerceValue(ToolItem.DragDataProperty);
-
         Assert.That(container.DragData, Is.Null, "A later local null must take effect before recycling.");
         InvokeClear(group, container, payload);
         Assert.Multiple(() =>
@@ -457,15 +466,13 @@ public sealed class ToolboxContainerTests
         var payload = new object();
         var container = new ToolItem();
         InvokePrepare(group, container, payload);
-        AssertGeneratedPayloadSurvivesExternalCoercion(container, payload);
+        AssertGeneratedPayload(container, payload);
         var source = new TextBlock { Tag = null };
 
         BindingOperations.SetBinding(
             container,
             ToolItem.DragDataProperty,
             new Binding(nameof(FrameworkElement.Tag)) { Source = source });
-        container.CoerceValue(ToolItem.DragDataProperty);
-
         Assert.That(container.DragData, Is.Null, "A later Binding-to-null must take effect before recycling.");
         InvokeClear(group, container, payload);
         Assert.Multiple(() =>
@@ -484,13 +491,11 @@ public sealed class ToolboxContainerTests
         var payload = new object();
         var container = new ToolItem();
         InvokePrepare(group, container, payload);
-        AssertGeneratedPayloadSurvivesExternalCoercion(container, payload);
+        AssertGeneratedPayload(container, payload);
         var style = new Style(typeof(ToolItem));
         style.Setters.Add(new Setter(ToolItem.DragDataProperty, null));
 
         container.Style = style;
-        container.CoerceValue(ToolItem.DragDataProperty);
-
         Assert.That(container.DragData, Is.Null, "A later Style null must take effect before recycling.");
         InvokeClear(group, container, payload);
         Assert.Multiple(() =>
@@ -498,37 +503,6 @@ public sealed class ToolboxContainerTests
             Assert.That(container.DragData, Is.Null);
             Assert.That(DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty).BaseValueSource,
                 Is.EqualTo(BaseValueSource.Style));
-        });
-    }
-
-    [Test]
-    public void GeneratedContainer_LaterCurrentNullTakesEffectAndSurvivesClear()
-    {
-        var group = new ToolboxItem();
-        var payload = new object();
-        var container = new ToolItem();
-        InvokePrepare(group, container, payload);
-        AssertGeneratedPayloadSurvivesExternalCoercion(container, payload);
-
-        container.SetCurrentValue(ToolItem.DragDataProperty, null);
-        container.CoerceValue(ToolItem.DragDataProperty);
-
-        ValueSource beforeClear = DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty);
-        Assert.Multiple(() =>
-        {
-            Assert.That(container.DragData, Is.Null, "A later current null must take effect before recycling.");
-            Assert.That(beforeClear.IsCurrent, Is.True);
-            Assert.That(GetPrivateField<bool>(container, "_ownsGeneratedDragData"), Is.False);
-            Assert.That(GetPrivateField<object?>(container, "_generatedDragData"), Is.Null);
-            Assert.That(GetPrivateField<object?>(container, "_generatedStateMarker"), Is.Null);
-        });
-
-        InvokeClear(group, container, payload);
-        ValueSource afterClear = DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty);
-        Assert.Multiple(() =>
-        {
-            Assert.That(container.DragData, Is.Null);
-            Assert.That(afterClear.IsCurrent, Is.True);
         });
     }
 
@@ -1034,59 +1008,16 @@ public sealed class ToolboxContainerTests
         });
     }
 
-    private static void AssertGeneratedPayloadSurvivesExternalCoercion(ToolItem container, object payload)
+    private static void AssertGeneratedPayload(ToolItem container, object payload)
     {
-        container.CoerceValue(ToolItem.DragDataProperty);
         ValueSource source = DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty);
 
         Assert.Multiple(() =>
         {
             Assert.That(container.DragData, Is.SameAs(payload));
             Assert.That(container.GetValue(ToolItem.DragDataProperty), Is.SameAs(payload));
-            Assert.That(source.IsCoerced, Is.True);
-        });
-    }
-
-    private static object? CreateTriggerPayload(TriggerPayloadKind payloadKind, object generatedPayload)
-    {
-        return payloadKind switch
-        {
-            TriggerPayloadKind.Null => null,
-            TriggerPayloadKind.Distinct => new object(),
-            TriggerPayloadKind.SameAsGenerated => generatedPayload,
-            _ => throw new ArgumentOutOfRangeException(nameof(payloadKind))
-        };
-    }
-
-    private static Style CreateDragDataTriggerStyle(object? payload)
-    {
-        var style = new Style(typeof(ToolItem));
-        var trigger = new Trigger
-        {
-            Property = FrameworkElement.TagProperty,
-            Value = "active"
-        };
-        trigger.Setters.Add(new Setter(ToolItem.DragDataProperty, payload));
-        style.Triggers.Add(trigger);
-        return style;
-    }
-
-    private static void ActivateDragDataTrigger(ToolItem container)
-    {
-        container.Tag = "active";
-    }
-
-    private static void AssertTriggerPayloadOwnsDragData(ToolItem container, object? payload)
-    {
-        ValueSource source = DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty);
-        Assert.Multiple(() =>
-        {
-            Assert.That(container.DragData, Is.SameAs(payload));
-            Assert.That(container.GetValue(ToolItem.DragDataProperty), Is.SameAs(payload));
-            Assert.That(source.BaseValueSource, Is.EqualTo(BaseValueSource.StyleTrigger));
-            Assert.That(GetPrivateField<bool>(container, "_ownsGeneratedDragData"), Is.False);
-            Assert.That(GetPrivateField<object?>(container, "_generatedDragData"), Is.Null);
-            Assert.That(GetPrivateField<object?>(container, "_generatedStateMarker"), Is.Null);
+            Assert.That(source.BaseValueSource, Is.EqualTo(BaseValueSource.Default));
+            Assert.That(source.IsCurrent, Is.True);
         });
     }
 
@@ -1100,10 +1031,7 @@ public sealed class ToolboxContainerTests
             Assert.That(source.IsCoerced, Is.False);
             Assert.That(source.IsCurrent, Is.False);
             Assert.That(container.ReadLocalValue(ToolItem.DragDataProperty), Is.SameAs(DependencyProperty.UnsetValue));
-            Assert.That(GetPrivateField<bool>(container, "_ownsGeneratedDragData"), Is.False);
             Assert.That(GetPrivateField<object?>(container, "_generatedDragData"), Is.Null);
-            Assert.That(GetPrivateField<object?>(container, "_generatedStateMarker"), Is.Null);
-            Assert.That(GetPrivateField<object>(container, "_generatedDragDataOperation").ToString(), Is.EqualTo("None"));
         });
     }
 
