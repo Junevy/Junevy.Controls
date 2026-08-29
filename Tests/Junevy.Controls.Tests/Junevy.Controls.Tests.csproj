@@ -7,9 +7,6 @@
     <IsTestProject>true</IsTestProject>
     <UseWPF>true</UseWPF>
     <LangVersion>12</LangVersion>
-    <DefineConstants>$(DefineConstants);JUNEVY_CONTROLS_TESTS</DefineConstants>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,4 +1,3 @@
-#if JUNEVY_CONTROLS_TESTS
 using System.Reflection;
 #if NET8_0_OR_GREATER
 using System.Runtime.Versioning;
@@ -224,4 +223,3 @@ public sealed class ToolboxDefaultsTests
         return (bool)method.Invoke(itemsControl, new[] { item })!;
     }
 }
-#endif
