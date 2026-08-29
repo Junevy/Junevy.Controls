@@ -1150,6 +1150,11 @@ public sealed class ToolboxContainerTests
     private static T? FindVisualChild<T>(DependencyObject root, Func<T, bool>? predicate = null)
         where T : DependencyObject
     {
+        if (root is T self && (predicate is null || predicate(self)))
+        {
+            return self;
+        }
+
         for (int index = 0; index < VisualTreeHelper.GetChildrenCount(root); index++)
         {
             DependencyObject child = VisualTreeHelper.GetChild(root, index);
