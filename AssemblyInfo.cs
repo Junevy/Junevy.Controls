@@ -8,6 +8,8 @@ using System.Windows.Markup;
 [assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.Box")]
 [assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.DataGrid")]
 [assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.Image")]
+[assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.Toolbox")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Junevy.Controls.Tests")]
 
 // 在文件末尾（其他 [assembly: ] 之后）添加：
 [assembly: ThemeInfo(
