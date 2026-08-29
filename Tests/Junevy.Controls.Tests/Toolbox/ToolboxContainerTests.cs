@@ -70,6 +70,21 @@ public sealed class ToolboxContainerTests
     }
 
     [Test]
+    public void CurrentDragDataFormat_TakesPrecedenceOverTheRootFormat()
+    {
+        var toolbox = new ToolboxControl();
+        var group = CreateGroup();
+        var tool = new ToolItem();
+        tool.SetCurrentValue(ToolItem.DragDataFormatProperty, "Application.CurrentTool");
+
+        InvokePrepare(toolbox, group, group);
+        InvokePrepare(group, tool, tool);
+        toolbox.DragDataFormat = "Application.RuntimeTool";
+
+        Assert.That(tool.EffectiveDragDataFormat, Is.EqualTo("Application.CurrentTool"));
+    }
+
+    [Test]
     public void GeneratedContainer_AssignsAndClearsOwnedDragPayloadAcrossRecycling()
     {
         var group = new ToolboxItem();
@@ -142,6 +157,75 @@ public sealed class ToolboxContainerTests
     }
 
     [Test]
+    public void GeneratedContainer_DoesNotOverwritePreexistingCurrentPayload()
+    {
+        var group = new ToolboxItem();
+        var currentPayload = new object();
+        var container = new ToolItem();
+        container.SetCurrentValue(ToolItem.DragDataProperty, currentPayload);
+
+        InvokePrepare(group, container, new object());
+
+        Assert.That(container.DragData, Is.SameAs(currentPayload));
+    }
+
+    [Test]
+    public void GeneratedContainer_ClearPreservesLaterBindingWithTheSamePayload()
+    {
+        var group = new ToolboxItem();
+        var payload = new object();
+        var container = new ToolItem();
+        InvokePrepare(group, container, payload);
+        var source = new TextBlock { Tag = payload };
+        BindingOperations.SetBinding(
+            container,
+            ToolItem.DragDataProperty,
+            new Binding(nameof(FrameworkElement.Tag)) { Source = source });
+
+        InvokeClear(group, container, payload);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(container.DragData, Is.SameAs(payload));
+            Assert.That(BindingOperations.GetBindingExpression(container, ToolItem.DragDataProperty), Is.Not.Null);
+        });
+    }
+
+    [Test]
+    public void GeneratedContainer_ClearPreservesLaterLocalValueWithTheSamePayload()
+    {
+        var group = new ToolboxItem();
+        var payload = new object();
+        var container = new ToolItem();
+        InvokePrepare(group, container, payload);
+        container.DragData = payload;
+
+        InvokeClear(group, container, payload);
+
+        Assert.That(container.DragData, Is.SameAs(payload));
+        Assert.That(container.ReadLocalValue(ToolItem.DragDataProperty), Is.SameAs(payload));
+    }
+
+    [Test]
+    public void GeneratedContainer_ClearPreservesLaterCurrentValueWithTheSamePayload()
+    {
+        var group = new ToolboxItem();
+        var payload = new object();
+        var container = new ToolItem();
+        InvokePrepare(group, container, payload);
+        container.SetCurrentValue(ToolItem.DragDataProperty, payload);
+
+        InvokeClear(group, container, payload);
+
+        ValueSource source = DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty);
+        Assert.Multiple(() =>
+        {
+            Assert.That(container.DragData, Is.SameAs(payload));
+            Assert.That(source.IsCurrent, Is.True);
+        });
+    }
+
+    [Test]
     public void ZeroDelayOpening_AThenB_LeavesOnlyBActive()
     {
         var toolbox = new ToolboxControl { OpenDelay = TimeSpan.Zero };
@@ -167,6 +251,51 @@ public sealed class ToolboxContainerTests
                 Assert.That(first.IsOpen, Is.False);
                 Assert.That(second.IsOpen, Is.True);
                 Assert.That(toolbox.ActiveItem, Is.SameAs(second));
+            });
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void LeavingPendingGroup_RestoresCloseScheduleForTheActiveGroup()
+    {
+        var toolbox = new ToolboxControl
+        {
+            OpenDelay = TimeSpan.Zero,
+            CloseDelay = TimeSpan.FromMilliseconds(40)
+        };
+        ToolboxItem active = CreateGroup();
+        ToolboxItem pending = CreateGroup();
+        Window? window = null;
+
+        try
+        {
+            InvokePrepare(toolbox, active, active);
+            InvokePrepare(toolbox, pending, pending);
+            active.SetPointerOverTrigger(true);
+            pending.SetPointerOverTrigger(false);
+            window = WpfTestHost.Show(toolbox, active, pending);
+            Open(toolbox, active, window);
+
+            active.SetPointerOverTrigger(false);
+            toolbox.RequestClose(active);
+
+            toolbox.OpenDelay = TimeSpan.FromMilliseconds(200);
+            pending.SetPointerOverTrigger(true);
+            toolbox.RequestOpen(pending);
+            pending.SetPointerOverTrigger(false);
+            toolbox.RequestClose(pending);
+
+            WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(100));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(active.IsOpen, Is.False);
+                Assert.That(pending.IsOpen, Is.False);
+                Assert.That(toolbox.ActiveItem, Is.Null);
             });
         }
         finally
@@ -220,6 +349,43 @@ public sealed class ToolboxContainerTests
                 Assert.That(disabled.IsOpen, Is.False);
                 Assert.That(empty.IsOpen, Is.False);
                 Assert.That(pointerLeft.IsOpen, Is.False);
+                Assert.That(toolbox.ActiveItem, Is.Null);
+            });
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void PendingOpen_IsCancelledWhenTheTargetBecomesDisabledOrEmpty()
+    {
+        var toolbox = new ToolboxControl { OpenDelay = TimeSpan.FromMilliseconds(20) };
+        ToolboxItem disabled = CreateGroup();
+        ToolboxItem emptied = CreateGroup();
+        Window? window = null;
+
+        try
+        {
+            InvokePrepare(toolbox, disabled, disabled);
+            InvokePrepare(toolbox, emptied, emptied);
+            disabled.SetPointerOverTrigger(true);
+            emptied.SetPointerOverTrigger(true);
+            window = WpfTestHost.Show(toolbox, disabled, emptied);
+
+            toolbox.RequestOpen(disabled);
+            disabled.IsEnabled = false;
+            WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(40));
+
+            toolbox.RequestOpen(emptied);
+            emptied.Items.Clear();
+            WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(40));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(disabled.IsOpen, Is.False);
+                Assert.That(emptied.IsOpen, Is.False);
                 Assert.That(toolbox.ActiveItem, Is.Null);
             });
         }
@@ -381,6 +547,94 @@ public sealed class ToolboxContainerTests
     }
 
     [Test]
+    public void DragCompletionForPreviousActiveGroup_ReleasesOnlyItsOwnLock()
+    {
+        var toolbox = new ToolboxControl
+        {
+            OpenDelay = TimeSpan.Zero,
+            CloseDelay = TimeSpan.FromMilliseconds(10)
+        };
+        ToolboxItem first = CreateGroup();
+        ToolboxItem second = CreateGroup();
+        ToolboxItem foreign = CreateGroup();
+        var foreignOwner = new ToolboxControl();
+        Window? window = null;
+
+        try
+        {
+            InvokePrepare(toolbox, first, first);
+            InvokePrepare(toolbox, second, second);
+            InvokePrepare(foreignOwner, foreign, foreign);
+            first.SetPointerOverTrigger(true);
+            second.SetPointerOverTrigger(true);
+            window = WpfTestHost.Show(toolbox, first, second);
+            Open(toolbox, first, window);
+
+            toolbox.NotifyDragStarted(first);
+            toolbox.NotifyDragCompleted(foreign);
+            toolbox.RequestOpen(second);
+            WpfTestHost.Drain(window.Dispatcher);
+            Assert.That(toolbox.ActiveItem, Is.SameAs(second));
+
+            second.SetPointerOverTrigger(false);
+            toolbox.RequestClose(second);
+            WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(30));
+            Assert.That(second.IsOpen, Is.True, "A foreign completion must not release A's drag lock.");
+
+            toolbox.NotifyDragCompleted(first);
+            toolbox.RequestClose(second);
+            WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(30));
+            AssertClosed(toolbox, second);
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void ForeignAndDetachedCoordinationCalls_DoNotMutateActiveStateOrDragLock()
+    {
+        var toolbox = new ToolboxControl
+        {
+            OpenDelay = TimeSpan.Zero,
+            CloseDelay = TimeSpan.FromMilliseconds(10)
+        };
+        ToolboxItem active = CreateGroup();
+        ToolboxItem foreign = CreateGroup();
+        ToolboxItem detached = CreateGroup();
+        var foreignOwner = new ToolboxControl();
+        Window? window = null;
+
+        try
+        {
+            InvokePrepare(toolbox, active, active);
+            InvokePrepare(foreignOwner, foreign, foreign);
+            active.SetPointerOverTrigger(true);
+            window = WpfTestHost.Show(toolbox, active);
+            Open(toolbox, active, window);
+
+            active.SetPointerOverTrigger(false);
+            toolbox.RequestClose(foreign);
+            toolbox.RequestClose(detached);
+            toolbox.NotifyDragStarted(foreign);
+            toolbox.NotifyDragStarted(detached);
+            toolbox.NotifyDragCompleted(foreign);
+            toolbox.NotifyDragCompleted(detached);
+            WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(30));
+            Assert.That(active.IsOpen, Is.True, "Foreign or detached calls must not close the active item.");
+
+            toolbox.RequestClose(active);
+            WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(30));
+            AssertClosed(toolbox, active);
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
     public void RepeatedLoadUnload_DoesNotDuplicateWindowLifecycleSubscriptions()
     {
         var toolbox = new ToolboxControl { OpenDelay = TimeSpan.Zero };
@@ -415,6 +669,38 @@ public sealed class ToolboxContainerTests
         finally
         {
             WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void TestHost_SetupFailureClosesAndDrainsTheShownWindow()
+    {
+        Window? observedWindow = null;
+        int initialOpenWindowCount = WpfTestHost.OpenWindowCount;
+
+        try
+        {
+            Assert.Throws<AssertionException>(() =>
+                WpfTestHost.Show(
+                    window =>
+                    {
+                        observedWindow = window;
+                        return false;
+                    },
+                    TimeSpan.FromMilliseconds(10),
+                    new Border()));
+
+            Assert.That(observedWindow, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(observedWindow!.IsVisible, Is.False);
+                Assert.That(observedWindow.IsLoaded, Is.False);
+                Assert.That(WpfTestHost.OpenWindowCount, Is.EqualTo(initialOpenWindowCount));
+            });
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(observedWindow);
         }
     }
 
