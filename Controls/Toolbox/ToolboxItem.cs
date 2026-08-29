@@ -138,6 +138,11 @@ public sealed class ToolboxItem : HeaderedItemsControl
 
     internal void SetIsOpen(bool value)
     {
+        if (value)
+        {
+            ApplyOwnerLayout();
+        }
+
         if (!value)
         {
             _focusFirstToolOnOpen = false;
@@ -189,6 +194,7 @@ public sealed class ToolboxItem : HeaderedItemsControl
 
         if (_popup is not null)
         {
+            _popup.CustomPopupPlacementCallback = GetCustomPopupPlacements;
             _popup.Opened += OnPopupOpened;
         }
 
@@ -270,6 +276,7 @@ public sealed class ToolboxItem : HeaderedItemsControl
 
         if (_popup is not null)
         {
+            _popup.CustomPopupPlacementCallback = null;
             _popup.Opened -= OnPopupOpened;
         }
 
@@ -377,6 +384,26 @@ public sealed class ToolboxItem : HeaderedItemsControl
         }
     }
 
+    private CustomPopupPlacement[] GetCustomPopupPlacements(
+        Size popupSize,
+        Size targetSize,
+        Point offset)
+    {
+        if (Owner is null)
+        {
+            return Array.Empty<CustomPopupPlacement>();
+        }
+
+        return ToolboxPopupPlacementCalculator.GetPlacements(
+                popupSize,
+                targetSize,
+                offset,
+                Owner.Orientation,
+                Owner.PopupPlacement)
+            .Select(candidate => candidate.Placement)
+            .ToArray();
+    }
+
     private void FocusFirstEnabledTool()
     {
         if (!_focusFirstToolOnOpen || !IsOpen)
@@ -427,10 +454,10 @@ public sealed class ToolboxItem : HeaderedItemsControl
             _popupRoot,
             WidthProperty,
             new Binding(nameof(Toolbox.PopupWidth)) { Source = Owner });
-        BindingOperations.SetBinding(
-            _popupRoot,
-            MaxHeightProperty,
-            new Binding(nameof(Toolbox.PopupMaxHeight)) { Source = Owner });
+        Visual workAreaTarget = _triggerButton is not null ? _triggerButton : this;
+        Rect workArea = MonitorWorkAreaProvider.GetWorkAreaDip(workAreaTarget);
+        double availableHeight = Math.Max(0d, workArea.Height - 16d);
+        _popupRoot.MaxHeight = Math.Min(Owner.PopupMaxHeight, availableHeight);
 
         UniformGrid? panel = FindVisualChild<UniformGrid>(_popupRoot);
         if (panel is not null)
@@ -440,6 +467,19 @@ public sealed class ToolboxItem : HeaderedItemsControl
                 UniformGrid.ColumnsProperty,
                 new Binding(nameof(Toolbox.ColumnCount)) { Source = Owner });
         }
+    }
+
+    internal void RepositionPopup()
+    {
+        if (_popup is null || !_popup.IsOpen)
+        {
+            return;
+        }
+
+        ApplyOwnerLayout();
+        double originalOffset = _popup.HorizontalOffset;
+        _popup.HorizontalOffset = originalOffset + 0.01d;
+        _popup.HorizontalOffset = originalOffset;
     }
 
     private static T? FindVisualChild<T>(DependencyObject root)
