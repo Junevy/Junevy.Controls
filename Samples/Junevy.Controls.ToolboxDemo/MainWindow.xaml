@@ -1,0 +1,139 @@
+<Window x:Class="Junevy.Controls.ToolboxDemo.MainWindow"
+        x:Name="DemoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Controls"
+        xmlns:jv="github.com.junevy"
+        xmlns:local="clr-namespace:Junevy.Controls.ToolboxDemo"
+        Title="Junevy Toolbox Demo"
+        Width="1120"
+        Height="720"
+        MinWidth="760"
+        MinHeight="520"
+        Background="{DynamicResource Theme.Brush.Background.App}"
+        Foreground="{DynamicResource Theme.Brush.Text.Primary}"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style x:Key="DemoToolItemStyle"
+               BasedOn="{StaticResource DefaultToolItemStyle}"
+               TargetType="{x:Type jv:ToolItem}">
+            <Setter Property="Icon" Value="{Binding Icon}" />
+            <Setter Property="Title" Value="{Binding Title}" />
+            <Setter Property="Command" Value="{x:Static local:MainWindow.PlaceToolCommand}" />
+            <Setter Property="CommandParameter" Value="{Binding}" />
+            <Setter Property="DragData" Value="{Binding}" />
+            <Setter Property="atc:Icon.FontFamily" Value="{DynamicResource IconFont}" />
+            <Setter Property="atc:Icon.IconSize" Value="22" />
+        </Style>
+
+        <Style x:Key="DemoToolboxItemStyle"
+               BasedOn="{StaticResource DefaultToolboxItemStyle}"
+               TargetType="{x:Type jv:ToolboxItem}">
+            <Setter Property="Icon" Value="{Binding Icon}" />
+            <Setter Property="Title" Value="{Binding Title}" />
+            <Setter Property="ItemsSource" Value="{Binding Tools}" />
+            <Setter Property="ItemContainerStyle" Value="{StaticResource DemoToolItemStyle}" />
+            <Setter Property="atc:Icon.FontFamily" Value="{DynamicResource IconFont}" />
+            <Setter Property="atc:Icon.IconSize" Value="24" />
+        </Style>
+    </Window.Resources>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:MainWindow.PlaceToolCommand}"
+                        CanExecute="OnPlaceToolCanExecute"
+                        Executed="OnPlaceToolExecuted" />
+    </Window.CommandBindings>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="64" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="32" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Padding="20,0"
+                Background="{DynamicResource Theme.Brush.Surface.Raised}"
+                BorderBrush="{DynamicResource Theme.Brush.Border.Subtle}"
+                BorderThickness="0,0,0,1">
+            <Grid>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock FontSize="19" FontWeight="SemiBold" Text="Toolbox interaction demo" />
+                    <TextBlock Margin="0,3,0,0"
+                               Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                               Text="Hover a category, then click or drag a tool onto the workspace." />
+                </StackPanel>
+                <Border HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Padding="10,5"
+                        Background="{DynamicResource Theme.Brush.Accent.PrimarySubtle}"
+                        CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
+                    <TextBlock Foreground="{DynamicResource Theme.Brush.Accent.Primary}" Text="14 tools / 6 columns" />
+                </Border>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Background="{DynamicResource Theme.Brush.Surface.Base}"
+                    BorderBrush="{DynamicResource Theme.Brush.Border.Subtle}"
+                    BorderThickness="0,0,1,0">
+                <jv:Toolbox Margin="10,14"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top"
+                            atc:Icon.FontFamily="{DynamicResource IconFont}"
+                            atc:Icon.IconSize="24"
+                            CloseDelay="0:0:0.30"
+                            ColumnCount="6"
+                            DragDataFormat="Junevy.Controls.Tool"
+                            ItemContainerStyle="{StaticResource DemoToolboxItemStyle}"
+                            ItemsSource="{Binding ToolGroups}"
+                            OpenDelay="0:0:0.15"
+                            Orientation="Vertical"
+                            PopupWidth="300" />
+            </Border>
+
+            <Border Grid.Column="1"
+                    Margin="20"
+                    Background="{DynamicResource Theme.Brush.Surface.Sunken}"
+                    BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                    BorderThickness="1"
+                    CornerRadius="{DynamicResource Theme.ControlCornerRadius}">
+                <Grid>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
+                        <TextBlock HorizontalAlignment="Center"
+                                   FontFamily="{DynamicResource IconFont}"
+                                   FontSize="38"
+                                   Foreground="{DynamicResource Theme.Brush.Text.Tertiary}"
+                                   Text="&#xE60B;" />
+                        <TextBlock Margin="0,12,0,0"
+                                   FontSize="16"
+                                   Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                                   Text="Workspace canvas" />
+                    </StackPanel>
+                    <Canvas x:Name="WorkspaceCanvas"
+                            AllowDrop="True"
+                            ClipToBounds="True"
+                            DragOver="OnCanvasDragOver"
+                            Drop="OnCanvasDrop" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2"
+                Padding="12,0"
+                Background="{DynamicResource Theme.Brush.Surface.Raised}"
+                BorderBrush="{DynamicResource Theme.Brush.Border.Subtle}"
+                BorderThickness="0,1,0,0">
+            <TextBlock x:Name="StatusText"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                       Text="Ready" />
+        </Border>
+    </Grid>
+</Window>
