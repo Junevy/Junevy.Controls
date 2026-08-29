@@ -53,4 +53,4 @@
 ## Task Status
 
 - Task 1: complete; independent re-review PASS on `97ebadd` + `f5e10e9`, no Critical or Important findings.
-- Task 2: fifth fix round complete; awaiting re-review (`d213d60` + `f58a711` + `c1dd37e` + `f0dad8b` + `bb43d2c` + pending fifth-fix commit).
+- Task 2: sixth fix round complete; awaiting re-review (`d213d60` + `f58a711` + `c1dd37e` + `f0dad8b` + `bb43d2c` + sixth-fix commit pending).
