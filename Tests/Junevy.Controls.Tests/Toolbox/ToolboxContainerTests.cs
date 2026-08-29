@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Input;
 using Junevy.Controls.Controls.Toolbox;
 using NUnit.Framework;
 using ToolboxControl = Junevy.Controls.Controls.Toolbox.Toolbox;
@@ -1124,6 +1125,252 @@ public sealed class ToolboxContainerTests
         {
             WpfTestHost.CloseAndDrain(window);
         }
+    }
+
+    [Test]
+    public void TemplateTriggerHover_TransfersToPopupWithoutClosingUntilBothRegionsLeave()
+    {
+        var toolbox = new ToolboxControl { OpenDelay = TimeSpan.Zero, CloseDelay = TimeSpan.Zero };
+        var group = new ToolboxItem { Title = "Shapes" };
+        group.Items.Add(new ToolItem { Title = "Line" });
+        toolbox.Items.Add(group);
+        Window? window = null;
+        try
+        {
+            window = WpfTestHost.Show(toolbox);
+            var trigger = (Button)group.Template.FindName("PART_TriggerButton", group)!;
+            var popupRoot = (FrameworkElement)group.Template.FindName("PART_PopupRoot", group)!;
+            RaiseMouse(trigger, Mouse.MouseEnterEvent);
+            WpfTestHost.Drain(window.Dispatcher);
+            Assert.That(group.IsOpen, Is.True);
+
+            RaiseMouse(trigger, Mouse.MouseLeaveEvent);
+            RaiseMouse(popupRoot, Mouse.MouseEnterEvent);
+            WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(20));
+            Assert.That(group.IsOpen, Is.True);
+
+            RaiseMouse(popupRoot, Mouse.MouseLeaveEvent);
+            WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(30));
+            Assert.That(group.IsOpen, Is.False);
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void TemplateTriggerHover_RespectsNonZeroOpenAndCloseDelays()
+    {
+        var toolbox = new ToolboxControl
+        {
+            OpenDelay = TimeSpan.FromMilliseconds(40),
+            CloseDelay = TimeSpan.FromMilliseconds(50)
+        };
+        var group = new ToolboxItem { Title = "Shapes" };
+        group.Items.Add(new ToolItem { Title = "Line" });
+        toolbox.Items.Add(group);
+        Window? window = null;
+        try
+        {
+            window = WpfTestHost.Show(toolbox);
+            var trigger = (Button)group.Template.FindName("PART_TriggerButton", group)!;
+            RaiseMouse(trigger, Mouse.MouseEnterEvent);
+            WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(10));
+            Assert.That(group.IsOpen, Is.False, "OpenDelay must suppress a premature open.");
+
+            WpfTestHost.PumpUntil(window.Dispatcher, () => group.IsOpen, TimeSpan.FromMilliseconds(150));
+            RaiseMouse(trigger, Mouse.MouseLeaveEvent);
+            WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(15));
+            Assert.That(group.IsOpen, Is.True, "CloseDelay must keep the popup open before expiry.");
+
+            WpfTestHost.PumpUntil(window.Dispatcher, () => !group.IsOpen, TimeSpan.FromMilliseconds(150));
+            Assert.That(toolbox.ActiveItem, Is.Null);
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void TemplateHover_EnteringSecondTriggerCancelsPendingFirstOpen()
+    {
+        var toolbox = new ToolboxControl { OpenDelay = TimeSpan.FromMilliseconds(30) };
+        var first = new ToolboxItem { Title = "A" };
+        var second = new ToolboxItem { Title = "B" };
+        first.Items.Add(new ToolItem());
+        second.Items.Add(new ToolItem());
+        toolbox.Items.Add(first);
+        toolbox.Items.Add(second);
+        Window? window = null;
+        try
+        {
+            window = WpfTestHost.Show(toolbox);
+            var triggerA = (Button)first.Template.FindName("PART_TriggerButton", first)!;
+            var triggerB = (Button)second.Template.FindName("PART_TriggerButton", second)!;
+            RaiseMouse(triggerA, Mouse.MouseEnterEvent);
+            WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(10));
+            RaiseMouse(triggerB, Mouse.MouseEnterEvent);
+            WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(50));
+            Assert.Multiple(() =>
+            {
+                Assert.That(first.IsOpen, Is.False);
+                Assert.That(second.IsOpen, Is.True);
+            });
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void ActiveTriggerClick_ClosesAndCancelsPendingOpen()
+    {
+        var toolbox = new ToolboxControl { OpenDelay = TimeSpan.Zero };
+        var group = new ToolboxItem { Title = "A" };
+        group.Items.Add(new ToolItem());
+        toolbox.Items.Add(group);
+        Window? window = null;
+        try
+        {
+            window = WpfTestHost.Show(toolbox);
+            var trigger = (Button)group.Template.FindName("PART_TriggerButton", group)!;
+            RaiseMouse(trigger, Mouse.MouseEnterEvent);
+            WpfTestHost.Drain(window.Dispatcher);
+            Assert.That(group.IsOpen, Is.True);
+            RaiseMouse(trigger, Mouse.MouseLeaveEvent);
+            trigger.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+            WpfTestHost.Drain(window.Dispatcher);
+            Assert.That(toolbox.ActiveItem, Is.Null);
+            Assert.That(group.IsOpen, Is.False);
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void TriggerClick_CancelsItsPendingHoverOpen()
+    {
+        var toolbox = new ToolboxControl { OpenDelay = TimeSpan.FromMilliseconds(40) };
+        var group = new ToolboxItem { Title = "A" };
+        group.Items.Add(new ToolItem());
+        toolbox.Items.Add(group);
+        Window? window = null;
+        try
+        {
+            window = WpfTestHost.Show(toolbox);
+            var trigger = (Button)group.Template.FindName("PART_TriggerButton", group)!;
+            RaiseMouse(trigger, Mouse.MouseEnterEvent);
+            WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(5));
+            trigger.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+            WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(70));
+            Assert.Multiple(() =>
+            {
+                Assert.That(group.IsOpen, Is.False);
+                Assert.That(toolbox.ActiveItem, Is.Null);
+            });
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void EscapeFromTrigger_ClosesAndRestoresTriggerFocus()
+    {
+        var toolbox = new ToolboxControl { OpenDelay = TimeSpan.Zero };
+        var group = new ToolboxItem { Title = "A" };
+        group.Items.Add(new ToolItem());
+        toolbox.Items.Add(group);
+        Window? window = null;
+        try
+        {
+            window = WpfTestHost.Show(toolbox);
+            var trigger = (Button)group.Template.FindName("PART_TriggerButton", group)!;
+            RaiseMouse(trigger, Mouse.MouseEnterEvent);
+            WpfTestHost.Drain(window.Dispatcher);
+            trigger.Focus();
+            var key = new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(trigger), Environment.TickCount, Key.Escape)
+            { RoutedEvent = Keyboard.PreviewKeyDownEvent };
+            trigger.RaiseEvent(key);
+            Assert.Multiple(() =>
+            {
+                Assert.That(group.IsOpen, Is.False);
+                Assert.That(trigger.IsKeyboardFocusWithin, Is.True);
+            });
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void EscapeFromPopup_ClosesAndReturnsFocusToTrigger()
+    {
+        var toolbox = new ToolboxControl { OpenDelay = TimeSpan.Zero };
+        var group = new ToolboxItem { Title = "A" };
+        group.Items.Add(new ToolItem { Title = "Line" });
+        toolbox.Items.Add(group);
+        Window? window = null;
+        try
+        {
+            window = WpfTestHost.Show(toolbox);
+            var trigger = (Button)group.Template.FindName("PART_TriggerButton", group)!;
+            RaiseMouse(trigger, Mouse.MouseEnterEvent);
+            WpfTestHost.Drain(window.Dispatcher);
+            var tool = (ToolItem)group.ItemContainerGenerator.ContainerFromIndex(0);
+            tool.Focus();
+            var key = new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(tool), Environment.TickCount, Key.Escape)
+            { RoutedEvent = Keyboard.PreviewKeyDownEvent };
+            tool.RaiseEvent(key);
+            Assert.That(group.IsOpen, Is.False);
+            Assert.That(trigger.IsKeyboardFocusWithin, Is.True);
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void KeyboardClick_UsesButtonClickAndFocusesFirstEnabledTool()
+    {
+        var toolbox = new ToolboxControl { OpenDelay = TimeSpan.FromMilliseconds(1) };
+        var group = new ToolboxItem { Title = "A" };
+        group.Items.Add(new ToolItem { IsEnabled = false, Title = "Disabled" });
+        group.Items.Add(new ToolItem { IsEnabled = true, Title = "Enabled" });
+        toolbox.Items.Add(group);
+        Window? window = null;
+        try
+        {
+            window = WpfTestHost.Show(toolbox);
+            var trigger = (Button)group.Template.FindName("PART_TriggerButton", group)!;
+            trigger.Focus();
+            var keyDown = new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(trigger), Environment.TickCount, Key.Enter)
+            { RoutedEvent = Keyboard.PreviewKeyDownEvent };
+            trigger.RaiseEvent(keyDown);
+            trigger.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+            WpfTestHost.PumpUntil(window.Dispatcher, () => group.IsOpen, TimeSpan.FromSeconds(1));
+            WpfTestHost.Drain(window.Dispatcher);
+            var enabled = (ToolItem)group.ItemContainerGenerator.ContainerFromIndex(1);
+            Assert.That(enabled.IsKeyboardFocusWithin, Is.True);
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    private static void RaiseMouse(UIElement target, RoutedEvent routedEvent)
+    {
+        var args = new MouseEventArgs(Mouse.PrimaryDevice, Environment.TickCount) { RoutedEvent = routedEvent };
+        target.RaiseEvent(args);
     }
 
     private static ToolboxItem CreateGroup()

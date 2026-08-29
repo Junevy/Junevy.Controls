@@ -215,6 +215,45 @@ public sealed class Toolbox : ItemsControl
         }
     }
 
+    internal void Toggle(ToolboxItem item, bool focusFirstTool)
+    {
+        if (!ReferenceEquals(item.Owner, this))
+        {
+            return;
+        }
+
+        _closeTimer.Stop();
+        if (ReferenceEquals(_pendingItem, item))
+        {
+            StopOpenTimer();
+            ScheduleActiveCloseIfNeeded();
+            return;
+        }
+
+        StopOpenTimer();
+        if (ReferenceEquals(_activeItem, item))
+        {
+            ClosePopup();
+            return;
+        }
+
+        if (!IsEligibleRequest(item))
+        {
+            return;
+        }
+
+        if (focusFirstTool)
+        {
+            item.RequestFocusFirstEnabledTool();
+        }
+
+        SetActiveItem(item);
+        if (focusFirstTool)
+        {
+            item.ScheduleFocusFirstEnabledTool();
+        }
+    }
+
     internal void NotifyDragStarted(ToolboxItem item)
     {
         if (!ReferenceEquals(_activeItem, item) || !IsEligibleRequest(item))

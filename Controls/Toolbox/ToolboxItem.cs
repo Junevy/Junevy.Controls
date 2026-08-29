@@ -28,6 +28,9 @@ public sealed class ToolboxItem : HeaderedItemsControl
     private ButtonBase? _triggerButton;
     private Popup? _popup;
     private FrameworkElement? _popupRoot;
+    private Key? _keyboardActivationKey;
+    private bool _focusFirstToolOnOpen;
+    private int _focusAttemptCount;
 
     public static readonly DependencyProperty IconProperty =
         DependencyProperty.Register(
@@ -135,7 +138,27 @@ public sealed class ToolboxItem : HeaderedItemsControl
 
     internal void SetIsOpen(bool value)
     {
+        if (!value)
+        {
+            _focusFirstToolOnOpen = false;
+            _focusAttemptCount = 0;
+            ItemContainerGenerator.StatusChanged -= OnItemGeneratorStatusChanged;
+        }
+
         SetValue(IsOpenPropertyKey, value);
+    }
+
+    internal void RequestFocusFirstEnabledTool()
+    {
+        _focusFirstToolOnOpen = true;
+        _focusAttemptCount = 0;
+        ItemContainerGenerator.StatusChanged -= OnItemGeneratorStatusChanged;
+        ItemContainerGenerator.StatusChanged += OnItemGeneratorStatusChanged;
+    }
+
+    internal void ScheduleFocusFirstEnabledTool()
+    {
+        Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(FocusFirstEnabledTool));
     }
 
     public override void OnApplyTemplate()
@@ -153,12 +176,15 @@ public sealed class ToolboxItem : HeaderedItemsControl
             _triggerButton.MouseLeave += OnTriggerMouseLeave;
             _triggerButton.Click += OnTriggerClick;
             _triggerButton.PreviewKeyDown += OnTriggerPreviewKeyDown;
+            _triggerButton.PreviewKeyUp += OnTriggerPreviewKeyUp;
+            _triggerButton.LostKeyboardFocus += OnTriggerLostKeyboardFocus;
         }
 
         if (_popupRoot is not null)
         {
             _popupRoot.MouseEnter += OnPopupMouseEnter;
             _popupRoot.MouseLeave += OnPopupMouseLeave;
+            _popupRoot.PreviewKeyDown += OnPopupPreviewKeyDown;
         }
 
         if (_popup is not null)
@@ -231,12 +257,15 @@ public sealed class ToolboxItem : HeaderedItemsControl
             _triggerButton.MouseLeave -= OnTriggerMouseLeave;
             _triggerButton.Click -= OnTriggerClick;
             _triggerButton.PreviewKeyDown -= OnTriggerPreviewKeyDown;
+            _triggerButton.PreviewKeyUp -= OnTriggerPreviewKeyUp;
+            _triggerButton.LostKeyboardFocus -= OnTriggerLostKeyboardFocus;
         }
 
         if (_popupRoot is not null)
         {
             _popupRoot.MouseEnter -= OnPopupMouseEnter;
             _popupRoot.MouseLeave -= OnPopupMouseLeave;
+            _popupRoot.PreviewKeyDown -= OnPopupPreviewKeyDown;
         }
 
         if (_popup is not null)
@@ -247,6 +276,7 @@ public sealed class ToolboxItem : HeaderedItemsControl
         _triggerButton = null;
         _popup = null;
         _popupRoot = null;
+        _keyboardActivationKey = null;
     }
 
     private void OnTriggerMouseEnter(object sender, MouseEventArgs e)
@@ -268,25 +298,61 @@ public sealed class ToolboxItem : HeaderedItemsControl
             return;
         }
 
-        if (IsOpen)
-        {
-            Owner.ClosePopup();
-        }
-        else
-        {
-            SetPointerOverTrigger(true);
-            Owner.RequestOpen(this);
-        }
+        bool focusFirstTool = _keyboardActivationKey is Key.Enter or Key.Space;
+        _keyboardActivationKey = null;
+        Owner.Toggle(this, focusFirstTool);
     }
 
     private void OnTriggerPreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Escape && Owner is not null)
+        if (e.Key == Key.Escape)
         {
-            Owner.ClosePopup();
-            _triggerButton?.Focus();
-            e.Handled = true;
+            CloseAndRestoreTriggerFocus(e);
         }
+        else if (e.Key is Key.Enter or Key.Space)
+        {
+            _keyboardActivationKey = e.Key;
+        }
+    }
+
+    private void OnTriggerPreviewKeyUp(object sender, KeyEventArgs e)
+    {
+        if (e.Key != _keyboardActivationKey)
+        {
+            return;
+        }
+
+        Dispatcher.BeginInvoke(
+            DispatcherPriority.Input,
+            new Action(() => _keyboardActivationKey = null));
+    }
+
+    private void OnTriggerLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+    {
+        if (!IsOpen)
+        {
+            _keyboardActivationKey = null;
+        }
+    }
+
+    private void OnPopupPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape)
+        {
+            CloseAndRestoreTriggerFocus(e);
+        }
+    }
+
+    private void CloseAndRestoreTriggerFocus(KeyEventArgs e)
+    {
+        if (Owner is null)
+        {
+            return;
+        }
+
+        Owner.ClosePopup();
+        _triggerButton?.Focus();
+        e.Handled = true;
     }
 
     private void OnPopupMouseEnter(object sender, MouseEventArgs e)
@@ -305,6 +371,49 @@ public sealed class ToolboxItem : HeaderedItemsControl
     {
         ApplyOwnerLayout();
         Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(ApplyOwnerLayout));
+        if (_focusFirstToolOnOpen)
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(FocusFirstEnabledTool));
+        }
+    }
+
+    private void FocusFirstEnabledTool()
+    {
+        if (!_focusFirstToolOnOpen || !IsOpen)
+        {
+            return;
+        }
+
+        for (int index = 0; index < Items.Count; index++)
+        {
+            if (ItemContainerGenerator.ContainerFromIndex(index) is ToolItem tool && tool.IsEnabled)
+            {
+                _focusFirstToolOnOpen = false;
+                _focusAttemptCount = 0;
+                ItemContainerGenerator.StatusChanged -= OnItemGeneratorStatusChanged;
+                tool.Focus();
+                return;
+            }
+        }
+
+        if (++_focusAttemptCount < 20)
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(FocusFirstEnabledTool));
+        }
+        else
+        {
+            _focusFirstToolOnOpen = false;
+            _focusAttemptCount = 0;
+            ItemContainerGenerator.StatusChanged -= OnItemGeneratorStatusChanged;
+        }
+    }
+
+    private void OnItemGeneratorStatusChanged(object? sender, EventArgs e)
+    {
+        if (_focusFirstToolOnOpen)
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(FocusFirstEnabledTool));
+        }
     }
 
     internal void ApplyOwnerLayout()
