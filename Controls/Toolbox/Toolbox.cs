@@ -512,6 +512,7 @@ public sealed class Toolbox : ItemsControl
     {
         if (_activeItem is not null)
         {
+            _activeItem.RepositionPopup();
             RepositionRequested?.Invoke();
         }
     }
