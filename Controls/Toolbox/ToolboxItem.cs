@@ -482,6 +482,16 @@ public sealed class ToolboxItem : HeaderedItemsControl
         _popup.HorizontalOffset = originalOffset;
     }
 
+    internal void NotifyDragStarted()
+    {
+        Owner?.NotifyDragStarted(this);
+    }
+
+    internal void NotifyDragCompleted()
+    {
+        Owner?.NotifyDragCompleted(this);
+    }
+
     private static T? FindVisualChild<T>(DependencyObject root)
         where T : DependencyObject
     {

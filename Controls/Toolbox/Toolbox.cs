@@ -170,6 +170,8 @@ public sealed class Toolbox : ItemsControl
 
     internal Action? RepositionRequested { get; set; }
 
+    internal bool IsDragInProgress => _dragOwner is not null;
+
     internal void RequestOpen(ToolboxItem item)
     {
         if (!IsEligibleRequest(item))
