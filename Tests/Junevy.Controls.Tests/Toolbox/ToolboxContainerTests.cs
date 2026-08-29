@@ -226,6 +226,100 @@ public sealed class ToolboxContainerTests
     }
 
     [Test]
+    public void GeneratedContainer_LaterLocalNullTakesEffectAndSurvivesClear()
+    {
+        var group = new ToolboxItem();
+        var payload = new object();
+        var container = new ToolItem();
+        InvokePrepare(group, container, payload);
+
+        container.DragData = null;
+
+        Assert.That(container.DragData, Is.Null, "A later local null must take effect before recycling.");
+        InvokeClear(group, container, payload);
+        Assert.Multiple(() =>
+        {
+            Assert.That(container.DragData, Is.Null);
+            Assert.That(container.ReadLocalValue(ToolItem.DragDataProperty), Is.Null);
+            Assert.That(DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty).BaseValueSource,
+                Is.EqualTo(BaseValueSource.Local));
+        });
+    }
+
+    [Test]
+    public void GeneratedContainer_LaterBindingToNullTakesEffectAndSurvivesClear()
+    {
+        var group = new ToolboxItem();
+        var payload = new object();
+        var container = new ToolItem();
+        InvokePrepare(group, container, payload);
+        var source = new TextBlock { Tag = null };
+
+        BindingOperations.SetBinding(
+            container,
+            ToolItem.DragDataProperty,
+            new Binding(nameof(FrameworkElement.Tag)) { Source = source });
+
+        Assert.That(container.DragData, Is.Null, "A later Binding-to-null must take effect before recycling.");
+        InvokeClear(group, container, payload);
+        Assert.Multiple(() =>
+        {
+            Assert.That(container.DragData, Is.Null);
+            Assert.That(BindingOperations.GetBindingExpression(container, ToolItem.DragDataProperty), Is.Not.Null);
+            Assert.That(DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty).IsExpression,
+                Is.True);
+        });
+    }
+
+    [Test]
+    public void GeneratedContainer_LaterStyleNullTakesEffectAndSurvivesClear()
+    {
+        var group = new ToolboxItem();
+        var payload = new object();
+        var container = new ToolItem();
+        InvokePrepare(group, container, payload);
+        var style = new Style(typeof(ToolItem));
+        style.Setters.Add(new Setter(ToolItem.DragDataProperty, null));
+
+        container.Style = style;
+
+        Assert.That(container.DragData, Is.Null, "A later Style null must take effect before recycling.");
+        InvokeClear(group, container, payload);
+        Assert.Multiple(() =>
+        {
+            Assert.That(container.DragData, Is.Null);
+            Assert.That(DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty).BaseValueSource,
+                Is.EqualTo(BaseValueSource.Style));
+        });
+    }
+
+    [Test]
+    public void GeneratedContainer_LaterCurrentNullTakesEffectAndSurvivesClear()
+    {
+        var group = new ToolboxItem();
+        var payload = new object();
+        var container = new ToolItem();
+        InvokePrepare(group, container, payload);
+
+        container.SetCurrentValue(ToolItem.DragDataProperty, null);
+
+        ValueSource beforeClear = DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty);
+        Assert.Multiple(() =>
+        {
+            Assert.That(container.DragData, Is.Null, "A later current null must take effect before recycling.");
+            Assert.That(beforeClear.IsCurrent, Is.True);
+        });
+
+        InvokeClear(group, container, payload);
+        ValueSource afterClear = DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty);
+        Assert.Multiple(() =>
+        {
+            Assert.That(container.DragData, Is.Null);
+            Assert.That(afterClear.IsCurrent, Is.True);
+        });
+    }
+
+    [Test]
     public void ZeroDelayOpening_AThenB_LeavesOnlyBActive()
     {
         var toolbox = new ToolboxControl { OpenDelay = TimeSpan.Zero };
