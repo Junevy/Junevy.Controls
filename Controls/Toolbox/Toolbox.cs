@@ -226,7 +226,22 @@ public sealed class Toolbox : ItemsControl
         if (ReferenceEquals(_pendingItem, item))
         {
             StopOpenTimer();
-            ScheduleActiveCloseIfNeeded();
+            if (!IsEligibleRequest(item))
+            {
+                return;
+            }
+
+            if (focusFirstTool)
+            {
+                item.RequestFocusFirstEnabledTool();
+            }
+
+            SetActiveItem(item);
+            if (focusFirstTool)
+            {
+                item.ScheduleFocusFirstEnabledTool();
+            }
+
             return;
         }
 
