@@ -2,7 +2,9 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Media;
 using Junevy.Controls.Controls.Toolbox;
 using NUnit.Framework;
 using ToolboxControl = Junevy.Controls.Controls.Toolbox.Toolbox;
@@ -985,11 +987,219 @@ public sealed class ToolboxContainerTests
         }
     }
 
+    [Test]
+    public void RealTwoLevelGenerators_CreateToolboxAndToolItemContainers()
+    {
+        var toolbox = new ToolboxControl { OpenDelay = TimeSpan.Zero };
+        var groupData = new ToolboxGroupData("Shapes", "S");
+        var firstTool = new ToolboxToolData("Line", "L");
+        var secondTool = new ToolboxToolData("Circle", "C");
+        groupData.Tools.Add(firstTool);
+        groupData.Tools.Add(secondTool);
+        toolbox.Items.Add(groupData);
+        toolbox.ItemContainerStyle = CreateGroupContainerStyle();
+        Window? window = null;
+
+        try
+        {
+            window = WpfTestHost.Show(toolbox);
+            WpfTestHost.PumpUntil(
+                window.Dispatcher,
+                () => toolbox.ItemContainerGenerator.ContainerFromItem(groupData) is ToolboxItem,
+                TimeSpan.FromSeconds(1));
+            var group = (ToolboxItem)toolbox.ItemContainerGenerator.ContainerFromItem(groupData);
+
+            group.SetPointerOverTrigger(true);
+            toolbox.RequestOpen(group);
+            WpfTestHost.PumpUntil(
+                window.Dispatcher,
+                () => group.ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated,
+                TimeSpan.FromSeconds(1));
+
+            var firstContainer = (ToolItem)group.ItemContainerGenerator.ContainerFromItem(firstTool);
+            var secondContainer = (ToolItem)group.ItemContainerGenerator.ContainerFromItem(secondTool);
+            Assert.Multiple(() =>
+            {
+                Assert.That(firstContainer, Is.Not.Null);
+                Assert.That(secondContainer, Is.Not.Null);
+                Assert.That(firstContainer.DragData, Is.SameAs(firstTool));
+                Assert.That(secondContainer.DragData, Is.SameAs(secondTool));
+                Assert.That(firstContainer.Owner, Is.SameAs(group));
+                Assert.That(firstContainer.Title, Is.EqualTo(firstTool.Title));
+                Assert.That(firstContainer.Icon, Is.EqualTo(firstTool.Icon));
+            });
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void ToolboxItemTemplate_ExposesRequiredPartsAndPopupContent()
+    {
+        var toolbox = new ToolboxControl { OpenDelay = TimeSpan.Zero };
+        var tool = new ToolItem { Icon = "I", Title = "Inspect" };
+        var group = new ToolboxItem { Icon = "G", Title = "Geometry" };
+        group.Items.Add(tool);
+        toolbox.Items.Add(group);
+        Window? window = null;
+
+        try
+        {
+            window = WpfTestHost.Show(toolbox);
+            group.SetPointerOverTrigger(true);
+            toolbox.RequestOpen(group);
+            WpfTestHost.PumpUntil(window.Dispatcher, () => group.IsOpen, TimeSpan.FromSeconds(1));
+
+            var trigger = group.Template.FindName("PART_TriggerButton", group);
+            var popup = group.Template.FindName("PART_Popup", group) as Popup;
+            var popupRoot = popup?.Child is null
+                ? null
+                : FindVisualChildByName<FrameworkElement>(popup.Child, "PART_PopupRoot");
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(trigger, Is.AssignableTo<ButtonBase>());
+                Assert.That(popup, Is.Not.Null);
+                Assert.That(popup!.IsOpen, Is.True);
+                Assert.That(popupRoot, Is.Not.Null);
+                Assert.That(group.PopupRoot, Is.SameAs(popupRoot));
+                Assert.That(FindVisualChild<TextBlock>(popupRoot!, text => text.Text == tool.Title), Is.Not.Null);
+                Assert.That(FindVisualChild<ContentPresenter>(
+                    popupRoot!,
+                    presenter => Equals(presenter.Content, tool.Icon)), Is.Not.Null);
+            });
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void OpenPopup_UsesConfiguredWidthAndSixColumnWrapping()
+    {
+        var toolbox = new ToolboxControl
+        {
+            PopupWidth = 300d,
+            ColumnCount = 6,
+            OpenDelay = TimeSpan.Zero
+        };
+        var group = new ToolboxItem { Title = "Shapes" };
+        for (int index = 1; index <= 7; index++)
+        {
+            group.Items.Add(new ToolItem { Icon = index.ToString(), Title = "Tool " + index });
+        }
+
+        toolbox.Items.Add(group);
+        Window? window = null;
+
+        try
+        {
+            window = WpfTestHost.Show(toolbox);
+            group.SetPointerOverTrigger(true);
+            toolbox.RequestOpen(group);
+            WpfTestHost.PumpUntil(window.Dispatcher, () => group.IsOpen, TimeSpan.FromSeconds(1));
+
+            var popup = (Popup)group.Template.FindName("PART_Popup", group);
+            var popupRoot = FindVisualChildByName<FrameworkElement>(popup.Child, "PART_PopupRoot");
+            var panel = FindVisualChild<UniformGrid>(popupRoot!);
+            Assert.Multiple(() =>
+            {
+                Assert.That(popupRoot, Is.Not.Null);
+                Assert.That(popupRoot!.ActualWidth, Is.EqualTo(300d).Within(0.1d));
+                Assert.That(panel, Is.Not.Null);
+                Assert.That(panel!.Columns, Is.EqualTo(6));
+                Assert.That(panel.Children.Count, Is.EqualTo(7));
+            });
+
+            var first = (FrameworkElement)panel!.Children[0];
+            var seventh = (FrameworkElement)panel.Children[6];
+            double firstY = first.TransformToAncestor(panel).Transform(new Point()).Y;
+            double seventhY = seventh.TransformToAncestor(panel).Transform(new Point()).Y;
+            Assert.That(seventhY, Is.GreaterThan(firstY));
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
     private static ToolboxItem CreateGroup()
     {
         var group = new ToolboxItem();
         group.Items.Add(new ToolItem());
         return group;
+    }
+
+    private static Style CreateGroupContainerStyle()
+    {
+        var toolStyle = new Style(typeof(ToolItem));
+        toolStyle.Setters.Add(new Setter(ToolItem.TitleProperty, new Binding(nameof(ToolboxToolData.Title))));
+        toolStyle.Setters.Add(new Setter(ToolItem.IconProperty, new Binding(nameof(ToolboxToolData.Icon))));
+
+        var groupStyle = new Style(typeof(ToolboxItem));
+        groupStyle.Setters.Add(new Setter(ToolboxItem.TitleProperty, new Binding(nameof(ToolboxGroupData.Title))));
+        groupStyle.Setters.Add(new Setter(ToolboxItem.IconProperty, new Binding(nameof(ToolboxGroupData.Icon))));
+        groupStyle.Setters.Add(new Setter(ItemsControl.ItemsSourceProperty, new Binding(nameof(ToolboxGroupData.Tools))));
+        groupStyle.Setters.Add(new Setter(ItemsControl.ItemContainerStyleProperty, toolStyle));
+        return groupStyle;
+    }
+
+    private static T? FindVisualChild<T>(DependencyObject root, Func<T, bool>? predicate = null)
+        where T : DependencyObject
+    {
+        for (int index = 0; index < VisualTreeHelper.GetChildrenCount(root); index++)
+        {
+            DependencyObject child = VisualTreeHelper.GetChild(root, index);
+            if (child is T match && (predicate is null || predicate(match)))
+            {
+                return match;
+            }
+
+            T? descendant = FindVisualChild(child, predicate);
+            if (descendant is not null)
+            {
+                return descendant;
+            }
+        }
+
+        return null;
+    }
+
+    private static T? FindVisualChildByName<T>(DependencyObject root, string name)
+        where T : FrameworkElement
+    {
+        return FindVisualChild<T>(root, element => element.Name == name);
+    }
+
+    private sealed class ToolboxGroupData
+    {
+        internal ToolboxGroupData(string title, object icon)
+        {
+            Title = title;
+            Icon = icon;
+        }
+
+        public string Title { get; }
+
+        public object Icon { get; }
+
+        public List<ToolboxToolData> Tools { get; } = new();
+    }
+
+    private sealed class ToolboxToolData
+    {
+        internal ToolboxToolData(string title, object icon)
+        {
+            Title = title;
+            Icon = icon;
+        }
+
+        public string Title { get; }
+
+        public object Icon { get; }
     }
 
     private static void Open(ToolboxControl toolbox, ToolboxItem group, Window window)
