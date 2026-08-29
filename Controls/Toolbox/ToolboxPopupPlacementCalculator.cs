@@ -44,9 +44,14 @@ internal static class ToolboxPopupPlacementCalculator
                 _ => throw new ArgumentOutOfRangeException(nameof(preference))
             };
 
+            PopupPrimaryAxis primaryAxis = direction is
+                ToolboxPopupPlacement.Right or ToolboxPopupPlacement.Left
+                    ? PopupPrimaryAxis.Vertical
+                    : PopupPrimaryAxis.Horizontal;
+
             placements[index] = new ToolboxPopupPlacementCandidate(
                 direction,
-                new CustomPopupPlacement(point, PopupPrimaryAxis.None));
+                new CustomPopupPlacement(point, primaryAxis));
         }
 
         return placements;

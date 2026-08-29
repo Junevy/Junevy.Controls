@@ -28,3 +28,8 @@ The specification asks for at least one tool row while also requiring the popup 
 
 - Automated tests cover deterministic placement order and coordinates. Actual multi-monitor movement and mixed-DPI transitions still require manual verification on representative hardware.
 - The environment uses a preview .NET 10 SDK and emits informational `NETSDK1057` messages before builds/tests; the product builds themselves report zero warnings and zero errors.
+
+## Review Follow-up
+
+- Corrected WPF primary-axis metadata for custom placement candidates: Right and Left use `PopupPrimaryAxis.Vertical`; Bottom and Top use `PopupPrimaryAxis.Horizontal`. Tests now assert the axis for every direction.
+- Reconfirmed the height decision: `min(PopupMaxHeight, max(0, workArea.Height - 16))` remains intentional. If the available work area is smaller than one complete row, keeping the popup inside the current monitor takes precedence over the one-row minimum.

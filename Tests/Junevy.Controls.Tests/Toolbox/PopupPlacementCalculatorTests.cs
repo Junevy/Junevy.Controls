@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using Junevy.Controls.Common;
 using Junevy.Controls.Controls.Toolbox;
 using NUnit.Framework;
@@ -45,6 +46,20 @@ public sealed class PopupPlacementCalculatorTests
             Assert.That(placements[1].Placement.Point, Is.EqualTo(new Point(-300d, 0d)));
             Assert.That(placements[2].Placement.Point, Is.EqualTo(new Point(0d, 40d)));
             Assert.That(placements[3].Placement.Point, Is.EqualTo(new Point(0d, -200d)));
+        });
+    }
+
+    [Test]
+    public void PlacementPrimaryAxis_MatchesCandidateDirection()
+    {
+        ToolboxPopupPlacementCandidate[] placements = Calculate(Orientation.Vertical);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(placements.Single(candidate => candidate.Direction == ToolboxPopupPlacement.Right).Placement.PrimaryAxis, Is.EqualTo(PopupPrimaryAxis.Vertical));
+            Assert.That(placements.Single(candidate => candidate.Direction == ToolboxPopupPlacement.Left).Placement.PrimaryAxis, Is.EqualTo(PopupPrimaryAxis.Vertical));
+            Assert.That(placements.Single(candidate => candidate.Direction == ToolboxPopupPlacement.Bottom).Placement.PrimaryAxis, Is.EqualTo(PopupPrimaryAxis.Horizontal));
+            Assert.That(placements.Single(candidate => candidate.Direction == ToolboxPopupPlacement.Top).Placement.PrimaryAxis, Is.EqualTo(PopupPrimaryAxis.Horizontal));
         });
     }
 
