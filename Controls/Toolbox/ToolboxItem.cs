@@ -1,7 +1,10 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 using Junevy.Controls.Common;
 
 namespace Junevy.Controls.Controls.Toolbox;
@@ -152,11 +155,18 @@ public sealed class ToolboxItem : HeaderedItemsControl
             _triggerButton.PreviewKeyDown += OnTriggerPreviewKeyDown;
         }
 
+        if (_popupRoot is not null)
+        {
+            _popupRoot.MouseEnter += OnPopupMouseEnter;
+            _popupRoot.MouseLeave += OnPopupMouseLeave;
+        }
+
         if (_popup is not null)
         {
-            _popup.MouseEnter += OnPopupMouseEnter;
-            _popup.MouseLeave += OnPopupMouseLeave;
+            _popup.Opened += OnPopupOpened;
         }
+
+        ApplyOwnerLayout();
     }
 
     protected override DependencyObject GetContainerForItemOverride()
@@ -223,10 +233,15 @@ public sealed class ToolboxItem : HeaderedItemsControl
             _triggerButton.PreviewKeyDown -= OnTriggerPreviewKeyDown;
         }
 
+        if (_popupRoot is not null)
+        {
+            _popupRoot.MouseEnter -= OnPopupMouseEnter;
+            _popupRoot.MouseLeave -= OnPopupMouseLeave;
+        }
+
         if (_popup is not null)
         {
-            _popup.MouseEnter -= OnPopupMouseEnter;
-            _popup.MouseLeave -= OnPopupMouseLeave;
+            _popup.Opened -= OnPopupOpened;
         }
 
         _triggerButton = null;
@@ -266,13 +281,6 @@ public sealed class ToolboxItem : HeaderedItemsControl
 
     private void OnTriggerPreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key is Key.Enter or Key.Space)
-        {
-            OnTriggerClick(sender, new RoutedEventArgs());
-            e.Handled = true;
-            return;
-        }
-
         if (e.Key == Key.Escape && Owner is not null)
         {
             Owner.ClosePopup();
@@ -291,5 +299,58 @@ public sealed class ToolboxItem : HeaderedItemsControl
     {
         SetPointerOverPopup(false);
         Owner?.RequestClose(this);
+    }
+
+    private void OnPopupOpened(object? sender, EventArgs e)
+    {
+        ApplyOwnerLayout();
+        Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(ApplyOwnerLayout));
+    }
+
+    internal void ApplyOwnerLayout()
+    {
+        if (Owner is null || _popupRoot is null)
+        {
+            return;
+        }
+
+        BindingOperations.SetBinding(
+            _popupRoot,
+            WidthProperty,
+            new Binding(nameof(Toolbox.PopupWidth)) { Source = Owner });
+        BindingOperations.SetBinding(
+            _popupRoot,
+            MaxHeightProperty,
+            new Binding(nameof(Toolbox.PopupMaxHeight)) { Source = Owner });
+
+        UniformGrid? panel = FindVisualChild<UniformGrid>(_popupRoot);
+        if (panel is not null)
+        {
+            BindingOperations.SetBinding(
+                panel,
+                UniformGrid.ColumnsProperty,
+                new Binding(nameof(Toolbox.ColumnCount)) { Source = Owner });
+        }
+    }
+
+    private static T? FindVisualChild<T>(DependencyObject root)
+        where T : DependencyObject
+    {
+        for (int index = 0; index < VisualTreeHelper.GetChildrenCount(root); index++)
+        {
+            DependencyObject child = VisualTreeHelper.GetChild(root, index);
+            if (child is T match)
+            {
+                return match;
+            }
+
+            T? descendant = FindVisualChild<T>(child);
+            if (descendant is not null)
+            {
+                return descendant;
+            }
+        }
+
+        return null;
     }
 }

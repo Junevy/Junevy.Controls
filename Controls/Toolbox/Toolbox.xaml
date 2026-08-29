@@ -1,0 +1,183 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
+    xmlns:cvt="clr-namespace:Junevy.Controls.Converters"
+    xmlns:local="clr-namespace:Junevy.Controls.Controls.Toolbox">
+
+    <Style x:Key="DefaultToolboxStyle" TargetType="{x:Type local:Toolbox}">
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:Toolbox}}, Path=Orientation}" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:Toolbox}">
+                    <Border Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{DynamicResource Theme.ControlCornerRadius}">
+                        <ItemsPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:Toolbox}" BasedOn="{StaticResource DefaultToolboxStyle}" />
+
+    <Style x:Key="DefaultToolboxItemStyle" TargetType="{x:Type local:ToolboxItem}">
+        <Setter Property="Width" Value="48" />
+        <Setter Property="Height" Value="48" />
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:ToolboxItem}">
+                    <Grid>
+                        <Button x:Name="PART_TriggerButton"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                FocusVisualStyle="{x:Null}"
+                                ToolTip="{TemplateBinding Title}"
+                                AutomationProperties.Name="{TemplateBinding Title}">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <ContentControl HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Content="{TemplateBinding Icon}"
+                                                FontFamily="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.FontFamily)}"
+                                                FontSize="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconSize)}"
+                                                Foreground="{TemplateBinding Foreground}"
+                                                TextElement.FontFamily="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.FontFamily)}"
+                                                TextElement.FontSize="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconSize)}"
+                                                TextElement.Foreground="{TemplateBinding Foreground}" />
+                                <TextBlock x:Name="TriggerTitle"
+                                           Text="{TemplateBinding Title}"
+                                           HorizontalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"
+                                           Visibility="Collapsed" />
+                            </StackPanel>
+                        </Button>
+                        <Popup x:Name="PART_Popup"
+                               AllowsTransparency="True"
+                               Focusable="False"
+                               IsOpen="{TemplateBinding IsOpen}"
+                               Placement="Custom"
+                               PlacementTarget="{Binding ElementName=PART_TriggerButton}"
+                               PopupAnimation="Fade"
+                               StaysOpen="True">
+                            <Border x:Name="PART_PopupRoot"
+                                    Width="300"
+                                    MaxHeight="480"
+                                    Padding="6"
+                                    Background="{DynamicResource Theme.Brush.Surface.Base}"
+                                    BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                                    BorderThickness="1"
+                                    CornerRadius="{DynamicResource Theme.ControlCornerRadius}"
+                                    Effect="{DynamicResource Theme.PopupShadow}">
+                                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                                              VerticalScrollBarVisibility="Auto"
+                                              CanContentScroll="True">
+                                    <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"
+                                                    KeyboardNavigation.TabNavigation="Cycle" />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="DisplayMode" Value="IconAndTitle">
+                            <Setter TargetName="PART_TriggerButton" Property="MinHeight" Value="60" />
+                            <Setter TargetName="TriggerTitle" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="PART_TriggerButton" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
+                            <Setter TargetName="PART_TriggerButton" Property="Opacity" Value="0.55" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="6" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:ToolboxItem}" BasedOn="{StaticResource DefaultToolboxItemStyle}" />
+
+    <Style x:Key="DefaultToolItemStyle" TargetType="{x:Type local:ToolItem}">
+        <Setter Property="Height" Value="68" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=Title}" />
+        <Setter Property="AutomationProperties.Name" Value="{Binding RelativeSource={RelativeSource Self}, Path=Title}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:ToolItem}">
+                    <Border x:Name="Root"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <ContentControl HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Content="{TemplateBinding Icon}"
+                                            FontFamily="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.FontFamily)}"
+                                            FontSize="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconSize)}"
+                                            Foreground="{TemplateBinding Foreground}"
+                                            TextElement.FontFamily="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.FontFamily)}"
+                                            TextElement.FontSize="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconSize)}"
+                                            TextElement.Foreground="{TemplateBinding Foreground}" />
+                            <TextBlock x:Name="ToolTitle"
+                                       Text="{TemplateBinding Title}"
+                                       HorizontalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"
+                                       TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="DisplayMode" Value="IconOnly">
+                            <Setter TargetName="Root" Property="Height" Value="40" />
+                            <Setter TargetName="ToolTitle" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Pressed}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
+                            <Setter TargetName="Root" Property="Opacity" Value="0.55" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:ToolItem}" BasedOn="{StaticResource DefaultToolItemStyle}" />
+</ResourceDictionary>
