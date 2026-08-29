@@ -14,6 +14,13 @@ namespace Junevy.Controls.Tests.Toolbox;
 [NonParallelizable]
 public sealed class ToolboxContainerTests
 {
+    private enum TriggerPayloadKind
+    {
+        Null,
+        Distinct,
+        SameAsGenerated
+    }
+
     [Test]
     public void ToolItem_FreshDragDataPreservesThePublicDependencyPropertyContract()
     {
@@ -153,7 +160,7 @@ public sealed class ToolboxContainerTests
         var nextPayload = new object();
         var container = new ToolItem();
 
-        if (failureOperation != ToolItem.GeneratedDragDataOperation.ApplyMarker)
+        if (failureOperation != ToolItem.GeneratedDragDataOperation.ApplyState)
         {
             container.SetGeneratedDragData(payload);
         }
@@ -166,7 +173,7 @@ public sealed class ToolboxContainerTests
             }
         };
 
-        if (failureOperation == ToolItem.GeneratedDragDataOperation.ApplyMarker)
+        if (failureOperation == ToolItem.GeneratedDragDataOperation.ApplyState)
         {
             Assert.Throws<InvalidOperationException>(() => container.SetGeneratedDragData(payload));
         }
@@ -247,6 +254,28 @@ public sealed class ToolboxContainerTests
         InvokePrepare(group, container, new object());
 
         Assert.That(container.DragData, Is.SameAs(currentPayload));
+    }
+
+    [Test]
+    public void GeneratedContainer_DoesNotOverwritePreexistingCurrentNull()
+    {
+        var group = new ToolboxItem();
+        var container = new ToolItem();
+        container.SetCurrentValue(ToolItem.DragDataProperty, null);
+
+        InvokePrepare(group, container, new object());
+
+        ValueSource source = DependencyPropertyHelper.GetValueSource(
+            container,
+            ToolItem.DragDataProperty);
+        Assert.Multiple(() =>
+        {
+            Assert.That(container.DragData, Is.Null);
+            Assert.That(source.IsCurrent, Is.True);
+            Assert.That(GetPrivateField<bool>(container, "_ownsGeneratedDragData"), Is.False);
+            Assert.That(GetPrivateField<object?>(container, "_generatedDragData"), Is.Null);
+            Assert.That(GetPrivateField<object?>(container, "_generatedStateMarker"), Is.Null);
+        });
     }
 
     [Test]
@@ -343,6 +372,61 @@ public sealed class ToolboxContainerTests
         });
     }
 
+    [TestCase(0)]
+    [TestCase(1)]
+    [TestCase(2)]
+    public void GeneratedContainer_InitiallyInactiveStyleTriggerTakesPrecedenceWhenActivated(
+        int payloadKindValue)
+    {
+        var payloadKind = (TriggerPayloadKind)payloadKindValue;
+        var group = new ToolboxItem();
+        var generatedPayload = new object();
+        object? triggerPayload = CreateTriggerPayload(payloadKind, generatedPayload);
+        var container = new ToolItem
+        {
+            Style = CreateDragDataTriggerStyle(triggerPayload)
+        };
+
+        InvokePrepare(group, container, generatedPayload);
+        AssertGeneratedPayloadSurvivesExternalCoercion(container, generatedPayload);
+
+        ActivateDragDataTrigger(container);
+
+        AssertTriggerPayloadOwnsDragData(container, triggerPayload);
+        container.CoerceValue(ToolItem.DragDataProperty);
+        AssertTriggerPayloadOwnsDragData(container, triggerPayload);
+
+        InvokeClear(group, container, generatedPayload);
+        AssertTriggerPayloadOwnsDragData(container, triggerPayload);
+    }
+
+    [TestCase(0)]
+    [TestCase(1)]
+    [TestCase(2)]
+    public void GeneratedContainer_LaterInactiveStyleTriggerTakesPrecedenceWhenActivated(
+        int payloadKindValue)
+    {
+        var payloadKind = (TriggerPayloadKind)payloadKindValue;
+        var group = new ToolboxItem();
+        var generatedPayload = new object();
+        object? triggerPayload = CreateTriggerPayload(payloadKind, generatedPayload);
+        var container = new ToolItem();
+
+        InvokePrepare(group, container, generatedPayload);
+        AssertGeneratedPayloadSurvivesExternalCoercion(container, generatedPayload);
+        container.Style = CreateDragDataTriggerStyle(triggerPayload);
+        AssertGeneratedPayloadSurvivesExternalCoercion(container, generatedPayload);
+
+        ActivateDragDataTrigger(container);
+
+        AssertTriggerPayloadOwnsDragData(container, triggerPayload);
+        container.CoerceValue(ToolItem.DragDataProperty);
+        AssertTriggerPayloadOwnsDragData(container, triggerPayload);
+
+        InvokeClear(group, container, generatedPayload);
+        AssertTriggerPayloadOwnsDragData(container, triggerPayload);
+    }
+
     [Test]
     public void GeneratedContainer_LaterLocalNullTakesEffectAndSurvivesClear()
     {
@@ -436,7 +520,7 @@ public sealed class ToolboxContainerTests
             Assert.That(beforeClear.IsCurrent, Is.True);
             Assert.That(GetPrivateField<bool>(container, "_ownsGeneratedDragData"), Is.False);
             Assert.That(GetPrivateField<object?>(container, "_generatedDragData"), Is.Null);
-            Assert.That(GetPrivateField<object?>(container, "_generatedBaseMarker"), Is.Null);
+            Assert.That(GetPrivateField<object?>(container, "_generatedStateMarker"), Is.Null);
         });
 
         InvokeClear(group, container, payload);
@@ -963,6 +1047,49 @@ public sealed class ToolboxContainerTests
         });
     }
 
+    private static object? CreateTriggerPayload(TriggerPayloadKind payloadKind, object generatedPayload)
+    {
+        return payloadKind switch
+        {
+            TriggerPayloadKind.Null => null,
+            TriggerPayloadKind.Distinct => new object(),
+            TriggerPayloadKind.SameAsGenerated => generatedPayload,
+            _ => throw new ArgumentOutOfRangeException(nameof(payloadKind))
+        };
+    }
+
+    private static Style CreateDragDataTriggerStyle(object? payload)
+    {
+        var style = new Style(typeof(ToolItem));
+        var trigger = new Trigger
+        {
+            Property = FrameworkElement.TagProperty,
+            Value = "active"
+        };
+        trigger.Setters.Add(new Setter(ToolItem.DragDataProperty, payload));
+        style.Triggers.Add(trigger);
+        return style;
+    }
+
+    private static void ActivateDragDataTrigger(ToolItem container)
+    {
+        container.Tag = "active";
+    }
+
+    private static void AssertTriggerPayloadOwnsDragData(ToolItem container, object? payload)
+    {
+        ValueSource source = DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty);
+        Assert.Multiple(() =>
+        {
+            Assert.That(container.DragData, Is.SameAs(payload));
+            Assert.That(container.GetValue(ToolItem.DragDataProperty), Is.SameAs(payload));
+            Assert.That(source.BaseValueSource, Is.EqualTo(BaseValueSource.StyleTrigger));
+            Assert.That(GetPrivateField<bool>(container, "_ownsGeneratedDragData"), Is.False);
+            Assert.That(GetPrivateField<object?>(container, "_generatedDragData"), Is.Null);
+            Assert.That(GetPrivateField<object?>(container, "_generatedStateMarker"), Is.Null);
+        });
+    }
+
     private static void AssertGeneratedStateReleased(ToolItem container)
     {
         ValueSource source = DependencyPropertyHelper.GetValueSource(container, ToolItem.DragDataProperty);
@@ -975,7 +1102,7 @@ public sealed class ToolboxContainerTests
             Assert.That(container.ReadLocalValue(ToolItem.DragDataProperty), Is.SameAs(DependencyProperty.UnsetValue));
             Assert.That(GetPrivateField<bool>(container, "_ownsGeneratedDragData"), Is.False);
             Assert.That(GetPrivateField<object?>(container, "_generatedDragData"), Is.Null);
-            Assert.That(GetPrivateField<object?>(container, "_generatedBaseMarker"), Is.Null);
+            Assert.That(GetPrivateField<object?>(container, "_generatedStateMarker"), Is.Null);
             Assert.That(GetPrivateField<object>(container, "_generatedDragDataOperation").ToString(), Is.EqualTo("None"));
         });
     }

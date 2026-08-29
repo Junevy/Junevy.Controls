@@ -6,19 +6,29 @@ namespace Junevy.Controls.Controls.Toolbox;
 
 public sealed class ToolItem : System.Windows.Controls.Button
 {
+    private static readonly object CurrentNullDragDataMarker = new();
+
     internal enum GeneratedDragDataOperation
     {
         None,
-        ApplyMarker,
-        ProbeMarker,
-        ClearMarker
+        ApplyState,
+        ProbeState,
+        ClearState
     }
 
     private object? _generatedDragData;
-    private object? _generatedBaseMarker;
+    private object? _generatedStateMarker;
     private bool _ownsGeneratedDragData;
-    private bool _generatedBaseMarkerObserved;
+    private bool _generatedStateObserved;
+    private bool _isApplyingCurrentNullMarker;
     private GeneratedDragDataOperation _generatedDragDataOperation;
+
+    private static readonly DependencyProperty GeneratedDragDataStateProperty =
+        DependencyProperty.Register(
+            "GeneratedDragDataState",
+            typeof(object),
+            typeof(ToolItem),
+            new PropertyMetadata(null, OnGeneratedDragDataStateChanged));
 
     public static readonly DependencyProperty IconProperty =
         DependencyProperty.Register(
@@ -105,6 +115,34 @@ public sealed class ToolItem : System.Windows.Controls.Button
         set => SetValue(DragDataFormatProperty, value);
     }
 
+    public new void SetCurrentValue(DependencyProperty dependencyProperty, object? value)
+    {
+        if (dependencyProperty == DragDataProperty && value is null)
+        {
+            // WPF drops a current null when coercion returns the metadata default. Preserve
+            // the current source with a non-public base marker and expose null via coercion.
+            _isApplyingCurrentNullMarker = true;
+            try
+            {
+                SetValue(dependencyProperty, CurrentNullDragDataMarker);
+                base.SetCurrentValue(dependencyProperty, null);
+            }
+            finally
+            {
+                _isApplyingCurrentNullMarker = false;
+            }
+
+            if (_ownsGeneratedDragData)
+            {
+                ReleaseGeneratedDragDataOwnership(recoerceDragData: true);
+            }
+
+            return;
+        }
+
+        base.SetCurrentValue(dependencyProperty, value);
+    }
+
     internal ToolboxItem? Owner { get; private set; }
 
     internal Action<GeneratedDragDataOperation>? GeneratedDragDataOperationCompletedForTest { get; set; }
@@ -141,24 +179,24 @@ public sealed class ToolItem : System.Windows.Controls.Button
             return;
         }
 
-        var marker = new object();
+        var stateMarker = new object();
         _generatedDragData = item;
-        _generatedBaseMarker = marker;
+        _generatedStateMarker = stateMarker;
         _ownsGeneratedDragData = true;
-        bool markerApplied = false;
+        bool stateApplied = false;
         try
         {
             ExecuteGeneratedDragDataOperation(
-                GeneratedDragDataOperation.ApplyMarker,
+                GeneratedDragDataOperation.ApplyState,
                 () =>
                 {
-                    SetValue(DragDataProperty, marker);
-                    markerApplied = true;
+                    SetValue(GeneratedDragDataStateProperty, stateMarker);
+                    stateApplied = true;
                 });
         }
         catch
         {
-            ReleaseGeneratedDragDataAfterFailure(markerApplied);
+            ReleaseGeneratedDragDataAfterFailure(stateApplied);
             throw;
         }
     }
@@ -170,28 +208,29 @@ public sealed class ToolItem : System.Windows.Controls.Button
             return;
         }
 
-        bool markerCleared = false;
+        bool stateCleared = false;
         try
         {
-            _generatedBaseMarkerObserved = false;
+            _generatedStateObserved = false;
             ExecuteGeneratedDragDataOperation(
-                GeneratedDragDataOperation.ProbeMarker,
+                GeneratedDragDataOperation.ProbeState,
                 () => CoerceValue(DragDataProperty));
 
-            if (_generatedBaseMarkerObserved)
+            if (_generatedStateObserved)
             {
                 ExecuteGeneratedDragDataOperation(
-                    GeneratedDragDataOperation.ClearMarker,
-                    () =>
-                    {
-                        ClearValue(DragDataProperty);
-                        markerCleared = true;
-                    });
+                GeneratedDragDataOperation.ClearState,
+                () =>
+                {
+                    ClearValue(GeneratedDragDataStateProperty);
+                    CoerceValue(DragDataProperty);
+                    stateCleared = true;
+                });
             }
         }
         catch
         {
-            ReleaseGeneratedDragDataAfterFailure(_generatedBaseMarkerObserved && !markerCleared);
+            ReleaseGeneratedDragDataAfterFailure(_generatedStateObserved && !stateCleared);
             throw;
         }
         finally
@@ -203,22 +242,32 @@ public sealed class ToolItem : System.Windows.Controls.Button
     private static object? CoerceDragData(DependencyObject dependencyObject, object? baseValue)
     {
         var toolItem = (ToolItem)dependencyObject;
-        if (toolItem._ownsGeneratedDragData
-            && toolItem._generatedBaseMarker is not null
-            && ReferenceEquals(baseValue, toolItem._generatedBaseMarker))
+        if (ReferenceEquals(baseValue, CurrentNullDragDataMarker))
         {
-            if (toolItem._generatedDragDataOperation == GeneratedDragDataOperation.ProbeMarker)
+            return toolItem._isApplyingCurrentNullMarker
+                ? toolItem._generatedDragData ?? CurrentNullDragDataMarker
+                : null;
+        }
+
+        if (!toolItem.HasGeneratedDragDataState())
+        {
+            return baseValue;
+        }
+
+        ValueSource source = DependencyPropertyHelper.GetValueSource(toolItem, DragDataProperty);
+        if (IsGeneratedDefaultSource(source))
+        {
+            if (toolItem._generatedDragDataOperation == GeneratedDragDataOperation.ProbeState)
             {
-                toolItem._generatedBaseMarkerObserved = true;
+                toolItem._generatedStateObserved = true;
             }
 
             return toolItem._generatedDragData;
         }
 
-        if (toolItem._ownsGeneratedDragData
-            && toolItem._generatedDragDataOperation == GeneratedDragDataOperation.None)
+        if (toolItem._generatedDragDataOperation == GeneratedDragDataOperation.None)
         {
-            toolItem.ReleaseGeneratedDragDataState();
+            toolItem.ReleaseGeneratedDragDataOwnership(recoerceDragData: false);
         }
 
         return baseValue;
@@ -228,40 +277,22 @@ public sealed class ToolItem : System.Windows.Controls.Button
     {
         base.OnPropertyChanged(e);
 
-        if (e.Property == StyleProperty
-            && _ownsGeneratedDragData
-            && _generatedBaseMarker is not null
-            && ReferenceEquals(ReadLocalValue(DragDataProperty), _generatedBaseMarker))
+        if (HasGeneratedDragDataState()
+            && e.Property != DragDataProperty
+            && e.Property != GeneratedDragDataStateProperty)
         {
-            ReevaluateGeneratedDragDataAfterStyleChange();
+            CoerceValue(DragDataProperty);
         }
     }
 
-    private void ReevaluateGeneratedDragDataAfterStyleChange()
+    private static void OnGeneratedDragDataStateChanged(
+        DependencyObject dependencyObject,
+        DependencyPropertyChangedEventArgs e)
     {
-        object marker = _generatedBaseMarker!;
-        try
+        var toolItem = (ToolItem)dependencyObject;
+        if (toolItem._generatedDragDataOperation != GeneratedDragDataOperation.ClearState)
         {
-            ExecuteGeneratedDragDataOperation(
-                GeneratedDragDataOperation.ClearMarker,
-                () => ClearValue(DragDataProperty));
-
-            ValueSource source = DependencyPropertyHelper.GetValueSource(this, DragDataProperty);
-            if (!IsUntouchedDefault(source))
-            {
-                ReleaseGeneratedDragDataState();
-                return;
-            }
-
-            ExecuteGeneratedDragDataOperation(
-                GeneratedDragDataOperation.ApplyMarker,
-                () => SetValue(DragDataProperty, marker));
-        }
-        catch
-        {
-            ReleaseGeneratedDragDataAfterFailure(
-                ReferenceEquals(ReadLocalValue(DragDataProperty), marker));
-            throw;
+            toolItem.CoerceValue(DragDataProperty);
         }
     }
 
@@ -279,14 +310,15 @@ public sealed class ToolItem : System.Windows.Controls.Button
         }
     }
 
-    private void ReleaseGeneratedDragDataAfterFailure(bool clearMarker)
+    private void ReleaseGeneratedDragDataAfterFailure(bool clearState)
     {
         try
         {
-            if (clearMarker)
+            if (clearState)
             {
-                _generatedDragDataOperation = GeneratedDragDataOperation.ClearMarker;
-                ClearValue(DragDataProperty);
+                _generatedDragDataOperation = GeneratedDragDataOperation.ClearState;
+                ClearValue(GeneratedDragDataStateProperty);
+                CoerceValue(DragDataProperty);
             }
         }
         finally
@@ -295,13 +327,56 @@ public sealed class ToolItem : System.Windows.Controls.Button
         }
     }
 
+    private void ReleaseGeneratedDragDataOwnership(bool recoerceDragData)
+    {
+        try
+        {
+            if (HasGeneratedDragDataState())
+            {
+                ExecuteGeneratedDragDataOperation(
+                    GeneratedDragDataOperation.ClearState,
+                    () =>
+                    {
+                        ClearValue(GeneratedDragDataStateProperty);
+                        if (recoerceDragData)
+                        {
+                            CoerceValue(DragDataProperty);
+                        }
+                    });
+            }
+        }
+        finally
+        {
+            _generatedDragDataOperation = GeneratedDragDataOperation.None;
+            _generatedStateObserved = false;
+            _generatedStateMarker = null;
+            _generatedDragData = null;
+            _ownsGeneratedDragData = false;
+        }
+    }
+
     private void ReleaseGeneratedDragDataState()
     {
         _generatedDragDataOperation = GeneratedDragDataOperation.None;
-        _generatedBaseMarkerObserved = false;
-        _generatedBaseMarker = null;
+        _generatedStateObserved = false;
+        _generatedStateMarker = null;
         _generatedDragData = null;
         _ownsGeneratedDragData = false;
+    }
+
+    private bool HasGeneratedDragDataState()
+    {
+        return _ownsGeneratedDragData
+            && _generatedStateMarker is not null
+            && ReferenceEquals(GetValue(GeneratedDragDataStateProperty), _generatedStateMarker);
+    }
+
+    private static bool IsGeneratedDefaultSource(ValueSource source)
+    {
+        return source.BaseValueSource == BaseValueSource.Default
+            && !source.IsAnimated
+            && !source.IsCurrent
+            && !source.IsExpression;
     }
 
     private static bool IsUntouchedDefault(ValueSource source)
