@@ -40,3 +40,17 @@ Added `ToolItemDragTests.cs` with coverage for:
 - Drag notification ordering is start-before-executor and completion-in-finally.
 - Popup close behavior remains centralized in the root coordinator.
 - No Task 7 or later files were changed.
+
+## Independent Review Follow-up
+
+The two Important findings from the independent review were addressed:
+
+- Click suppression is now bound to the initiating mouse gesture. A new left-button gesture clears stale suppression, and suppression is honored only while that same gesture's mouse-up synchronously invokes the Button base click path. If OLE drag completion produces no source mouse-up/click, later mouse, keyboard, access-key, automation, or direct activation executes normally.
+- Drag execution captures both the initiating ToolboxItem and its root coordinator before entering the replaceable executor. The finally block notifies that exact coordinator even if the tool is removed or reparented during the nested drag loop.
+
+Additional STA coverage exercises routed mouse down/up cleanup, the synchronous same-gesture click window, independent activation after a drag with no source mouse-up, a new mouse gesture after stale state, and reentrant tool reparenting while the original group remains valid.
+
+Follow-up verification:
+
+- ToolItemDragTests: 21 passed on net8.0-windows; 21 passed on net48.
+- ToolboxContainerTests, ToolboxDefaultsTests, and PopupPlacementCalculatorTests: 71 passed on net8.0-windows; 71 passed on net48.

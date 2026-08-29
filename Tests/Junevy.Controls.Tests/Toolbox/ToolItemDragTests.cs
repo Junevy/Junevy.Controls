@@ -147,6 +147,7 @@ public sealed class ToolItemDragTests
             return DragDropEffects.Copy;
         };
 
+        tool.BeginDragGesture(new Point());
         DragDropEffects result = tool.ExecuteDrag(tool.CreateDragDataObject()!);
 
         Assert.Multiple(() =>
@@ -171,6 +172,7 @@ public sealed class ToolItemDragTests
             ? throw new InvalidOperationException("OLE failure")
             : DragDropEffects.None;
 
+        tool.BeginDragGesture(new Point());
         if (throwFromExecutor)
         {
             Assert.Throws<InvalidOperationException>(() => tool.ExecuteDrag(tool.CreateDragDataObject()!));
@@ -196,6 +198,7 @@ public sealed class ToolItemDragTests
         group.SetPointerOverPopup(true);
         tool.DragExecutor = (_, _, _) => DragDropEffects.None;
 
+        tool.BeginDragGesture(new Point());
         tool.ExecuteDrag(tool.CreateDragDataObject()!);
 
         Assert.Multiple(() =>
@@ -206,15 +209,16 @@ public sealed class ToolItemDragTests
     }
 
     [Test]
-    public void OnClick_AfterDragSuppressesOnlyThatGestureThenPreservesButtonCommandBehavior()
+    public void SameGestureMouseUp_SuppressesOnlyItsSynchronousClick()
     {
         (ToolboxControl _, ToolboxItem _, ToolItem tool) = CreateOpenOwnedTool(new object());
         int executions = 0;
         tool.Command = new TestCommand(() => executions++);
         tool.DragExecutor = (_, _, _) => DragDropEffects.Copy;
+        RaiseMouseButton(tool, Mouse.PreviewMouseDownEvent, MouseButton.Left);
         tool.ExecuteDrag(tool.CreateDragDataObject()!);
 
-        InvokeOnClick(tool);
+        tool.CompleteMouseGesture(() => InvokeOnClick(tool));
         Assert.Multiple(() =>
         {
             Assert.That(executions, Is.Zero);
@@ -223,6 +227,80 @@ public sealed class ToolItemDragTests
 
         InvokeOnClick(tool);
         Assert.That(executions, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void RoutedMouseUp_AfterDragClearsGestureSuppression()
+    {
+        (ToolboxControl _, ToolboxItem _, ToolItem tool) = CreateOpenOwnedTool(new object());
+        tool.DragExecutor = (_, _, _) => DragDropEffects.Copy;
+        RaiseMouseButton(tool, Mouse.PreviewMouseDownEvent, MouseButton.Left);
+        tool.ExecuteDrag(tool.CreateDragDataObject()!);
+
+        RaiseMouseButton(tool, Mouse.MouseUpEvent, MouseButton.Left);
+
+        Assert.That(tool.SuppressClick, Is.False);
+    }
+
+    [Test]
+    public void NoPostDragMouseUp_DirectActivationIsNotConsumedByStaleSuppression()
+    {
+        (ToolboxControl _, ToolboxItem _, ToolItem tool) = CreateOpenOwnedTool(new object());
+        int executions = 0;
+        tool.Command = new TestCommand(() => executions++);
+        tool.DragExecutor = (_, _, _) => DragDropEffects.Copy;
+        tool.BeginDragGesture(new Point());
+        tool.ExecuteDrag(tool.CreateDragDataObject()!);
+
+        InvokeOnClick(tool);
+
+        Assert.That(executions, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void NoPostDragMouseUp_NewMouseGestureClearsStaleSuppression()
+    {
+        (ToolboxControl _, ToolboxItem _, ToolItem tool) = CreateOpenOwnedTool(new object());
+        int executions = 0;
+        tool.Command = new TestCommand(() => executions++);
+        tool.DragExecutor = (_, _, _) => DragDropEffects.Copy;
+        tool.BeginDragGesture(new Point());
+        tool.ExecuteDrag(tool.CreateDragDataObject()!);
+
+        RaiseMouseButton(tool, Mouse.PreviewMouseDownEvent, MouseButton.Left);
+        InvokeOnClick(tool);
+
+        Assert.That(executions, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void ExecuteDrag_WhenToolIsReparented_ReleasesTheInitiatingRootLock()
+    {
+        (ToolboxControl originalRoot, ToolboxItem originalGroup, ToolItem tool) = CreateOpenOwnedTool(new object());
+        originalGroup.Items.Add(new ToolItem { DragData = new object() });
+        var replacementRoot = new ToolboxControl();
+        var replacementGroup = new ToolboxItem();
+        replacementGroup.Items.Add(new ToolItem());
+        replacementGroup.AttachOwner(replacementRoot);
+        tool.DragExecutor = (_, _, _) =>
+        {
+            Assert.That(originalRoot.IsDragInProgress, Is.True);
+            originalGroup.Items.Remove(tool);
+            tool.DetachOwner(originalGroup);
+            replacementGroup.Items.Add(tool);
+            tool.AttachOwner(replacementGroup);
+            return DragDropEffects.None;
+        };
+        tool.BeginDragGesture(new Point());
+
+        tool.ExecuteDrag(tool.CreateDragDataObject()!);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(tool.Owner, Is.SameAs(replacementGroup));
+            Assert.That(originalGroup.HasItems, Is.True);
+            Assert.That(originalRoot.IsDragInProgress, Is.False);
+        });
     }
 
     private static (ToolboxControl Toolbox, ToolboxItem Group, ToolItem Tool) CreateOpenOwnedTool(object payload)
@@ -256,6 +334,16 @@ public sealed class ToolItemDragTests
             "OnClick",
             BindingFlags.Instance | BindingFlags.NonPublic)!;
         method.Invoke(tool, null);
+    }
+
+    private static void RaiseMouseButton(UIElement target, RoutedEvent routedEvent, MouseButton button)
+    {
+        var args = new MouseButtonEventArgs(Mouse.PrimaryDevice, Environment.TickCount, button)
+        {
+            RoutedEvent = routedEvent,
+            Source = target
+        };
+        target.RaiseEvent(args);
     }
 
     private sealed class TestCommand : ICommand
