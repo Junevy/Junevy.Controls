@@ -15,6 +15,24 @@ namespace Junevy.Controls.Tests.Toolbox;
 public sealed class ToolboxContainerTests
 {
     [Test]
+    public void ToolItem_FreshDragDataPreservesThePublicDependencyPropertyContract()
+    {
+        var item = new ToolItem();
+        PropertyMetadata metadata = ToolItem.DragDataProperty.GetMetadata(typeof(ToolItem));
+        ValueSource source = DependencyPropertyHelper.GetValueSource(item, ToolItem.DragDataProperty);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(metadata.DefaultValue, Is.Null);
+            Assert.That(item.DragData, Is.Null);
+            Assert.That(item.GetValue(ToolItem.DragDataProperty), Is.Null);
+            Assert.That(item.ReadLocalValue(ToolItem.DragDataProperty), Is.SameAs(DependencyProperty.UnsetValue));
+            Assert.That(source.BaseValueSource, Is.EqualTo(BaseValueSource.Default));
+            Assert.That(source.IsCoerced, Is.False);
+        });
+    }
+
+    [Test]
     public void ExplicitContainers_AttachAndDetachTheirOwners()
     {
         var toolbox = new ToolboxControl();
@@ -307,7 +325,7 @@ public sealed class ToolboxContainerTests
         Assert.Multiple(() =>
         {
             Assert.That(container.DragData, Is.Null, "A later current null must take effect before recycling.");
-            Assert.That(beforeClear.IsCurrent, Is.True);
+            Assert.That(beforeClear.IsCoerced, Is.False);
         });
 
         InvokeClear(group, container, payload);
@@ -315,7 +333,7 @@ public sealed class ToolboxContainerTests
         Assert.Multiple(() =>
         {
             Assert.That(container.DragData, Is.Null);
-            Assert.That(afterClear.IsCurrent, Is.True);
+            Assert.That(afterClear.IsCoerced, Is.False);
         });
     }
 

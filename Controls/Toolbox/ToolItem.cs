@@ -6,14 +6,16 @@ namespace Junevy.Controls.Controls.Toolbox;
 
 public sealed class ToolItem : System.Windows.Controls.Button
 {
-    private sealed class DragDataDefaultMarker
+    private enum GeneratedCoercionOperation
     {
+        None,
+        Apply,
+        Clear
     }
-
-    private static readonly DragDataDefaultMarker DragDataDefaultValue = new();
 
     private object? _generatedDragData;
     private bool _ownsGeneratedDragData;
+    private GeneratedCoercionOperation _generatedCoercionOperation;
 
     public static readonly DependencyProperty IconProperty =
         DependencyProperty.Register(
@@ -48,7 +50,7 @@ public sealed class ToolItem : System.Windows.Controls.Button
             nameof(DragData),
             typeof(object),
             typeof(ToolItem),
-            new PropertyMetadata(DragDataDefaultValue, null, CoerceDragData));
+            new PropertyMetadata(null, null, CoerceDragData));
 
     public static readonly DependencyProperty DragDataFormatProperty =
         DependencyProperty.Register(
@@ -62,11 +64,6 @@ public sealed class ToolItem : System.Windows.Controls.Button
         DefaultStyleKeyProperty.OverrideMetadata(
             typeof(ToolItem),
             new FrameworkPropertyMetadata(typeof(ToolItem)));
-    }
-
-    public ToolItem()
-    {
-        CoerceValue(DragDataProperty);
     }
 
     public object? Icon
@@ -141,7 +138,15 @@ public sealed class ToolItem : System.Windows.Controls.Button
 
         _generatedDragData = item;
         _ownsGeneratedDragData = true;
-        CoerceValue(DragDataProperty);
+        _generatedCoercionOperation = GeneratedCoercionOperation.Apply;
+        try
+        {
+            CoerceValue(DragDataProperty);
+        }
+        finally
+        {
+            _generatedCoercionOperation = GeneratedCoercionOperation.None;
+        }
     }
 
     internal void ClearGeneratedDragData(object item)
@@ -151,26 +156,36 @@ public sealed class ToolItem : System.Windows.Controls.Button
             return;
         }
 
-        _generatedDragData = null;
-        _ownsGeneratedDragData = false;
-        CoerceValue(DragDataProperty);
+        _generatedCoercionOperation = GeneratedCoercionOperation.Clear;
+        try
+        {
+            CoerceValue(DragDataProperty);
+        }
+        finally
+        {
+            _generatedCoercionOperation = GeneratedCoercionOperation.None;
+            _generatedDragData = null;
+            _ownsGeneratedDragData = false;
+        }
     }
 
     private static object? CoerceDragData(DependencyObject dependencyObject, object? baseValue)
     {
         var toolItem = (ToolItem)dependencyObject;
-        if (baseValue is not DragDataDefaultMarker)
+        if (toolItem._generatedCoercionOperation == GeneratedCoercionOperation.Apply
+            && toolItem._ownsGeneratedDragData)
         {
-            return baseValue;
+            return toolItem._generatedDragData;
         }
 
-        return toolItem._ownsGeneratedDragData ? toolItem._generatedDragData : null;
+        return baseValue;
     }
 
     private static bool IsUntouchedDefault(ValueSource source)
     {
         return source.BaseValueSource == BaseValueSource.Default
             && !source.IsAnimated
+            && !source.IsCoerced
             && !source.IsCurrent
             && !source.IsExpression;
     }
