@@ -10,6 +10,8 @@ public sealed class ToolItem : System.Windows.Controls.Button
     private object? _generatedDragData;
     private Point? _dragStart;
     private bool _suppressClick;
+    private bool _mouseGestureActive;
+    private bool _isCompletingMouseGesture;
 
     public static readonly DependencyProperty IconProperty =
         DependencyProperty.Register(
@@ -139,6 +141,8 @@ public sealed class ToolItem : System.Windows.Controls.Button
 
     internal void BeginDragGesture(Point start)
     {
+        _suppressClick = false;
+        _mouseGestureActive = true;
         _dragStart = start;
     }
 
@@ -172,15 +176,40 @@ public sealed class ToolItem : System.Windows.Controls.Button
 
     internal DragDropEffects ExecuteDrag(DataObject data)
     {
-        _suppressClick = true;
-        Owner?.NotifyDragStarted();
+        ToolboxItem? initiatingOwner = Owner;
+        Toolbox? initiatingCoordinator = initiatingOwner?.Owner;
+        _suppressClick = _mouseGestureActive;
+        if (initiatingOwner is not null)
+        {
+            initiatingCoordinator?.NotifyDragStarted(initiatingOwner);
+        }
+
         try
         {
             return DragExecutor(this, data, DragDropEffects.Copy);
         }
         finally
         {
-            Owner?.NotifyDragCompleted();
+            if (initiatingOwner is not null)
+            {
+                initiatingCoordinator?.NotifyDragCompleted(initiatingOwner);
+            }
+        }
+    }
+
+    internal void CompleteMouseGesture(Action completeMouseUp)
+    {
+        _isCompletingMouseGesture = _mouseGestureActive && _suppressClick;
+        try
+        {
+            completeMouseUp();
+        }
+        finally
+        {
+            _dragStart = null;
+            _mouseGestureActive = false;
+            _suppressClick = false;
+            _isCompletingMouseGesture = false;
         }
     }
 
@@ -246,9 +275,7 @@ public sealed class ToolItem : System.Windows.Controls.Button
 
     protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
     {
-        base.OnMouseLeftButtonUp(e);
-        _dragStart = null;
-        _suppressClick = false;
+        CompleteMouseGesture(() => InvokeBaseMouseLeftButtonUp(e));
     }
 
     protected override void OnLostMouseCapture(MouseEventArgs e)
@@ -259,13 +286,20 @@ public sealed class ToolItem : System.Windows.Controls.Button
 
     protected override void OnClick()
     {
-        if (_suppressClick)
+        if (_isCompletingMouseGesture && _suppressClick)
         {
             _suppressClick = false;
             return;
         }
 
+        _suppressClick = false;
+        _mouseGestureActive = false;
         base.OnClick();
+    }
+
+    private void InvokeBaseMouseLeftButtonUp(MouseButtonEventArgs e)
+    {
+        base.OnMouseLeftButtonUp(e);
     }
 
     private static bool IsUntouchedDefault(ValueSource source)
