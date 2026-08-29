@@ -7,6 +7,8 @@ namespace Junevy.Controls.Controls.Toolbox;
 public sealed class ToolItem : System.Windows.Controls.Button
 {
     private object? _generatedDragData;
+    private object? _generatedBaseValue;
+    private ValueSource _generatedValueSource;
     private bool _ownsGeneratedDragData;
 
     public static readonly DependencyProperty IconProperty =
@@ -42,7 +44,7 @@ public sealed class ToolItem : System.Windows.Controls.Button
             nameof(DragData),
             typeof(object),
             typeof(ToolItem),
-            new PropertyMetadata(null));
+            new PropertyMetadata(null, null, CoerceDragData));
 
     public static readonly DependencyProperty DragDataFormatProperty =
         DependencyProperty.Register(
@@ -101,7 +103,7 @@ public sealed class ToolItem : System.Windows.Controls.Button
         get
         {
             ValueSource source = DependencyPropertyHelper.GetValueSource(this, DragDataFormatProperty);
-            return source.BaseValueSource == BaseValueSource.Default
+            return IsUntouchedDefault(source)
                 ? Owner?.Owner?.DragDataFormat
                 : DragDataFormat;
         }
@@ -123,14 +125,16 @@ public sealed class ToolItem : System.Windows.Controls.Button
     internal void SetGeneratedDragData(object item)
     {
         ValueSource source = DependencyPropertyHelper.GetValueSource(this, DragDataProperty);
-        if (source.BaseValueSource != BaseValueSource.Default)
+        if (!IsUntouchedDefault(source))
         {
             return;
         }
 
-        SetCurrentValue(DragDataProperty, item);
+        _generatedBaseValue = GetValue(DragDataProperty);
         _generatedDragData = item;
         _ownsGeneratedDragData = true;
+        CoerceValue(DragDataProperty);
+        _generatedValueSource = DependencyPropertyHelper.GetValueSource(this, DragDataProperty);
     }
 
     internal void ClearGeneratedDragData(object item)
@@ -140,12 +144,43 @@ public sealed class ToolItem : System.Windows.Controls.Button
             return;
         }
 
-        if (ReferenceEquals(DragData, _generatedDragData))
-        {
-            ClearValue(DragDataProperty);
-        }
-
+        ValueSource currentSource = DependencyPropertyHelper.GetValueSource(this, DragDataProperty);
+        bool stillOwned = HasSameSource(currentSource, _generatedValueSource);
         _generatedDragData = null;
+        _generatedBaseValue = null;
         _ownsGeneratedDragData = false;
+        CoerceValue(DragDataProperty);
+
+        if (stillOwned)
+        {
+            _generatedValueSource = default;
+        }
+    }
+
+    private static object? CoerceDragData(DependencyObject dependencyObject, object? baseValue)
+    {
+        var toolItem = (ToolItem)dependencyObject;
+        return toolItem._ownsGeneratedDragData
+            && ReferenceEquals(baseValue, toolItem._generatedBaseValue)
+                ? toolItem._generatedDragData
+                : baseValue;
+    }
+
+    private static bool IsUntouchedDefault(ValueSource source)
+    {
+        return source.BaseValueSource == BaseValueSource.Default
+            && !source.IsAnimated
+            && !source.IsCoerced
+            && !source.IsCurrent
+            && !source.IsExpression;
+    }
+
+    private static bool HasSameSource(ValueSource left, ValueSource right)
+    {
+        return left.BaseValueSource == right.BaseValueSource
+            && left.IsAnimated == right.IsAnimated
+            && left.IsCoerced == right.IsCoerced
+            && left.IsCurrent == right.IsCurrent
+            && left.IsExpression == right.IsExpression;
     }
 }

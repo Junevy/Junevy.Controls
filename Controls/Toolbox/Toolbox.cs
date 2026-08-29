@@ -83,7 +83,7 @@ public sealed class Toolbox : ItemsControl
     private ToolboxItem? _pendingItem;
     private ToolboxItem? _activeItem;
     private Window? _hostWindow;
-    private bool _isDragging;
+    private ToolboxItem? _dragOwner;
 
     static Toolbox()
     {
@@ -157,7 +157,7 @@ public sealed class Toolbox : ItemsControl
     {
         StopOpenTimer();
         _closeTimer.Stop();
-        _isDragging = false;
+        _dragOwner = null;
 
         if (_activeItem is not null)
         {
@@ -197,19 +197,22 @@ public sealed class Toolbox : ItemsControl
             return;
         }
 
-        if (ReferenceEquals(_pendingItem, item))
+        bool cancelledPendingOpen = ReferenceEquals(_pendingItem, item);
+        if (cancelledPendingOpen)
         {
             StopOpenTimer();
         }
 
-        if (!ReferenceEquals(_activeItem, item) || _isDragging || item.IsPointerOverEitherRegion)
+        if (ReferenceEquals(_activeItem, item) && item.IsPointerOverEitherRegion)
         {
+            _closeTimer.Stop();
             return;
         }
 
-        _closeTimer.Stop();
-        _closeTimer.Interval = CloseDelay;
-        _closeTimer.Start();
+        if (ReferenceEquals(_activeItem, item) || cancelledPendingOpen)
+        {
+            ScheduleActiveCloseIfNeeded();
+        }
     }
 
     internal void NotifyDragStarted(ToolboxItem item)
@@ -219,19 +222,24 @@ public sealed class Toolbox : ItemsControl
             return;
         }
 
-        _isDragging = true;
+        if (_dragOwner is not null && !ReferenceEquals(_dragOwner, item))
+        {
+            return;
+        }
+
+        _dragOwner = item;
         _closeTimer.Stop();
     }
 
     internal void NotifyDragCompleted(ToolboxItem item)
     {
-        if (!_isDragging || !ReferenceEquals(_activeItem, item) || !ReferenceEquals(item.Owner, this))
+        if (!ReferenceEquals(_dragOwner, item))
         {
             return;
         }
 
-        _isDragging = false;
-        if (!item.IsPointerOverEitherRegion)
+        _dragOwner = null;
+        if (_activeItem is not null && !_activeItem.IsPointerOverEitherRegion)
         {
             ClosePopup();
         }
@@ -247,6 +255,7 @@ public sealed class Toolbox : ItemsControl
         if (ReferenceEquals(_pendingItem, item))
         {
             StopOpenTimer();
+            ScheduleActiveCloseIfNeeded();
         }
 
         if (ReferenceEquals(_activeItem, item))
@@ -285,6 +294,11 @@ public sealed class Toolbox : ItemsControl
             {
                 ClosePopup();
             }
+            else if (ReferenceEquals(_dragOwner, container))
+            {
+                _dragOwner = null;
+                ScheduleActiveCloseIfNeeded();
+            }
 
             container.DetachOwner(this);
         }
@@ -305,6 +319,7 @@ public sealed class Toolbox : ItemsControl
             || !item.HasItems
             || !item.IsPointerOverTrigger)
         {
+            ScheduleActiveCloseIfNeeded();
             return;
         }
 
@@ -314,7 +329,7 @@ public sealed class Toolbox : ItemsControl
     private void OnCloseTimerTick(object? sender, EventArgs e)
     {
         _closeTimer.Stop();
-        if (_isDragging || _activeItem is null || _activeItem.IsPointerOverEitherRegion)
+        if (_dragOwner is not null || _activeItem is null || _activeItem.IsPointerOverEitherRegion)
         {
             return;
         }
@@ -355,6 +370,20 @@ public sealed class Toolbox : ItemsControl
     {
         _openTimer.Stop();
         _pendingItem = null;
+    }
+
+    private void ScheduleActiveCloseIfNeeded()
+    {
+        _closeTimer.Stop();
+        if (_dragOwner is not null
+            || _activeItem is null
+            || _activeItem.IsPointerOverEitherRegion)
+        {
+            return;
+        }
+
+        _closeTimer.Interval = CloseDelay;
+        _closeTimer.Start();
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)

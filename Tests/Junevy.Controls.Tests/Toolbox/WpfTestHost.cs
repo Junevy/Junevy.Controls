@@ -8,8 +8,22 @@ namespace Junevy.Controls.Tests.Toolbox;
 internal static class WpfTestHost
 {
     private static readonly TimeSpan DrainTimeout = TimeSpan.FromSeconds(1);
+    private static readonly HashSet<Window> OpenWindows = new();
+
+    internal static int OpenWindowCount => OpenWindows.Count;
 
     internal static Window Show(params FrameworkElement[] elements)
+    {
+        return Show(
+            window => window.IsLoaded && elements.All(element => element.IsLoaded),
+            DrainTimeout,
+            elements);
+    }
+
+    internal static Window Show(
+        Func<Window, bool> setupComplete,
+        TimeSpan timeout,
+        params FrameworkElement[] elements)
     {
         var panel = new StackPanel();
         foreach (FrameworkElement element in elements)
@@ -27,14 +41,23 @@ internal static class WpfTestHost
             WindowStyle = WindowStyle.ToolWindow
         };
 
-        window.Show();
-        window.UpdateLayout();
-        PumpUntil(
-            window.Dispatcher,
-            () => window.IsLoaded && elements.All(element => element.IsLoaded),
-            DrainTimeout);
+        try
+        {
+            window.Show();
+            OpenWindows.Add(window);
+            window.UpdateLayout();
+            PumpUntil(
+                window.Dispatcher,
+                () => setupComplete(window),
+                timeout);
 
-        return window;
+            return window;
+        }
+        catch
+        {
+            CloseAndDrain(window);
+            throw;
+        }
     }
 
     internal static void Drain(Dispatcher dispatcher)
@@ -49,8 +72,8 @@ internal static class WpfTestHost
         Dispatcher.PushFrame(frame);
         timeout.Stop();
 
-        Assert.That(operation.Status, Is.Not.EqualTo(DispatcherOperationStatus.Pending),
-            "The Dispatcher did not drain before the bounded timeout.");
+        Assert.That(operation.Status, Is.EqualTo(DispatcherOperationStatus.Completed),
+            "The Dispatcher drain operation did not complete before the bounded timeout.");
     }
 
     internal static void PumpFor(Dispatcher dispatcher, TimeSpan duration)
@@ -103,6 +126,7 @@ internal static class WpfTestHost
 
         Dispatcher dispatcher = window.Dispatcher;
         window.Close();
+        OpenWindows.Remove(window);
         Drain(dispatcher);
     }
 
