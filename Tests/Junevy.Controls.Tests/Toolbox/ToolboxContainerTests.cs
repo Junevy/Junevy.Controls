@@ -1253,7 +1253,7 @@ public sealed class ToolboxContainerTests
     }
 
     [Test]
-    public void TriggerClick_CancelsItsPendingHoverOpen()
+    public void TriggerClick_OpensPendingHoverImmediatelyAndCancelsTimer()
     {
         var toolbox = new ToolboxControl { OpenDelay = TimeSpan.FromMilliseconds(40) };
         var group = new ToolboxItem { Title = "A" };
@@ -1267,11 +1267,16 @@ public sealed class ToolboxContainerTests
             RaiseMouse(trigger, Mouse.MouseEnterEvent);
             WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(5));
             trigger.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+            Assert.Multiple(() =>
+            {
+                Assert.That(group.IsOpen, Is.True);
+                Assert.That(toolbox.ActiveItem, Is.SameAs(group));
+            });
             WpfTestHost.PumpFor(window.Dispatcher, TimeSpan.FromMilliseconds(70));
             Assert.Multiple(() =>
             {
-                Assert.That(group.IsOpen, Is.False);
-                Assert.That(toolbox.ActiveItem, Is.Null);
+                Assert.That(group.IsOpen, Is.True);
+                Assert.That(toolbox.ActiveItem, Is.SameAs(group));
             });
         }
         finally
