@@ -1,17 +1,30 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using Junevy.Controls.Common;
 
 namespace Junevy.Controls.Controls.Toolbox;
 
+[TemplatePart(Name = PartTriggerButton, Type = typeof(ButtonBase))]
+[TemplatePart(Name = PartPopup, Type = typeof(Popup))]
+[TemplatePart(Name = PartPopupRoot, Type = typeof(FrameworkElement))]
 public sealed class ToolboxItem : HeaderedItemsControl
 {
+    internal const string PartTriggerButton = "PART_TriggerButton";
+    internal const string PartPopup = "PART_Popup";
+    internal const string PartPopupRoot = "PART_PopupRoot";
+
     private static readonly DependencyPropertyKey IsOpenPropertyKey =
         DependencyProperty.RegisterReadOnly(
             nameof(IsOpen),
             typeof(bool),
             typeof(ToolboxItem),
             new PropertyMetadata(false));
+
+    private ButtonBase? _triggerButton;
+    private Popup? _popup;
+    private FrameworkElement? _popupRoot;
 
     public static readonly DependencyProperty IconProperty =
         DependencyProperty.Register(
@@ -68,6 +81,12 @@ public sealed class ToolboxItem : HeaderedItemsControl
 
     public bool IsOpen => (bool)GetValue(IsOpenProperty);
 
+    internal ButtonBase? TriggerButton => _triggerButton;
+
+    internal Popup? Popup => _popup;
+
+    internal FrameworkElement? PopupRoot => _popupRoot;
+
     internal Toolbox? Owner { get; private set; }
 
     internal bool IsPointerOverTrigger { get; private set; }
@@ -114,6 +133,30 @@ public sealed class ToolboxItem : HeaderedItemsControl
     internal void SetIsOpen(bool value)
     {
         SetValue(IsOpenPropertyKey, value);
+    }
+
+    public override void OnApplyTemplate()
+    {
+        DetachTemplateParts();
+        base.OnApplyTemplate();
+
+        _triggerButton = GetTemplateChild(PartTriggerButton) as ButtonBase;
+        _popup = GetTemplateChild(PartPopup) as Popup;
+        _popupRoot = GetTemplateChild(PartPopupRoot) as FrameworkElement;
+
+        if (_triggerButton is not null)
+        {
+            _triggerButton.MouseEnter += OnTriggerMouseEnter;
+            _triggerButton.MouseLeave += OnTriggerMouseLeave;
+            _triggerButton.Click += OnTriggerClick;
+            _triggerButton.PreviewKeyDown += OnTriggerPreviewKeyDown;
+        }
+
+        if (_popup is not null)
+        {
+            _popup.MouseEnter += OnPopupMouseEnter;
+            _popup.MouseLeave += OnPopupMouseLeave;
+        }
     }
 
     protected override DependencyObject GetContainerForItemOverride()
@@ -168,5 +211,85 @@ public sealed class ToolboxItem : HeaderedItemsControl
         {
             Owner?.NotifyItemInvalidated(this);
         }
+    }
+
+    private void DetachTemplateParts()
+    {
+        if (_triggerButton is not null)
+        {
+            _triggerButton.MouseEnter -= OnTriggerMouseEnter;
+            _triggerButton.MouseLeave -= OnTriggerMouseLeave;
+            _triggerButton.Click -= OnTriggerClick;
+            _triggerButton.PreviewKeyDown -= OnTriggerPreviewKeyDown;
+        }
+
+        if (_popup is not null)
+        {
+            _popup.MouseEnter -= OnPopupMouseEnter;
+            _popup.MouseLeave -= OnPopupMouseLeave;
+        }
+
+        _triggerButton = null;
+        _popup = null;
+        _popupRoot = null;
+    }
+
+    private void OnTriggerMouseEnter(object sender, MouseEventArgs e)
+    {
+        SetPointerOverTrigger(true);
+        Owner?.RequestOpen(this);
+    }
+
+    private void OnTriggerMouseLeave(object sender, MouseEventArgs e)
+    {
+        SetPointerOverTrigger(false);
+        Owner?.RequestClose(this);
+    }
+
+    private void OnTriggerClick(object sender, RoutedEventArgs e)
+    {
+        if (Owner is null)
+        {
+            return;
+        }
+
+        if (IsOpen)
+        {
+            Owner.ClosePopup();
+        }
+        else
+        {
+            SetPointerOverTrigger(true);
+            Owner.RequestOpen(this);
+        }
+    }
+
+    private void OnTriggerPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key is Key.Enter or Key.Space)
+        {
+            OnTriggerClick(sender, new RoutedEventArgs());
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == Key.Escape && Owner is not null)
+        {
+            Owner.ClosePopup();
+            _triggerButton?.Focus();
+            e.Handled = true;
+        }
+    }
+
+    private void OnPopupMouseEnter(object sender, MouseEventArgs e)
+    {
+        SetPointerOverPopup(true);
+        Owner?.RequestOpen(this);
+    }
+
+    private void OnPopupMouseLeave(object sender, MouseEventArgs e)
+    {
+        SetPointerOverPopup(false);
+        Owner?.RequestClose(this);
     }
 }
