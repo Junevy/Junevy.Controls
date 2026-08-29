@@ -6,6 +6,9 @@ namespace Junevy.Controls.Controls.Toolbox;
 
 public sealed class ToolItem : System.Windows.Controls.Button
 {
+    private object? _generatedDragData;
+    private bool _ownsGeneratedDragData;
+
     public static readonly DependencyProperty IconProperty =
         DependencyProperty.Register(
             nameof(Icon),
@@ -89,5 +92,60 @@ public sealed class ToolItem : System.Windows.Controls.Button
     {
         get => (string?)GetValue(DragDataFormatProperty);
         set => SetValue(DragDataFormatProperty, value);
+    }
+
+    internal ToolboxItem? Owner { get; private set; }
+
+    internal string? EffectiveDragDataFormat
+    {
+        get
+        {
+            ValueSource source = DependencyPropertyHelper.GetValueSource(this, DragDataFormatProperty);
+            return source.BaseValueSource == BaseValueSource.Default
+                ? Owner?.Owner?.DragDataFormat
+                : DragDataFormat;
+        }
+    }
+
+    internal void AttachOwner(ToolboxItem owner)
+    {
+        Owner = owner;
+    }
+
+    internal void DetachOwner(ToolboxItem owner)
+    {
+        if (ReferenceEquals(Owner, owner))
+        {
+            Owner = null;
+        }
+    }
+
+    internal void SetGeneratedDragData(object item)
+    {
+        ValueSource source = DependencyPropertyHelper.GetValueSource(this, DragDataProperty);
+        if (source.BaseValueSource != BaseValueSource.Default)
+        {
+            return;
+        }
+
+        SetCurrentValue(DragDataProperty, item);
+        _generatedDragData = item;
+        _ownsGeneratedDragData = true;
+    }
+
+    internal void ClearGeneratedDragData(object item)
+    {
+        if (!_ownsGeneratedDragData || !ReferenceEquals(_generatedDragData, item))
+        {
+            return;
+        }
+
+        if (ReferenceEquals(DragData, _generatedDragData))
+        {
+            ClearValue(DragDataProperty);
+        }
+
+        _generatedDragData = null;
+        _ownsGeneratedDragData = false;
     }
 }
