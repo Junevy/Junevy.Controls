@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Junevy.Controls.Common;
 
 namespace Junevy.Controls.Controls.Toolbox;
@@ -7,6 +8,8 @@ namespace Junevy.Controls.Controls.Toolbox;
 public sealed class ToolItem : System.Windows.Controls.Button
 {
     private object? _generatedDragData;
+    private Point? _dragStart;
+    private bool _suppressClick;
 
     public static readonly DependencyProperty IconProperty =
         DependencyProperty.Register(
@@ -95,6 +98,11 @@ public sealed class ToolItem : System.Windows.Controls.Button
 
     internal ToolboxItem? Owner { get; private set; }
 
+    internal Func<DependencyObject, DataObject, DragDropEffects, DragDropEffects> DragExecutor { get; set; } =
+        static (source, data, allowedEffects) => DragDrop.DoDragDrop(source, data, allowedEffects);
+
+    internal bool SuppressClick => _suppressClick;
+
     internal string? EffectiveDragDataFormat
     {
         get
@@ -103,6 +111,76 @@ public sealed class ToolItem : System.Windows.Controls.Button
             return IsUntouchedDefault(source)
                 ? Owner?.Owner?.DragDataFormat
                 : DragDataFormat;
+        }
+    }
+
+    internal DataObject? CreateDragDataObject()
+    {
+        string? format = EffectiveDragDataFormat;
+        if (!IsDragEnabled || DragData is null || string.IsNullOrWhiteSpace(format))
+        {
+            return null;
+        }
+
+        var data = new DataObject();
+        data.SetData(format, DragData, false);
+        return data;
+    }
+
+    internal static bool ExceedsDragThreshold(
+        Point start,
+        Point current,
+        double minHorizontal,
+        double minVertical)
+    {
+        return Math.Abs(current.X - start.X) > minHorizontal
+            || Math.Abs(current.Y - start.Y) > minVertical;
+    }
+
+    internal void BeginDragGesture(Point start)
+    {
+        _dragStart = start;
+    }
+
+    internal DragDropEffects? ContinueDragGesture(Point current, MouseButtonState leftButton)
+    {
+        if (leftButton != MouseButtonState.Pressed || _dragStart is not Point start)
+        {
+            _dragStart = null;
+            return null;
+        }
+
+        if (!ExceedsDragThreshold(
+                start,
+                current,
+                SystemParameters.MinimumHorizontalDragDistance,
+                SystemParameters.MinimumVerticalDragDistance))
+        {
+            return null;
+        }
+
+        DataObject? data = CreateDragDataObject();
+        if (data is null)
+        {
+            _dragStart = null;
+            return null;
+        }
+
+        _dragStart = null;
+        return ExecuteDrag(data);
+    }
+
+    internal DragDropEffects ExecuteDrag(DataObject data)
+    {
+        _suppressClick = true;
+        Owner?.NotifyDragStarted();
+        try
+        {
+            return DragExecutor(this, data, DragDropEffects.Copy);
+        }
+        finally
+        {
+            Owner?.NotifyDragCompleted();
         }
     }
 
@@ -152,6 +230,42 @@ public sealed class ToolItem : System.Windows.Controls.Button
         {
             _generatedDragData = null;
         }
+    }
+
+    protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
+    {
+        BeginDragGesture(e.GetPosition(this));
+        base.OnPreviewMouseLeftButtonDown(e);
+    }
+
+    protected override void OnMouseMove(MouseEventArgs e)
+    {
+        base.OnMouseMove(e);
+        ContinueDragGesture(e.GetPosition(this), e.LeftButton);
+    }
+
+    protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+    {
+        base.OnMouseLeftButtonUp(e);
+        _dragStart = null;
+        _suppressClick = false;
+    }
+
+    protected override void OnLostMouseCapture(MouseEventArgs e)
+    {
+        _dragStart = null;
+        base.OnLostMouseCapture(e);
+    }
+
+    protected override void OnClick()
+    {
+        if (_suppressClick)
+        {
+            _suppressClick = false;
+            return;
+        }
+
+        base.OnClick();
     }
 
     private static bool IsUntouchedDefault(ValueSource source)
