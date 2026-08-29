@@ -6,6 +6,7 @@
 		<LangVersion>12</LangVersion>
 		<UseWPF>true</UseWPF>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<DefaultItemExcludes>$(DefaultItemExcludes);Tests\**\*;Samples\**\*</DefaultItemExcludes>
 
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>Junevy.Controls</PackageId>
@@ -24,6 +25,9 @@
 
 	<ItemGroup>
 		<Compile Remove="Controls\Menu\MenuItem.NodeType.cs" />
+		<Compile Remove="Tests\**\*.cs;Samples\**\*.cs" />
+		<Page Remove="Tests\**\*.xaml;Samples\**\*.xaml" />
+		<ApplicationDefinition Remove="Tests\**\*.xaml;Samples\**\*.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
