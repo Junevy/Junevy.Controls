@@ -568,6 +568,98 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
 
 `ItemTemplate` 只用于显示按钮的 `Content`，不要在其中再次创建 `ToolBarItem`。如果 `ItemsSource` 本身存放 `ToolBarItem`，WPF 会把它们视为现成容器并忽略 `ItemTemplate`，这是标准 `ItemsControl` 行为。
 
+### Toolbox、ToolboxItem 与 ToolItem
+
+`jv:Toolbox` 是一级悬浮工具箱，继承 WPF `ItemsControl`；`jv:ToolboxItem` 是分组触发器和 Popup 容器，继承 `HeaderedItemsControl`；`jv:ToolItem` 继承 WPF `Button`，保留标准 `Command`、`CommandParameter`、`Click`、焦点和禁用行为。任意时刻最多展开一个分组。
+
+`Toolbox` 的公开属性和方法：
+
+| 属性/方法 | 默认值 | 效果 |
+| --- | --- | --- |
+| `Orientation` | `Vertical` | 一级分组排列方向；也决定 `PopupPlacement=Auto` 的优先方向 |
+| `OpenDelay` | `150 ms` | 指针停留在有效分组触发器上后打开 Popup 的延迟；不能为负值 |
+| `CloseDelay` | `300 ms` | 指针同时离开触发器和 Popup 后关闭的延迟；不能为负值 |
+| `PopupWidth` | `300` DIP | Popup 边框总宽度；必须为有限且大于 `0` 的值 |
+| `ColumnCount` | `6` | Popup 中 `UniformGrid` 的固定列数；至少为 `1` |
+| `PopupMaxHeight` | `480` DIP | Popup 请求的最大高度；必须为有限且大于 `0` 的值 |
+| `PopupPlacement` | `Auto` | 位置偏好：`Auto`、`Right`、`Left`、`Bottom` 或 `Top` |
+| `DragDataFormat` | `Junevy.Controls.Tool` | 子工具未单独指定格式时使用的 WPF 拖放数据格式；不能为空或空白 |
+| `ActiveItem` | `null` | 当前打开的 `ToolboxItem`，只读 |
+| `ClosePopup()` | - | 立即取消待处理的打开/关闭并关闭当前 Popup |
+
+`ToolboxItem` 的公开属性：
+
+| 属性 | 默认值 | 效果 |
+| --- | --- | --- |
+| `Icon` | `null` | 分组图标，可使用图标字体字符或任意对象 |
+| `Title` | `null` | 分组标题，同时用于默认 ToolTip 和自动化名称 |
+| `DisplayMode` | `IconOnly` | `IconOnly` 只显示图标；`IconAndTitle` 同时显示标题 |
+| `IsOpen` | `false` | Popup 是否打开，只读 |
+
+`ToolItem` 的公开属性：
+
+| 属性 | 默认值 | 效果 |
+| --- | --- | --- |
+| `Icon` | `null` | 工具图标，可使用图标字体字符或任意对象 |
+| `Title` | `null` | 工具标题；默认单行省略，并作为 ToolTip 和自动化名称 |
+| `DisplayMode` | `IconAndTitle` | `IconOnly` 只显示图标；`IconAndTitle` 同时显示标题 |
+| `IsDragEnabled` | `true` | 是否允许超过 WPF 系统拖动阈值后启动 Copy 拖放 |
+| `DragData` | `null` | 拖放载荷；应为工具定义等业务数据，不要使用 `ToolItem` 或其他 UI 对象 |
+| `DragDataFormat` | `null` | 单项拖放格式；未设置时继承所属 `Toolbox.DragDataFormat` |
+
+绑定普通数据集合时，`Toolbox` 自动为外层数据生成 `ToolboxItem`，`ToolboxItem` 自动为内层数据生成 `ToolItem`。使用两级 `ItemContainerStyle` 绑定分组和工具属性；普通内层数据对象还会成为所生成 `ToolItem` 的默认 `DragData`。显式提供 `ToolboxItem` 或 `ToolItem` 时，WPF 会直接使用该实例，调用方应自行设置其属性和 `DragData`，不要在 `ItemTemplate` 中再创建同类型容器。
+
+```xml
+<Window.Resources>
+    <Style x:Key="ToolItemStyle"
+           BasedOn="{StaticResource DefaultToolItemStyle}"
+           TargetType="{x:Type jv:ToolItem}">
+        <Setter Property="Icon" Value="{Binding Icon}" />
+        <Setter Property="Title" Value="{Binding Title}" />
+        <Setter Property="Command" Value="{Binding DataContext.PlaceToolCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+        <Setter Property="CommandParameter" Value="{Binding}" />
+    </Style>
+
+    <Style x:Key="ToolboxItemStyle"
+           BasedOn="{StaticResource DefaultToolboxItemStyle}"
+           TargetType="{x:Type jv:ToolboxItem}">
+        <Setter Property="Icon" Value="{Binding Icon}" />
+        <Setter Property="Title" Value="{Binding Title}" />
+        <Setter Property="ItemsSource" Value="{Binding Tools}" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource ToolItemStyle}" />
+    </Style>
+</Window.Resources>
+
+<jv:Toolbox
+    ItemContainerStyle="{StaticResource ToolboxItemStyle}"
+    ItemsSource="{Binding ToolGroups}" />
+```
+
+Popup 默认使用 300 DIP 总宽度和六列网格，水平滚动关闭，超出有效高度时垂直滚动。垂直工具箱的 `Auto` 定位顺序为右、左、下、上；水平工具箱为下、上、右、左。显式位置仍保留其余方向作为空间不足时的回退。控件按目标窗口所在显示器取得工作区并将物理像素转换为 DIP，有效最大高度为 `min(PopupMaxHeight, 当前显示器工作区高度 - 16 DIP)`；窗口移动、调整大小或跨越不同缩放比例的显示器时，已打开的 Popup 会重新定位。窗口失活、最小化或控件卸载时 Popup 会立即关闭。
+
+拖放固定使用 `DragDropEffects.Copy`。默认格式是 `Junevy.Controls.Tool`，载荷是 `DragData`；启动拖动的鼠标手势不会再执行按钮 Click。Canvas 必须设置 `AllowDrop="True"`，并由消费方验证格式、读取业务数据和创建节点：
+
+```csharp
+private void Canvas_OnDrop(object sender, DragEventArgs e)
+{
+    const string format = "Junevy.Controls.Tool";
+    if (sender is not Canvas canvas || !e.Data.GetDataPresent(format))
+    {
+        e.Effects = DragDropEffects.None;
+        e.Handled = true;
+        return;
+    }
+
+    object toolDefinition = e.Data.GetData(format);
+    Point position = e.GetPosition(canvas);
+    viewModel.AddTool(toolDefinition, position);
+    e.Effects = DragDropEffects.Copy;
+    e.Handled = true;
+}
+```
+
+控件库只负责工具的展示、命令和拖放数据传递，不包含 Canvas 节点工厂、节点创建、连线、撤销重做或序列化；这些能力和具体坐标语义属于消费应用。
+
 ### AppBar
 
 `jv:AppBar` 继承 WPF `ContentControl`，提供应用图标、标题、工具栏以及最小化、最大化/还原、关闭按钮。系统按钮通过 WPF `SystemCommands` 操作所在窗口。
@@ -630,8 +722,8 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
 Junevy.Controls 遵循 WPF 的项目容器规则：
 
 1. `ItemsSource` 为普通数据对象时，控件负责生成容器；用 `ItemTemplate` 控制内容显示，用 `ItemContainerStyle` 设置容器属性。
-2. 集合元素已经是容器类型时，例如 `ToolBarItem`、`TabMenuItem` 或原生 `MenuItem`，WPF 会直接使用该实例，并可能忽略 `ItemTemplate`。
-3. 不要在 `ToolBar.ItemTemplate` 中创建另一个 `ToolBarItem`，也不要在 `TabMenu.ItemTemplate` 中创建另一个 `TabMenuItem`，否则会形成嵌套容器。
+2. 集合元素已经是容器类型时，例如 `ToolboxItem`、`ToolItem`、`ToolBarItem`、`TabMenuItem` 或原生 `MenuItem`，WPF 会直接使用该实例，并可能忽略 `ItemTemplate`。
+3. 不要在 `Toolbox.ItemTemplate`、`ToolboxItem.ItemTemplate`、`ToolBar.ItemTemplate` 或 `TabMenu.ItemTemplate` 中创建对应的容器类型，否则会形成嵌套容器。
 4. `ContextMenu` 使用 WPF `MenuItem`/`jv:ContextMenuItem`；`jv:MenuItem` 仅用于导航控件。
 
 ## 控件索引
@@ -643,7 +735,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | 输入/选择 | `CheckBox`、`TextBox`、`ComboBox`、`ComboBoxItem` |
 | 集合/数据 | `ListBox`、`ListView`、`DataGrid` |
 | 文本/状态 | `Label`、`TextTitle` |
-| 菜单/导航 | `ContextMenu`、`ContextMenuItem`、`MenuItem`、`SideMenu`、`TreeMenu`、`TreeMenuItem`、`TabMenu`、`TabMenuItem`、`ToolBar`、`ToolBarItem` |
+| 菜单/导航 | `ContextMenu`、`ContextMenuItem`、`MenuItem`、`SideMenu`、`TreeMenu`、`TreeMenuItem`、`TabMenu`、`TabMenuItem`、`ToolBar`、`ToolBarItem`、`Toolbox`、`ToolboxItem`、`ToolItem` |
 | 图像 | `ImageViewer` |
 
 ## 控件依赖速查
@@ -676,6 +768,9 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `TabMenuItem` | WPF `TabItem`、`DefaultTabMenuItemStyle`、`TabMenu.CloseTabCommand` | 继承所在 `TabMenu` 的相关附加属性 |
 | `ToolBar` | WPF `ItemsControl`、`ToolBarItem`、虚拟化面板 | 无；图标由项目自身属性提供 |
 | `ToolBarItem` | WPF `Button`、`DefaultToolBarItemStyle` | 无 |
+| `Toolbox` | WPF `ItemsControl`、`ToolboxItem`、`Popup`、`UniformGrid`、当前显示器工作区 | `Icon.FontFamily`、`Icon.IconSize` 由分组和工具模板继承使用 |
+| `ToolboxItem` | WPF `HeaderedItemsControl`、`ToolItem`、`DefaultToolboxItemStyle`、所属 `Toolbox` 的交互和布局参数 | `Icon.FontFamily`、`Icon.IconSize` |
+| `ToolItem` | WPF `Button` 命令管线、`DefaultToolItemStyle`、WPF `DragDrop` | `Icon.FontFamily`、`Icon.IconSize` |
 | `ImageViewer` | WPF `Image`、`MatrixTransform`、`BitmapSource`、`SaveFileDialog` | 无 |
 
 ## 开发注意事项
