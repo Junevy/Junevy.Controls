@@ -609,6 +609,8 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
 
 `ToolboxItem` 和 `ToolItem` 的默认模板在图标与标题之间保留 5 DIP 间距。可在各自的 `ItemContainerStyle` 中使用 `atc:Icon.IconSize` 调整图标大小、使用 `atc:Icon.IconForeground` 设置图标颜色、使用 `Foreground` 设置标题颜色，并使用 `FontSize` 调整标题字号。两条颜色通道彼此独立。
 
+一级 `ToolboxItem` 的 Hover 背景覆盖完整触发区域，并使用 `Theme.SmallCornerRadius`（默认 4 DIP）裁切圆角；该背景不属于图标内容，也不会改变图标大小或布局。
+
 Popup 内的 `ToolItem` 在 `IsDragEnabled="True"` 且 `IsEnabled="True"` 时显示十字形鼠标指针，提示该项可以拖动到设计画布；关闭拖动或禁用工具项后会恢复系统默认指针。一级 `ToolboxItem` 仍使用默认指针，因为它负责展开和切换分组。
 
 绑定普通数据集合时，`Toolbox` 自动为外层数据生成 `ToolboxItem`，`ToolboxItem` 自动为内层数据生成 `ToolItem`。使用两级 `ItemContainerStyle` 绑定分组和工具属性；普通内层数据对象还会成为所生成 `ToolItem` 的默认 `DragData`。显式提供 `ToolboxItem` 或 `ToolItem` 时，WPF 会直接使用该实例，调用方应自行设置其属性和 `DragData`，不要在 `ItemTemplate` 中再创建同类型容器。

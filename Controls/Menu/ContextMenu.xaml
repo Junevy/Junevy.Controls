@@ -57,14 +57,17 @@
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition x:Name="ArrowColumn" Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <ContentControl x:Name="IconPresenter" Grid.Column="0" Width="16" Height="16"
-                                            HorizontalAlignment="Center" VerticalAlignment="Center"
-                                            HorizontalContentAlignment="Center"
-                                            VerticalContentAlignment="Center"
-                                            Content="{TemplateBinding Icon}"
-                                            FontFamily="{DynamicResource IconFont}" FontSize="14"
-                                            Foreground="{TemplateBinding Foreground}"
-                                            Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Icon, Converter={StaticResource ContextMenuIconVisibility}}" />
+                            <TextBlock x:Name="IconPresenter" Grid.Column="0" Width="16"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Text="{TemplateBinding Icon}"
+                                       FontFamily="{DynamicResource IconFont}"
+                                       FontSize="{TemplateBinding FontSize}"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       TextAlignment="Center"
+                                       TextWrapping="NoWrap"
+                                       LineStackingStrategy="BlockLineHeight"
+                                       LineHeight="{TemplateBinding FontSize}"
+                                       Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Icon, Converter={StaticResource ContextMenuIconVisibility}}" />
                             <TextBlock x:Name="CheckMark" Grid.Column="0"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        FontFamily="Segoe UI Symbol" FontSize="12"
