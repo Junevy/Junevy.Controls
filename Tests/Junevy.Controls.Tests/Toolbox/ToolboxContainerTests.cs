@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Input;
 using Junevy.Controls.Controls.Toolbox;
 using NUnit.Framework;
+using IconProperties = Junevy.Controls.AttachedProperties.Icon;
 using ToolboxControl = Junevy.Controls.Controls.Toolbox.Toolbox;
 
 namespace Junevy.Controls.Tests.Toolbox;
@@ -1040,8 +1041,8 @@ public sealed class ToolboxContainerTests
     public void ToolboxItemTemplate_ExposesRequiredPartsAndPopupContent()
     {
         var toolbox = new ToolboxControl { OpenDelay = TimeSpan.Zero };
-        var tool = new ToolItem { Icon = "I", Title = "Inspect" };
-        var group = new ToolboxItem { Icon = "G", Title = "Geometry" };
+        var tool = new ToolItem { Icon = "I", Title = "Inspect", Foreground = Brushes.Red };
+        var group = new ToolboxItem { Icon = "G", Title = "Geometry", Foreground = Brushes.Red };
         group.Items.Add(tool);
         toolbox.Items.Add(group);
         Window? window = null;
@@ -1049,6 +1050,8 @@ public sealed class ToolboxContainerTests
         try
         {
             window = WpfTestHost.Show(toolbox);
+            IconProperties.SetIconForeground(tool, Brushes.Yellow);
+            IconProperties.SetIconForeground(group, Brushes.Yellow);
             group.SetPointerOverTrigger(true);
             toolbox.RequestOpen(group);
             WpfTestHost.PumpUntil(window.Dispatcher, () => group.IsOpen, TimeSpan.FromSeconds(1));
@@ -1058,6 +1061,18 @@ public sealed class ToolboxContainerTests
             var popupRoot = popup?.Child is null
                 ? null
                 : FindVisualChildByName<FrameworkElement>(popup.Child, "PART_PopupRoot");
+            var triggerTitle = trigger is DependencyObject triggerRoot
+                ? FindVisualChildByName<TextBlock>(triggerRoot, "TriggerTitle")
+                : null;
+            var toolTitle = popupRoot is null
+                ? null
+                : FindVisualChildByName<TextBlock>(popupRoot, "ToolTitle");
+            var triggerIcon = trigger is DependencyObject triggerIconRoot
+                ? FindVisualChild<ContentControl>(triggerIconRoot, control => Equals(control.Content, group.Icon))
+                : null;
+            var toolIcon = popupRoot is null
+                ? null
+                : FindVisualChild<ContentControl>(popupRoot, control => Equals(control.Content, tool.Icon));
 
             Assert.Multiple(() =>
             {
@@ -1070,6 +1085,12 @@ public sealed class ToolboxContainerTests
                 Assert.That(FindVisualChild<ContentPresenter>(
                     popupRoot!,
                     presenter => Equals(presenter.Content, tool.Icon)), Is.Not.Null);
+                Assert.That(triggerTitle?.Margin, Is.EqualTo(new Thickness(0d, 5d, 0d, 0d)));
+                Assert.That(toolTitle?.Margin, Is.EqualTo(new Thickness(0d, 5d, 0d, 0d)));
+                Assert.That(triggerIcon?.Foreground, Is.EqualTo(Brushes.Yellow));
+                Assert.That(toolIcon?.Foreground, Is.EqualTo(Brushes.Yellow));
+                Assert.That(triggerTitle?.Foreground, Is.EqualTo(Brushes.Red));
+                Assert.That(toolTitle?.Foreground, Is.EqualTo(Brushes.Red));
             });
         }
         finally
@@ -1079,16 +1100,39 @@ public sealed class ToolboxContainerTests
     }
 
     [Test]
-    public void OpenPopup_UsesConfiguredWidthAndSixColumnWrapping()
+    public void ToolItem_DefaultStyleUsesCrossCursorForDragEnabledItems()
+    {
+        var toolbox = new ToolboxControl { OpenDelay = TimeSpan.Zero };
+        var tool = new ToolItem { Icon = "I", Title = "Inspect" };
+        var group = new ToolboxItem { Title = "Geometry" };
+        group.Items.Add(tool);
+        toolbox.Items.Add(group);
+        Window? window = null;
+
+        try
+        {
+            window = WpfTestHost.Show(toolbox);
+            group.SetPointerOverTrigger(true);
+            toolbox.RequestOpen(group);
+            WpfTestHost.PumpUntil(window.Dispatcher, () => group.IsOpen, TimeSpan.FromSeconds(1));
+
+            Assert.That(tool.Cursor, Is.EqualTo(Cursors.Cross));
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void OpenPopup_UsesDefaultWidthAndFourColumnWrapping()
     {
         var toolbox = new ToolboxControl
         {
-            PopupWidth = 300d,
-            ColumnCount = 6,
             OpenDelay = TimeSpan.Zero
         };
         var group = new ToolboxItem { Title = "Shapes" };
-        for (int index = 1; index <= 7; index++)
+        for (int index = 1; index <= 5; index++)
         {
             group.Items.Add(new ToolItem { Icon = index.ToString(), Title = "Tool " + index });
         }
@@ -1111,15 +1155,15 @@ public sealed class ToolboxContainerTests
                 Assert.That(popupRoot, Is.Not.Null);
                 Assert.That(popupRoot!.ActualWidth, Is.EqualTo(300d).Within(0.1d));
                 Assert.That(panel, Is.Not.Null);
-                Assert.That(panel!.Columns, Is.EqualTo(6));
-                Assert.That(panel.Children.Count, Is.EqualTo(7));
+                Assert.That(panel!.Columns, Is.EqualTo(4));
+                Assert.That(panel.Children.Count, Is.EqualTo(5));
             });
 
             var first = (FrameworkElement)panel!.Children[0];
-            var seventh = (FrameworkElement)panel.Children[6];
+            var fifth = (FrameworkElement)panel.Children[4];
             double firstY = first.TransformToAncestor(panel).Transform(new Point()).Y;
-            double seventhY = seventh.TransformToAncestor(panel).Transform(new Point()).Y;
-            Assert.That(seventhY, Is.GreaterThan(firstY));
+            double fifthY = fifth.TransformToAncestor(panel).Transform(new Point()).Y;
+            Assert.That(fifthY, Is.GreaterThan(firstY));
         }
         finally
         {

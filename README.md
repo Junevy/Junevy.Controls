@@ -81,9 +81,9 @@ ThemeManager.ToggleTheme();
 | `atc:Icon.Icon` | `null` | 设置图标内容。可以是图标字体字符，也可以是 `Image`、`Path` 或其他对象。模板支持的控件会在值为空时折叠图标本身；周围布局是否收缩由具体控件决定。 |
 | `atc:Icon.FontFamily` | 内置 `iconfont` | 设置图标字体。用于 `Button`、`CardButton`、`TextBox`、`Label`、`AppBar`、`SideMenu`、`TreeMenu`、`TabMenu` 等控件。 |
 | `atc:Icon.IconSize` | `14` | 设置图标尺寸。`Button`、`AppBar`、`SideMenu` 和 `TreeMenu` 的模板会读取该值。 |
-| `atc:Icon.IconForeground` | `Gray` | 已注册的兼容属性；当前默认模板没有读取它，因此目前不会改变图标颜色。请设置控件的 `Foreground`。 |
+| `atc:Icon.IconForeground` | `Gray` | 设置图标颜色。`ToolboxItem` 和 `ToolItem` 的默认模板会读取该值；其他控件是否支持取决于其模板。 |
 
-图标字体字符会跟随 `Foreground`；`Image` 或带固定 `Fill` 的 `Path` 不会自动重新着色。
+`ToolboxItem` 和 `ToolItem` 的图标字体字符跟随 `IconForeground`，标题跟随 `Foreground`；其他控件的图标字体字符通常跟随 `Foreground`。`Image` 或带固定 `Fill` 的 `Path` 不会自动重新着色。
 
 ```xml
 <jv:Button
@@ -580,7 +580,7 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
 | `OpenDelay` | `150 ms` | 指针停留在有效分组触发器上后打开 Popup 的延迟；不能为负值 |
 | `CloseDelay` | `300 ms` | 指针同时离开触发器和 Popup 后关闭的延迟；不能为负值 |
 | `PopupWidth` | `300` DIP | Popup 边框总宽度；必须为有限且大于 `0` 的值 |
-| `ColumnCount` | `6` | Popup 中 `UniformGrid` 的固定列数；至少为 `1` |
+| `ColumnCount` | `4` | Popup 中 `UniformGrid` 的固定列数；至少为 `1` |
 | `PopupMaxHeight` | `480` DIP | Popup 请求的最大高度；必须为有限且大于 `0` 的值 |
 | `PopupPlacement` | `Auto` | 位置偏好：`Auto`、`Right`、`Left`、`Bottom` 或 `Top` |
 | `DragDataFormat` | `Junevy.Controls.Tool` | 子工具未单独指定格式时使用的 WPF 拖放数据格式；不能为空或空白 |
@@ -603,9 +603,13 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
 | `Icon` | `null` | 工具图标，可使用图标字体字符或任意对象 |
 | `Title` | `null` | 工具标题；默认单行省略，并作为 ToolTip 和自动化名称 |
 | `DisplayMode` | `IconAndTitle` | `IconOnly` 只显示图标；`IconAndTitle` 同时显示标题 |
-| `IsDragEnabled` | `true` | 是否允许超过 WPF 系统拖动阈值后启动 Copy 拖放 |
+| `IsDragEnabled` | `true` | 是否允许超过 WPF 系统拖动阈值后启动 Copy 拖放；启用且控件可用时默认鼠标指针为十字形 `Cross` |
 | `DragData` | `null` | 拖放载荷；应为工具定义等业务数据，不要使用 `ToolItem` 或其他 UI 对象 |
 | `DragDataFormat` | `null` | 单项拖放格式；未设置时继承所属 `Toolbox.DragDataFormat` |
+
+`ToolboxItem` 和 `ToolItem` 的默认模板在图标与标题之间保留 5 DIP 间距。可在各自的 `ItemContainerStyle` 中使用 `atc:Icon.IconSize` 调整图标大小、使用 `atc:Icon.IconForeground` 设置图标颜色、使用 `Foreground` 设置标题颜色，并使用 `FontSize` 调整标题字号。两条颜色通道彼此独立。
+
+Popup 内的 `ToolItem` 在 `IsDragEnabled="True"` 且 `IsEnabled="True"` 时显示十字形鼠标指针，提示该项可以拖动到设计画布；关闭拖动或禁用工具项后会恢复系统默认指针。一级 `ToolboxItem` 仍使用默认指针，因为它负责展开和切换分组。
 
 绑定普通数据集合时，`Toolbox` 自动为外层数据生成 `ToolboxItem`，`ToolboxItem` 自动为内层数据生成 `ToolItem`。使用两级 `ItemContainerStyle` 绑定分组和工具属性；普通内层数据对象还会成为所生成 `ToolItem` 的默认 `DragData`。显式提供 `ToolboxItem` 或 `ToolItem` 时，WPF 会直接使用该实例，调用方应自行设置其属性和 `DragData`，不要在 `ItemTemplate` 中再创建同类型容器。
 
@@ -635,7 +639,7 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
     ItemsSource="{Binding ToolGroups}" />
 ```
 
-Popup 默认使用 300 DIP 总宽度和六列网格，水平滚动关闭，超出有效高度时垂直滚动。垂直工具箱的 `Auto` 定位顺序为右、左、下、上；水平工具箱为下、上、右、左。显式位置仍保留其余方向作为空间不足时的回退。控件按目标窗口所在显示器取得工作区并将物理像素转换为 DIP，有效最大高度为 `min(PopupMaxHeight, 当前显示器工作区高度 - 16 DIP)`；窗口移动、调整大小或跨越不同缩放比例的显示器时，已打开的 Popup 会重新定位。窗口失活、最小化或控件卸载时 Popup 会立即关闭。
+Popup 默认使用 300 DIP 总宽度和四列网格，水平滚动关闭，超出有效高度时垂直滚动。垂直工具箱的 `Auto` 定位顺序为右、左、下、上；水平工具箱为下、上、右、左。显式位置仍保留其余方向作为空间不足时的回退。控件按目标窗口所在显示器取得工作区并将物理像素转换为 DIP，有效最大高度为 `min(PopupMaxHeight, 当前显示器工作区高度 - 16 DIP)`；窗口移动、调整大小或跨越不同缩放比例的显示器时，已打开的 Popup 会重新定位。窗口失活、最小化或控件卸载时 Popup 会立即关闭。
 
 拖放固定使用 `DragDropEffects.Copy`。默认格式是 `Junevy.Controls.Tool`，载荷是 `DragData`；启动拖动的鼠标手势不会再执行按钮 Click。Canvas 必须设置 `AllowDrop="True"`，并由消费方验证格式、读取业务数据和创建节点：
 
@@ -768,9 +772,9 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `TabMenuItem` | WPF `TabItem`、`DefaultTabMenuItemStyle`、`TabMenu.CloseTabCommand` | 继承所在 `TabMenu` 的相关附加属性 |
 | `ToolBar` | WPF `ItemsControl`、`ToolBarItem`、虚拟化面板 | 无；图标由项目自身属性提供 |
 | `ToolBarItem` | WPF `Button`、`DefaultToolBarItemStyle` | 无 |
-| `Toolbox` | WPF `ItemsControl`、`ToolboxItem`、`Popup`、`UniformGrid`、当前显示器工作区 | `Icon.FontFamily`、`Icon.IconSize` 由分组和工具模板继承使用 |
-| `ToolboxItem` | WPF `HeaderedItemsControl`、`ToolItem`、`DefaultToolboxItemStyle`、所属 `Toolbox` 的交互和布局参数 | `Icon.FontFamily`、`Icon.IconSize` |
-| `ToolItem` | WPF `Button` 命令管线、`DefaultToolItemStyle`、WPF `DragDrop` | `Icon.FontFamily`、`Icon.IconSize` |
+| `Toolbox` | WPF `ItemsControl`、`ToolboxItem`、`Popup`、`UniformGrid`、当前显示器工作区 | `Icon.FontFamily`、`Icon.IconSize`、`Icon.IconForeground` 由分组和工具模板使用 |
+| `ToolboxItem` | WPF `HeaderedItemsControl`、`ToolItem`、`DefaultToolboxItemStyle`、所属 `Toolbox` 的交互和布局参数 | `Icon.FontFamily`、`Icon.IconSize`、`Icon.IconForeground` |
+| `ToolItem` | WPF `Button` 命令管线、`DefaultToolItemStyle`、WPF `DragDrop` | `Icon.FontFamily`、`Icon.IconSize`、`Icon.IconForeground` |
 | `ImageViewer` | WPF `Image`、`MatrixTransform`、`BitmapSource`、`SaveFileDialog` | 无 |
 
 ## 开发注意事项

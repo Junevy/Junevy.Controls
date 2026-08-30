@@ -51,7 +51,7 @@ public sealed class ToolboxDefaultsTests
             Assert.That(toolbox.OpenDelay, Is.EqualTo(TimeSpan.FromMilliseconds(150)));
             Assert.That(toolbox.CloseDelay, Is.EqualTo(TimeSpan.FromMilliseconds(300)));
             Assert.That(toolbox.PopupWidth, Is.EqualTo(300d));
-            Assert.That(toolbox.ColumnCount, Is.EqualTo(6));
+            Assert.That(toolbox.ColumnCount, Is.EqualTo(4));
             Assert.That(toolbox.PopupMaxHeight, Is.EqualTo(480d));
             Assert.That(toolbox.PopupPlacement, Is.EqualTo(ToolboxPopupPlacement.Auto));
             Assert.That(toolbox.DragDataFormat, Is.EqualTo("Junevy.Controls.Tool"));
