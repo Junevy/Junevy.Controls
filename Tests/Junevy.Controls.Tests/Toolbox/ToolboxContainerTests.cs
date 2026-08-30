@@ -1100,6 +1100,36 @@ public sealed class ToolboxContainerTests
     }
 
     [Test]
+    public void ToolboxItem_TriggerTemplateRoundsTheFullHoverSurface()
+    {
+        var toolbox = new ToolboxControl();
+        var group = new ToolboxItem { Icon = "G", Title = "Geometry" };
+        toolbox.Items.Add(group);
+        Window? window = null;
+
+        try
+        {
+            toolbox.Resources["Theme.SmallCornerRadius"] = new CornerRadius(4d);
+            window = WpfTestHost.Show(toolbox);
+
+            var trigger = (Button)group.Template.FindName("PART_TriggerButton", group)!;
+            var hoverSurface = trigger.Template.FindName("PART_HoverSurface", trigger) as Border;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(hoverSurface, Is.Not.Null);
+                Assert.That(hoverSurface!.CornerRadius, Is.EqualTo(new CornerRadius(4d)));
+                Assert.That(hoverSurface.ActualWidth, Is.EqualTo(trigger.ActualWidth).Within(0.1d));
+                Assert.That(hoverSurface.ActualHeight, Is.EqualTo(trigger.ActualHeight).Within(0.1d));
+            });
+        }
+        finally
+        {
+            WpfTestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
     public void ToolItem_DefaultStyleUsesCrossCursorForDragEnabledItems()
     {
         var toolbox = new ToolboxControl { OpenDelay = TimeSpan.Zero };

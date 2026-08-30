@@ -54,6 +54,25 @@
                                 FocusVisualStyle="{x:Null}"
                                 ToolTip="{TemplateBinding Title}"
                                 AutomationProperties.Name="{TemplateBinding Title}">
+                            <Button.Template>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Border x:Name="PART_HoverSurface"
+                                            Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
+                                            SnapsToDevicePixels="True">
+                                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                          Content="{TemplateBinding Content}"
+                                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                          ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                                          TextElement.FontFamily="{TemplateBinding FontFamily}"
+                                                          TextElement.FontSize="{TemplateBinding FontSize}"
+                                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <ContentControl HorizontalAlignment="Center"
                                                 VerticalAlignment="Center"

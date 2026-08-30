@@ -3,24 +3,30 @@
     <!--
         Light theme — "Optics Blue"
         Design tokens for high-contrast readability and industrial-machine-vision aesthetic.
-
+        
         Naming convention:
-          Theme.Color.{Category}.{Variant}  — raw Color values
-          Theme.Brush.{Category}.{Variant}   — SolidColorBrush, references its Color
-          Theme.{LayoutToken}                — CornerRadius, Thickness, DropShadowEffect
-
+        Theme.Color.{Category}.{Variant}  — raw Color values
+        Theme.Brush.{Category}.{Variant}   — SolidColorBrush, references its Color
+        Theme.{LayoutToken}                — CornerRadius, Thickness, DropShadowEffect
+        
         Categories: Background | Surface | Text | Border | Accent | Status | State | Effect
     -->
 
-    <!-- ============================================================
-         Background colors
-         ============================================================ -->
+    <!--
+        ============================================================
+        Background colors
+        ============================================================
+    -->
     <Color x:Key="Theme.Color.Background.App">#F6F8FA</Color>
-    <Color x:Key="Theme.Color.Background.Subtle">#EEF2F6</Color>
+    <Color x:Key="Theme.Color.Background.Subtle">#F5F5F5</Color>
+    <Color x:Key="Theme.Color.Background.Second">#E8E8E8</Color>
+    <Color x:Key="Theme.Color.Background.Third">#CFCFCF</Color>
 
-    <!-- ============================================================
-         Surface colors (stacked from lowest to highest)
-         ============================================================ -->
+    <!--
+        ============================================================
+        Surface colors (stacked from lowest to highest)
+        ============================================================
+    -->
     <Color x:Key="Theme.Color.Surface.Base">#FFFFFF</Color>
     <Color x:Key="Theme.Color.Surface.Raised">#FFFFFF</Color>
     <Color x:Key="Theme.Color.Surface.Sunken">#F1F4F8</Color>
@@ -29,9 +35,11 @@
     <Color x:Key="Theme.Color.Surface.Pressed">#DCE5F6</Color>
     <Color x:Key="Theme.Color.Surface.Selected">#D6E4FF</Color>
 
-    <!-- ============================================================
-         Text colors
-         ============================================================ -->
+    <!--
+        ============================================================
+        Text colors
+        ============================================================
+    -->
     <Color x:Key="Theme.Color.Text.Primary">#0D1520</Color>
     <Color x:Key="Theme.Color.Text.Secondary">#485568</Color>
     <Color x:Key="Theme.Color.Text.Tertiary">#788597</Color>
@@ -39,17 +47,21 @@
     <Color x:Key="Theme.Color.Text.Inverse">#FFFFFF</Color>
     <Color x:Key="Theme.Color.Text.OnAccent">#FFFFFF</Color>
 
-    <!-- ============================================================
-         Border colors
-         ============================================================ -->
+    <!--
+        ============================================================
+        Border colors
+        ============================================================
+    -->
     <Color x:Key="Theme.Color.Border.Default">#DCE2EA</Color>
     <Color x:Key="Theme.Color.Border.Subtle">#E8ECF2</Color>
     <Color x:Key="Theme.Color.Border.Strong">#AFB9C8</Color>
     <Color x:Key="Theme.Color.Border.Focus">#3B82F6</Color>
 
-    <!-- ============================================================
-         Accent colors
-         ============================================================ -->
+    <!--
+        ============================================================
+        Accent colors
+        ============================================================
+    -->
     <Color x:Key="Theme.Color.Accent.Primary">#1E5EE6</Color>
     <Color x:Key="Theme.Color.Accent.PrimaryHover">#174BC2</Color>
     <Color x:Key="Theme.Color.Accent.PrimaryPressed">#1240A8</Color>
@@ -57,49 +69,61 @@
     <Color x:Key="Theme.Color.Accent.Secondary">#5469D4</Color>
     <Color x:Key="Theme.Color.Accent.SecondarySubtle">#EBEEFF</Color>
 
-    <!-- ============================================================
-         Status colors
-         ============================================================ -->
+    <!--
+        ============================================================
+        Status colors
+        ============================================================
+    -->
     <Color x:Key="Theme.Color.Status.Info">#2563EB</Color>
     <Color x:Key="Theme.Color.Status.InfoSubtle">#DCEBFF</Color>
     <Color x:Key="Theme.Color.Status.Success">#158A4A</Color>
     <Color x:Key="Theme.Color.Status.SuccessHover">#116D3C</Color>
     <Color x:Key="Theme.Color.Status.SuccessSubtle">#DCFCE7</Color>
-    <Color x:Key="Theme.Color.Status.Warning">#D97706</Color>
+    <Color x:Key="Theme.Color.Status.Warning">#FFB020</Color>
     <Color x:Key="Theme.Color.Status.WarningHover">#B76104</Color>
     <Color x:Key="Theme.Color.Status.WarningSubtle">#FFF3CD</Color>
     <Color x:Key="Theme.Color.Status.Danger">#DC2626</Color>
     <Color x:Key="Theme.Color.Status.DangerHover">#B91C1C</Color>
     <Color x:Key="Theme.Color.Status.DangerSubtle">#FEE2E2</Color>
 
-    <!-- ============================================================
-         State / disabled colors
-         ============================================================ -->
+    <!--
+        ============================================================
+        State / disabled colors
+        ============================================================
+    -->
     <Color x:Key="Theme.Color.State.DisabledSurface">#EFF2F6</Color>
     <Color x:Key="Theme.Color.State.DisabledBorder">#DCE0E8</Color>
     <Color x:Key="Theme.Color.State.DisabledForeground">#98A4B4</Color>
 
-    <!-- ============================================================
-         Effect & overlay colors
-         ============================================================ -->
+    <!--
+        ============================================================
+        Effect & overlay colors
+        ============================================================
+    -->
     <Color x:Key="Theme.Color.Effect.Shadow">#1A0D1520</Color>
     <Color x:Key="Theme.Color.Overlay.Backdrop">#800D1520</Color>
 
-    <!-- ============================================================
-         ScrollBar colors
-         ============================================================ -->
+    <!--
+        ============================================================
+        ScrollBar colors
+        ============================================================
+    -->
     <Color x:Key="Theme.Color.ScrollBar.Thumb">#C4CCD6</Color>
     <Color x:Key="Theme.Color.ScrollBar.ThumbHover">#A0ABB8</Color>
 
-    <!-- ============================================================
-         Background brushes
-         ============================================================ -->
+    <!--
+        ============================================================
+        Background brushes
+        ============================================================
+    -->
     <SolidColorBrush x:Key="Theme.Brush.Background.App" Color="{StaticResource Theme.Color.Background.App}" />
     <SolidColorBrush x:Key="Theme.Brush.Background.Subtle" Color="{StaticResource Theme.Color.Background.Subtle}" />
 
-    <!-- ============================================================
-         Surface brushes
-         ============================================================ -->
+    <!--
+        ============================================================
+        Surface brushes
+        ============================================================
+    -->
     <SolidColorBrush x:Key="Theme.Brush.Surface.Base" Color="{StaticResource Theme.Color.Surface.Base}" />
     <SolidColorBrush x:Key="Theme.Brush.Surface.Raised" Color="{StaticResource Theme.Color.Surface.Raised}" />
     <SolidColorBrush x:Key="Theme.Brush.Surface.Sunken" Color="{StaticResource Theme.Color.Surface.Sunken}" />
@@ -108,9 +132,11 @@
     <SolidColorBrush x:Key="Theme.Brush.Surface.Pressed" Color="{StaticResource Theme.Color.Surface.Pressed}" />
     <SolidColorBrush x:Key="Theme.Brush.Surface.Selected" Color="{StaticResource Theme.Color.Surface.Selected}" />
 
-    <!-- ============================================================
-         Text brushes
-         ============================================================ -->
+    <!--
+        ============================================================
+        Text brushes
+        ============================================================
+    -->
     <SolidColorBrush x:Key="Theme.Brush.Text.Primary" Color="{StaticResource Theme.Color.Text.Primary}" />
     <SolidColorBrush x:Key="Theme.Brush.Text.Secondary" Color="{StaticResource Theme.Color.Text.Secondary}" />
     <SolidColorBrush x:Key="Theme.Brush.Text.Tertiary" Color="{StaticResource Theme.Color.Text.Tertiary}" />
@@ -118,17 +144,21 @@
     <SolidColorBrush x:Key="Theme.Brush.Text.Inverse" Color="{StaticResource Theme.Color.Text.Inverse}" />
     <SolidColorBrush x:Key="Theme.Brush.Text.OnAccent" Color="{StaticResource Theme.Color.Text.OnAccent}" />
 
-    <!-- ============================================================
-         Border brushes
-         ============================================================ -->
+    <!--
+        ============================================================
+        Border brushes
+        ============================================================
+    -->
     <SolidColorBrush x:Key="Theme.Brush.Border.Default" Color="{StaticResource Theme.Color.Border.Default}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Subtle" Color="{StaticResource Theme.Color.Border.Subtle}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Strong" Color="{StaticResource Theme.Color.Border.Strong}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Focus" Color="{StaticResource Theme.Color.Border.Focus}" />
 
-    <!-- ============================================================
-         Accent brushes
-         ============================================================ -->
+    <!--
+        ============================================================
+        Accent brushes
+        ============================================================
+    -->
     <SolidColorBrush x:Key="Theme.Brush.Accent.Primary" Color="{StaticResource Theme.Color.Accent.Primary}" />
     <SolidColorBrush x:Key="Theme.Brush.Accent.PrimaryHover" Color="{StaticResource Theme.Color.Accent.PrimaryHover}" />
     <SolidColorBrush x:Key="Theme.Brush.Accent.PrimaryPressed" Color="{StaticResource Theme.Color.Accent.PrimaryPressed}" />
@@ -136,9 +166,11 @@
     <SolidColorBrush x:Key="Theme.Brush.Accent.Secondary" Color="{StaticResource Theme.Color.Accent.Secondary}" />
     <SolidColorBrush x:Key="Theme.Brush.Accent.SecondarySubtle" Color="{StaticResource Theme.Color.Accent.SecondarySubtle}" />
 
-    <!-- ============================================================
-         Status brushes
-         ============================================================ -->
+    <!--
+        ============================================================
+        Status brushes
+        ============================================================
+    -->
     <SolidColorBrush x:Key="Theme.Brush.Status.Info" Color="{StaticResource Theme.Color.Status.Info}" />
     <SolidColorBrush x:Key="Theme.Brush.Status.InfoSubtle" Color="{StaticResource Theme.Color.Status.InfoSubtle}" />
     <SolidColorBrush x:Key="Theme.Brush.Status.Success" Color="{StaticResource Theme.Color.Status.Success}" />
@@ -150,29 +182,38 @@
     <SolidColorBrush x:Key="Theme.Brush.Status.Danger" Color="{StaticResource Theme.Color.Status.Danger}" />
     <SolidColorBrush x:Key="Theme.Brush.Status.DangerHover" Color="{StaticResource Theme.Color.Status.DangerHover}" />
     <SolidColorBrush x:Key="Theme.Brush.Status.DangerSubtle" Color="{StaticResource Theme.Color.Status.DangerSubtle}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.Disable" Color="#9E9E9E" />
 
-    <!-- ============================================================
-         State / disabled brushes
-         ============================================================ -->
+    <!--
+        ============================================================
+        State / disabled brushes
+        ============================================================
+    -->
     <SolidColorBrush x:Key="Theme.Brush.State.DisabledSurface" Color="{StaticResource Theme.Color.State.DisabledSurface}" />
     <SolidColorBrush x:Key="Theme.Brush.State.DisabledBorder" Color="{StaticResource Theme.Color.State.DisabledBorder}" />
     <SolidColorBrush x:Key="Theme.Brush.State.DisabledForeground" Color="{StaticResource Theme.Color.State.DisabledForeground}" />
 
-    <!-- ============================================================
-         Effect & overlay brushes
-         ============================================================ -->
+    <!--
+        ============================================================
+        Effect & overlay brushes
+        ============================================================
+    -->
     <SolidColorBrush x:Key="Theme.Brush.Effect.Shadow" Color="{StaticResource Theme.Color.Effect.Shadow}" />
     <SolidColorBrush x:Key="Theme.Brush.Overlay.Backdrop" Color="{StaticResource Theme.Color.Overlay.Backdrop}" />
 
-    <!-- ============================================================
-         ScrollBar brushes
-         ============================================================ -->
+    <!--
+        ============================================================
+        ScrollBar brushes
+        ============================================================
+    -->
     <SolidColorBrush x:Key="Theme.Brush.ScrollBar.Thumb" Color="{StaticResource Theme.Color.ScrollBar.Thumb}" />
     <SolidColorBrush x:Key="Theme.Brush.ScrollBar.ThumbHover" Color="{StaticResource Theme.Color.ScrollBar.ThumbHover}" />
 
-    <!-- ============================================================
-         Layout tokens
-         ============================================================ -->
+    <!--
+        ============================================================
+        Layout tokens
+        ============================================================
+    -->
     <CornerRadius x:Key="Theme.SmallCornerRadius">4</CornerRadius>
     <CornerRadius x:Key="Theme.ControlCornerRadius">6</CornerRadius>
     <CornerRadius x:Key="Theme.LargeCornerRadius">8</CornerRadius>
