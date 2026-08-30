@@ -60,14 +60,16 @@
                                                 Content="{TemplateBinding Icon}"
                                                 FontFamily="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.FontFamily)}"
                                                 FontSize="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconSize)}"
-                                                Foreground="{TemplateBinding Foreground}"
+                                                Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconForeground)}"
                                                 TextElement.FontFamily="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.FontFamily)}"
                                                 TextElement.FontSize="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconSize)}"
-                                                TextElement.Foreground="{TemplateBinding Foreground}" />
+                                                TextElement.Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconForeground)}" />
                                 <TextBlock x:Name="TriggerTitle"
                                            Text="{TemplateBinding Title}"
                                            HorizontalAlignment="Center"
+                                           Margin="0,5,0,0"
                                            TextTrimming="CharacterEllipsis"
+                                           TextElement.Foreground="{TemplateBinding Foreground}"
                                            Visibility="Collapsed" />
                             </StackPanel>
                         </Button>
@@ -116,7 +118,7 @@
         <Setter Property="ItemsPanel">
             <Setter.Value>
                 <ItemsPanelTemplate>
-                    <UniformGrid Columns="6" />
+                    <UniformGrid Columns="4" />
                 </ItemsPanelTemplate>
             </Setter.Value>
         </Setter>
@@ -147,13 +149,14 @@
                                             Content="{TemplateBinding Icon}"
                                             FontFamily="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.FontFamily)}"
                                             FontSize="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconSize)}"
-                                            Foreground="{TemplateBinding Foreground}"
+                                            Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconForeground)}"
                                             TextElement.FontFamily="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.FontFamily)}"
                                             TextElement.FontSize="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconSize)}"
-                                            TextElement.Foreground="{TemplateBinding Foreground}" />
+                                            TextElement.Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconForeground)}" />
                             <TextBlock x:Name="ToolTitle"
                                        Text="{TemplateBinding Title}"
                                        HorizontalAlignment="Center"
+                                       Margin="0,5,0,0"
                                        TextTrimming="CharacterEllipsis"
                                        TextElement.Foreground="{TemplateBinding Foreground}" />
                         </StackPanel>
@@ -177,6 +180,15 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsDragEnabled" Value="True" />
+                    <Condition Property="IsEnabled" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Cursor" Value="Cross" />
+            </MultiTrigger>
+        </Style.Triggers>
     </Style>
 
     <Style TargetType="{x:Type local:ToolItem}" BasedOn="{StaticResource DefaultToolItemStyle}" />

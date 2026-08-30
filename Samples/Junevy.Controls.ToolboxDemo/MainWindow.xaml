@@ -23,7 +23,9 @@
             <Setter Property="CommandParameter" Value="{Binding}" />
             <Setter Property="DragData" Value="{Binding}" />
             <Setter Property="atc:Icon.FontFamily" Value="{DynamicResource IconFont}" />
+            <Setter Property="atc:Icon.IconForeground" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
             <Setter Property="atc:Icon.IconSize" Value="22" />
+            <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         </Style>
 
         <Style x:Key="DemoToolboxItemStyle"
@@ -34,7 +36,9 @@
             <Setter Property="ItemsSource" Value="{Binding Tools}" />
             <Setter Property="ItemContainerStyle" Value="{StaticResource DemoToolItemStyle}" />
             <Setter Property="atc:Icon.FontFamily" Value="{DynamicResource IconFont}" />
+            <Setter Property="atc:Icon.IconForeground" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
             <Setter Property="atc:Icon.IconSize" Value="24" />
+            <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         </Style>
     </Window.Resources>
 
@@ -68,7 +72,7 @@
                         Padding="10,5"
                         Background="{DynamicResource Theme.Brush.Accent.PrimarySubtle}"
                         CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
-                    <TextBlock Foreground="{DynamicResource Theme.Brush.Accent.Primary}" Text="14 tools / 6 columns" />
+                    <TextBlock Foreground="{DynamicResource Theme.Brush.Accent.Primary}" Text="14 tools / 4 columns" />
                 </Border>
             </Grid>
         </Border>
@@ -89,7 +93,6 @@
                             atc:Icon.FontFamily="{DynamicResource IconFont}"
                             atc:Icon.IconSize="24"
                             CloseDelay="0:0:0.30"
-                            ColumnCount="6"
                             DragDataFormat="Junevy.Controls.Tool"
                             ItemContainerStyle="{StaticResource DemoToolboxItemStyle}"
                             ItemsSource="{Binding ToolGroups}"

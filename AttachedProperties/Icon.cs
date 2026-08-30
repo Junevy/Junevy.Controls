@@ -60,8 +60,7 @@ namespace Junevy.Controls.AttachedProperties
             DependencyProperty.RegisterAttached("FontFamily", typeof(FontFamily), typeof(Icon),
                 new PropertyMetadata(
                     new FontFamily(
-                        new Uri("pack://application:,,,/"),
-                            "/Junevy.Controls;component/Resources/Font/#iconfont")));
+                        "/Junevy.Controls;component/Resources/Font/iconfont.ttf#iconfont")));
 
         public static readonly DependencyProperty IconSizeProperty =
             DependencyProperty.RegisterAttached("IconSize", typeof(int), typeof(Icon), new PropertyMetadata(14));

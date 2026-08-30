@@ -50,7 +50,7 @@ public sealed class Toolbox : ItemsControl
             nameof(ColumnCount),
             typeof(int),
             typeof(Toolbox),
-            new PropertyMetadata(6),
+            new PropertyMetadata(4),
             IsPositiveColumnCount);
 
     public static readonly DependencyProperty PopupMaxHeightProperty =

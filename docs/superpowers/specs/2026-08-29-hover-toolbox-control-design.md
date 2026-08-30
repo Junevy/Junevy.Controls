@@ -7,7 +7,7 @@
 - `Toolbox` 常驻显示一层 `ToolboxItem`。
 - 鼠标停留在 `ToolboxItem` 上约 150 ms 后展开其悬浮工具面板。
 - 悬浮面板紧邻触发项，并根据可用空间在右、左、下、上之间回退。
-- 面板默认总宽度为 300 DIP，每行固定 6 个工具，超出后向下换行。
+- 面板默认总宽度为 300 DIP，每行固定 4 个工具，超出后向下换行。
 - 面板中的 `ToolItem` 默认显示上方图标和下方标题。
 - `ToolItem` 可点击执行命令，也可拖到 Canvas；拖放载荷是工具数据，而不是 UI 控件实例。
 - 支持 `ItemsSource`、样式、数据模板、键盘访问以及浅色/深色主题。
@@ -66,7 +66,7 @@ public sealed class Toolbox : ItemsControl
     public TimeSpan OpenDelay { get; set; }                  // 150 ms
     public TimeSpan CloseDelay { get; set; }                 // 300 ms
     public double PopupWidth { get; set; }                   // 300 DIP
-    public int ColumnCount { get; set; }                     // 6
+    public int ColumnCount { get; set; }                     // 4
     public double PopupMaxHeight { get; set; }               // 480 DIP
     public ToolboxPopupPlacement PopupPlacement { get; set; }// Auto
     public string DragDataFormat { get; set; }               // Junevy.Controls.Tool
@@ -163,12 +163,13 @@ public enum ToolboxPopupPlacement
 ## 6. 布局
 
 - `PopupWidth` 默认 300 DIP，指的是 Popup 边框的总宽度。
-- `ColumnCount` 默认 6，使用 `UniformGrid.Columns` 严格固定列数。
-- 边框、Padding 和垂直滚动条占用宽度后，剩余内容宽度平均分给 6 列；不再额外硬编码 50 DIP 项宽，避免互相冲突。
+- `ColumnCount` 默认 4，使用 `UniformGrid.Columns` 严格固定列数。
+- 边框、Padding 和垂直滚动条占用宽度后，剩余内容宽度平均分给 4 列；不再额外硬编码项宽，避免互相冲突。
 - `ToolItem` 默认高度 68 DIP，图标建议 24 至 28 DIP。
+- `ToolboxItem` 和 `ToolItem` 的图标与可见标题之间保留 5 DIP 间距。
 - 标题单行居中，使用省略号，不允许文本改变列宽或行高。
 - 水平滚动条始终禁用；内容超过有效最大高度时启用垂直滚动。
-- 最后一行不足 6 项时保持左对齐的网格位置，不拉伸为更大的项目。
+- 最后一行不足 4 项时保持左对齐的网格位置，不拉伸为更大的项目。
 
 ## 7. Popup 定位与多屏
 
@@ -217,7 +218,7 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 
 - 新增 `Controls/Toolbox/Toolbox.xaml`，由 `Themes/Generic.xaml` 合并。
 - 颜色、边框、阴影和圆角全部使用现有 `Theme.*` 动态资源。
-- 默认模板使用 `Icon.FontFamily` 和 `Icon.IconSize` 附加属性，以兼容图标字体及任意对象图标。
+- 默认模板使用 `Icon.FontFamily`、`Icon.IconSize` 和 `Icon.IconForeground` 附加属性；图标颜色由 `IconForeground` 控制，标题颜色由控件 `Foreground` 独立控制。
 - `ToolboxItem` 和 `ToolItem` 共用图标在上、标题在下的视觉构成，但保留独立样式键，避免语义耦合。
 - 不修改现有 `DefaultToolBarItemStyle`，避免对 AppBar 和已有用户造成回归。
 
@@ -225,7 +226,7 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 
 1. 默认 150 ms 后打开，快速划过不打开过期分组。
 2. 任意时刻最多一个 Popup 打开。
-3. 300 DIP 面板每行严格 6 项，第 7 项进入第二行，第 13 项进入第三行。
+3. 300 DIP 面板每行严格 4 项，第 5 项进入第二行，第 9 项进入第三行。
 4. 大量工具触发垂直滚动，不出现水平滚动或列数变化。
 5. 从触发项移动到 Popup 不闪退；离开两者约 300 ms 后关闭。
 6. 拖动期间 Popup 不关闭，Drop 后不会额外执行 Click。
