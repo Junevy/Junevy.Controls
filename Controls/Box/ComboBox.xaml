@@ -15,7 +15,13 @@
             Padding="{TemplateBinding Padding}"
             Background="{TemplateBinding Background}"
             CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
-            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <ContentPresenter
+                Content="{TemplateBinding Content}"
+                ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                ContentTemplate="{TemplateBinding ContentTemplate}"
+                ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center" />
         </Border>
 
 
@@ -77,6 +83,7 @@
                         Content="{TemplateBinding SelectionBoxItem}"
                         ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
                         ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                        ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
                         IsHitTestVisible="False" />
 
                     <!-- WPF's editable ComboBox contract.  Keeping this named
@@ -213,8 +220,8 @@
         <Setter Property="MinHeight" Value="30" />
         <!--<Setter Property="Width" Value="150" />-->
         <Setter Property="MinWidth" Value="50" />
-        <Setter Property="Padding" Value="12,0,0,0" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Padding" Value="{DynamicResource Theme.ControlPadding}" />
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
@@ -225,6 +232,8 @@
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template" Value="{StaticResource DefaultComboBoxTemplate}" />
     </Style>
