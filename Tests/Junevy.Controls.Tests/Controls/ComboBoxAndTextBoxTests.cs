@@ -1,8 +1,12 @@
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 using NUnit.Framework;
+using Junevy.Controls.AttachedProperties;
+using JunevyButton = Junevy.Controls.Controls.Button.Button;
 using JunevyComboBox = Junevy.Controls.Controls.Box.ComboBox;
 using JunevyTextBox = Junevy.Controls.Controls.Text.TextBox;
 using TestHost = Junevy.Controls.Tests.Toolbox.WpfTestHost;
@@ -107,6 +111,111 @@ public sealed class ComboBoxAndTextBoxTests
         {
             TestHost.CloseAndDrain(window);
         }
+    }
+
+    [Test]
+    public void NonEditableComboBox_ClickingContentOpensDropDown()
+    {
+        var comboBox = new JunevyComboBox
+        {
+            Width = 180,
+            ItemsSource = new[] { "First", "Second" },
+            SelectedIndex = 0,
+            IsEditable = false
+        };
+        ApplyTheme(comboBox);
+
+        Window window = TestHost.Show(comboBox);
+        try
+        {
+            comboBox.ApplyTemplate();
+            comboBox.UpdateLayout();
+
+            var args = new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
+            {
+                RoutedEvent = UIElement.PreviewMouseLeftButtonDownEvent
+            };
+            comboBox.RaiseEvent(args);
+            TestHost.Drain(comboBox.Dispatcher);
+
+            Assert.That(comboBox.IsDropDownOpen, Is.True);
+        }
+        finally
+        {
+            comboBox.IsDropDownOpen = false;
+            TestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void TextBoxCloseButton_UsesIconFont()
+    {
+        var textBox = new JunevyTextBox { Text = "Value" };
+        ApplyTheme(textBox);
+
+        Window window = TestHost.Show(textBox);
+        try
+        {
+            textBox.ApplyTemplate();
+            textBox.UpdateLayout();
+
+            var closeButton = (JunevyButton)textBox.Template.FindName("PART_CloseButton", textBox)!;
+            FontFamily expectedFont = (FontFamily)textBox.GetValue(Icon.FontFamilyProperty);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(expectedFont, Is.Not.Null);
+                Assert.That(closeButton.FontFamily, Is.SameAs(expectedFont));
+                Assert.That(closeButton.FontFamily.Source, Does.Contain("iconfont.ttf#iconfont"));
+                Assert.That(
+                    FindVisualChildren<ContentPresenter>(closeButton)
+                        .Any(presenter => ReferenceEquals(TextElement.GetFontFamily(presenter), expectedFont)),
+                    Is.True);
+                Assert.That(
+                    new Typeface(closeButton.FontFamily, closeButton.FontStyle, closeButton.FontWeight, closeButton.FontStretch)
+                        .TryGetGlyphTypeface(out GlyphTypeface? glyphTypeface),
+                    Is.True);
+                Assert.That(glyphTypeface!.CharacterToGlyphMap, Does.ContainKey('\uE639'));
+            });
+        }
+        finally
+        {
+            TestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void Button_DefaultMinimumHeight_Is20()
+    {
+        var button = new JunevyButton { Content = "Button" };
+        ApplyTheme(button);
+
+        Window window = TestHost.Show(button);
+        try
+        {
+            button.ApplyTemplate();
+            button.UpdateLayout();
+
+            Assert.That(button.MinHeight, Is.EqualTo(20));
+        }
+        finally
+        {
+            TestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
+    public void IconFont_DefaultAttachedValueContainsClearGlyph()
+    {
+        var textBox = new JunevyTextBox();
+        FontFamily font = (FontFamily)textBox.GetValue(Icon.FontFamilyProperty);
+
+        Assert.That(font.Source, Is.EqualTo("./iconfont.ttf#iconfont"));
+        Assert.That(
+            new Typeface(font, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal)
+                .TryGetGlyphTypeface(out GlyphTypeface? glyphTypeface),
+            Is.True);
+        Assert.That(glyphTypeface!.CharacterToGlyphMap, Does.ContainKey('\uE639'));
     }
 
     private static void ApplyTheme(FrameworkElement element)

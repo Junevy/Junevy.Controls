@@ -7,6 +7,7 @@
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Text">
 
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Junevy.Controls;component/Resources/Font/IconFont.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/Button.xaml" />
     </ResourceDictionary.MergedDictionaries>
@@ -178,6 +179,7 @@
 
     <Style x:Key="DefaultTextBoxStyle" TargetType="{x:Type local:TextBox}">
         <Setter Property="MinHeight" Value="30" />
+        <Setter Property="atc:Icon.FontFamily" Value="{StaticResource IconFont}" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
