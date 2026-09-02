@@ -177,6 +177,7 @@
 
 
     <Style x:Key="DefaultTextBoxStyle" TargetType="{x:Type local:TextBox}">
+        <Setter Property="MinHeight" Value="30" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
