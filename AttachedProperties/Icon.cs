@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -56,11 +57,16 @@ namespace Junevy.Controls.AttachedProperties
         //     }
         // }
 
+        // Resolve the embedded font relative to its XAML resource so the default
+        // value has the same pack URI base as the IconFont static resource.
         public static readonly DependencyProperty FontFamilyProperty =
             DependencyProperty.RegisterAttached("FontFamily", typeof(FontFamily), typeof(Icon),
                 new PropertyMetadata(
                     new FontFamily(
-                        "/Junevy.Controls;component/Resources/Font/iconfont.ttf#iconfont")));
+                        new Uri(
+                            "pack://application:,,,/Junevy.Controls;component/Resources/Font/IconFont.xaml",
+                            UriKind.Absolute),
+                        "./iconfont.ttf#iconfont")));
 
         public static readonly DependencyProperty IconSizeProperty =
             DependencyProperty.RegisterAttached("IconSize", typeof(int), typeof(Icon), new PropertyMetadata(14));
