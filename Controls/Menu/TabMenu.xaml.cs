@@ -345,6 +345,18 @@ namespace Junevy.Controls.Controls.Menu
             {
                 if (tabItem.Content is FrameworkElement fe)
                 {
+                    if (fe.DataContext is IDisposable disposableDataContext)
+                    {
+                        try
+                        {
+                            disposableDataContext.Dispose();
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"TabMenu.Dispose error: {ex}");
+                        }
+                    }
+
                     fe.DataContext = null;
                 }
 
