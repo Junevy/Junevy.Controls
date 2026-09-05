@@ -1,0 +1,180 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
+    xmlns:bt="clr-namespace:Junevy.Controls.Controls.Button"
+    xmlns:local="clr-namespace:Junevy.Controls.Controls.Bar">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Junevy.Controls;component/Resources/Font/IconFont.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/Button.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <!--  通知条右上角关闭按钮：中性悬停，避免复用 NoBorderButtonStyle 的警告色悬停  -->
+    <Style
+        x:Key="MessageBarCloseButtonStyle"
+        BasedOn="{StaticResource DefaultButtonStyle}"
+        TargetType="{x:Type bt:Button}">
+        <Setter Property="Width" Value="26" />
+        <Setter Property="Height" Value="26" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Tertiary}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type bt:Button}">
+                    <Border
+                        x:Name="ContentBorder"
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
+                        <ContentPresenter
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            ContentSource="Content"
+                            RecognizesAccessKey="True"
+                            TextElement.FontFamily="{TemplateBinding FontFamily}"
+                            TextElement.FontSize="{TemplateBinding FontSize}"
+                            TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Pressed}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <ControlTemplate x:Key="DefaultMessageBarTemplate" TargetType="{x:Type local:MessageBar}">
+        <Border
+            x:Name="RootBorder"
+            Background="{DynamicResource Theme.Brush.Surface.Base}"
+            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+            BorderThickness="1"
+            CornerRadius="{DynamicResource Theme.ControlCornerRadius}"
+            Effect="{DynamicResource Theme.PopupShadow}"
+            SnapsToDevicePixels="True">
+            <Grid>
+                <!--  左侧严重程度色条  -->
+                <Border
+                    x:Name="AccentStripe"
+                    Width="5"
+                    HorizontalAlignment="Left"
+                    Background="{DynamicResource Theme.Brush.Status.Info}"
+                    CornerRadius="4,0,0,4" />
+
+                <Grid Margin="12,9,6,9">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <ContentControl
+                        x:Name="IconHost"
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Content="{TemplateBinding Icon}"
+                        FontFamily="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.FontFamily)}"
+                        FontSize="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconSize)}"
+                        Foreground="{DynamicResource Theme.Brush.Status.Info}" />
+
+                    <StackPanel
+                        Grid.Column="1"
+                        Margin="10,0,6,0"
+                        VerticalAlignment="Center">
+                        <ContentPresenter
+                            x:Name="TitlePresenter"
+                            Content="{TemplateBinding Title}"
+                            TextElement.FontSize="{TemplateBinding FontSize}"
+                            TextElement.FontWeight="SemiBold"
+                            TextElement.Foreground="{DynamicResource Theme.Brush.Text.Primary}" />
+                        <ContentPresenter
+                            x:Name="MessagePresenter"
+                            Margin="0,2,0,0"
+                            Content="{TemplateBinding Message}"
+                            TextElement.FontSize="{TemplateBinding FontSize}"
+                            TextElement.Foreground="{DynamicResource Theme.Brush.Text.Secondary}" />
+                        <ContentPresenter
+                            x:Name="ContentHost"
+                            Margin="0,6,0,0"
+                            ContentSource="Content" />
+                    </StackPanel>
+
+                    <bt:Button
+                        x:Name="CloseButton"
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Command="{Binding CloseCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                        Content="&#xE639;"
+                        FontFamily="{StaticResource IconFont}"
+                        FontSize="11"
+                        Style="{StaticResource MessageBarCloseButtonStyle}" />
+                </Grid>
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="Appearance" Value="Success">
+                <Setter TargetName="AccentStripe" Property="Background" Value="{DynamicResource Theme.Brush.Status.Success}" />
+                <Setter TargetName="IconHost" Property="Foreground" Value="{DynamicResource Theme.Brush.Status.Success}" />
+            </Trigger>
+            <Trigger Property="Appearance" Value="Warning">
+                <Setter TargetName="AccentStripe" Property="Background" Value="{DynamicResource Theme.Brush.Status.Warning}" />
+                <Setter TargetName="IconHost" Property="Foreground" Value="{DynamicResource Theme.Brush.Status.Warning}" />
+            </Trigger>
+            <Trigger Property="Appearance" Value="Danger">
+                <Setter TargetName="AccentStripe" Property="Background" Value="{DynamicResource Theme.Brush.Status.Danger}" />
+                <Setter TargetName="IconHost" Property="Foreground" Value="{DynamicResource Theme.Brush.Status.Danger}" />
+            </Trigger>
+            <Trigger Property="Title" Value="{x:Null}">
+                <Setter TargetName="TitlePresenter" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="Content" Value="{x:Null}">
+                <Setter TargetName="ContentHost" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="CloseButtonEnabled" Value="False">
+                <Setter TargetName="CloseButton" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="RootBorder" Property="Opacity" Value="0.5" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type local:MessageBar}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="MaxWidth" Value="560" />
+        <Setter Property="Template" Value="{StaticResource DefaultMessageBarTemplate}" />
+        <Setter Property="atc:Icon.FontFamily" Value="{StaticResource IconFont}" />
+        <Setter Property="atc:Icon.IconSize" Value="16" />
+    </Style>
+
+    <Style TargetType="{x:Type local:MessageBarPresenter}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Bottom" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:MessageBarPresenter}">
+                    <ContentPresenter
+                        ContentSource="Content"
+                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

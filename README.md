@@ -701,6 +701,78 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 
 依赖：所在 `Window`、WPF `SystemCommands`、内置图标字体、`ToolBar` 和 `Button` 样式。自定义无边框窗口时仍需由应用配置 `WindowChrome`、`WindowStyle` 和拖动区域。
 
+## 通知控件
+
+### MessageBar、MessageBarPresenter 与 MessageBarService
+
+`jv:MessageBar` 是参考 WPF-UI `Snackbar` 的应用内通知条：以卡片形式滑入显示标题、正文和状态图标，支持超时自动关闭、手动关闭和显示/隐藏生命周期事件。`jv:MessageBarPresenter` 是通知条的宿主容器；`MessageBarService` 是静态服务，注册宿主后可在任意位置弹出通知。
+
+| 属性/方法/事件 | 效果 |
+| --- | --- |
+| `Title` | 标题行，类型为 `object`；为 `null` 时不显示 |
+| `Message` | 正文内容，类型为 `object` |
+| `Appearance` | `Informational`、`Success`、`Warning`、`Danger`，对应主题状态色，决定左侧色条与图标颜色 |
+| `Icon` | 图标内容；未显式设置时跟随 `Appearance` 使用内置图标字体字形，显式设置后不再被外观切换覆盖 |
+| `IsShown` | 是否显示；设置后播放滑入/滑出动画，完全折叠时占位消失 |
+| `Timeout` | 自动关闭时间，默认 2 秒；零或负值禁用自动关闭 |
+| `CloseButtonEnabled` | 是否显示右上角关闭按钮，默认 `true` |
+| `Show()` / `Hide()` | 显示或隐藏，等同设置 `IsShown` |
+| `Opening` / `Closing` | 显示或隐藏之前触发；设置 `MessageBarCancelEventArgs.Cancel=true` 可取消 |
+| `Opened` / `Closed` | 显示或隐藏动画完成后触发 |
+
+`MessageBar` 的 `Visibility`、`Opacity` 和 `RenderTransform` 由控件自身随 `IsShown` 管理，请通过 `IsShown` 控制显示状态，不要直接设置这三个属性。
+
+服务方法（`MessageBarService`）：
+
+| 方法 | 效果 |
+| --- | --- |
+| `SetPresenter(presenter)` | 注册宿主容器；重复调用会替换，整个应用通常只需注册一次 |
+| `Show(message)` | Informational 外观、无标题 |
+| `Show(title, message)` | Informational 外观 |
+| `Show(appearance, message)` / `Show(appearance, title, message)` | 指定外观 |
+| `Show(appearance, title, message, timeout)` | 指定外观与超时；`timeout` 为零或负值时禁用自动关闭 |
+| `Clear()` | 隐藏当前显示的通知 |
+
+服务可在非 UI 线程调用，内部会自动调度到宿主所在的 UI 线程。宿主同一时间只承载一条通知，新通知会替换旧通知，被替换的通知停止自己的自动关闭计时。
+
+在窗口底部放置宿主（覆盖在内容之上，不占用布局空间），并在代码中注册：
+
+```xml
+<Grid>
+    <local:MainContent />
+
+    <!--  覆盖在内容底部居中  -->
+    <jv:MessageBarPresenter x:Name="NotificationPresenter" Margin="16,0,16,24" />
+</Grid>
+```
+
+```csharp
+public MainWindow()
+{
+    InitializeComponent();
+    MessageBarService.SetPresenter(NotificationPresenter);
+}
+
+private void OnSaved()
+{
+    MessageBarService.Show(MessageBarAppearance.Success, "Saved", "Exposure settings saved.");
+    MessageBarService.Show(MessageBarAppearance.Danger, "Device lost", "Camera 2 disconnected.", TimeSpan.FromSeconds(5));
+}
+```
+
+也可以直接在布局中声明通知条，并用 `IsShown` 控制显隐：
+
+```xml
+<jv:MessageBar
+    Title="Low exposure"
+    Message="Scene brightness below target."
+    Appearance="Warning"
+    IsShown="True"
+    Closing="OnMessageBarClosing" />
+```
+
+依赖：WPF `ContentControl`、`DispatcherTimer` 动画与计时、`jv:Button`（关闭按钮）、主题资源和内置图标字体；图标跟随 `atc:Icon.FontFamily` 与 `atc:Icon.IconSize`。
+
 ## 图像控件
 
 ### ImageViewer
@@ -741,6 +813,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | 输入/选择 | `CheckBox`、`TextBox`、`ComboBox`、`ComboBoxItem` |
 | 集合/数据 | `ListBox`、`ListView`、`DataGrid` |
 | 文本/状态 | `Label`、`TextTitle` |
+| 通知 | `MessageBar`、`MessageBarPresenter`、`MessageBarService` |
 | 菜单/导航 | `ContextMenu`、`ContextMenuItem`、`MenuItem`、`SideMenu`、`TreeMenu`、`TreeMenuItem`、`TabMenu`、`TabMenuItem`、`ToolBar`、`ToolBarItem`、`Toolbox`、`ToolboxItem`、`ToolItem` |
 | 图像 | `ImageViewer` |
 
@@ -764,6 +837,8 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `DataGrid` | WPF `DataGrid`、标准列/行/单元格容器、虚拟化 | 无 |
 | `Label` | WPF `Label`、状态和图标资源 | `Icon.Icon`、`Icon.FontFamily`（仅相应模板） |
 | `TextTitle` | WPF `ContentControl`、标准内容模板管线 | 无 |
+| `MessageBar` | WPF `ContentControl`、`DispatcherTimer`、`jv:Button` 关闭按钮、主题资源 | `Icon.FontFamily`、`Icon.IconSize` |
+| `MessageBarPresenter` | WPF `ContentControl`、承载 `MessageBar`，配合 `MessageBarService` | 无 |
 | `ContextMenu` | WPF `ContextMenu`、`MenuItem`、`Separator`、Popup/阴影资源 | 无 |
 | `ContextMenuItem` | WPF `MenuItem`、`JunevyContextMenuItemStyle` | 无 |
 | `MenuItem` | WPF `ContentControl`；作为 `SideMenu`/`TreeMenuItem` 的导航数据 | 无 |
