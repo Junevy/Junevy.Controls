@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace Junevy.Controls.Controls.Bar
 {
@@ -18,6 +19,29 @@ namespace Junevy.Controls.Controls.Bar
 
         /// <summary>当前承载的通知条；没有则为 <c>null</c>。</summary>
         public MessageBar? ActiveMessageBar => Content as MessageBar;
+
+        /// <summary>
+        /// 将宿主的最小尺寸约束转发给承载的通知条，确保在 XAML 中为
+        /// <see cref="MessageBarPresenter"/> 设置的 <see cref="FrameworkElement.MinWidth"/>
+        /// 与 <see cref="FrameworkElement.MinHeight"/> 真正作用于可见的通知条，
+        /// 同时保留通知条原有的自适应宽高能力。
+        /// </summary>
+        protected override void OnContentChanged(object oldContent, object newContent)
+        {
+            base.OnContentChanged(oldContent, newContent);
+
+            if (oldContent is MessageBar oldBar)
+            {
+                BindingOperations.ClearBinding(oldBar, MinWidthProperty);
+                BindingOperations.ClearBinding(oldBar, MinHeightProperty);
+            }
+
+            if (newContent is MessageBar newBar)
+            {
+                newBar.SetBinding(MinWidthProperty, new Binding(nameof(MinWidth)) { Source = this });
+                newBar.SetBinding(MinHeightProperty, new Binding(nameof(MinHeight)) { Source = this });
+            }
+        }
 
         /// <summary>替换内容并显示指定通知条。</summary>
         public void Show(MessageBar messageBar)

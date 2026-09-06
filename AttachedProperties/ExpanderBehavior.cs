@@ -1,4 +1,5 @@
-﻿using Junevy.Controls.Controls.Menu;
+﻿using Junevy.Controls.Controls.Button;
+using Junevy.Controls.Controls.Menu;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -26,45 +27,59 @@ namespace Junevy.Controls.AttachedProperties
             if (d is TreeViewItem item)
             {
                 if ((bool)e.NewValue)
-                    item.PreviewMouseLeftButtonDown += OnDoubleClick;
+                {
+                    item.PreviewMouseLeftButtonDown += OnPreviewMouseLeftButtonDown;
+                    item.KeyDown += OnKeyDown;
+                }
                 else
-                    item.PreviewMouseLeftButtonDown -= OnDoubleClick;
+                {
+                    item.PreviewMouseLeftButtonDown -= OnPreviewMouseLeftButtonDown;
+                    item.KeyDown -= OnKeyDown;
+                }
             }
         }
 
-        private static void OnDoubleClick(object sender, MouseButtonEventArgs e)
+        private static void OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ClickCount != 2)
+            if (e.ClickCount != 2 || sender is not TreeViewItem item)
                 return;
 
-            // 找到真正点击的 TreeViewItem
-            var clickedItem = FindAncestor<TreeViewItem>(e.OriginalSource as DependencyObject);
-            var parent = FindAncestor<TreeMenu>(e.OriginalSource as DependencyObject);
-
-            if (clickedItem == null)
+            // 展开箭头本身是 ToggleButton，单击即切换展开状态；
+            // 双击箭头时避免再切换一次，造成“展开后立刻收起”的抖动。
+            if (FindAncestor<ToggleButton>(e.OriginalSource as DependencyObject) != null)
                 return;
 
-            // 只处理当前 sender（避免父节点触发）
-            if (!ReferenceEquals(clickedItem, sender))
+            // 只处理当前容器（避免父节点被子节点冒泡的事件误触发）。
+            if (!ReferenceEquals(FindAncestor<TreeViewItem>(e.OriginalSource as DependencyObject), item))
                 return;
 
-            if (clickedItem.DataContext is TreeMenuItem vm)
-            {
-                if (!vm.IsLeaf)
-                {
-                    clickedItem.IsExpanded = !clickedItem.IsExpanded;
-                }
-                else
-                {
-                    //if (vm.Command?.CanExecute(vm) == true)
-                    //    vm.Command?.Execute(vm);
-                    parent?.NavigateCommand?.Execute(vm);
-                }
-            }
-
+            ToggleOrActivate(item);
             e.Handled = true;
         }
 
+        private static void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter || sender is not TreeViewItem item)
+                return;
+
+            ToggleOrActivate(item);
+            e.Handled = true;
+        }
+
+        private static void ToggleOrActivate(TreeViewItem item)
+        {
+            if (item.DataContext is not TreeMenuItem vm)
+                return;
+
+            if (vm.IsLeaf)
+            {
+                FindAncestor<TreeMenu>(item)?.NavigateCommand?.Execute(vm);
+            }
+            else
+            {
+                item.IsExpanded = !item.IsExpanded;
+            }
+        }
 
         private static T? FindAncestor<T>(DependencyObject? current) where T : DependencyObject
         {

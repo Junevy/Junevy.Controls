@@ -171,6 +171,8 @@
                 <ControlTemplate TargetType="{x:Type local:MessageBarPresenter}">
                     <ContentPresenter
                         ContentSource="Content"
+                        MinWidth="{TemplateBinding MinWidth}"
+                        MinHeight="{TemplateBinding MinHeight}"
                         HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                 </ControlTemplate>

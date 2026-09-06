@@ -4,7 +4,6 @@
     xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
     xmlns:bt="clr-namespace:Junevy.Controls.Controls.Button"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Bar"
-    xmlns:menu="clr-namespace:Junevy.Controls.Controls.Menu"
     xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework">
 
     <ResourceDictionary.MergedDictionaries>
