@@ -1,0 +1,135 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Junevy.Controls.Controls.Progress">
+
+    <!--  线性模板：确定模式由 ProgressBar 内置的 PART_Track/PART_Indicator 契约驱动填充宽度，
+          不确定模式由控件代码在 PART_IndeterminateOverlay 上播放来回扫动动画  -->
+    <ControlTemplate x:Key="LinearProgressBarTemplate" TargetType="{x:Type local:ProgressBar}">
+        <Grid Background="Transparent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Grid
+                x:Name="PART_Track"
+                Grid.Column="0"
+                Height="6"
+                VerticalAlignment="Center"
+                ClipToBounds="True">
+                <Border
+                    Background="{DynamicResource Theme.Brush.Surface.Sunken}"
+                    CornerRadius="{TemplateBinding Border.CornerRadius}" />
+                <Border
+                    x:Name="PART_Indicator"
+                    HorizontalAlignment="Left"
+                    Background="{DynamicResource Theme.Brush.Accent.Primary}"
+                    CornerRadius="{TemplateBinding Border.CornerRadius}" />
+                <Border
+                    x:Name="PART_IndeterminateOverlay"
+                    HorizontalAlignment="Left"
+                    IsHitTestVisible="False"
+                    Background="{DynamicResource Theme.Brush.Accent.Primary}"
+                    CornerRadius="{TemplateBinding Border.CornerRadius}"
+                    Visibility="Collapsed">
+                    <Border.RenderTransform>
+                        <TranslateTransform />
+                    </Border.RenderTransform>
+                </Border>
+            </Grid>
+
+            <TextBlock
+                x:Name="ProgressTextHost"
+                Grid.Column="1"
+                Margin="8,0,0,0"
+                VerticalAlignment="Center"
+                Text="{TemplateBinding ProgressText}"
+                FontSize="{TemplateBinding FontSize}"
+                Foreground="{DynamicResource Theme.Brush.Text.Secondary}" />
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="ShowProgressText" Value="False">
+                <Setter TargetName="ProgressTextHost" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <!--  环形模板：确定模式绘制值圆弧，不确定模式旋转四分之一圆弧  -->
+    <ControlTemplate x:Key="CircularProgressBarTemplate" TargetType="{x:Type local:ProgressBar}">
+        <Grid Background="Transparent">
+            <Path
+                x:Name="PART_RingTrack"
+                Stroke="{DynamicResource Theme.Brush.Surface.Sunken}"
+                StrokeThickness="{TemplateBinding RingThickness}"
+                StrokeStartLineCap="Round"
+                StrokeEndLineCap="Round" />
+            <Path
+                x:Name="PART_Arc"
+                Stroke="{TemplateBinding Foreground}"
+                StrokeThickness="{TemplateBinding RingThickness}"
+                StrokeStartLineCap="Round"
+                StrokeEndLineCap="Round" />
+            <Path
+                x:Name="PART_SpinnerArc"
+                RenderTransformOrigin="0.5,0.5"
+                Stroke="{TemplateBinding Foreground}"
+                StrokeThickness="{TemplateBinding RingThickness}"
+                StrokeStartLineCap="Round"
+                StrokeEndLineCap="Round"
+                Visibility="Collapsed">
+                <Path.RenderTransform>
+                    <RotateTransform />
+                </Path.RenderTransform>
+            </Path>
+            <TextBlock
+                x:Name="ProgressTextHost"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Text="{TemplateBinding ProgressText}"
+                FontSize="11"
+                FontWeight="SemiBold"
+                Foreground="{DynamicResource Theme.Brush.Text.Primary}" />
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsIndeterminate" Value="True">
+                <Setter TargetName="PART_Arc" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="PART_SpinnerArc" Property="Visibility" Value="Visible" />
+                <Trigger.EnterActions>
+                    <BeginStoryboard x:Name="SpinnerStoryboard">
+                        <Storyboard>
+                            <DoubleAnimation
+                                Storyboard.TargetName="PART_SpinnerArc"
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                From="0"
+                                To="360"
+                                Duration="0:0:1"
+                                RepeatBehavior="Forever" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.EnterActions>
+                <Trigger.ExitActions>
+                    <StopStoryboard BeginStoryboardName="SpinnerStoryboard" />
+                </Trigger.ExitActions>
+            </Trigger>
+            <Trigger Property="ShowProgressText" Value="False">
+                <Setter TargetName="ProgressTextHost" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type local:ProgressBar}">
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+        <Setter Property="Border.CornerRadius" Value="3" />
+        <Setter Property="Height" Value="16" />
+        <Setter Property="Template" Value="{StaticResource LinearProgressBarTemplate}" />
+        <Style.Triggers>
+            <Trigger Property="ShapeMode" Value="Circular">
+                <Setter Property="Width" Value="36" />
+                <Setter Property="Height" Value="36" />
+                <Setter Property="Template" Value="{StaticResource CircularProgressBarTemplate}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

@@ -121,6 +121,30 @@
 
     <!--
         ============================================================
+        ImageViewer checkerboard (geometry-drawn transparency grid)
+        ============================================================
+    -->
+    <Color x:Key="Theme.Color.ImageViewer.Checkerboard.Base">#2B2B30</Color>
+    <Color x:Key="Theme.Color.ImageViewer.Checkerboard.Alt">#232327</Color>
+    <SolidColorBrush x:Key="Theme.Brush.ImageViewer.Checkerboard.Base" Color="{StaticResource Theme.Color.ImageViewer.Checkerboard.Base}" />
+    <SolidColorBrush x:Key="Theme.Brush.ImageViewer.Checkerboard.Alt" Color="{StaticResource Theme.Color.ImageViewer.Checkerboard.Alt}" />
+    <DrawingBrush
+        x:Key="Theme.Brush.ImageViewer.Checkerboard"
+        TileMode="Tile"
+        Viewbox="0,0,16,16"
+        ViewboxUnits="Absolute"
+        Viewport="0,0,16,16"
+        ViewportUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="{StaticResource Theme.Brush.ImageViewer.Checkerboard.Base}" Geometry="M0,0 H16 V16 H0 Z" />
+                <GeometryDrawing Brush="{StaticResource Theme.Brush.ImageViewer.Checkerboard.Alt}" Geometry="M0,0 H8 V8 H0 Z M8,8 H16 V16 H8 Z" />
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <!--
+        ============================================================
         Surface brushes
         ============================================================
     -->

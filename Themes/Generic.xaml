@@ -30,5 +30,8 @@
 
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Image/ImageViewer.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Bar/MessageBar.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Progress/ProgressBar.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Progress/ProgressBarWindow.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Dialog/DialogWindow.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
