@@ -773,6 +773,50 @@ private void OnSaved()
 
 依赖：WPF `ContentControl`、`DispatcherTimer` 动画与计时、`jv:Button`（关闭按钮）、主题资源和内置图标字体；图标跟随 `atc:Icon.FontFamily` 与 `atc:Icon.IconSize`。
 
+## 窗口控件
+
+### DialogWindow
+
+`jv:DialogWindow` 是通用对话框宿主窗口：无边框、圆角、投影、主题化标题栏（图标、标题、最小化/最大化/关闭按钮），颜色全部跟随 `Theme.Brush.*` 动态资源，支持运行时浅色/深色切换。标题栏支持拖动，边缘支持鼠标缩放；Esc 可关闭（宿主可通过 `Closing` 事件拦截）。标题会自动读取 `DataContext` 上的 `Title` 属性（例如实现 `IDialogAware` 的 ViewModel），并监听 `INotifyPropertyChanged` 同步刷新。
+
+| 属性 | 效果 |
+| --- | --- |
+| `TitleBarHeight` | 标题栏高度，默认 `40`，同时是拖拽区高度 |
+| `ShadowMargin` | 四周为投影保留的透明外边距，默认 `16`；缩放热区与它对齐 |
+| `CornerRadius` | 窗口圆角，默认跟随 `Theme.ControlCornerRadius`，最大化时自动归零 |
+| `ShowMinimizeButton` | 是否显示最小化按钮，默认 `false` |
+| `ShowMaximizeButton` | 是否显示最大化按钮，默认 `false` |
+| `ShowCloseButton` | 是否显示关闭按钮（同时控制 Esc），默认 `true` |
+
+窗口内容与 `DataContext` 由宿主注入后显示在标题栏下方；内容会按窗口圆角裁剪，避免内容自带背景顶破圆角。`Padding` 由窗口内部在最大化时管理，请勿依赖。
+
+在应用项目中接入 Prism 的 `IDialogService` 时，本库无需引用 Prism，派生一个窗口补上 `Result` 属性即可（Prism 8.x 在 `Prism.Services.Dialogs`，9.x 在 `Prism.Dialogs`）：
+
+```csharp
+public class PrismDialogWindow : Junevy.Controls.Controls.Dialog.DialogWindow, IDialogWindow
+{
+    public IDialogResult Result { get; set; }
+}
+```
+
+注册并弹出（ViewModel 实现 `IDialogAware`，其 `Title` 会成为窗口标题）：
+
+```csharp
+// App.RegisterTypes
+containerRegistry.RegisterDialogWindow<PrismDialogWindow>();
+containerRegistry.RegisterDialog<DeviceSettingView, DeviceSettingViewModel>();
+
+// 任意位置
+_dialogService.ShowDialog(nameof(DeviceSettingView), parameters, result =>
+{
+    if (result.Result == ButtonResult.OK) { /* ... */ }
+});
+```
+
+不使用 Prism 时也可以直接实例化：`new DialogWindow { Content = view }.ShowDialog()`。子类如需覆盖默认样式，请再执行一次 `DefaultStyleKeyProperty.OverrideMetadata(typeof(子类), new FrameworkPropertyMetadata(typeof(DialogWindow)))`。
+
+依赖：WPF `Window`、`WindowChrome`、`SystemCommands`、`RectangleGeometry` 圆角裁剪、主题资源；不依赖任何第三方包。
+
 ## 图像控件
 
 ### ImageViewer
@@ -814,6 +858,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | 集合/数据 | `ListBox`、`ListView`、`DataGrid` |
 | 文本/状态 | `Label`、`TextTitle` |
 | 通知 | `MessageBar`、`MessageBarPresenter`、`MessageBarService` |
+| 窗口 | `DialogWindow` |
 | 菜单/导航 | `ContextMenu`、`ContextMenuItem`、`MenuItem`、`SideMenu`、`TreeMenu`、`TreeMenuItem`、`TabMenu`、`TabMenuItem`、`ToolBar`、`ToolBarItem`、`Toolbox`、`ToolboxItem`、`ToolItem` |
 | 图像 | `ImageViewer` |
 
@@ -839,6 +884,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `TextTitle` | WPF `ContentControl`、标准内容模板管线 | 无 |
 | `MessageBar` | WPF `ContentControl`、`DispatcherTimer`、`jv:Button` 关闭按钮、主题资源 | `Icon.FontFamily`、`Icon.IconSize` |
 | `MessageBarPresenter` | WPF `ContentControl`、承载 `MessageBar`，配合 `MessageBarService` | 无 |
+| `DialogWindow` | WPF `Window`、`WindowChrome`、`SystemCommands`、主题资源（含阴影/圆角令牌） | 无 |
 | `ContextMenu` | WPF `ContextMenu`、`MenuItem`、`Separator`、Popup/阴影资源 | 无 |
 | `ContextMenuItem` | WPF `MenuItem`、`JunevyContextMenuItemStyle` | 无 |
 | `MenuItem` | WPF `ContentControl`；作为 `SideMenu`/`TreeMenuItem` 的导航数据 | 无 |

@@ -24,11 +24,14 @@ public static class ThemeManager
             throw new ArgumentNullException(nameof(resources));
 
         Uri targetUri = GetThemeUri(theme);
-        if (!ReplaceThemeDictionary(resources, targetUri))
-        {
-            resources.MergedDictionaries.Add(CreateDictionary(targetUri));
-        }
+        RemoveThemeDictionaries(resources);
 
+        // Append at the TOP level of the merged dictionary chain: top-level changes
+        // invalidate live DynamicResource references, while replacing dictionaries
+        // nested inside Generic.xaml would silently leave existing elements on the
+        // old theme. Appending also gives the theme dictionary the highest lookup
+        // priority, shadowing any theme dictionary still nested elsewhere.
+        resources.MergedDictionaries.Add(CreateDictionary(targetUri));
         CurrentTheme = theme;
     }
 
@@ -56,30 +59,23 @@ public static class ThemeManager
             || path.EndsWith("Themes\\AppColors.Dark.xaml", StringComparison.OrdinalIgnoreCase);
     }
 
-    private static bool ReplaceThemeDictionary(ResourceDictionary resources, Uri targetUri)
+    private static void RemoveThemeDictionaries(ResourceDictionary resources)
     {
-        bool replaced = false;
         var dictionaries = resources.MergedDictionaries;
 
-        for (int i = 0; i < dictionaries.Count; i++)
+        for (int i = dictionaries.Count - 1; i >= 0; i--)
         {
             ResourceDictionary dictionary = dictionaries[i];
             Uri? source = dictionary.Source;
 
             if (source != null && IsThemeDictionary(source))
             {
-                dictionaries[i] = CreateDictionary(targetUri);
-                replaced = true;
+                dictionaries.RemoveAt(i);
                 continue;
             }
 
-            if (ReplaceThemeDictionary(dictionary, targetUri))
-            {
-                replaced = true;
-            }
+            RemoveThemeDictionaries(dictionary);
         }
-
-        return replaced;
     }
 
     private static Uri GetThemeUri(AppTheme theme)
