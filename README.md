@@ -615,6 +615,18 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
 
 `ToolboxItem` 和 `ToolItem` 的默认模板在图标与标题之间保留 5 DIP 间距。可在各自的 `ItemContainerStyle` 中使用 `atc:Icon.IconSize` 调整图标大小、使用 `atc:Icon.IconForeground` 设置图标颜色、使用 `Foreground` 设置标题颜色，并使用 `FontSize` 调整标题字号。两条颜色通道彼此独立。
 
+库内提供两组紧凑样式，可将一级分组触发器由默认 48 DIP 等比缩小到约 40 DIP（图标、标题与间距同步缩小；Popup 内的 `ToolItem` 保持默认尺寸不变）：
+
+- `CompactToolboxItemStyle`：紧凑的 `ToolboxItem` 项样式。
+- `CompactToolboxStyle`：紧凑的 `Toolbox` 容器样式，减小内边距并默认使用紧凑项样式。
+
+```xml
+<jv:Toolbox Style="{StaticResource CompactToolboxStyle}" ... />
+<!-- 或保持默认容器样式，仅替换分组项样式 -->
+<jv:Toolbox ItemContainerStyle="{StaticResource CompactToolboxItemStyle}" ... />
+```
+
+
 一级 `ToolboxItem` 的 Hover 背景覆盖完整触发区域，并使用 `Theme.SmallCornerRadius`（默认 4 DIP）裁切圆角；该背景不属于图标内容，也不会改变图标大小或布局。
 
 Popup 内的 `ToolItem` 在 `IsDragEnabled="True"` 且 `IsEnabled="True"` 时显示十字形鼠标指针，提示该项可以拖动到设计画布；关闭拖动或禁用工具项后会恢复系统默认指针。一级 `ToolboxItem` 仍使用默认指针，因为它负责展开和切换分组。
@@ -706,6 +718,39 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 ```
 
 依赖：所在 `Window`、WPF `SystemCommands`、内置图标字体、`ToolBar` 和 `Button` 样式。自定义无边框窗口时仍需由应用配置 `WindowChrome`、`WindowStyle` 和拖动区域。
+
+## 布局控件
+
+### ExpanderPanel
+
+`jv:ExpanderPanel` 继承 WPF `HeaderedContentControl`，提供可折叠的头部与内容区，支持平滑的展开/折叠过渡动画，并可通过模板重写、命令绑定与依赖属性绑定无缝集成到现有项目。
+
+| 属性/事件/方法 | 默认值 | 效果 |
+| --- | --- | --- |
+| `Header` | `null` | 头部内容；点击头部切换展开/折叠 |
+| `Content` | `null` | 内容区 |
+| `IsExpanded` | `true` | 是否展开；支持双向绑定 |
+| `ExpandDirection` | `Down` | 展开方向：`Down`、`Up`、`Left`、`Right` |
+| `AnimationDuration` | `200 ms` | 展开/折叠过渡动画时长；`Automatic` 或 `Forever` 视为无效 |
+| `ToggleCommand` | `null` | 状态切换时执行的命令 |
+| `CommandParameter` | `null` | 传给 `ToggleCommand` 的参数 |
+| `Toggle()` | - | 切换展开/折叠状态 |
+| `Expanded` | - | 展开动画完成后触发的冒泡路由事件 |
+| `Collapsed` | - | 折叠动画完成后触发的冒泡路由事件 |
+
+```xml
+<jv:ExpanderPanel
+    Header="Camera"
+    ExpandDirection="Down"
+    IsExpanded="{Binding CameraExpanded, Mode=TwoWay}"
+    AnimationDuration="0:0:0.25">
+    <Grid>
+        <TextBlock Text="Camera settings" />
+    </Grid>
+</jv:ExpanderPanel>
+```
+
+键盘与无障碍：头部使用 `ToggleButton`，支持 `Space`/`Enter` 切换，自动获得按钮角色、可访问名称与焦点视觉样式。
 
 ## 通知控件
 
@@ -865,6 +910,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | 文本/状态 | `Label`、`TextTitle` |
 | 通知 | `MessageBar`、`MessageBarPresenter`、`MessageBarService` |
 | 窗口 | `DialogWindow` |
+| 布局 | `ExpanderPanel` |
 | 菜单/导航 | `ContextMenu`、`ContextMenuItem`、`MenuItem`、`SideMenu`、`TreeMenu`、`TreeMenuItem`、`TabMenu`、`TabMenuItem`、`ToolBar`、`ToolBarItem`、`Toolbox`、`ToolboxItem`、`ToolItem` |
 | 图像 | `ImageViewer` |
 
@@ -905,6 +951,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ToolboxItem` | WPF `HeaderedItemsControl`、`ToolItem`、`DefaultToolboxItemStyle`、所属 `Toolbox` 的交互和布局参数 | `Icon.FontFamily`、`Icon.IconSize`、`Icon.IconForeground` |
 | `ToolItem` | WPF `Button` 命令管线、`DefaultToolItemStyle`、WPF `DragDrop` | `Icon.FontFamily`、`Icon.IconSize`、`Icon.IconForeground` |
 | `ImageViewer` | WPF `Image`、`MatrixTransform`、`BitmapSource`、`SaveFileDialog` | 无 |
+| `ExpanderPanel` | WPF `HeaderedContentControl`、`ToggleButton`、`ScaleTransform` 过渡动画、主题资源 | 无 |
 
 ## 开发注意事项
 

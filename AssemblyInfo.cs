@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Markup;
 
 [assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.Menu")]
@@ -11,6 +11,7 @@ using System.Windows.Markup;
 [assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.Toolbox")]
 [assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.Progress")]
 [assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.Dialog")]
+[assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.Expander")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Junevy.Controls.Tests")]
 
 // 在文件末尾（其他 [assembly: ] 之后）添加：
