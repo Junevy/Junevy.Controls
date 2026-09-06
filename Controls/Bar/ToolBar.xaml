@@ -4,7 +4,7 @@
     xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
     xmlns:bt="clr-namespace:Junevy.Controls.Controls.Button"
     xmlns:cvt="clr-namespace:Junevy.Controls.Converters"
-    xmlns:local="clr-namespace:Junevy.Controls.Controls.Menu">
+    xmlns:local="clr-namespace:Junevy.Controls.Controls.Bar">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls;component/Resources/Font/IconFont.xaml" />

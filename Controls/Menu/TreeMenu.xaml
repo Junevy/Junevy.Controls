@@ -75,14 +75,6 @@
                     </Border>
 
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
-                        </Trigger>
-
-                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=IsSelected}" Value="True">
-                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
-                        </DataTrigger>
-
                         <Trigger Property="Icon" Value="{x:Null}">
                             <Setter TargetName="NormalIcon" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="IconModeIcon" Property="Visibility" Value="Collapsed" />
@@ -145,6 +137,16 @@
                     </StackPanel>
 
                     <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Selected}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
+                        </Trigger>
+
                         <Trigger Property="HasItems" Value="False">
                             <Setter TargetName="ExpanderButton" Property="Visibility" Value="Hidden" />
                         </Trigger>
@@ -200,6 +202,16 @@
                     </StackPanel>
 
                     <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Selected}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
+                        </Trigger>
+
                         <Trigger Property="HasItems" Value="True">
                             <Setter TargetName="Indicator" Property="Visibility" Value="Visible" />
                         </Trigger>
@@ -228,15 +240,20 @@
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
         <Setter Property="TextElement.FontSize" Value="12" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
 
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:TreeMenu}">
                     <ScrollViewer
-                        CanContentScroll="True"
+                        CanContentScroll="{TemplateBinding ScrollViewer.CanContentScroll}"
                         Focusable="False"
-                        HorizontalScrollBarVisibility="Hidden"
-                        VerticalScrollBarVisibility="Hidden">
+                        HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                        VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
                         <Border
                             Background="{DynamicResource Theme.Brush.Surface.Base}"
                             BorderBrush="{DynamicResource Theme.Brush.Border.Default}"

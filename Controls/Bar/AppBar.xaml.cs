@@ -1,4 +1,3 @@
-﻿using Junevy.Controls.Controls.Menu;
 using System.Windows;
 
 namespace Junevy.Controls.Controls.Bar

@@ -439,12 +439,12 @@ ThemeManager.ToggleTheme();
 | 属性 | 效果 |
 | --- | --- |
 | `TreeMenu.DisplayMode` | `Normal` 显示展开箭头；`Icon` 使用左侧层级指示器 |
-| `TreeMenu.NavigateCommand` | 双击叶节点时执行，参数为叶节点 `TreeMenuItem` |
+| `TreeMenu.NavigateCommand` | 激活叶节点时执行（双击或按 `Enter`），参数为叶节点 `TreeMenuItem` |
 | `TreeMenuItem.Childrens` | 子节点集合，构造时自动初始化 |
 | `TreeMenuItem.IsLeaf` | 根据 `Childrens` 是否为空计算的只读状态 |
 | `atc:Icon.FontFamily` | 节点图标字体 |
 | `atc:Icon.IconSize` | `Icon` 模式的节点图标大小 |
-| `atc:ExpanderBehavior.Enable` | 默认容器样式已启用；控制双击展开和导航 |
+| `atc:ExpanderBehavior.Enable` | 默认容器样式已启用；控制双击/`Enter` 展开与激活导航 |
 
 ```csharp
 public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
@@ -471,6 +471,12 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
 ```
 
 当前默认树模板和双击行为依赖 `TreeMenuItem`，因此树数据应使用该类型。
+
+交互约定：
+
+- 单击选中节点；双击文件夹节点切换展开/收起，双击叶节点触发 `NavigateCommand`。
+- 键盘方向键沿用 WPF `TreeView` 原生行为：`↑`/`↓` 移动选择，`→`/`←` 展开/收起；`Enter` 激活叶节点或切换文件夹展开。
+- 悬停、选中、禁用三种视觉状态使用主题色区分，并作用于整行；长列表自动显示垂直滚动条。
 
 ### TabMenu 与 TabMenuItem
 

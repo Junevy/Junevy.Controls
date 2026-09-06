@@ -1,7 +1,7 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 
-namespace Junevy.Controls.Controls.Menu
+namespace Junevy.Controls.Controls.Bar
 {
     public class ToolBarItem : System.Windows.Controls.Button
     {
