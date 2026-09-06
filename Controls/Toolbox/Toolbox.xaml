@@ -211,4 +211,27 @@
     </Style>
 
     <Style TargetType="{x:Type local:ToolItem}" BasedOn="{StaticResource DefaultToolItemStyle}" />
+
+    <!--
+        紧凑（约 40px）工具栏项样式：
+        将触发器按钮由默认 48px 等比缩小到 40px，并同步缩小图标与标题字号；
+        弹出面板（PART_Popup）内的 ToolItem 仍使用默认样式，保持原尺寸不变。
+    -->
+    <Style x:Key="CompactToolboxItemStyle"
+           BasedOn="{StaticResource DefaultToolboxItemStyle}"
+           TargetType="{x:Type local:ToolboxItem}">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Margin" Value="1" />
+        <Setter Property="atc:Icon.IconSize" Value="12" />
+        <Setter Property="FontSize" Value="10" />
+    </Style>
+
+    <!--  紧凑工具栏容器：减小内边距并默认使用紧凑项样式。  -->
+    <Style x:Key="CompactToolboxStyle"
+           BasedOn="{StaticResource DefaultToolboxStyle}"
+           TargetType="{x:Type local:Toolbox}">
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource CompactToolboxItemStyle}" />
+    </Style>
 </ResourceDictionary>
