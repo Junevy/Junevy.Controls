@@ -24,6 +24,5 @@ namespace Junevy.Controls.Controls.Bar
                 nameof(ToolBar),
                 typeof(ToolBar),
                 typeof(AppBar));
-
     }
 }

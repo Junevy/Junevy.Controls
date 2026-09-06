@@ -100,7 +100,7 @@
                 <!--  title  -->
                 <Grid Grid.Row="0">
                     <ContentPresenter
-                        Margin="0,3,0,3"
+                        Margin="0,5,0,5"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         ContentSource="Content"
@@ -197,12 +197,10 @@
                 Content="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.Icon)}"
                 FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
                 Foreground="{TemplateBinding Foreground}" />
-
         </Grid>
     </ControlTemplate>
 
     <Style TargetType="{x:Type local:AppBar}">
-        <Setter Property="Height" Value="70" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template" Value="{StaticResource DefaultAppBar}" />

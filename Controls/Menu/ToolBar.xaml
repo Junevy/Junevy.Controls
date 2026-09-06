@@ -15,9 +15,9 @@
     <cvt:NullToCollapsedConverter x:Key="ToolBarItemContentVisibility" />
 
     <Style x:Key="DefaultToolBarItemStyle" TargetType="{x:Type local:ToolBarItem}">
-        <Setter Property="Width" Value="40" />
+        <!--<Setter Property="Width" Value="40" />-->
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="Height" Value="40" />
+        <!--<Setter Property="Height" Value="40" />-->
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Template">
@@ -80,9 +80,9 @@
 
     <Style x:Key="DefaultToolMenu" TargetType="{x:Type local:ToolBar}">
         <Setter Property="FontSize" Value="15" />
-        <Setter Property="MinHeight" Value="42" />
+        <!--<Setter Property="MinHeight" Value="42" />-->
         <Setter Property="Margin" Value="0" />
-        <Setter Property="Padding" Value="4" />
+        <Setter Property="Padding" Value="2" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
@@ -125,8 +125,10 @@
         </Setter>
 
         <Style.Triggers>
-            <!-- Horizontal toolbars are single-row controls. If their host gives them
-                 less height than the item row, a vertical thumb would appear at the end. -->
+            <!--
+                Horizontal toolbars are single-row controls. If their host gives them
+                less height than the item row, a vertical thumb would appear at the end.
+            -->
             <Trigger Property="Orientation" Value="Horizontal">
                 <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
             </Trigger>
