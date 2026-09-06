@@ -9,55 +9,11 @@
         <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-
-    <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
     <cvt:NullToCollapsedConverter x:Key="NullToVisibility" />
     <cvt:IncreaseFontsizeConverter x:Key="IncreaseFontSize" />
-    <Thickness x:Key="Margin">4,0</Thickness>
+    <Thickness x:Key="ButtonContentSpacing">4,0</Thickness>
 
-
-    <!--  normal button  -->
-    <ControlTemplate x:Key="DefaultButtonTemplate" TargetType="{x:Type local:Button}">
-        <Border
-            x:Name="ContentBorder"
-            MinWidth="{TemplateBinding MinWidth}"
-            MinHeight="{TemplateBinding MinHeight}"
-            Padding="{TemplateBinding Padding}"
-            Background="{TemplateBinding Background}"
-            BorderBrush="{TemplateBinding BorderBrush}"
-            BorderThickness="{TemplateBinding BorderThickness}"
-            CornerRadius="{TemplateBinding Border.CornerRadius}"
-            Opacity="1">
-            <ContentPresenter
-                x:Name="ContentPresenter"
-                Margin="{StaticResource Margin}"
-                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                ContentSource="Content"
-                RecognizesAccessKey="True"
-                Opacity="1"
-                TextElement.Foreground="{TemplateBinding Foreground}" />
-        </Border>
-
-        <ControlTemplate.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
-            </Trigger>
-
-            <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Pressed}" />
-            </Trigger>
-
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
-                <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
-                <Setter TargetName="ContentBorder" Property="Opacity" Value="0.5" />
-            </Trigger>
-        </ControlTemplate.Triggers>
-    </ControlTemplate>
-
-    <ControlTemplate x:Key="IconButtonTemplate" TargetType="{x:Type local:Button}">
-
+    <ControlTemplate x:Key="ButtonTemplate" TargetType="{x:Type local:Button}">
         <Border
             x:Name="ContentBorder"
             MinWidth="{TemplateBinding MinWidth}"
@@ -72,18 +28,15 @@
 
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-
-                <!--  Height="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.IconSize)}"  -->
-
                 <ContentControl
-                    x:Name="PART_ICON"
+                    x:Name="IconPresenter"
                     Grid.Column="0"
                     Width="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.IconSize)}"
-                    Margin="{StaticResource Margin}"
+                    Margin="{StaticResource ButtonContentSpacing}"
                     VerticalAlignment="Center"
                     Content="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.Icon)}"
                     Focusable="False"
@@ -91,18 +44,17 @@
                     TextElement.FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.IconSize)}"
                     TextElement.Foreground="{TemplateBinding Foreground}"
                     Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
+
                 <ContentPresenter
                     x:Name="ContentPresenter"
                     Grid.Column="1"
-                    Margin="{StaticResource Margin}"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
+                    Margin="{StaticResource ButtonContentSpacing}"
+                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                     ContentSource="Content"
                     RecognizesAccessKey="True"
                     TextElement.FontSize="{TemplateBinding FontSize}"
-                    TextElement.Foreground="{TemplateBinding Foreground}"
-                    Visibility="{TemplateBinding Content,
-                                                 Converter={StaticResource BoolToVisibility}}" />
+                    TextElement.Foreground="{TemplateBinding Foreground}" />
             </Grid>
         </Border>
 
@@ -130,9 +82,9 @@
             CornerRadius="{TemplateBinding Border.CornerRadius}">
             <ContentPresenter
                 x:Name="ContentPresenter"
-                Margin="{StaticResource Margin}"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
+                Margin="{StaticResource ButtonContentSpacing}"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                 ContentSource="Content"
                 RecognizesAccessKey="True"
                 TextElement.FontFamily="{TemplateBinding FontFamily}"
@@ -156,7 +108,6 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
-
     <Style x:Key="DefaultButtonStyle" TargetType="{x:Type local:Button}">
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
@@ -171,10 +122,8 @@
         <Setter Property="Border.CornerRadius" Value="{DynamicResource Theme.ControlCornerRadius}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Margin" Value="{StaticResource Margin}" />
-        <Setter Property="Template" Value="{StaticResource IconButtonTemplate}" />
+        <Setter Property="Template" Value="{StaticResource ButtonTemplate}" />
     </Style>
-
 
     <Style
         x:Key="NoBorderButtonStyle"
@@ -185,8 +134,6 @@
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
     </Style>
 
-    <!--<Style BasedOn="{StaticResource DefaultButtonStyle}" TargetType="{x:Type Button}" />-->
     <Style BasedOn="{StaticResource DefaultButtonStyle}" TargetType="{x:Type local:Button}" />
-
 
 </ResourceDictionary>
