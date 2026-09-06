@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -90,7 +91,7 @@ public class ExpanderPanel : HeaderedContentControl
         set => SetValue(IsExpandedProperty, value);
     }
 
-    /// <summary>展开方向：Down / Up / Left / Right。</summary>
+    /// <summary>展开方向：Down / Up / Left / Right；Left 表示内容向左展开（头部在右侧），与 WPF Expander 语义一致。</summary>
     public ExpandDirection ExpandDirection
     {
         get => (ExpandDirection)GetValue(ExpandDirectionProperty);
@@ -104,7 +105,7 @@ public class ExpanderPanel : HeaderedContentControl
         set => SetValue(AnimationDurationProperty, value);
     }
 
-    /// <summary>状态切换时执行的命令。</summary>
+    /// <summary>状态切换时执行的命令；可用（CanExecute）时才执行。</summary>
     public ICommand? ToggleCommand
     {
         get => (ICommand?)GetValue(ToggleCommandProperty);
@@ -130,17 +131,6 @@ public class ExpanderPanel : HeaderedContentControl
         remove => RemoveHandler(CollapsedEvent, value);
     }
 
-    public override void OnApplyTemplate()
-    {
-        base.OnApplyTemplate();
-
-        _contentHost = GetTemplateChild(PartContentHost) as FrameworkElement;
-        _scaleTransform = GetTemplateChild(PartScaleTransform) as ScaleTransform;
-
-        ApplyDirection();
-        ApplyExpansionState(IsExpanded, animate: false);
-    }
-
     /// <summary>切换展开/折叠状态。</summary>
     public void Toggle()
     {
@@ -150,6 +140,22 @@ public class ExpanderPanel : HeaderedContentControl
     /// <summary>供派生类响应展开/折叠状态变化。</summary>
     protected virtual void OnIsExpandedChanged(bool isExpanded)
     {
+    }
+
+    protected override AutomationPeer OnCreateAutomationPeer()
+    {
+        return new ExpanderPanelAutomationPeer(this);
+    }
+
+    public override void OnApplyTemplate()
+    {
+        base.OnApplyTemplate();
+
+        _contentHost = GetTemplateChild(PartContentHost) as FrameworkElement;
+        _scaleTransform = GetTemplateChild(PartScaleTransform) as ScaleTransform;
+
+        ApplyDirection();
+        ApplyExpansionState(IsExpanded, animate: false);
     }
 
     private void ApplyExpansionState(bool isExpanded, bool animate)
@@ -164,10 +170,9 @@ public class ExpanderPanel : HeaderedContentControl
             ? ScaleTransform.ScaleYProperty
             : ScaleTransform.ScaleXProperty;
 
-        _scaleTransform.BeginAnimation(scaleProperty, null);
-        _scaleTransform.BeginAnimation(vertical
-            ? ScaleTransform.ScaleXProperty
-            : ScaleTransform.ScaleYProperty, null);
+        // 停掉两个方向上残留的动画，避免中途反向切换时闪烁。
+        _scaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, null);
+        _scaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, null);
 
         if (!animate || AnimationDuration.TimeSpan <= TimeSpan.Zero)
         {
@@ -176,15 +181,12 @@ public class ExpanderPanel : HeaderedContentControl
             return;
         }
 
-        double from = isExpanded ? 0d : 1d;
-        double to = isExpanded ? 1d : 0d;
-
         if (isExpanded)
         {
             _contentHost.Visibility = Visibility.Visible;
         }
 
-        var animation = new DoubleAnimation(from, to, AnimationDuration.TimeSpan)
+        var animation = new DoubleAnimation(isExpanded ? 0d : 1d, isExpanded ? 1d : 0d, AnimationDuration.TimeSpan)
         {
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut }
         };
@@ -195,8 +197,6 @@ public class ExpanderPanel : HeaderedContentControl
             {
                 _contentHost.Visibility = Visibility.Collapsed;
             }
-
-            RaiseEvent(new RoutedEventArgs(isExpanded ? ExpandedEvent : CollapsedEvent, this));
         };
 
         _scaleTransform.BeginAnimation(scaleProperty, animation);
@@ -204,21 +204,33 @@ public class ExpanderPanel : HeaderedContentControl
 
     private void ApplyDirection()
     {
-        if (_contentHost is null || _scaleTransform is null)
+        if (_contentHost is null)
+        {
+            return;
+        }
+
+        // LayoutTransform 参与布局，动画期间周围元素同步收缩；
+        // 对齐方向决定内容向头部一侧收缩。
+        _contentHost.HorizontalAlignment = ExpandDirection switch
+        {
+            ExpandDirection.Left => HorizontalAlignment.Right,
+            ExpandDirection.Right => HorizontalAlignment.Left,
+            _ => HorizontalAlignment.Stretch
+        };
+
+        _contentHost.VerticalAlignment = ExpandDirection switch
+        {
+            ExpandDirection.Up => VerticalAlignment.Bottom,
+            _ => VerticalAlignment.Top
+        };
+
+        if (_scaleTransform is null)
         {
             return;
         }
 
         _scaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, null);
         _scaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, null);
-
-        _contentHost.RenderTransformOrigin = ExpandDirection switch
-        {
-            ExpandDirection.Up => new Point(0.5, 1),
-            ExpandDirection.Left => new Point(1, 0.5),
-            ExpandDirection.Right => new Point(0, 0.5),
-            _ => new Point(0.5, 0)
-        };
 
         SetScale(IsExpanded ? 1d : 0d);
         _contentHost.Visibility = IsExpanded ? Visibility.Visible : Visibility.Collapsed;
@@ -248,7 +260,18 @@ public class ExpanderPanel : HeaderedContentControl
         var panel = (ExpanderPanel)d;
         bool isExpanded = (bool)e.NewValue;
         panel.ApplyExpansionState(isExpanded, animate: true);
-        panel.ToggleCommand?.Execute(panel.CommandParameter);
+
+        // 事件跟随状态变化触发，与 WPF Expander 一致；不依赖动画完成，
+        // 避免 0 时长动画或模板尚未加载时事件丢失。
+        panel.RaiseEvent(new RoutedEventArgs(isExpanded ? ExpandedEvent : CollapsedEvent, panel));
+
+        ICommand? command = panel.ToggleCommand;
+        object? parameter = panel.CommandParameter;
+        if (command?.CanExecute(parameter) == true)
+        {
+            command.Execute(parameter);
+        }
+
         panel.OnIsExpandedChanged(isExpanded);
     }
 
