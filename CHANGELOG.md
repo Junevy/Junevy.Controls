@@ -2,6 +2,16 @@
 
 本文档记录 `Junevy.Controls` 控件库中 `TreeMenu` 与 `TreeMenuItem` 的历史变更与本次迭代内容。
 
+## ExpanderPanel
+
+### 本次更新（评审修复）
+
+- 修复 `ExpandDirection.Left/Right` 与 WPF `Expander` 语义相反的问题：`Left` 现在表示内容向左展开、头部停靠右侧；`Right` 相反。
+- 展开/折叠动画由 `RenderTransform` 改为 `LayoutTransform`：动画期间周围布局同步收缩，修复折叠结束瞬间内容区"先占位、后跳变"的问题。
+- `Expanded`/`Collapsed` 事件改为随状态切换立即触发（与 WPF `Expander` 一致），修复动画时长为 `0` 或模板尚未加载时事件不触发的问题。
+- `ToggleCommand` 执行前检查 `CanExecute`。
+- 新增 `ExpanderPanelAutomationPeer`，暴露 UIA `ExpandCollapse` 自动化模式。
+
 ## TreeMenu / TreeMenuItem
 
 ### 本次更新（交互与视觉升级）

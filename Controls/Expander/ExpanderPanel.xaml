@@ -73,9 +73,9 @@
                         </ToggleButton>
 
                         <Grid x:Name="PART_ContentHost" ClipToBounds="True">
-                            <Grid.RenderTransform>
+                            <Grid.LayoutTransform>
                                 <ScaleTransform x:Name="PART_ScaleTransform" ScaleX="1" ScaleY="1" />
-                            </Grid.RenderTransform>
+                            </Grid.LayoutTransform>
                             <ContentPresenter ContentSource="Content" />
                         </Grid>
                     </DockPanel>
@@ -84,11 +84,12 @@
                         <Trigger Property="ExpandDirection" Value="Up">
                             <Setter TargetName="PART_HeaderButton" Property="DockPanel.Dock" Value="Bottom" />
                         </Trigger>
+                        <!--  Left：内容向左展开，头部停靠右侧；与 WPF Expander 语义一致  -->
                         <Trigger Property="ExpandDirection" Value="Left">
-                            <Setter TargetName="PART_HeaderButton" Property="DockPanel.Dock" Value="Left" />
+                            <Setter TargetName="PART_HeaderButton" Property="DockPanel.Dock" Value="Right" />
                         </Trigger>
                         <Trigger Property="ExpandDirection" Value="Right">
-                            <Setter TargetName="PART_HeaderButton" Property="DockPanel.Dock" Value="Right" />
+                            <Setter TargetName="PART_HeaderButton" Property="DockPanel.Dock" Value="Left" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

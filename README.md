@@ -730,13 +730,13 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 | `Header` | `null` | 头部内容；点击头部切换展开/折叠 |
 | `Content` | `null` | 内容区 |
 | `IsExpanded` | `true` | 是否展开；支持双向绑定 |
-| `ExpandDirection` | `Down` | 展开方向：`Down`、`Up`、`Left`、`Right` |
-| `AnimationDuration` | `200 ms` | 展开/折叠过渡动画时长；`Automatic` 或 `Forever` 视为无效 |
-| `ToggleCommand` | `null` | 状态切换时执行的命令 |
+| `ExpandDirection` | `Down` | 展开方向，与 WPF `Expander` 语义一致：`Down` 头部在上、内容向下展开；`Up` 头部在下、内容向上展开；`Left` 头部在右、内容向左展开；`Right` 头部在左、内容向右展开 |
+| `AnimationDuration` | `200 ms` | 展开/折叠过渡动画时长；`Automatic` 或 `Forever` 视为无效，`0` 表示无过渡动画直接切换 |
+| `ToggleCommand` | `null` | 状态切换时执行的命令；`CanExecute` 返回 `false` 时不会执行 |
 | `CommandParameter` | `null` | 传给 `ToggleCommand` 的参数 |
 | `Toggle()` | - | 切换展开/折叠状态 |
-| `Expanded` | - | 展开动画完成后触发的冒泡路由事件 |
-| `Collapsed` | - | 折叠动画完成后触发的冒泡路由事件 |
+| `Expanded` | - | 展开时触发的冒泡路由事件；随状态切换立即触发，不等待动画结束 |
+| `Collapsed` | - | 折叠时触发的冒泡路由事件；随状态切换立即触发，不等待动画结束 |
 
 ```xml
 <jv:ExpanderPanel
@@ -750,7 +750,9 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 </jv:ExpanderPanel>
 ```
 
-键盘与无障碍：头部使用 `ToggleButton`，支持 `Space`/`Enter` 切换，自动获得按钮角色、可访问名称与焦点视觉样式。
+键盘与无障碍：头部使用 `ToggleButton`，按 `Space` 切换，自动获得按钮角色、可访问名称与焦点视觉样式；控件自身通过 `ExpanderPanelAutomationPeer` 暴露 UIA `ExpandCollapse` 模式，辅助工具可以读取并切换展开状态。
+
+展开/折叠动画基于 `LayoutTransform` 缩放：动画期间周围布局同步收缩，折叠完成后不留占位空间，也不会出现布局跳变。
 
 ## 通知控件
 
@@ -951,7 +953,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ToolboxItem` | WPF `HeaderedItemsControl`、`ToolItem`、`DefaultToolboxItemStyle`、所属 `Toolbox` 的交互和布局参数 | `Icon.FontFamily`、`Icon.IconSize`、`Icon.IconForeground` |
 | `ToolItem` | WPF `Button` 命令管线、`DefaultToolItemStyle`、WPF `DragDrop` | `Icon.FontFamily`、`Icon.IconSize`、`Icon.IconForeground` |
 | `ImageViewer` | WPF `Image`、`MatrixTransform`、`BitmapSource`、`SaveFileDialog` | 无 |
-| `ExpanderPanel` | WPF `HeaderedContentControl`、`ToggleButton`、`ScaleTransform` 过渡动画、主题资源 | 无 |
+| `ExpanderPanel` | WPF `HeaderedContentControl`、`ToggleButton`、`LayoutTransform` 过渡动画、主题资源 | 无 |
 
 ## 开发注意事项
 
