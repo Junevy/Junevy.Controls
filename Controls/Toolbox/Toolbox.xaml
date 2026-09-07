@@ -3,7 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
     xmlns:cvt="clr-namespace:Junevy.Controls.Converters"
-    xmlns:local="clr-namespace:Junevy.Controls.Controls.Toolbox">
+    xmlns:local="clr-namespace:Junevy.Controls.Controls.Toolbox"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <Style x:Key="DefaultToolboxStyle" TargetType="{x:Type local:Toolbox}">
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
@@ -213,25 +214,53 @@
     <Style TargetType="{x:Type local:ToolItem}" BasedOn="{StaticResource DefaultToolItemStyle}" />
 
     <!--
-        紧凑（约 40px）工具栏项样式：
-        将触发器按钮由默认 48px 等比缩小到 40px，并同步缩小图标与标题字号；
+        紧凑（约 40px 窄列）工具栏项样式：
+        宽度不再固定（自适应拉伸以适配 40px 窄列，避免固定 Width + Margin 溢出被裁剪），
+        以 MinWidth / MinHeight 兜底最小可用尺寸；同时缩小图标与标题字号；
         弹出面板（PART_Popup）内的 ToolItem 仍使用默认样式，保持原尺寸不变。
     -->
     <Style x:Key="CompactToolboxItemStyle"
            BasedOn="{StaticResource DefaultToolboxItemStyle}"
            TargetType="{x:Type local:ToolboxItem}">
-        <Setter Property="Width" Value="40" />
-        <Setter Property="Height" Value="40" />
+        <!--  覆盖基样式的固定 Width：NaN 即 Auto，宽度随窄列可用空间自适应拉伸。  -->
+        <Setter Property="Width" Value="{x:Static sys:Double.NaN}" />
+        <Setter Property="MinWidth" Value="32" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <!--  覆盖基样式的固定 Height：NaN 即 Auto，配合 MinHeight 兜底；IconAndTitle 模式下可随按钮 MinHeight=60 自动增高。  -->
+        <Setter Property="Height" Value="{x:Static sys:Double.NaN}" />
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="Margin" Value="1" />
         <Setter Property="atc:Icon.IconSize" Value="12" />
         <Setter Property="FontSize" Value="10" />
     </Style>
 
-    <!--  紧凑工具栏容器：减小内边距并默认使用紧凑项样式。  -->
+    <!--
+        紧凑工具栏容器：内边距收窄（40px 窄列下尽量让出内容空间），
+        默认使用紧凑项样式，并为纵向内容溢出提供滚动支持（避免条目过多时被直接裁剪）。
+    -->
     <Style x:Key="CompactToolboxStyle"
            BasedOn="{StaticResource DefaultToolboxStyle}"
            TargetType="{x:Type local:Toolbox}">
-        <Setter Property="Padding" Value="2" />
+        <Setter Property="Padding" Value="1" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource CompactToolboxItemStyle}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:Toolbox}">
+                    <Border Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{DynamicResource Theme.ControlCornerRadius}">
+                        <ScrollViewer Focusable="False"
+                                      CanContentScroll="True"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      VerticalScrollBarVisibility="Auto">
+                            <ItemsPresenter />
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 </ResourceDictionary>

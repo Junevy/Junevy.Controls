@@ -25,25 +25,33 @@
                         Background="{TemplateBinding Background}"
                         CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
                         <Grid>
-                            <StackPanel x:Name="NormalLayout" Orientation="Horizontal">
-                                <ContentControl
-                                    x:Name="NormalIcon"
-                                    Margin="5"
-                                    VerticalAlignment="Center"
-                                    Content="{TemplateBinding Icon}"
-                                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=(atc:Icon.FontFamily)}"
-                                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=FontSize}"
-                                    Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=Foreground}" />
+                        <Grid x:Name="NormalLayout">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
 
-                                <TextBlock
-                                    x:Name="NormalTitle"
-                                    Margin="5"
-                                    VerticalAlignment="Center"
-                                    Background="Transparent"
-                                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=FontSize}"
-                                    Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=Foreground}"
-                                    Text="{TemplateBinding Title}" />
-                            </StackPanel>
+                            <ContentControl
+                                x:Name="NormalIcon"
+                                Grid.Column="0"
+                                Margin="5"
+                                VerticalAlignment="Center"
+                                Content="{TemplateBinding Icon}"
+                                FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=(atc:Icon.FontFamily)}"
+                                FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=FontSize}"
+                                Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=Foreground}" />
+
+                            <TextBlock
+                                x:Name="NormalTitle"
+                                Grid.Column="1"
+                                Margin="5"
+                                VerticalAlignment="Center"
+                                Background="Transparent"
+                                FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=FontSize}"
+                                Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=Foreground}"
+                                Text="{TemplateBinding Title}"
+                                TextTrimming="CharacterEllipsis" />
+                        </Grid>
 
                             <Grid x:Name="IconLayout" Visibility="Collapsed">
                                 <Grid.ColumnDefinitions>
@@ -69,7 +77,8 @@
                                     Background="Transparent"
                                     FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=FontSize}"
                                     Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=Foreground}"
-                                    Text="{TemplateBinding Title}" />
+                                    Text="{TemplateBinding Title}"
+                                    TextTrimming="CharacterEllipsis" />
                             </Grid>
                         </Grid>
                     </Border>
@@ -133,7 +142,17 @@
                             </Border>
                         </Grid>
 
-                        <ItemsPresenter x:Name="ItemHost" Margin="0,0,0,0" />
+                        <!--
+                            嵌套（二级及更深层）菜单宽度钳制：
+                            MaxWidth 绑定到本表头 Border 宽度，使子级菜单的期望宽度不会向上撑大
+                            一级 TreeViewItem 与整个 TreeMenu，控件自动宽度仅由最长的一级菜单决定；
+                            ClipToBounds 保证超出部分被截断，不绘制到相邻控件上。
+                        -->
+                        <ItemsPresenter
+                            x:Name="ItemHost"
+                            Margin="0,0,0,0"
+                            MaxWidth="{Binding ElementName=Root, Path=ActualWidth}"
+                            ClipToBounds="True" />
                     </StackPanel>
 
                     <ControlTemplate.Triggers>
@@ -195,10 +214,13 @@
                             </Border>
                         </Grid>
 
+                        <!--  同 DefaultTreeMenuTemplate：钳制子级宽度，避免展开后撑大控件。  -->
                         <ItemsPresenter
                             x:Name="ItemHost"
                             Grid.Row="1"
-                            Margin="0,0,0,0" />
+                            Margin="0,0,0,0"
+                            MaxWidth="{Binding ElementName=Root, Path=ActualWidth}"
+                            ClipToBounds="True" />
                     </StackPanel>
 
                     <ControlTemplate.Triggers>
@@ -258,6 +280,7 @@
                             Background="{DynamicResource Theme.Brush.Surface.Base}"
                             BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
                             BorderThickness="1"
+                            ClipToBounds="True"
                             CornerRadius="{DynamicResource Theme.ControlCornerRadius}">
                             <ItemsPresenter />
                         </Border>

@@ -15,6 +15,8 @@
     </ResourceDictionary.MergedDictionaries>
 
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+    <cvt:CornerRadiusFilterConverter x:Key="TopCornerRadius" Mode="Top" />
+    <cvt:CornerRadiusFilterConverter x:Key="BottomCornerRadius" Mode="Bottom" />
 
     <!--  1. TabItem style  -->
     <Style x:Key="DefaultTabMenuItemStyle" TargetType="{x:Type local:TabMenuItem}">
@@ -23,7 +25,8 @@
         <Setter Property="MinHeight" Value="20" />
         <!--<Setter Property="MinWidth" Value="120" />-->
         <Setter Property="HorizontalAlignment" Value="Left" />
-        <Setter Property="VerticalAlignment" Value="Center" />
+        <!--  Stretch使页签底边始终对齐页签行底部，与内容区上边框无缝衔接  -->
+        <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
@@ -40,8 +43,8 @@
                         Margin="0,0,2,0"
                         Background="{TemplateBinding Background}"
                         BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                        BorderThickness="1,1,1,0"
-                        CornerRadius="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=HeaderCornerRadius}">
+                        BorderThickness="1,1,1,1"
+                        CornerRadius="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=HeaderCornerRadius, Converter={StaticResource TopCornerRadius}, FallbackValue=4}">
 
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -121,15 +124,19 @@
                     </Border>
 
                     <ControlTemplate.Triggers>
+                        <!--  触发器后声明者优先：IsSelected需覆盖IsMouseOver，
+                              避免悬停选中页签时背景偏离内容区背景色  -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                        </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
+                            <!--  背景与内容区一致、去掉底边框，使选中页签与内容区视觉一体  -->
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.Background.App}" />
+                            <Setter TargetName="border" Property="BorderThickness" Value="1,1,1,0" />
                         </Trigger>
                         <Trigger Property="IsEditing" Value="True">
                             <Setter TargetName="PART_HeaderPresenter" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="PART_EditHeaderTextBox" Property="Visibility" Value="Visible" />
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
@@ -165,26 +172,21 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:TabMenu}">
-                    <Grid>
+                    <Grid Background="{TemplateBinding Background}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <!--  标签头  -->
-                        <ScrollViewer CanContentScroll="True"
-                                      HorizontalScrollBarVisibility="Auto"
-                                      VerticalScrollBarVisibility="Disabled">
-                            <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" />
-                        </ScrollViewer>
-
-                        <!--  内容  -->
+                        <!--  内容：上移1px，使上边框线延伸到页签行底部，作为页签之间的分割线。
+                              声明在页签行之前，页签行绘制在其上层——选中页签无底边框即可盖住分割线，与内容区连为一体  -->
                         <Border
                             Grid.Row="1"
+                            Margin="0,-1,0,0"
                             Background="{DynamicResource Theme.Brush.Background.App}"
                             BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                            BorderThickness="1,0,1,1"
-                            CornerRadius="{TemplateBinding ContentCornerRadius}">
+                            BorderThickness="1,1,1,1"
+                            CornerRadius="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ContentCornerRadius, Converter={StaticResource BottomCornerRadius}, FallbackValue=8}">
                             <ContentPresenter
                                 Margin="{TemplateBinding Padding}"
                                 ContentSource="SelectedContent"
@@ -192,6 +194,14 @@
                                 ContentTemplateSelector="{TemplateBinding SelectedContentTemplateSelector}"
                                 ContentStringFormat="{TemplateBinding SelectedContentStringFormat}" />
                         </Border>
+
+                        <!--  标签头（绘制在内容区上边框线之上）  -->
+                        <ScrollViewer
+                            CanContentScroll="True"
+                            HorizontalScrollBarVisibility="Auto"
+                            VerticalScrollBarVisibility="Disabled">
+                            <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" />
+                        </ScrollViewer>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
