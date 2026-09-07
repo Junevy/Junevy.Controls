@@ -172,6 +172,12 @@ namespace Junevy.Controls.Controls.Menu
         {
             try
             {
+                // 延迟派发期间页签可能已被移除，执行前需重新校验
+                if (!ContainsTab(tabItem))
+                {
+                    return;
+                }
+
                 object itemToRemove = GetItemForTab(tabItem);
 
                 if (tabItem.IsSelected && Items.Count > 1)

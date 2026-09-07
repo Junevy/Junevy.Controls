@@ -28,6 +28,7 @@ namespace Junevy.Controls.Controls.Menu
             if (headerTextBox != null)
             {
                 headerTextBox.LostFocus -= TextBox_LostFocus;
+                headerTextBox.PreviewKeyDown -= HeaderTextBox_PreviewKeyDown;
             }
 
             if (closeButton != null)
@@ -50,6 +51,7 @@ namespace Junevy.Controls.Controls.Menu
             }
 
             headerTextBox.LostFocus += TextBox_LostFocus;
+            headerTextBox.PreviewKeyDown += HeaderTextBox_PreviewKeyDown;
         }
 
         protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
@@ -97,6 +99,29 @@ namespace Junevy.Controls.Controls.Menu
         private void TextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             SetValue(IsEditingPropertyKey, false);
+        }
+
+        private void HeaderTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (sender is not TextBox textBox)
+            {
+                return;
+            }
+
+            switch (e.Key)
+            {
+                case Key.Enter:
+                    // 提交编辑：移出焦点，经LostFocus绑定把文本写回Header
+                    e.Handled = true;
+                    Keyboard.Focus(this);
+                    break;
+                case Key.Escape:
+                    // 取消编辑：绑定在LostFocus才写回，先恢复原文本再移出焦点即可还原
+                    e.Handled = true;
+                    textBox.Text = Header as string ?? string.Empty;
+                    Keyboard.Focus(this);
+                    break;
+            }
         }
 
         private static readonly DependencyPropertyKey IsEditingPropertyKey =
