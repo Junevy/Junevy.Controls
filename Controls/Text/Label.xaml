@@ -12,7 +12,12 @@
 
     <cvt:NullToCollapsedConverter x:Key="NullToVisibility" />
 
-    <ControlTemplate x:Key="DefaultLabelTemplate" TargetType="{x:Type local:Label}">
+    <!--
+        带背景标签模板（Error/Success/Warning/Neutral 共用）：
+        背景跟随 Background，由样式按 DisplayMode 注入状态色；
+        图标由 atc:Icon.Icon 提供（样式触发器注入各模式的默认图标，用户可用局部值覆盖），为空时折叠图标区域。
+    -->
+    <ControlTemplate x:Key="BoxedLabelTemplate" TargetType="{x:Type local:Label}">
         <Border
             x:Name="Bd"
             Padding="{TemplateBinding Padding}"
@@ -20,10 +25,9 @@
             CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
             SnapsToDevicePixels="True">
             <StackPanel Orientation="Horizontal">
-
                 <ContentControl
+                    x:Name="IconPresenter"
                     Margin="5,0,5,0"
-                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                     Content="{Binding RelativeSource={RelativeSource AncestorType=local:Label}, Path=(atc:Icon.Icon)}"
                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:Label}, Path=(atc:Icon.FontFamily)}"
@@ -32,148 +36,29 @@
                     Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:Label}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
                 <ContentPresenter
                     Margin="0,0,5,0"
-                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                     RecognizesAccessKey="True" />
             </StackPanel>
         </Border>
     </ControlTemplate>
 
-    <ControlTemplate x:Key="ErrorLabelTemplate" TargetType="{x:Type local:Label}">
-        <Border
-            x:Name="Bd"
-            Padding="{TemplateBinding Padding}"
-            Background="{DynamicResource Theme.Brush.Status.Danger}"
-            CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
-            SnapsToDevicePixels="True">
-            <StackPanel Orientation="Horizontal">
-
-                <ContentControl
-                    Margin="5,0,5,0"
-                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                    Content="&#xe61a;"
-                    FontFamily="{StaticResource IconFont}"
-                    FontSize="{TemplateBinding FontSize}"
-                    Foreground="{TemplateBinding Foreground}" />
-                <ContentPresenter
-                    Margin="0,0,5,0"
-                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                    RecognizesAccessKey="True" />
-            </StackPanel>
-        </Border>
-        <ControlTemplate.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.Brush.Status.DangerHover}" />
-            </Trigger>
-        </ControlTemplate.Triggers>
-    </ControlTemplate>
-
-    <ControlTemplate x:Key="SuccessLabelTemplate" TargetType="{x:Type local:Label}">
-        <Border
-            x:Name="Bd"
-            Padding="{TemplateBinding Padding}"
-            Background="{DynamicResource Theme.Brush.Status.Success}"
-            CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
-            SnapsToDevicePixels="True">
-            <StackPanel Orientation="Horizontal">
-                <ContentControl
-                    Margin="5,0,5,0"
-                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                    Content="&#xe613;"
-                    FontFamily="{StaticResource IconFont}"
-                    FontSize="{TemplateBinding FontSize}"
-                    Foreground="{TemplateBinding Foreground}" />
-                <ContentPresenter
-                    Margin="0,0,5,0"
-                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                    RecognizesAccessKey="True" />
-            </StackPanel>
-        </Border>
-        <ControlTemplate.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.Brush.Status.SuccessHover}" />
-            </Trigger>
-        </ControlTemplate.Triggers>
-    </ControlTemplate>
-
-    <ControlTemplate x:Key="WarningLabelTemplate" TargetType="{x:Type local:Label}">
-        <Border
-            x:Name="Bd"
-            Padding="{TemplateBinding Padding}"
-            Background="{DynamicResource Theme.Brush.Status.Warning}"
-            CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
-            SnapsToDevicePixels="True">
-            <StackPanel Orientation="Horizontal">
-
-                <ContentControl
-                    Margin="5,0,5,0"
-                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                    Content="&#xe932;"
-                    FontFamily="{StaticResource IconFont}"
-                    FontSize="{TemplateBinding FontSize}"
-                    Foreground="{TemplateBinding Foreground}" />
-                <ContentPresenter
-                    Margin="0,0,5,0"
-                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                    RecognizesAccessKey="True" />
-            </StackPanel>
-        </Border>
-        <ControlTemplate.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.Brush.Status.WarningHover}" />
-            </Trigger>
-        </ControlTemplate.Triggers>
-    </ControlTemplate>
-
-    <ControlTemplate x:Key="AccentLabelTemplate" TargetType="{x:Type local:Label}">
-        <Border
-            x:Name="Bd"
-            Padding="{TemplateBinding Padding}"
-            Background="{DynamicResource Theme.Brush.Accent.Primary}"
-            CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
-            SnapsToDevicePixels="True">
-            <StackPanel Orientation="Horizontal">
-                <ContentControl
-                    Margin="5,0,5,0"
-                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                    Content="{Binding RelativeSource={RelativeSource AncestorType=local:Label}, Path=(atc:Icon.Icon)}"
-                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:Label}, Path=(atc:Icon.FontFamily)}"
-                    FontSize="{TemplateBinding FontSize}"
-                    Foreground="{TemplateBinding Foreground}" />
-                <ContentPresenter
-                    Margin="0,0,5,0"
-                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                    RecognizesAccessKey="True" />
-            </StackPanel>
-        </Border>
-        <ControlTemplate.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.Brush.Accent.PrimaryHover}" />
-            </Trigger>
-        </ControlTemplate.Triggers>
-    </ControlTemplate>
-
-    <ControlTemplate x:Key="NoBorderLabelTemplate" TargetType="{x:Type local:Label}">
+    <!--
+        无边框标签模板（BorderlessError/BorderlessWarning/BorderlessNotice 共用）：
+        无背景色块，图标由 atc:Icon.Icon 提供（样式触发器注入默认图标，用户可覆盖），内容由 Content 提供。
+    -->
+    <ControlTemplate x:Key="PlainLabelTemplate" TargetType="{x:Type local:Label}">
         <StackPanel Orientation="Horizontal">
             <ContentControl
+                x:Name="IconPresenter"
                 Margin="5,0,5,0"
-                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                Content="{TemplateBinding Tag}"
-                FontFamily="{TemplateBinding FontFamily}"
+                Content="{Binding RelativeSource={RelativeSource AncestorType=local:Label}, Path=(atc:Icon.Icon)}"
+                FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:Label}, Path=(atc:Icon.FontFamily)}"
                 FontSize="{TemplateBinding FontSize}"
-                Foreground="{TemplateBinding Foreground}" />
+                Foreground="{TemplateBinding Foreground}"
+                Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:Label}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
             <ContentPresenter
                 Margin="0"
-                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                 RecognizesAccessKey="True" />
         </StackPanel>
@@ -188,63 +73,76 @@
         <Setter Property="FontFamily" Value="Arial" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="Template" Value="{StaticResource DefaultLabelTemplate}" />
+        <Setter Property="Template" Value="{StaticResource BoxedLabelTemplate}" />
         <Style.Triggers>
-            <Trigger Property="DisplayMode" Value="0">
-                <Setter Property="Template" Value="{StaticResource ErrorLabelTemplate}" />
+            <Trigger Property="DisplayMode" Value="Error">
+                <Setter Property="Background" Value="{DynamicResource Theme.Brush.Status.Danger}" />
+                <Setter Property="atc:Icon.Icon" Value="&#xe61a;" />
             </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="DisplayMode" Value="Error" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource Theme.Brush.Status.DangerHover}" />
+            </MultiTrigger>
 
-            <Trigger Property="DisplayMode" Value="1">
-                <Setter Property="Template" Value="{StaticResource SuccessLabelTemplate}" />
+            <Trigger Property="DisplayMode" Value="Success">
+                <Setter Property="Background" Value="{DynamicResource Theme.Brush.Status.Success}" />
+                <Setter Property="atc:Icon.Icon" Value="&#xe613;" />
             </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="DisplayMode" Value="Success" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource Theme.Brush.Status.SuccessHover}" />
+            </MultiTrigger>
 
-            <Trigger Property="DisplayMode" Value="-1">
-                <Setter Property="Template" Value="{StaticResource WarningLabelTemplate}" />
+            <Trigger Property="DisplayMode" Value="Warning">
+                <Setter Property="Background" Value="{DynamicResource Theme.Brush.Status.Warning}" />
+                <Setter Property="atc:Icon.Icon" Value="&#xe932;" />
             </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="DisplayMode" Value="Warning" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource Theme.Brush.Status.WarningHover}" />
+            </MultiTrigger>
 
-            <Trigger Property="DisplayMode" Value="10">
-                <Setter Property="Template" Value="{StaticResource NoBorderLabelTemplate}" />
+            <Trigger Property="DisplayMode" Value="BorderlessError">
+                <Setter Property="Template" Value="{StaticResource PlainLabelTemplate}" />
                 <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Status.Danger}" />
+                <Setter Property="atc:Icon.Icon" Value="&#xe61a;" />
                 <Setter Property="Margin" Value="0" />
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="FontSize" Value="14" />
-                <Setter Property="Content" Value="Error" />
-                <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
-                <Setter Property="Tag" Value="&#xe61a;" />
             </Trigger>
 
-            <Trigger Property="DisplayMode" Value="-11">
-                <Setter Property="Template" Value="{StaticResource NoBorderLabelTemplate}" />
+            <Trigger Property="DisplayMode" Value="BorderlessWarning">
+                <Setter Property="Template" Value="{StaticResource PlainLabelTemplate}" />
                 <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Status.Warning}" />
+                <Setter Property="atc:Icon.Icon" Value="&#xe932;" />
                 <Setter Property="Margin" Value="0" />
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="FontSize" Value="14" />
-                <Setter Property="Content" Value="Warning" />
-                <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
-                <Setter Property="Tag" Value="&#xe932;" />
             </Trigger>
 
-            <Trigger Property="DisplayMode" Value="11">
-                <Setter Property="Template" Value="{StaticResource NoBorderLabelTemplate}" />
+            <Trigger Property="DisplayMode" Value="BorderlessNotice">
+                <Setter Property="Template" Value="{StaticResource PlainLabelTemplate}" />
                 <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
+                <Setter Property="atc:Icon.Icon" Value="&#xe651;" />
                 <Setter Property="Margin" Value="0" />
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="FontSize" Value="14" />
-                <Setter Property="Content" Value="Notice" />
-                <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
-                <Setter Property="Tag" Value="&#xe651;" />
-            </Trigger>
-
-            <Trigger Property="DisplayMode" Value="100">
-                <Setter Property="Template" Value="{StaticResource DefaultLabelTemplate}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
 
     <Style BasedOn="{StaticResource BoxLabelStyle}" TargetType="{x:Type local:Label}" />
-    <!--<Style BasedOn="{StaticResource BoxLabelStyle}" TargetType="Label" />-->
 </ResourceDictionary>

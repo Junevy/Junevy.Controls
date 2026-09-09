@@ -11,7 +11,6 @@
 
     <cvt:NullToCollapsedConverter x:Key="NullToVisibility" />
     <cvt:IncreaseFontsizeConverter x:Key="IncreaseFontSize" />
-    <Thickness x:Key="ButtonContentSpacing">4,0</Thickness>
 
     <ControlTemplate x:Key="ButtonTemplate" TargetType="{x:Type local:Button}">
         <Border
@@ -32,27 +31,32 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <ContentControl
+                <!--
+                    图标区域：模板内一律使用 TemplateBinding 读取附加属性，
+                    避免 AncestorType 查找（更慢且在 Popup/嵌套模板中脆弱）；
+                    内容呈现使用 ContentPresenter 而非 ContentControl。
+                -->
+                <ContentPresenter
                     x:Name="IconPresenter"
                     Grid.Column="0"
-                    Width="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.IconSize)}"
-                    Margin="{StaticResource ButtonContentSpacing}"
+                    Width="{TemplateBinding atc:Icon.IconSize}"
+                    Margin="0,0,4,0"
                     VerticalAlignment="Center"
-                    Content="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.Icon)}"
+                    Content="{TemplateBinding atc:Icon.Icon}"
                     Focusable="False"
-                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.FontFamily)}"
-                    TextElement.FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.IconSize)}"
+                    TextElement.FontFamily="{TemplateBinding atc:Icon.FontFamily}"
+                    TextElement.FontSize="{TemplateBinding atc:Icon.IconSize}"
                     TextElement.Foreground="{TemplateBinding Foreground}"
-                    Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:Button}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
+                    Visibility="{TemplateBinding atc:Icon.Icon, Converter={StaticResource NullToVisibility}}" />
 
                 <ContentPresenter
                     x:Name="ContentPresenter"
                     Grid.Column="1"
-                    Margin="{StaticResource ButtonContentSpacing}"
                     HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                     ContentSource="Content"
                     RecognizesAccessKey="True"
+                    TextElement.FontFamily="{TemplateBinding FontFamily}"
                     TextElement.FontSize="{TemplateBinding FontSize}"
                     TextElement.Foreground="{TemplateBinding Foreground}" />
             </Grid>
@@ -78,16 +82,19 @@
             x:Name="ContentBorder"
             MinWidth="{TemplateBinding MinWidth}"
             MinHeight="{TemplateBinding MinHeight}"
+            Padding="{TemplateBinding Padding}"
             Background="Transparent"
-            CornerRadius="{TemplateBinding Border.CornerRadius}">
+            CornerRadius="{TemplateBinding Border.CornerRadius}"
+            SnapsToDevicePixels="True"
+            UseLayoutRounding="True">
             <ContentPresenter
                 x:Name="ContentPresenter"
-                Margin="{StaticResource ButtonContentSpacing}"
                 HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                 ContentSource="Content"
                 RecognizesAccessKey="True"
                 TextElement.FontFamily="{TemplateBinding FontFamily}"
+                TextElement.FontSize="{TemplateBinding FontSize}"
                 TextElement.Foreground="{TemplateBinding Foreground}" />
         </Border>
 
@@ -103,7 +110,6 @@
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="ContentBorder" Property="Opacity" Value="0.5" />
                 <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
-                <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>

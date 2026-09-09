@@ -237,7 +237,7 @@ ThemeManager.ToggleTheme();
 
 ### ComboBox 与 ComboBoxItem
 
-`jv:ComboBox` 继承 WPF `ComboBox`，支持标准 `ItemsSource`、`ItemTemplate`、可编辑模式、键盘操作和选择绑定。`jv:ComboBoxItem` 是对应的公开容器类型；绑定数据时通常不需要手动创建它。
+`jv:ComboBox` 继承 WPF `ComboBox`，支持标准 `ItemsSource`、`ItemTemplate`、可编辑模式、键盘操作和选择绑定。不可编辑时，单击主体区域与单击箭头按钮等效：展开未打开的下拉，再次单击则折叠。`jv:ComboBoxItem` 是对应的公开容器类型；绑定数据时通常不需要手动创建它。
 
 额外属性 `PlaceHolder` 会在没有选中项时显示占位文本。
 
@@ -313,39 +313,39 @@ ThemeManager.ToggleTheme();
 
 ### Label
 
-`jv:Label` 继承 WPF `Label`，用于状态标签和带图标的提示文本。
+`jv:Label` 继承 WPF `Label`，用于状态标签和带图标的提示文本。`DisplayMode` 为枚举 `LabelDisplayMode`（历史魔数取值已映射为枚举成员，数值保持兼容）。
 
-| `DisplayMode` | 效果 |
+| `DisplayMode`（`LabelDisplayMode`） | 效果 |
 | --- | --- |
-| `0` | 错误色块标签 |
-| `1` | 成功色块标签 |
-| `-1` | 警告色块标签 |
-| `10` | 无边框 Error 提示 |
-| `-11` | 无边框 Warning 提示 |
-| `11` | 无边框 Notice 提示 |
-| `100` | 默认强调色标签 |
+| `Error`（`0`，默认） | 错误色块标签 |
+| `Success`（`1`） | 成功色块标签 |
+| `Warning`（`-1`） | 警告色块标签 |
+| `BorderlessError`（`10`） | 无边框 Error 提示 |
+| `BorderlessWarning`（`-11`） | 无边框 Warning 提示 |
+| `BorderlessNotice`（`11`） | 无边框 Notice 提示 |
+| `Neutral`（`100`） | 中性标签，背景跟随 `Background` |
 
-`DisplayMode=0`、`1`、`-1` 使用模板内置的固定状态图标；`10`、`-11`、`11` 使用各自固定的无边框提示图标。`DisplayMode=100` 的默认模板才读取 `atc:Icon.Icon` 和 `atc:Icon.FontFamily`，图标为空时会折叠图标区域。
+标签内容始终由 `Content` 提供，样式不会改写。各模式通过样式触发器注入默认图标（`atc:Icon.Icon`），可用局部值覆盖；图标为空时折叠图标区域。所有模式均读取 `atc:Icon.Icon` 和 `atc:Icon.FontFamily`。
 
 ```xml
 <StackPanel Orientation="Horizontal">
-    <jv:Label Content="Connected" DisplayMode="1" />
-    <jv:Label Content="Low exposure" DisplayMode="-1" />
-    <jv:Label atc:Icon.Icon="&#xE651;" Content="Notice" DisplayMode="100" />
+    <jv:Label Content="Connected" DisplayMode="Success" />
+    <jv:Label Content="Low exposure" DisplayMode="Warning" />
+    <jv:Label atc:Icon.Icon="&#xE651;" Content="Notice" DisplayMode="Neutral" />
 </StackPanel>
 ```
 
-### TextTitle
+### TextBlock
 
-`jv:TextTitle` 继承 WPF `ContentControl`，左侧显示 `Content`，右侧显示 `Title`，适合图标或图片加标题的组合。
+`jv:TextBlock`（原 `TextTitle`）继承 WPF `ContentControl`，左侧显示 `Content`，右侧显示 `Text`，适合图标或图片加标题的组合。作为纯显示控件，默认 `Focusable=False`、`IsTabStop=False`。
 
 ```xml
-<jv:TextTitle Title="Inspection Station" FontSize="20">
+<jv:TextBlock Text="Inspection Station" FontSize="20">
     <Image Width="32" Height="32" Source="/Resources;component/PNG/inspector.png" />
-</jv:TextTitle>
+</jv:TextBlock>
 ```
 
-依赖：标准 `Content`/`ContentTemplate` 和 `Title` 依赖属性，无专用附加属性。
+依赖：标准 `Content`/`ContentTemplate` 管线和 `Text`、`TextAlignment`、`TextWrapping` 依赖属性，无专用附加属性。标题文本超宽时以省略号截断（`TextTrimming`），可通过对齐/内边距属性覆盖模板默认值。
 
 ## 菜单与导航控件
 
@@ -493,6 +493,7 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
 | `CloseTab(TabMenuItem)` | 通过代码关闭指定页签 |
 | `TabMenuItem.Icon` | 页签图标 |
 | `TabMenuItem.IsEditing` | 双击文字标题进入编辑时的只读状态 |
+| `TabMenuItem.CanRename` | 是否允许双击标题重命名，默认 `true`；设为 `false` 后双击不再进入编辑态，编辑中被禁用会立即退出编辑并保留当前文本 |
 
 直接声明页签：
 
@@ -909,7 +910,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | 按钮 | `Button`、`CardButton`、`ToggleButton`、`RadioButton` |
 | 输入/选择 | `CheckBox`、`TextBox`、`ComboBox`、`ComboBoxItem` |
 | 集合/数据 | `ListBox`、`ListView`、`DataGrid` |
-| 文本/状态 | `Label`、`TextTitle` |
+| 文本/状态 | `Label`、`TextBlock` |
 | 通知 | `MessageBar`、`MessageBarPresenter`、`MessageBarService` |
 | 窗口 | `DialogWindow` |
 | 布局 | `ExpanderPanel` |
@@ -935,7 +936,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ListView` | WPF `ListView`、`GridView`、虚拟化和转换器 | `Border.CornerRadius` |
 | `DataGrid` | WPF `DataGrid`、标准列/行/单元格容器、虚拟化 | 无 |
 | `Label` | WPF `Label`、状态和图标资源 | `Icon.Icon`、`Icon.FontFamily`（仅相应模板） |
-| `TextTitle` | WPF `ContentControl`、标准内容模板管线 | 无 |
+| `TextBlock` | WPF `ContentControl`、`ContentPresenter`、标准内容模板管线 | 无 |
 | `MessageBar` | WPF `ContentControl`、`DispatcherTimer`、`jv:Button` 关闭按钮、主题资源 | `Icon.FontFamily`、`Icon.IconSize` |
 | `MessageBarPresenter` | WPF `ContentControl`、承载 `MessageBar`，配合 `MessageBarService` | 无 |
 | `DialogWindow` | WPF `Window`、`WindowChrome`、`SystemCommands`、主题资源（含阴影/圆角令牌） | 无 |
