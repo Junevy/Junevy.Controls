@@ -83,7 +83,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="DefaultListBoxStyle" TargetType="{x:Type local:ListBox}">
+    <Style x:Key="DefaultListBoxStyle" TargetType="ListBox">
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
@@ -113,7 +113,7 @@
 
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:ListBox}">
+                <ControlTemplate TargetType="ListBox">
                     <Border
                         x:Name="Root"
                         Padding="{TemplateBinding Padding}"
@@ -161,5 +161,9 @@
         </Setter>
     </Style>
 
+    <!--  隐式样式（官方类型）：App 合并字典后 <ListBox> 自动生效  -->
+    <Style BasedOn="{StaticResource DefaultListBoxStyle}" TargetType="ListBox" />
+
+    <!--  隐式样式（派生类型）：jv:ListBox 照常使用主题样式  -->
     <Style BasedOn="{StaticResource DefaultListBoxStyle}" TargetType="{x:Type local:ListBox}" />
 </ResourceDictionary>

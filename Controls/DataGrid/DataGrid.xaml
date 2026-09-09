@@ -1,10 +1,18 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
+    xmlns:cvt="clr-namespace:Junevy.Controls.Converters"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.DataGrid">
 
-    <!--  琛ㄥご鏍峰紡  -->
-    <Style x:Key="SimpleColumnHeaderStyle" TargetType="DataGridColumnHeader">
+    <!--
+        null / 空白字符串 → Collapsed：
+        用于空态提示（atc:DataGridAssist.EmptyText）非空校验。
+    -->
+    <cvt:NullToCollapsedConverter x:Key="NullToVisibility" />
+
+    <!--  列标题样式：Sunken 表头、底部分隔线、悬停高亮与排序方向指示箭头  -->
+    <Style x:Key="DefaultDataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
@@ -13,6 +21,7 @@
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="DataGridColumnHeader">
@@ -21,22 +30,101 @@
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}">
-                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ContentPresenter
+                                Grid.Column="0"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                            <Path
+                                x:Name="SortArrow"
+                                Grid.Column="1"
+                                Width="9"
+                                Height="6"
+                                Margin="6,0,0,0"
+                                VerticalAlignment="Center"
+                                Data="M 0 5 L 4.5 0.5 L 9 5"
+                                RenderTransformOrigin="0.5,0.5"
+                                Stretch="None"
+                                Stroke="{TemplateBinding Foreground}"
+                                StrokeThickness="1.5"
+                                Visibility="Collapsed" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                        </Trigger>
+                        <Trigger Property="SortDirection" Value="Ascending">
+                            <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="SortDirection" Value="Descending">
+                            <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="SortArrow" Property="RenderTransform">
+                                <Setter.Value>
+                                    <RotateTransform Angle="180" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  行头样式（HeadersVisibility=Row / All 时使用）  -->
+    <Style x:Key="DefaultDataGridRowHeaderStyle" TargetType="DataGridRowHeader">
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="0,0,1,1" />
+        <Setter Property="MinWidth" Value="24" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridRowHeader">
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <!--  鍗曞厓鏍兼牱寮? -->
-    <Style x:Key="SimpleCellStyle" TargetType="DataGridCell">
-        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+    <!--  左上角全选按钮样式（HeadersVisibility=All 时使用）  -->
+    <Style x:Key="DefaultDataGridSelectAllButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="0,0,1,1" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        单元格样式：
+        背景透明，行悬停/选中色直接透出；底部细分隔线；键盘焦点时底部分隔线切换为主题焦点色。
+    -->
+    <Style x:Key="DefaultDataGridCellStyle" TargetType="DataGridCell">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Subtle}" />
         <Setter Property="BorderThickness" Value="0,0,0,1" />
         <Setter Property="Padding" Value="12,8" />
         <Setter Property="FontSize" Value="13" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="DataGridCell">
@@ -45,7 +133,7 @@
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}">
-                        <ContentPresenter />
+                        <ContentPresenter VerticalAlignment="Center" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
@@ -55,11 +143,14 @@
                 <Setter Property="Background" Value="{DynamicResource Theme.Brush.Accent.PrimarySubtle}" />
                 <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
             </Trigger>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Focus}" />
+            </Trigger>
         </Style.Triggers>
     </Style>
 
-    <!--  琛屾牱寮忎笌鎮仠鏃舵敼鍙樿儗鏅? -->
-    <Style x:Key="SimpleRowStyle" TargetType="DataGridRow">
+    <!--  行样式：悬停高亮与选中背景（单元格透明，颜色直接透出）  -->
+    <Style x:Key="DefaultDataGridRowStyle" TargetType="DataGridRow">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="MinHeight" Value="36" />
@@ -73,23 +164,144 @@
         </Style.Triggers>
     </Style>
 
-    <!--  DataGrid 鏍峰紡  -->
-    <Style x:Key="SimpleDataGridStyle" TargetType="DataGrid">
+    <!--
+        DataGrid 控件模板（官方模板部件契约）：
+        PART_ColumnHeadersPresenter / PART_RowsPresenter / PART_ScrollContentPresenter 均按
+        WPF DataGrid 模板约定命名，DataGrid 内部会将 RowsPresenter 移交给 ScrollContentPresenter
+        完成滚动；滚动条由主题级隐式 ScrollBar 样式提供。
+    -->
+    <ControlTemplate x:Key="DefaultDataGridTemplate" TargetType="DataGrid">
+        <Border
+            Padding="{TemplateBinding Padding}"
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}"
+            ClipToBounds="True"
+            CornerRadius="{DynamicResource Theme.ControlCornerRadius}"
+            SnapsToDevicePixels="True"
+            UseLayoutRounding="True">
+            <ScrollViewer Focusable="False">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!--  HeadersVisibility=All 时的左上角全选按钮  -->
+                    <Button
+                        Command="{x:Static DataGrid.SelectAllCommand}"
+                        Focusable="False"
+                        Style="{StaticResource DefaultDataGridSelectAllButtonStyle}"
+                        Visibility="{Binding HeadersVisibility,
+                                             ConverterParameter={x:Static DataGridHeadersVisibility.All},
+                                             Converter={x:Static DataGrid.HeadersVisibilityConverter},
+                                             RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"
+                        Width="{Binding CellsPanelHorizontalOffset, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+
+                    <!--  列标题容器  -->
+                    <DataGridColumnHeadersPresenter
+                        x:Name="PART_ColumnHeadersPresenter"
+                        Grid.Column="1"
+                        Visibility="{Binding HeadersVisibility,
+                                             ConverterParameter={x:Static DataGridHeadersVisibility.Column},
+                                             Converter={x:Static DataGrid.HeadersVisibilityConverter},
+                                             RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+
+                    <!--  HeadersVisibility=None 的兜底容器（RowsPresenter 之后会被移入 ScrollContentPresenter）  -->
+                    <Grid
+                        Grid.Row="1"
+                        Grid.ColumnSpan="2"
+                        Visibility="{Binding HeadersVisibility,
+                                             ConverterParameter={x:Static DataGridHeadersVisibility.None},
+                                             Converter={x:Static DataGrid.HeadersVisibilityConverter},
+                                             RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}">
+                        <DataGridRowsPresenter x:Name="PART_RowsPresenter" />
+                    </Grid>
+
+                    <!--  行滚动视口：DataGrid 内部会把 PART_RowsPresenter 设为其 Content  -->
+                    <ScrollContentPresenter
+                        x:Name="PART_ScrollContentPresenter"
+                        Grid.Row="1"
+                        Grid.ColumnSpan="2"
+                        CanContentScroll="{TemplateBinding ScrollViewer.CanContentScroll}" />
+
+                    <!--  空态提示：Items 为空且 EmptyText 非空时显示在内容区中央  -->
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.ColumnSpan="2"
+                        Margin="16"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="13"
+                        Foreground="{DynamicResource Theme.Brush.Text.Tertiary}"
+                        IsHitTestVisible="False"
+                        Text="{Binding Path=(atc:DataGridAssist.EmptyText), RelativeSource={RelativeSource TemplatedParent}}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding Items.Count, RelativeSource={RelativeSource TemplatedParent}}" Value="0" />
+                                            <Condition
+                                                Binding="{Binding Path=(atc:DataGridAssist.EmptyText),
+                                                                  RelativeSource={RelativeSource TemplatedParent},
+                                                                  Converter={StaticResource NullToVisibility}}"
+                                                Value="Visible" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <!--  底部收边线  -->
+                    <Rectangle
+                        x:Name="PART_BottomLeftCorner"
+                        Grid.Row="2"
+                        Height="1"
+                        Fill="{DynamicResource Theme.Brush.Border.Subtle}" />
+                    <Rectangle
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Height="1"
+                        Fill="{DynamicResource Theme.Brush.Border.Subtle}" />
+                    <Rectangle
+                        x:Name="PART_LowerRightCorner"
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        Height="1"
+                        Fill="{DynamicResource Theme.Brush.Border.Subtle}" />
+                </Grid>
+            </ScrollViewer>
+        </Border>
+    </ControlTemplate>
+
+    <!--  DataGrid 控件样式  -->
+    <Style x:Key="DefaultDataGridStyle" TargetType="DataGrid">
+        <Setter Property="Template" Value="{StaticResource DefaultDataGridTemplate}" />
+        <Setter Property="ColumnHeaderStyle" Value="{StaticResource DefaultDataGridColumnHeaderStyle}" />
+        <Setter Property="RowHeaderStyle" Value="{StaticResource DefaultDataGridRowHeaderStyle}" />
+        <Setter Property="CellStyle" Value="{StaticResource DefaultDataGridCellStyle}" />
+        <Setter Property="RowStyle" Value="{StaticResource DefaultDataGridRowStyle}" />
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="GridLinesVisibility" Value="None" />
+        <Setter Property="HeadersVisibility" Value="Column" />
         <Setter Property="EnableRowVirtualization" Value="True" />
         <Setter Property="EnableColumnVirtualization" Value="True" />
         <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
         <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
         <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
-        <Setter Property="HeadersVisibility" Value="Column" />
-        <Setter Property="RowHeaderWidth" Value="0" />
-        <Setter Property="ColumnHeaderStyle" Value="{StaticResource SimpleColumnHeaderStyle}" />
-        <Setter Property="CellStyle" Value="{StaticResource SimpleCellStyle}" />
-        <Setter Property="RowStyle" Value="{StaticResource SimpleRowStyle}" />
-        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
-        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CanUserAddRows" Value="False" />
         <Setter Property="CanUserDeleteRows" Value="False" />
         <Setter Property="CanUserResizeRows" Value="False" />
@@ -97,6 +309,10 @@
         <Setter Property="SelectionUnit" Value="FullRow" />
     </Style>
 
-    <Style BasedOn="{StaticResource SimpleDataGridStyle}" TargetType="{x:Type local:DataGrid}" />
+    <!--  隐式样式（官方类型）：App 合并字典后 <DataGrid> 自动生效  -->
+    <Style BasedOn="{StaticResource DefaultDataGridStyle}" TargetType="DataGrid" />
+
+    <!--  隐式样式（派生类型）：jv:DataGrid 照常使用主题样式  -->
+    <Style BasedOn="{StaticResource DefaultDataGridStyle}" TargetType="{x:Type local:DataGrid}" />
 
 </ResourceDictionary>

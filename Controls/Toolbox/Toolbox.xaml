@@ -49,6 +49,7 @@
                 <ControlTemplate TargetType="{x:Type local:ToolboxItem}">
                     <Grid>
                         <Button x:Name="PART_TriggerButton"
+                                Style="{x:Null}"
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
