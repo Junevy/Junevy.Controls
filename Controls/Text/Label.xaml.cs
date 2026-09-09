@@ -11,16 +11,19 @@ namespace Junevy.Controls.Controls.Text
                 new FrameworkPropertyMetadata(typeof(Label)));
         }
 
-
-        public int DisplayMode
+        /// <summary>
+        /// 标签的显示模式（决定背景与图标外观）。内容始终由 Content 提供，样式不会改写。
+        /// </summary>
+        public LabelDisplayMode DisplayMode
         {
-            get { return (int)GetValue(DisplayModeProperty); }
+            get { return (LabelDisplayMode)GetValue(DisplayModeProperty); }
             set { SetValue(DisplayModeProperty, value); }
         }
+
+        /// <summary>
+        /// 标识 <see cref="DisplayMode"/> 的依赖属性。
+        /// </summary>
         public static readonly DependencyProperty DisplayModeProperty =
-            DependencyProperty.Register("DisplayMode", typeof(int), typeof(Label), new PropertyMetadata(0));
-
-
-
+            DependencyProperty.Register(nameof(DisplayMode), typeof(LabelDisplayMode), typeof(Label), new PropertyMetadata(LabelDisplayMode.Error));
     }
 }
