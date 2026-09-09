@@ -46,6 +46,8 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `<ComboBox>` | 外观 + 交互 | 占位符（`PlaceHolder`）与主体单击切换折叠逻辑在 `jv:ComboBox` 中，原生实例走 WPF 原生行为 |
 | `<ListBox>` / `<ListView>` | 外观 + 交互 | 完整等效 |
 | `<DataGrid>` | 外观 + 交互 | 完整等效（含专属模板）；空态提示通过附加属性 `atc:DataGridAssist.EmptyText` 提供，原生与 `jv:` 实例均可用 |
+| `<DatePicker>` | 外观 + 交互 | 完整等效（含日历全套模板）；占位符通过附加属性 `atc:DatePickerAssist.PlaceHolder` 提供，原生实例可用 |
+| `<ToolTip>` | 外观 | 完整等效，任意元素的 `ToolTip` 属性自动获得主题样式 |
 
 以下控件因依赖自有依赖属性（样式触发器直接引用），**必须使用 `jv:` 前缀**：`RadioButton`、`ToggleButton`（`DisplayMode`/`SwitchWidth`/`SwitchHeight`）、`Label`（`DisplayMode`）、`TextBlock`（`Text`/`TextAlignment`/`TextWrapping`）、`ProgressBar`（`ProgressText` 等）。
 
@@ -302,6 +304,19 @@ ThemeManager.ToggleTheme();
 ```
 
 依赖：标准 `Header`/`Content` 管线、主题资源，模板通过 `Border.CornerRadius` 读取圆角。
+
+### DatePicker
+
+`DatePicker` 为 WPF 官方控件的完整主题接管（无 `jv:` 派生类）：输入框、下拉日历图标与 `Calendar` 弹层全部按官方模板部件契约实现（`PART_Root`/`PART_TextBox`/`PART_Button`/`PART_Calendar`，Calendar/CalendarItem/CalendarDayButton/CalendarButton 全套）。视觉与库内一致：卡片输入框（悬停/聚焦/展开高亮、禁用态）、日历卡片带阴影、今日高亮与选中色、月/年视图导航。合并 `Themes/Generic.xaml` 后，原生写法 `<DatePicker>` 直接生效。
+
+```xml
+<DatePicker SelectedDate="{Binding BeginDate}"
+            atc:DatePickerAssist.PlaceHolder="选择开始日期" />
+```
+
+**占位符**：`atc:DatePickerAssist.PlaceHolder` 为附加属性（未选日期且文本为空时显示），官方原生实例同样支持，不设置则无占位文案。
+
+依赖：WPF `DatePicker`/`Calendar` 标准行为（`SelectedDateFormat`、`FirstDayOfWeek`、`BlackoutDates` 等）、主题滚动条与阴影令牌；附加属性 `atc:DatePickerAssist.PlaceHolder`（占位符）。
 
 ## 集合与数据控件
 
@@ -875,6 +890,17 @@ private void OnSaved()
 
 依赖：WPF `ContentControl`、`DispatcherTimer` 动画与计时、`jv:Button`（关闭按钮）、主题资源和内置图标字体；图标跟随 `atc:Icon.FontFamily` 与 `atc:Icon.IconSize`。
 
+### ToolTip
+
+`ToolTip` 为 WPF 官方控件的完整主题接管（无 `jv:` 派生类）：悬浮卡片式提示——`Surface.Overlay` 表面、细边框、主题圆角，系统级阴影由 `HasDropShadow` 提供。合并 `Themes/Generic.xaml` 后，任意元素的 `ToolTip` 属性自动获得该样式，无需 `jv:` 前缀。
+
+```xml
+<TextBlock Text="曝光增益"
+           ToolTip="取值范围 1.0 - 16.0，调整后立即生效" />
+```
+
+依赖：WPF `ToolTip` 标准行为（`Placement`、`InitialShowDelay` 等），主题资源。
+
 ## 窗口控件
 
 ### DialogWindow
@@ -956,10 +982,10 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | --- | --- |
 | 应用栏 | `AppBar` |
 | 按钮 | `Button`、`CardButton`、`ToggleButton`、`RadioButton` |
-| 输入/选择 | `CheckBox`、`TextBox`、`ComboBox`、`ComboBoxItem` |
+| 输入/选择 | `CheckBox`、`TextBox`、`ComboBox`、`ComboBoxItem`、`DatePicker` |
 | 集合/数据 | `ListBox`、`ListView`、`DataGrid` |
 | 文本/状态 | `Label`、`TextBlock` |
-| 通知 | `MessageBar`、`MessageBarPresenter`、`MessageBarService` |
+| 通知 | `MessageBar`、`MessageBarPresenter`、`MessageBarService`、`ToolTip` |
 | 窗口 | `DialogWindow` |
 | 布局 | `ExpanderPanel`、`GroupBox` |
 | 菜单/导航 | `ContextMenu`、`ContextMenuItem`、`MenuItem`、`SideMenu`、`TreeMenu`、`TreeMenuItem`、`TabMenu`、`TabMenuItem`、`ToolBar`、`ToolBarItem`、`Toolbox`、`ToolboxItem`、`ToolItem` |
@@ -983,6 +1009,8 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ListBox` | WPF `ListBox`、`ListBoxItem`、虚拟化和滚动资源 | 无 |
 | `ListView` | WPF `ListView`、`GridView`、虚拟化和转换器 | `Border.CornerRadius` |
 | `DataGrid` | WPF `DataGrid`、标准列/行/单元格容器、虚拟化、主题滚动条 | `atc:DataGridAssist.EmptyText` |
+| `DatePicker` | WPF `DatePicker`/`Calendar`、官方模板部件契约、主题阴影令牌 | `atc:DatePickerAssist.PlaceHolder` |
+| `ToolTip` | WPF `ToolTip`、主题资源 | 无 |
 | `Label` | WPF `Label`、状态和图标资源 | `Icon.Icon`、`Icon.FontFamily`（仅相应模板） |
 | `TextBlock` | WPF `ContentControl`、`ContentPresenter`、标准内容模板管线 | 无 |
 | `MessageBar` | WPF `ContentControl`、`DispatcherTimer`、`jv:Button` 关闭按钮、主题资源 | `Icon.FontFamily`、`Icon.IconSize` |

@@ -129,6 +129,12 @@
                 <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Strong}" />
             </Trigger>
 
+            <!--  只读态：底色下沉 + 光标恢复箭头（区别于可编辑态）  -->
+            <Trigger Property="IsReadOnly" Value="True">
+                <Setter TargetName="Border" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
+                <Setter Property="Cursor" Value="Arrow" />
+            </Trigger>
+
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="Border" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
                 <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />

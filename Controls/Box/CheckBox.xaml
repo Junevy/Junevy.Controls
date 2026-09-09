@@ -13,7 +13,7 @@
         <Grid Background="Transparent">
             <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
 
-                <!--  澶栨  -->
+                <!--  勾选框  -->
                 <Border
                     x:Name="CheckBorder"
                     Width="18"
@@ -23,7 +23,7 @@
                     BorderThickness="1.5"
                     CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
 
-                    <!--  鍕鹃€夊浘鏍?  -->
+                    <!--  勾选图标  -->
                     <TextBlock
                         x:Name="CheckMark"
                         HorizontalAlignment="Center"
@@ -35,7 +35,7 @@
                         Text="&#xe611;" />
                 </Border>
 
-                <!--  鏂囧瓧  -->
+                <!--  文本  -->
                 <ContentPresenter
                     Margin="8,0,0,0"
                     VerticalAlignment="Center"
@@ -69,7 +69,23 @@
                 <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.PrimaryHover}" />
             </MultiTrigger>
 
-            <!--  Disabled  -->
+            <!--  Pressed（按下反馈：未勾选时边框加深 + 底色浮现）  -->
+            <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.PrimaryHover}" />
+                <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.Brush.Accent.PrimarySubtle}" />
+            </Trigger>
+
+            <!--  Checked + Pressed（按下反馈：勾选底色加深）  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="IsPressed" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.Brush.Accent.PrimaryPressed}" />
+                <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.PrimaryPressed}" />
+            </MultiTrigger>
+
+            <!--  Disabled（最后声明，保证覆盖所有状态）  -->
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
                 <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />

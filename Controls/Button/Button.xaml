@@ -109,7 +109,6 @@
 
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="ContentBorder" Property="Opacity" Value="0.5" />
-                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
