@@ -91,7 +91,7 @@
                             <GridViewRowPresenter
                                 x:Name="GridViewContent"
                                 Content="{TemplateBinding Content}"
-                                Columns="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ListView}}, Path=View, Converter={StaticResource GridViewColumnsConverter}}"
+                                Columns="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}}, Path=View, Converter={StaticResource GridViewColumnsConverter}}"
                                 TextElement.FontFamily="{TemplateBinding FontFamily}"
                                 TextElement.FontSize="{TemplateBinding FontSize}"
                                 TextElement.FontStretch="{TemplateBinding FontStretch}"
@@ -119,7 +119,7 @@
 
                     <ControlTemplate.Triggers>
                         <DataTrigger
-                            Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ListView}}, Path=View, Converter={StaticResource IsGridViewConverter}}"
+                            Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}}, Path=View, Converter={StaticResource IsGridViewConverter}}"
                             Value="False">
                             <Setter TargetName="GridViewContent" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="ContentSite" Property="Visibility" Value="Visible" />
@@ -155,7 +155,7 @@
         </Setter>
     </Style>
 
-    <ControlTemplate x:Key="DefaultListViewTemplate" TargetType="{x:Type local:ListView}">
+    <ControlTemplate x:Key="DefaultListViewTemplate" TargetType="ListView">
         <Border
             x:Name="Root"
             Padding="{TemplateBinding Padding}"
@@ -196,7 +196,7 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
-    <ControlTemplate x:Key="DefaultGridViewListViewTemplate" TargetType="{x:Type local:ListView}">
+    <ControlTemplate x:Key="DefaultGridViewListViewTemplate" TargetType="ListView">
         <ControlTemplate.Resources>
             <Style
                 BasedOn="{StaticResource DefaultListViewColumnHeaderStyle}"
@@ -243,7 +243,7 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
-    <Style x:Key="DefaultListViewStyle" TargetType="{x:Type local:ListView}">
+    <Style x:Key="DefaultListViewStyle" TargetType="ListView">
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
@@ -271,6 +271,17 @@
         <Setter Property="Template" Value="{StaticResource DefaultListViewTemplate}" />
     </Style>
 
+    <!--  隐式样式（官方类型）：App 合并字典后 <ListView> 自动生效  -->
+    <Style BasedOn="{StaticResource DefaultListViewStyle}" TargetType="ListView">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding View, RelativeSource={RelativeSource Self}, Converter={StaticResource IsGridViewConverter}}"
+                         Value="True">
+                <Setter Property="Template" Value="{StaticResource DefaultGridViewListViewTemplate}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--  隐式样式（派生类型）：jv:ListView 照常使用主题样式  -->
     <Style BasedOn="{StaticResource DefaultListViewStyle}" TargetType="{x:Type local:ListView}">
         <Style.Triggers>
             <DataTrigger Binding="{Binding View, RelativeSource={RelativeSource Self}, Converter={StaticResource IsGridViewConverter}}"

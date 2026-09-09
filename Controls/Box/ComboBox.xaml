@@ -56,7 +56,7 @@
 
 
 
-    <ControlTemplate x:Key="DefaultComboBoxTemplate" TargetType="{x:Type local:ComboBox}">
+    <ControlTemplate x:Key="DefaultComboBoxTemplate" TargetType="ComboBox">
         <Grid>
             <!--  涓讳綋杈规  -->
             <Border
@@ -88,9 +88,11 @@
 
                     <!-- WPF's editable ComboBox contract.  Keeping this named
                          PART lets keyboard input and Text binding work while
-                         preserving the custom visual style. -->
+                         preserving the custom visual style. Style is pinned to
+                         null so the implicit TextBox style cannot restyle it. -->
                     <TextBox
                         x:Name="PART_EditableTextBox"
+                        Style="{x:Null}"
                         Grid.Column="0"
                         Margin="{TemplateBinding Padding}"
                         Padding="0"
@@ -112,7 +114,7 @@
                         FontSize="{TemplateBinding FontSize}"
                         Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
                         IsHitTestVisible="False"
-                        Text="{TemplateBinding PlaceHolder}"
+                        Text="{Binding PlaceHolder, RelativeSource={RelativeSource TemplatedParent}, FallbackValue=''}"
                         Visibility="Collapsed" />
 
 
@@ -215,8 +217,8 @@
     </ControlTemplate>
 
 
-    <!--  ComboBox 涓绘牱寮?  -->
-    <Style x:Key="DefaultComboBoxStyle" TargetType="{x:Type local:ComboBox}">
+    <!--  ComboBox 主样式  -->
+    <Style x:Key="DefaultComboBoxStyle" TargetType="ComboBox">
         <Setter Property="MinHeight" Value="30" />
         <!--<Setter Property="Width" Value="150" />-->
         <Setter Property="MinWidth" Value="50" />
@@ -240,6 +242,10 @@
 
 
 
+    <!--  隐式样式（官方类型）：App 合并字典后 <ComboBox> 自动生效。
+          注意：PlaceHolder 与主体点击切换逻辑在 jv:ComboBox 子类中，原生实例上占位符为空、展开/折叠走 WPF 原生行为。  -->
+    <Style BasedOn="{StaticResource DefaultComboBoxStyle}" TargetType="ComboBox" />
+
+    <!--  隐式样式（派生类型）：jv:ComboBox 照常使用主题样式  -->
     <Style BasedOn="{StaticResource DefaultComboBoxStyle}" TargetType="{x:Type local:ComboBox}" />
-    <!--<Style BasedOn="{StaticResource DefaultComboBoxStyle}" TargetType="ComboBox" />-->
 </ResourceDictionary>

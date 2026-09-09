@@ -1,0 +1,134 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
+    xmlns:local="clr-namespace:Junevy.Controls.Controls.Box">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <!--
+        GroupBox 模板：卡片式分组框。
+        标题行（PART_Header）整行可点击折叠，左侧箭头随折叠状态旋转；
+        折叠后内容区域 Collapsed，不占布局空间。
+    -->
+    <ControlTemplate x:Key="DefaultGroupBoxTemplate" TargetType="{x:Type local:GroupBox}">
+        <Border
+            x:Name="Root"
+            Padding="0"
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}"
+            CornerRadius="{TemplateBinding Border.CornerRadius}"
+            SnapsToDevicePixels="True"
+            UseLayoutRounding="True">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!--  标题行：整行响应点击折叠；标题内按钮等交互元素照常工作  -->
+                <Border x:Name="PART_Header" Grid.Row="0" Padding="{TemplateBinding Padding}">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Cursor" Value="Hand" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsCollapsible, RelativeSource={RelativeSource TemplatedParent}}" Value="False">
+                                    <Setter Property="Cursor" Value="Arrow" />
+                                </DataTrigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsMouseOver" Value="True" />
+                                        <Condition Binding="{Binding IsCollapsible, RelativeSource={RelativeSource TemplatedParent}}" Value="True" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                                </MultiTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+
+                    <Grid TextElement.FontWeight="SemiBold">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--  折叠指示箭头  -->
+                        <Path
+                            x:Name="Arrow"
+                            Grid.Column="0"
+                            Width="10"
+                            Height="6"
+                            Margin="0,0,7,0"
+                            VerticalAlignment="Center"
+                            Data="M1,1 L5,5 L9,1"
+                            RenderTransformOrigin="0.5,0.5"
+                            Stroke="{DynamicResource Theme.Brush.Text.Secondary}"
+                            StrokeEndLineCap="Round"
+                            StrokeLineJoin="Round"
+                            StrokeStartLineCap="Round"
+                            StrokeThickness="1.5">
+                            <Path.RenderTransform>
+                                <RotateTransform Angle="0" />
+                            </Path.RenderTransform>
+                        </Path>
+
+                        <ContentPresenter
+                            x:Name="HeaderPresenter"
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Content="{TemplateBinding Header}"
+                            ContentStringFormat="{TemplateBinding HeaderStringFormat}"
+                            ContentTemplate="{TemplateBinding HeaderTemplate}"
+                            ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}"
+                            RecognizesAccessKey="True"
+                            TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Grid>
+                </Border>
+
+                <!--  内容区：折叠时整体隐藏  -->
+                <Border
+                    x:Name="ContentArea"
+                    Grid.Row="1"
+                    BorderBrush="{DynamicResource Theme.Brush.Border.Subtle}"
+                    BorderThickness="0,1,0,0">
+                    <ContentPresenter
+                        Margin="10,8"
+                        Content="{TemplateBinding Content}"
+                        ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                        ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
+                </Border>
+            </Grid>
+        </Border>
+
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsCollapsed" Value="True">
+                <Setter TargetName="ContentArea" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="Arrow" Property="RenderTransform">
+                    <Setter.Value>
+                        <RotateTransform Angle="-90" />
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style x:Key="DefaultGroupBoxStyle" TargetType="{x:Type local:GroupBox}">
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Border.CornerRadius" Value="{DynamicResource Theme.ControlCornerRadius}" />
+        <Setter Property="Padding" Value="{DynamicResource Theme.ControlPadding}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+        <Setter Property="Template" Value="{StaticResource DefaultGroupBoxTemplate}" />
+    </Style>
+
+    <Style BasedOn="{StaticResource DefaultGroupBoxStyle}" TargetType="{x:Type local:GroupBox}" />
+
+</ResourceDictionary>

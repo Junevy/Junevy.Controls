@@ -28,7 +28,7 @@
         <Setter Property="Focusable" Value="False" />
     </Style>
 
-    <ControlTemplate x:Key="DefaultTextBoxTemplate" TargetType="{x:Type local:TextBox}">
+    <ControlTemplate x:Key="DefaultTextBoxTemplate" TargetType="TextBox">
         <Grid>
             <!--  澶栧眰 Border  -->
             <Border
@@ -52,12 +52,12 @@
                         Grid.Column="0"
                         Margin="10,0,0,0"
                         VerticalAlignment="Center"
-                        Content="{Binding RelativeSource={RelativeSource AncestorType=local:TextBox}, Path=(atc:Icon.Icon)}"
+                        Content="{TemplateBinding atc:Icon.Icon}"
                         Focusable="False"
-                        FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TextBox}, Path=(atc:Icon.FontFamily)}"
+                        FontFamily="{TemplateBinding atc:Icon.FontFamily}"
                         TextElement.FontSize="{TemplateBinding FontSize}"
                         TextElement.Foreground="{TemplateBinding Foreground}"
-                        Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:TextBox}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
+                        Visibility="{TemplateBinding atc:Icon.Icon, Converter={StaticResource NullToVisibility}}" />
 
                     <ScrollViewer
                         x:Name="PART_ContentHost"
@@ -91,10 +91,10 @@
                         VerticalAlignment="Stretch"
                         Content="&#xe639;"
                         FontSize="{TemplateBinding FontSize}"
-                        FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TextBox}, Path=(atc:Icon.FontFamily)}"
+                        FontFamily="{TemplateBinding atc:Icon.FontFamily}"
                         Foreground="{TemplateBinding Foreground}"
                         Style="{StaticResource TextBoxCloseButtonStyle}"
-                        Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:TextBox}, Path=(atc:AttachFuc.IsClosable), Converter={StaticResource BoolToVisibility}}" />
+                        Visibility="{TemplateBinding atc:AttachFuc.IsClosable, Converter={StaticResource BoolToVisibility}}" />
                 </Grid>
             </Border>
 
@@ -177,7 +177,7 @@
     </ControlTemplate>
 
 
-    <Style x:Key="DefaultTextBoxStyle" TargetType="{x:Type local:TextBox}">
+    <Style x:Key="DefaultTextBoxStyle" TargetType="TextBox">
         <Setter Property="MinHeight" Value="30" />
         <Setter Property="atc:Icon.FontFamily" Value="{StaticResource IconFont}" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
@@ -196,7 +196,11 @@
     </Style>
 
 
+    <!--  隐式样式（官方类型）：App 合并字典后 <TextBox> 自动生效。
+          注意：清空按钮的 Click 处理在 jv:TextBox 子类中，原生 TextBox 上仅外观生效。  -->
+    <Style BasedOn="{StaticResource DefaultTextBoxStyle}" TargetType="TextBox" />
+
+    <!--  隐式样式（派生类型）：jv:TextBox 照常使用主题样式  -->
     <Style BasedOn="{StaticResource DefaultTextBoxStyle}" TargetType="{x:Type local:TextBox}" />
-    <!--<Style BasedOn="{StaticResource DefaultTextBoxStyle}" TargetType="TextBox" />-->
 
 </ResourceDictionary>

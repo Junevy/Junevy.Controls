@@ -34,6 +34,21 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 
 `jv` 包含控件库的全部公开控件。`atc` 用于 `Icon`、`AttachFuc` 和 `ExpanderBehavior` 附加属性。
 
+### 官方同名控件自动生效
+
+合并 `Themes/Generic.xaml` 后，以下控件**无需 `jv:` 前缀**即可直接以官方写法使用并自动获得本库样式（通过 App 作用域隐式样式接管）：
+
+| 官方写法 | 生效范围 | 说明 |
+| --- | --- | --- |
+| `<Button>` | 外观 + 交互 | 完整等效 |
+| `<CheckBox>` | 外观 + 交互 | 完整等效 |
+| `<TextBox>` | 外观 + 交互 | 占位符通过 `Tag` 提供；清空按钮的 Click 处理在 `jv:TextBox` 中，原生实例上仅外观 |
+| `<ComboBox>` | 外观 + 交互 | 占位符（`PlaceHolder`）与主体单击切换折叠逻辑在 `jv:ComboBox` 中，原生实例走 WPF 原生行为 |
+| `<ListBox>` / `<ListView>` | 外观 + 交互 | 完整等效 |
+| `<DataGrid>` | 外观 + 交互 | 完整等效（含专属模板）；空态提示通过附加属性 `atc:DataGridAssist.EmptyText` 提供，原生与 `jv:` 实例均可用 |
+
+以下控件因依赖自有依赖属性（样式触发器直接引用），**必须使用 `jv:` 前缀**：`RadioButton`、`ToggleButton`（`DisplayMode`/`SwitchWidth`/`SwitchHeight`）、`Label`（`DisplayMode`）、`TextBlock`（`Text`/`TextAlignment`/`TextWrapping`）、`ProgressBar`（`ProgressText` 等）。
+
 ## 主题
 
 `Themes/Generic.xaml` 会加载默认浅色主题、所有控件样式、滚动条、焦点样式和内置图标字体。主题相关颜色应使用 `DynamicResource`，这样运行时切换主题后现有控件可以同步刷新。
@@ -259,6 +274,35 @@ ThemeManager.ToggleTheme();
 </jv:ComboBox>
 ```
 
+### GroupBox
+
+`jv:GroupBox` 继承 WPF `GroupBox`，以卡片形式呈现标题与内容。**单击标题区域即可折叠/展开**：折叠后内容区域完全隐藏（`Collapsed`，不占布局空间），标题左侧箭头同步旋转指示状态。
+
+| 属性 | 效果 |
+| --- | --- |
+| `IsCollapsible` | 是否允许单击标题折叠，默认 `true`；设为 `false` 后标题仅作展示，悬停无高亮 |
+| `IsCollapsed` | 内容是否已折叠，默认支持双向绑定，可从代码或绑定控制展开/收起 |
+
+标题可以是任意对象（`HeaderTemplate`/`HeaderTemplateSelector` 照常可用）；标题内的按钮、复选框等交互元素不受点击折叠影响，照常响应。
+
+```xml
+<jv:GroupBox Header="采集设置" IsCollapsed="{Binding IsAdvancedCollapsed}">
+    <StackPanel>
+        <jv:TextBox Width="200" />
+        <jv:ComboBox Width="200" PlaceHolder="Select mode...">
+            <jv:ComboBoxItem Content="Continuous" />
+        </jv:ComboBox>
+    </StackPanel>
+</jv:GroupBox>
+
+<!-- 折叠状态由代码控制 -->
+<jv:GroupBox Header="诊断日志" IsCollapsible="True" IsCollapsed="True">
+    <TextBlock Text="已折叠的内容默认不可见" />
+</jv:GroupBox>
+```
+
+依赖：标准 `Header`/`Content` 管线、主题资源，模板通过 `Border.CornerRadius` 读取圆角。
+
 ## 集合与数据控件
 
 ### ListBox
@@ -296,10 +340,12 @@ ThemeManager.ToggleTheme();
 
 ### DataGrid
 
-`jv:DataGrid` 继承 WPF `DataGrid`，统一列标题、单元格、行悬停和选中样式。默认启用行列虚拟化，关闭新增行、删除行和行高调整，并使用整行单选。
+`jv:DataGrid` 继承 WPF `DataGrid`，提供专属控件模板（完整实现官方模板部件契约 `PART_ColumnHeadersPresenter` / `PART_RowsPresenter` / `PART_ScrollContentPresenter`）与库内统一的卡片式视觉：Sunken 列标题（悬停高亮、排序方向箭头）、透明单元格（行悬停与选中色直接透出、键盘焦点时底边切换为焦点色）、行悬停/选中高亮。默认启用行列虚拟化，关闭新增行、删除行和行高调整，并使用整行单选。合并 `Themes/Generic.xaml` 后，原生写法 `<DataGrid>` 直接生效，无需 `jv:` 前缀。
 
 ```xml
-<jv:DataGrid AutoGenerateColumns="False" ItemsSource="{Binding InspectionResults}">
+<jv:DataGrid AutoGenerateColumns="False"
+             ItemsSource="{Binding InspectionResults}"
+             atc:DataGridAssist.EmptyText="暂无检测结果">
     <jv:DataGrid.Columns>
         <DataGridTextColumn Header="Time" Binding="{Binding Time}" />
         <DataGridTextColumn Header="Result" Binding="{Binding Result}" />
@@ -307,7 +353,9 @@ ThemeManager.ToggleTheme();
 </jv:DataGrid>
 ```
 
-依赖：WPF `DataGrid` 的标准列类型、排序、编辑和绑定机制，无额外附加属性。
+**空态提示**：`atc:DataGridAssist.EmptyText` 为附加属性，Items 为空且该文本非空时显示在内容区中央；官方原生实例同样支持。不设置则无空态提示。
+
+依赖：WPF `DataGrid` 的标准列类型、排序、编辑和绑定机制，虚拟化面板与主题滚动条；附加属性 `atc:DataGridAssist.EmptyText`（空态提示）。
 
 ## 文本与状态控件
 
@@ -913,7 +961,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | 文本/状态 | `Label`、`TextBlock` |
 | 通知 | `MessageBar`、`MessageBarPresenter`、`MessageBarService` |
 | 窗口 | `DialogWindow` |
-| 布局 | `ExpanderPanel` |
+| 布局 | `ExpanderPanel`、`GroupBox` |
 | 菜单/导航 | `ContextMenu`、`ContextMenuItem`、`MenuItem`、`SideMenu`、`TreeMenu`、`TreeMenuItem`、`TabMenu`、`TabMenuItem`、`ToolBar`、`ToolBarItem`、`Toolbox`、`ToolboxItem`、`ToolItem` |
 | 图像 | `ImageViewer` |
 
@@ -934,7 +982,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ComboBoxItem` | WPF `ComboBoxItem`、`DefaultComboBoxItemStyle` | 无 |
 | `ListBox` | WPF `ListBox`、`ListBoxItem`、虚拟化和滚动资源 | 无 |
 | `ListView` | WPF `ListView`、`GridView`、虚拟化和转换器 | `Border.CornerRadius` |
-| `DataGrid` | WPF `DataGrid`、标准列/行/单元格容器、虚拟化 | 无 |
+| `DataGrid` | WPF `DataGrid`、标准列/行/单元格容器、虚拟化、主题滚动条 | `atc:DataGridAssist.EmptyText` |
 | `Label` | WPF `Label`、状态和图标资源 | `Icon.Icon`、`Icon.FontFamily`（仅相应模板） |
 | `TextBlock` | WPF `ContentControl`、`ContentPresenter`、标准内容模板管线 | 无 |
 | `MessageBar` | WPF `ContentControl`、`DispatcherTimer`、`jv:Button` 关闭按钮、主题资源 | `Icon.FontFamily`、`Icon.IconSize` |
@@ -955,6 +1003,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ToolItem` | WPF `Button` 命令管线、`DefaultToolItemStyle`、WPF `DragDrop` | `Icon.FontFamily`、`Icon.IconSize`、`Icon.IconForeground` |
 | `ImageViewer` | WPF `Image`、`MatrixTransform`、`BitmapSource`、`SaveFileDialog` | 无 |
 | `ExpanderPanel` | WPF `HeaderedContentControl`、`ToggleButton`、`LayoutTransform` 过渡动画、主题资源 | 无 |
+| `GroupBox` | WPF `GroupBox`、主题资源（卡片、悬停、状态令牌） | `Border.CornerRadius` |
 
 ## 开发注意事项
 
