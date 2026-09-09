@@ -148,6 +148,47 @@ public sealed class ComboBoxAndTextBoxTests
     }
 
     [Test]
+    public void NonEditableComboBox_ClickingContentAgainClosesDropDown()
+    {
+        var comboBox = new JunevyComboBox
+        {
+            Width = 180,
+            ItemsSource = new[] { "First", "Second" },
+            SelectedIndex = 0,
+            IsEditable = false
+        };
+        ApplyTheme(comboBox);
+
+        Window window = TestHost.Show(comboBox);
+        try
+        {
+            comboBox.ApplyTemplate();
+            comboBox.UpdateLayout();
+
+            MouseButtonEventArgs ClickArgs() =>
+                new(Mouse.PrimaryDevice, 0, MouseButton.Left)
+                {
+                    RoutedEvent = UIElement.PreviewMouseLeftButtonDownEvent
+                };
+
+            // 第一次单击：展开
+            comboBox.RaiseEvent(ClickArgs());
+            TestHost.Drain(comboBox.Dispatcher);
+            Assert.That(comboBox.IsDropDownOpen, Is.True);
+
+            // 第二次单击：折叠（真实点击每次都是新的事件参数，不复用 Handled 状态）
+            comboBox.RaiseEvent(ClickArgs());
+            TestHost.Drain(comboBox.Dispatcher);
+            Assert.That(comboBox.IsDropDownOpen, Is.False);
+        }
+        finally
+        {
+            comboBox.IsDropDownOpen = false;
+            TestHost.CloseAndDrain(window);
+        }
+    }
+
+    [Test]
     public void TextBoxCloseButton_UsesIconFont()
     {
         var textBox = new JunevyTextBox { Text = "Value" };
