@@ -1,6 +1,4 @@
 ﻿using System.Windows;
-using System;
-using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace Junevy.Controls.AttachedProperties
@@ -9,53 +7,6 @@ namespace Junevy.Controls.AttachedProperties
     {
         public static readonly DependencyProperty IconProperty =
             DependencyProperty.RegisterAttached("Icon", typeof(object), typeof(Icon), new PropertyMetadata(null));
-
-        // private static void OnIconPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        // {
-        //     if (d is FrameworkElement element)
-        //     {
-        //         bool isEmpty = IsIconValueEmpty(e.NewValue);
-        //         ApplyIconHostVisibility(element, isEmpty);
-        //     }
-        // }
-
-        // private static bool IsIconValueEmpty(object value)
-        // {
-        //     return value == null || (value is string s && string.IsNullOrEmpty(s));
-        // }
-
-        // private static void ApplyIconHostVisibility(FrameworkElement element, bool collapse)
-        // {
-        //     var visibility = collapse ? Visibility.Collapsed : Visibility.Visible;
-
-        //     if (element.IsLoaded)
-        //     {
-        //         SetIconHostVisibility(element, visibility);
-        //     }
-        //     else
-        //     {
-        //         RoutedEventHandler handler = null;
-        //         handler = (s, _) =>
-        //         {
-        //             if (s is FrameworkElement fe)
-        //             {
-        //                 fe.Loaded -= handler;
-        //                 bool isEmpty = IsIconValueEmpty(fe.GetValue(IconProperty));
-        //                 SetIconHostVisibility(fe, isEmpty ? Visibility.Collapsed : Visibility.Visible);
-        //             }
-        //         };
-        //         element.Loaded += handler;
-        //     }
-        // }
-
-        // private static void SetIconHostVisibility(FrameworkElement element, Visibility visibility)
-        // {
-        //     if (element.Template?.FindName("PART_IconHost", element) is FrameworkElement iconHost)
-        //     {
-        //         // element.temp
-        //         iconHost.Visibility = visibility;
-        //     }
-        // }
 
         // Resolve the embedded font relative to its XAML resource so the default
         // value has the same pack URI base as the IconFont static resource.
@@ -94,8 +45,6 @@ namespace Junevy.Controls.AttachedProperties
         {
             obj.SetValue(FontFamilyProperty, value);
         }
-
-
 
         public static int GetIconSize(DependencyObject obj)
         {

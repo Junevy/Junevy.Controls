@@ -57,6 +57,7 @@ namespace Junevy.Controls.Controls.Menu
         protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
         {
             if (!e.Handled
+                && CanRename
                 && !IsEditing
                 && Header is string
                 && headerTextBox != null
@@ -134,6 +135,27 @@ namespace Junevy.Controls.Controls.Menu
         public static readonly DependencyProperty IsEditingProperty = IsEditingPropertyKey.DependencyProperty;
 
         public bool IsEditing => (bool)GetValue(IsEditingProperty);
+
+        /// <summary>
+        /// 是否允许双击标签头重命名（默认允许）。设为 false 后双击不再进入编辑态；
+        /// 若在编辑过程中被禁用，将立即退出编辑并保留当前文本。
+        /// </summary>
+        public static readonly DependencyProperty CanRenameProperty =
+            DependencyProperty.Register("CanRename", typeof(bool), typeof(TabMenuItem), new PropertyMetadata(true, OnCanRenameChanged));
+
+        public bool CanRename
+        {
+            get { return (bool)GetValue(CanRenameProperty); }
+            set { SetValue(CanRenameProperty, value); }
+        }
+
+        private static void OnCanRenameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is TabMenuItem item && !(bool)e.NewValue && item.IsEditing)
+            {
+                item.SetValue(IsEditingPropertyKey, false);
+            }
+        }
 
         /// <summary>
         /// MenuItem内元素的布局方向
