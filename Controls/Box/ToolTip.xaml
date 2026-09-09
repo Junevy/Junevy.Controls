@@ -1,0 +1,42 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        ToolTip 主题（官方同名控件，隐式样式接管）：
+        悬浮卡片式提示——Overlay 表面 + 细边框 + 主题圆角；系统级阴影由
+        HasDropShadow 提供（ToolTip 弹层非透明表面，Effect 阴影会被裁剪）。
+        App 合并 Themes/Generic.xaml 后 <ToolTip> 直接生效，无需 jv: 前缀。
+    -->
+    <Style x:Key="DefaultToolTipStyle" TargetType="ToolTip">
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Overlay}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Padding" Value="10,6" />
+        <Setter Property="HasDropShadow" Value="True" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToolTip">
+                    <Border
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{DynamicResource Theme.ControlCornerRadius}"
+                        SnapsToDevicePixels="True"
+                        UseLayoutRounding="True">
+                        <ContentPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  隐式样式（官方类型）：任意元素上的 ToolTip 自动生效  -->
+    <Style BasedOn="{StaticResource DefaultToolTipStyle}" TargetType="ToolTip" />
+
+</ResourceDictionary>

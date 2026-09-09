@@ -140,6 +140,19 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="FontSize" Value="14" />
             </Trigger>
+
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="DisplayMode" Value="Neutral" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource Theme.Brush.Accent.PrimaryHover}" />
+            </MultiTrigger>
+
+            <!--  Disabled：整体弱化（最后声明，保证覆盖所有状态）  -->
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.5" />
+            </Trigger>
         </Style.Triggers>
     </Style>
 
