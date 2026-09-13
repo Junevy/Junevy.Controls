@@ -141,7 +141,7 @@ namespace Junevy.Controls.Controls.Menu
         /// 若在编辑过程中被禁用，将立即退出编辑并保留当前文本。
         /// </summary>
         public static readonly DependencyProperty CanRenameProperty =
-            DependencyProperty.Register("CanRename", typeof(bool), typeof(TabMenuItem), new PropertyMetadata(true, OnCanRenameChanged));
+            DependencyProperty.Register("CanRename", typeof(bool), typeof(TabMenuItem), new PropertyMetadata(false, OnCanRenameChanged));
 
         public bool CanRename
         {

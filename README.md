@@ -307,7 +307,7 @@ ThemeManager.ToggleTheme();
 
 ### DatePicker
 
-`DatePicker` 为 WPF 官方控件的完整主题接管（无 `jv:` 派生类）：输入框、下拉日历图标与 `Calendar` 弹层全部按官方模板部件契约实现（`PART_Root`/`PART_TextBox`/`PART_Button`/`PART_Calendar`，Calendar/CalendarItem/CalendarDayButton/CalendarButton 全套）。视觉与库内一致：卡片输入框（悬停/聚焦/展开高亮、禁用态）、日历卡片带阴影、今日高亮与选中色、月/年视图导航。合并 `Themes/Generic.xaml` 后，原生写法 `<DatePicker>` 直接生效。
+`DatePicker` 为 WPF 官方控件的完整主题接管：输入框、下拉日历图标与 `Calendar` 弹层全部按官方模板部件契约实现（`PART_Root`/`PART_TextBox`/`PART_Button`/`PART_Popup`）。日历弹层由 `DatePicker` 内部创建的 `Calendar` 承载——其 `Style` 被官方代码绑定到 `DatePicker.CalendarStyle` 属性（绑定属显式赋值，会绕过隐式样式查找），因此弹层主题经由 `DatePicker` 样式中的 `CalendarStyle` Setter 注入，`Calendar` 内部再显式下发 `CalendarItemStyle`/`CalendarDayButtonStyle`/`CalendarButtonStyle`（弹层子树内隐式样式同样不生效）。视觉与库内一致：卡片输入框（悬停/聚焦/展开高亮、禁用态）、日历卡片带阴影、今日高亮与选中色、月/年视图导航。合并 `Themes/Generic.xaml` 后，原生写法 `<DatePicker>` 与 `jv:DatePicker`（库内派生类）均直接生效，外观一致。
 
 ```xml
 <DatePicker SelectedDate="{Binding BeginDate}"
