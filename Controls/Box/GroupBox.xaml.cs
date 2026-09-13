@@ -26,8 +26,8 @@ namespace Junevy.Controls.Controls.Box
         }
 
         /// <summary>
-        /// 是否允许单击标题折叠（默认允许）。设为 false 后标题仅作展示，
-        /// 鼠标悬停不出现高亮，点击不会改变折叠状态。
+        /// 是否允许单击标题折叠（默认允许）。设为 false 后标题仅作展示：
+        /// 左侧折叠箭头一并隐藏，鼠标悬停不出现高亮，点击不会改变折叠状态。
         /// </summary>
         public bool IsCollapsible
         {

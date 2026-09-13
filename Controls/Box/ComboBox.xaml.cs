@@ -62,14 +62,23 @@ namespace Junevy.Controls.Controls.Box
 
         private bool IsInDropDownClick(DependencyObject? source)
         {
+            if (popup is null || popup.Child is not DependencyObject popupRoot)
+            {
+                return false;
+            }
+
+            // 弹出内容位于独立 HWND 的视觉树（根为 PopupRoot），从弹层内元素向上走
+            // 视觉链不会经过 Popup 本身，因此以 popup.Child（弹出内容根）为判定锚点。
             while (source is not null)
             {
-                if (popup is not null && ReferenceEquals(source, popup))
+                if (ReferenceEquals(source, popup) || ReferenceEquals(source, popupRoot))
                 {
                     return true;
                 }
 
-                source = VisualTreeHelper.GetParent(source);
+                source = source is Visual || source is System.Windows.Media.Media3D.Visual3D
+                    ? VisualTreeHelper.GetParent(source)
+                    : LogicalTreeHelper.GetParent(source);
             }
 
             return false;
