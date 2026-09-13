@@ -39,13 +39,14 @@
                                 <DataTrigger Binding="{Binding IsCollapsible, RelativeSource={RelativeSource TemplatedParent}}" Value="False">
                                     <Setter Property="Cursor" Value="Arrow" />
                                 </DataTrigger>
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsMouseOver" Value="True" />
+                                <!--  MultiDataTrigger：混合 IsMouseOver 与 IsCollapsible 两个绑定条件  -->
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True" />
                                         <Condition Binding="{Binding IsCollapsible, RelativeSource={RelativeSource TemplatedParent}}" Value="True" />
-                                    </MultiTrigger.Conditions>
+                                    </MultiDataTrigger.Conditions>
                                     <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
-                                </MultiTrigger>
+                                </MultiDataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
