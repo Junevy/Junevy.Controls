@@ -107,6 +107,10 @@
         </Border>
 
         <ControlTemplate.Triggers>
+            <!--  不允许折叠时隐藏箭头，避免误导用户以为标题可点击折叠  -->
+            <DataTrigger Binding="{Binding IsCollapsible, RelativeSource={RelativeSource Self}}" Value="False">
+                <Setter TargetName="Arrow" Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
             <Trigger Property="IsCollapsed" Value="True">
                 <Setter TargetName="ContentArea" Property="Visibility" Value="Collapsed" />
                 <Setter TargetName="Arrow" Property="RenderTransform">
