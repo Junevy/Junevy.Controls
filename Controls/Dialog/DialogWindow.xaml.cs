@@ -26,6 +26,9 @@ namespace Junevy.Controls.Controls.Dialog
     /// }
     /// containerRegistry.RegisterDialogWindow&lt;PrismDialogWindow&gt;();
     /// </code>
+    ///
+    /// 窗口没有默认宽高：启用 <c>SizeToContent = WidthAndHeight</c>，尺寸完全由
+    /// 注入的内容（如 UserControl）决定；需要固定尺寸时给内容设置显式宽高即可。
     /// </summary>
     public class DialogWindow : Window
     {
@@ -40,6 +43,23 @@ namespace Junevy.Controls.Controls.Dialog
             DefaultStyleKeyProperty.OverrideMetadata(
                 typeof(DialogWindow),
                 new FrameworkPropertyMetadata(typeof(DialogWindow)));
+
+            // WPF 对 SizeToContent=WidthAndHeight 的窗口不执行系统最大化。
+            // Coerce 阶段先于 WindowState 生效回调，在这里提前切到 Manual，
+            // 最大化才能真实铺满屏幕；还原由 OnWindowStateChanged 恢复自适应。
+            WindowStateProperty.OverrideMetadata(
+                typeof(DialogWindow),
+                new FrameworkPropertyMetadata((PropertyChangedCallback)null, CoerceWindowState));
+        }
+
+        private static object CoerceWindowState(DependencyObject d, object baseValue)
+        {
+            if (d is DialogWindow window && (WindowState)baseValue == WindowState.Maximized)
+            {
+                window.SizeToContent = SizeToContent.Manual;
+            }
+
+            return baseValue;
         }
 
         public DialogWindow()
@@ -53,6 +73,12 @@ namespace Junevy.Controls.Controls.Dialog
             WindowStartupLocation = WindowStartupLocation.CenterOwner;
             UseLayoutRounding = true;
             SnapsToDevicePixels = true;
+
+            // WPF Window 在 Width/Height 为 NaN 时会向系统请求 CW_USEDEFAULT
+            // 默认尺寸，内容周围因此出现大片空白。改为按内容自适应：尺寸完全
+            // 由 Content 决定（WPF 官方契约：该模式下窗口也不可拖拽边缘缩放，
+            // 符合对话框语义）。
+            SizeToContent = SizeToContent.WidthAndHeight;
 
             _chrome = new WindowChrome
             {
@@ -220,6 +246,13 @@ namespace Junevy.Controls.Controls.Dialog
 
         private void OnWindowStateChanged(object? sender, EventArgs e)
         {
+            // SizeToContent 与最大化互斥：最大化时窗口尺寸交给系统（Manual），
+            // 否则内部 Padding 补偿会触发重新测量、内容可能缩在角落；还原到
+            // 普通状态后再恢复按内容自适应。
+            SizeToContent = WindowState == WindowState.Maximized
+                ? SizeToContent.Manual
+                : SizeToContent.WidthAndHeight;
+
             SyncMaximizedPadding();
             UpdateContentClip();
         }
