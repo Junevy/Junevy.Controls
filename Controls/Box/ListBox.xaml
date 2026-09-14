@@ -7,6 +7,11 @@
         <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
+    <!--  Orientation=Horizontal 时替换默认竖向面板：项目自左向右排列并沿水平方向虚拟化滚动  -->
+    <ItemsPanelTemplate x:Key="DefaultListBoxHorizontalItemsPanel">
+        <VirtualizingStackPanel Orientation="Horizontal" />
+    </ItemsPanelTemplate>
+
     <Style x:Key="DefaultListBoxItemStyle" TargetType="ListBoxItem">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
@@ -164,6 +169,19 @@
     <!--  隐式样式（官方类型）：App 合并字典后 <ListBox> 自动生效  -->
     <Style BasedOn="{StaticResource DefaultListBoxStyle}" TargetType="ListBox" />
 
-    <!--  隐式样式（派生类型）：jv:ListBox 照常使用主题样式  -->
-    <Style BasedOn="{StaticResource DefaultListBoxStyle}" TargetType="{x:Type local:ListBox}" />
+    <!--  隐式样式（派生类型）：jv:ListBox 照常使用主题样式，并额外支持水平滑动  -->
+    <Style BasedOn="{StaticResource DefaultListBoxStyle}" TargetType="{x:Type local:ListBox}">
+        <Style.Triggers>
+            <!--
+                Orientation=Horizontal：项目横向排列，水平滚动条按需显示、垂直滚动条关闭。
+                值回到 Vertical 时触发器失效，自动恢复基样式的竖向面板与滚动条设置，
+                因此运行时切换方向无需重建控件。
+            -->
+            <Trigger Property="Orientation" Value="Horizontal">
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+                <Setter Property="ItemsPanel" Value="{StaticResource DefaultListBoxHorizontalItemsPanel}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>

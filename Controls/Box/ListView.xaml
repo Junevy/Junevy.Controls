@@ -11,6 +11,11 @@
     <cvt:IsGridViewConverter x:Key="IsGridViewConverter" />
     <cvt:GridViewColumnsConverter x:Key="GridViewColumnsConverter" />
 
+    <!--  Orientation=Horizontal 时替换默认竖向面板：项目自左向右排列并沿水平方向虚拟化滚动  -->
+    <ItemsPanelTemplate x:Key="DefaultListViewHorizontalItemsPanel">
+        <VirtualizingStackPanel Orientation="Horizontal" />
+    </ItemsPanelTemplate>
+
     <Style x:Key="DefaultListViewColumnHeaderStyle" TargetType="GridViewColumnHeader">
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
@@ -281,13 +286,28 @@
         </Style.Triggers>
     </Style>
 
-    <!--  隐式样式（派生类型）：jv:ListView 照常使用主题样式  -->
+    <!--  隐式样式（派生类型）：jv:ListView 照常使用主题样式，并额外支持水平滑动  -->
     <Style BasedOn="{StaticResource DefaultListViewStyle}" TargetType="{x:Type local:ListView}">
         <Style.Triggers>
             <DataTrigger Binding="{Binding View, RelativeSource={RelativeSource Self}, Converter={StaticResource IsGridViewConverter}}"
                          Value="True">
                 <Setter Property="Template" Value="{StaticResource DefaultGridViewListViewTemplate}" />
             </DataTrigger>
+
+            <!--
+                Orientation=Horizontal 且未设置 View（普通列表）：项目横向排列，
+                水平滚动条按需显示、垂直滚动条关闭。设置 GridView 等视图时条件不成立，
+                列表维持竖向排列，避免破坏列布局与表头。
+            -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="Orientation" Value="Horizontal" />
+                    <Condition Property="View" Value="{x:Null}" />
+                </MultiTrigger.Conditions>
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+                <Setter Property="ItemsPanel" Value="{StaticResource DefaultListViewHorizontalItemsPanel}" />
+            </MultiTrigger>
         </Style.Triggers>
     </Style>
 </ResourceDictionary>
