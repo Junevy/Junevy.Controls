@@ -44,7 +44,7 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `<CheckBox>` | 外观 + 交互 | 完整等效 |
 | `<TextBox>` | 外观 + 交互 | 占位符通过 `Tag` 提供；清空按钮的 Click 处理在 `jv:TextBox` 中，原生实例上仅外观 |
 | `<ComboBox>` | 外观 + 交互 | 占位符（`PlaceHolder`）与主体单击切换折叠逻辑在 `jv:ComboBox` 中，原生实例走 WPF 原生行为 |
-| `<ListBox>` / `<ListView>` | 外观 + 交互 | 完整等效 |
+| `<ListBox>` / `<ListView>` | 外观 + 交互 | 外观完整等效；水平滑动（`Orientation`）为本库 `jv:` 实例专有属性，原生实例沿用 WPF 原生排列 |
 | `<DataGrid>` | 外观 + 交互 | 完整等效（含专属模板）；空态提示通过附加属性 `atc:DataGridAssist.EmptyText` 提供，原生与 `jv:` 实例均可用 |
 | `<DatePicker>` | 外观 + 交互 | 完整等效（含日历全套模板）；占位符通过附加属性 `atc:DatePickerAssist.PlaceHolder` 提供，原生实例可用 |
 | `<ToolTip>` | 外观 | 完整等效，任意元素的 `ToolTip` 属性自动获得主题样式 |
@@ -322,9 +322,15 @@ ThemeManager.ToggleTheme();
 
 ### ListBox
 
-`jv:ListBox` 继承 WPF `ListBox`，提供统一的悬停、选中、焦点和禁用状态，并默认启用 UI 虚拟化和回收模式。
+`jv:ListBox` 继承 WPF `ListBox`，提供统一的悬停、选中、焦点和禁用状态，并默认启用 UI 虚拟化和回收模式。项目既可按默认的竖向列表排列，也可通过 `Orientation` 切换为横向带状列表并沿水平方向滑动。
 
-依赖：标准 `ItemsSource`、`ItemTemplate` 和 `ListBoxItem` 容器，无额外附加属性。
+| 属性 | 默认值 | 效果 |
+| --- | --- | --- |
+| `Orientation` | `Vertical` | `Vertical`：项目自上而下排列，垂直滚动条按需显示、水平滚动条关闭；`Horizontal`：项目自左向右排列，水平滚动条按需显示、垂直滚动条关闭（水平滑动）。运行时修改立即生效，无需重建控件 |
+
+依赖：标准 `ItemsSource`、`ItemTemplate` 和 `ListBoxItem` 容器；排列与滚动方向由 `Orientation` 驱动，无额外附加属性。
+
+竖向列表（默认）：
 
 ```xml
 <jv:ListBox ItemsSource="{Binding Devices}" SelectedItem="{Binding SelectedDevice, Mode=TwoWay}">
@@ -336,9 +342,29 @@ ThemeManager.ToggleTheme();
 </jv:ListBox>
 ```
 
+横向滑动（例如缩略图、相机列表等横向带状内容）：
+
+```xml
+<jv:ListBox Height="110" Orientation="Horizontal" ItemsSource="{Binding Thumbnails}">
+    <jv:ListBox.ItemTemplate>
+        <DataTemplate>
+            <Image Width="120" Height="80" Source="{Binding Preview}" Stretch="Uniform" />
+        </DataTemplate>
+    </jv:ListBox.ItemTemplate>
+</jv:ListBox>
+```
+
+横向模式实际把项目面板替换为横向 `VirtualizingStackPanel`，虚拟化与回收模式保持启用，条目数量很多时不会一次性实例化全部容器。项目高度默认撑满控件（容器 `VerticalAlignment` 为 `Stretch`），需要固定尺寸时在 `ItemContainerStyle` 中设置 `Height`、`Width` 或对齐方式。官方 `<ListBox>` 实例沿用 WPF 原生排列，仅外观被本库接管；使用水平滑动请使用 `jv:ListBox`。
+
 ### ListView
 
-`jv:ListView` 继承 WPF `ListView`，同时支持普通列表和标准 `GridView`。控件保留 WPF 的 `View` 管线，可以正常使用 `GridViewColumn.DisplayMemberBinding`、单元格模板和自定义 `ItemTemplate`。
+`jv:ListView` 继承 WPF `ListView`，同时支持普通列表和标准 `GridView`。控件保留 WPF 的 `View` 管线，可以正常使用 `GridViewColumn.DisplayMemberBinding`、单元格模板和自定义 `ItemTemplate`。普通列表同样支持横向带状排列与水平滑动。
+
+| 属性 | 默认值 | 效果 |
+| --- | --- | --- |
+| `Orientation` | `Vertical` | 排列与滚动方向：`Vertical` 竖向列表；`Horizontal` 项目自左向右排列并水平滑动。仅在未设置 `View` 的普通列表上生效 |
+
+`Orientation="Horizontal"` 需要配合“没有 `View`”这一条件：列表一旦使用 `GridView`（或自定义视图），排列方向维持竖向，`Orientation` 不参与布局，以免破坏列布局与表头。因此同一条 `jv:ListView` 可以安全地在两种模式间复用。
 
 ```xml
 <jv:ListView ItemsSource="{Binding Devices}">
@@ -348,6 +374,19 @@ ThemeManager.ToggleTheme();
             <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status}" />
         </GridView>
     </jv:ListView.View>
+</jv:ListView>
+```
+
+```xml
+<!-- 普通列表 + 水平滑动 -->
+<jv:ListView Height="110" Orientation="Horizontal" ItemsSource="{Binding Devices}">
+    <jv:ListView.ItemTemplate>
+        <DataTemplate>
+            <Border Width="140" Padding="8">
+                <TextBlock Text="{Binding Name}" />
+            </Border>
+        </DataTemplate>
+    </jv:ListView.ItemTemplate>
 </jv:ListView>
 ```
 
