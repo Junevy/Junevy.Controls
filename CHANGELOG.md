@@ -2,6 +2,16 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## DialogWindow
+
+### 本次更新（按内容自适应尺寸）— 2026-09-14
+
+- 修复对话框出现"默认宽高"的问题：`DialogWindow` 本身未设置 `Width`/`Height`，但 WPF `Window` 在二者为 NaN 时会向操作系统请求 `CW_USEDEFAULT` 默认尺寸，导致塞入的 `UserControl` 四周出现大片空白边距。
+- 构造函数中启用 `SizeToContent = SizeToContent.WidthAndHeight`：窗口尺寸完全由注入的内容（如 UserControl）决定，内容多大窗口就多大；需要固定尺寸时给内容控件设置显式 `Width`/`Height` 即可。
+- 最大化状态处理：WPF 对 `SizeToContent = WidthAndHeight` 的窗口不执行系统最大化（实测窗口保持内容尺寸），因此重写 `WindowState` 属性的 Coerce 回调，在最大化生效前先切换为 `Manual`，最大化才能真实铺满屏幕；还原普通状态后由 `StateChanged` 恢复 `WidthAndHeight` 继续按内容自适应。
+- 验证：`DialogProbe` 端到端探测通过——固定尺寸内容（窗口 = 内容 + 阴影边距 + 边框 + 标题栏）、内容尺寸变化跟随、无显式宽高的自然尺寸内容、最大化铺满工作区、还原后尺寸与 `SizeToContent` 均正确恢复。
+- 附带说明：`SizeToContent = WidthAndHeight` 下 WPF 官方契约禁用拖拽边缘缩放，符合对话框语义；`ShadowMargin` 的缩放热区在对话框模式下不再生效。
+
 ## 主题滚动条（ScrollBar）
 
 ### 本次更新（横向滚动修复）

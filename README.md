@@ -965,6 +965,8 @@ private void OnSaved()
 
 窗口内容与 `DataContext` 由宿主注入后显示在标题栏下方；内容会按窗口圆角裁剪，避免内容自带背景顶破圆角。`Padding` 由窗口内部在最大化时管理，请勿依赖。
 
+窗口没有默认宽高：启用 `SizeToContent = WidthAndHeight`，尺寸完全跟随注入的内容（如 UserControl）自动收缩或撑大，不会出现系统默认窗口尺寸留下的大片空白。需要固定尺寸时给内容控件设置显式 `Width`/`Height` 即可；该模式下窗口不可拖拽边缘缩放（WPF 官方契约，符合对话框语义），最大化时自动切换为手动尺寸以正常铺满屏幕。
+
 在应用项目中接入 Prism 的 `IDialogService` 时，本库无需引用 Prism，派生一个窗口补上 `Result` 属性即可（Prism 8.x 在 `Prism.Services.Dialogs`，9.x 在 `Prism.Dialogs`）：
 
 ```csharp
