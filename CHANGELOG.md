@@ -1,6 +1,26 @@
 # Junevy.Controls 更新日志
 
-本文档记录 `Junevy.Controls` 控件库中 `TreeMenu` 与 `TreeMenuItem` 的历史变更与本次迭代内容。
+本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
+
+## 主题滚动条（ScrollBar）
+
+### 本次更新（横向滚动修复）
+
+- 修复横向滚动条被压成细竖条的问题：原样式的 `Width=8` 对两个方向都生效，横向滚动条因此只有 8px 宽并贴在容器底部，看起来像一条竖着的滚动条。现在按方向分别给尺寸——竖向 `Width/MinWidth=8`，横向 `Height/MinHeight=8`。
+- 四个尺寸属性都必须显式书写：系统主题样式同样会设置它们（竖向 `MinWidth`、横向 `MinHeight` 为系统滚动条厚度），只写 `Width`/`Height` 会被 `Min*` 顶掉。
+- 修复横向滚动条点击、拖动完全无效的问题，共两处原因：
+  - 翻页按钮对横向条仍使用竖向命令 `PageUp`/`PageDown`。WPF 的 `ScrollBar.OnScrollCommand` 只按方向映射命令（横向只认 `PageLeft`/`PageRight`），命令因此被忽略；现在横向模板改用 `PageLeft`/`PageRight`。
+  - `Track` 对两个方向都写死 `IsDirectionReversed=True`，与官方横向的 `False` 相反，滑块位置与拖动方向都不正确。
+- 移除用 `LayoutTransform` 镜像翻转伪造横向下拉的做法，改为按方向各提供一套模板（官方主题同样如此），`Track` 方向、`IsDirectionReversed`、翻页命令全部与 WPF 官方一致。
+- 轨道空白处的翻页热区改为透明仍可命中的 `RepeatButton` 模板，不再依赖系统 `RepeatButton` 外观加 `Opacity=0`。
+
+## ListBox / ListView
+
+### 本次更新（横向滑动）
+
+- `jv:ListBox`、`jv:ListView` 新增 `Orientation` 依赖属性（默认 `Vertical`）：设为 `Horizontal` 后项目自左向右排列、水平滚动条按需显示、垂直滚动条关闭；运行时切换立即生效，无需重建控件。
+- 横向模式下补齐鼠标滚轮折算。WPF 的 `ScrollViewer.OnMouseWheel` 只做竖直滚动并无条件把事件标记为已处理，竖向滚不动时不会退化为水平滚动；控件在「横向 + 竖向不可滚动 + 横向可滚动」时按 `SystemParameters.WheelScrollLines` 折算为水平滚动，条目模板内部的滚动控件仍优先获得滚轮。
+- `jv:ListView` 的横向模式要求未设置 `View`，使用 `GridView` 时列表维持竖向，避免破坏列布局与表头。
 
 ## ExpanderPanel
 
