@@ -107,10 +107,12 @@
         </Border>
 
         <ControlTemplate.Triggers>
-            <!--  不允许折叠时隐藏箭头，避免误导用户以为标题可点击折叠  -->
-            <DataTrigger Binding="{Binding IsCollapsible, RelativeSource={RelativeSource Self}}" Value="False">
+            <!--  不允许折叠时隐藏箭头，避免误导用户以为标题可点击折叠。
+                  注意：模板触发器中 DataTrigger + RelativeSource 绑定不生效，
+                  TargetType 是 local:GroupBox，直接用 Property 触发器读依赖属性。  -->
+            <Trigger Property="IsCollapsible" Value="False">
                 <Setter TargetName="Arrow" Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
+            </Trigger>
             <Trigger Property="IsCollapsed" Value="True">
                 <Setter TargetName="ContentArea" Property="Visibility" Value="Collapsed" />
                 <Setter TargetName="Arrow" Property="RenderTransform">
