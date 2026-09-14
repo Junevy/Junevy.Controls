@@ -326,7 +326,7 @@ ThemeManager.ToggleTheme();
 
 | 属性 | 默认值 | 效果 |
 | --- | --- | --- |
-| `Orientation` | `Vertical` | `Vertical`：项目自上而下排列，垂直滚动条按需显示、水平滚动条关闭；`Horizontal`：项目自左向右排列，水平滚动条按需显示、垂直滚动条关闭（水平滑动）。运行时修改立即生效，无需重建控件 |
+| `Orientation` | `Vertical` | `Vertical`：项目自上而下排列，垂直滚动条按需显示、水平滚动条关闭；`Horizontal`：项目自左向右排列，水平滚动条按需显示、垂直滚动条关闭（水平滑动，鼠标滚轮同样横向滚动）。运行时修改立即生效，无需重建控件 |
 
 依赖：标准 `ItemsSource`、`ItemTemplate` 和 `ListBoxItem` 容器；排列与滚动方向由 `Orientation` 驱动，无额外附加属性。
 
@@ -355,6 +355,12 @@ ThemeManager.ToggleTheme();
 ```
 
 横向模式实际把项目面板替换为横向 `VirtualizingStackPanel`，虚拟化与回收模式保持启用，条目数量很多时不会一次性实例化全部容器。项目高度默认撑满控件（容器 `VerticalAlignment` 为 `Stretch`），需要固定尺寸时在 `ItemContainerStyle` 中设置 `Height`、`Width` 或对齐方式。官方 `<ListBox>` 实例沿用 WPF 原生排列，仅外观被本库接管；使用水平滑动请使用 `jv:ListBox`。
+
+横向模式下鼠标滚轮同样左右滚动。WPF 的 `ScrollViewer` 只把滚轮用于竖直滚动，竖向滚不动时不会自动退化为水平滚动，`jv:ListBox` 在竖向不可滚动时补上这一步折算，折算量与 WPF 竖向滚轮保持一致（逻辑滚动按 `SystemParameters.WheelScrollLines` 条项目滚动，像素滚动按一个行高折算）；条目模板内部自带滚动控件时（例如条目里还有 `ScrollViewer`）滚轮仍归内层控件。竖向列表、`Orientation` 行为以及原生 `<ListBox>` 完全沿用 WPF 原生滚轮行为。
+
+自定义模板时请保留名为 `PART_ScrollViewer` 的 `ScrollViewer`（本库两个模板均如此命名），滚轮折算依赖该部件定位滚动宿主；缺少该部件时不会报错，只是退回 WPF 原生滚轮行为。
+
+导航控件 `jv:SideMenu` 也有一个同名属性，但它继承的是 WPF `ListBox` 而非 `jv:ListBox`，其 `Orientation` 表示菜单项面板的排列方向，与本属性无关。
 
 ### ListView
 
@@ -391,6 +397,8 @@ ThemeManager.ToggleTheme();
 ```
 
 依赖：WPF `ListView`/`GridView`、虚拟化面板和主题滚动条，无额外附加属性。
+
+横向模式同样支持鼠标滚轮左右滚动，实现与 `jv:ListBox` 一致（横向且竖向不可滚动时按 `SystemParameters.WheelScrollLines` 折算）；使用 `GridView` 时列表维持竖向，滚轮行为与 WPF 原生一致。
 
 ### DataGrid
 
@@ -511,11 +519,11 @@ ThemeManager.ToggleTheme();
 
 ### SideMenu
 
-`jv:SideMenu` 继承 `jv:ListBox`，适合应用侧边导航。它使用选择机制而不是按钮命令，通常绑定 `SelectedItem` 后由 ViewModel 完成导航。
+`jv:SideMenu` 继承 WPF `ListBox`（**不是** `jv:ListBox`：它只复用 WPF 的列表选择机制，模板与样式完全独立），适合应用侧边导航。它使用选择机制而不是按钮命令，通常绑定 `SelectedItem` 后由 ViewModel 完成导航。
 
 | 属性 | 效果 |
 | --- | --- |
-| `Orientation` | 菜单项面板方向，默认 `Vertical` |
+| `Orientation` | 菜单项面板排列方向，默认 `Vertical`。这是 `jv:SideMenu` 自有的属性，与 `jv:ListBox` 的 `Orientation`（列表排列和滚动方向）含义不同、互不影响 |
 | `DisplayMode="Horizontal"` | 图标与标题横向排列 |
 | `DisplayMode="Vertical"` | 紧凑图标模式，默认宽度调整为 `60` |
 | `ItemHeight` | 固定项目高度；默认 `NaN`，使用内容自然高度 |
@@ -1058,7 +1066,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ContextMenu` | WPF `ContextMenu`、`MenuItem`、`Separator`、Popup/阴影资源 | 无 |
 | `ContextMenuItem` | WPF `MenuItem`、`JunevyContextMenuItemStyle` | 无 |
 | `MenuItem` | WPF `ContentControl`；作为 `SideMenu`/`TreeMenuItem` 的导航数据 | 无 |
-| `SideMenu` | `jv:ListBox`、`ListBoxItem`、导航数据模板 | `Icon.FontFamily`、`Icon.IconSize` |
+| `SideMenu` | WPF `ListBox`、`ListBoxItem`、导航数据模板 | `Icon.FontFamily`、`Icon.IconSize` |
 | `TreeMenu` | WPF `TreeView`、`TreeMenuItem`、`jv:ToggleButton` | `Icon.FontFamily`、`Icon.IconSize`、`ExpanderBehavior.Enable` |
 | `TreeMenuItem` | `jv:MenuItem`、`ObservableCollection<TreeMenuItem>` | 通过所在 `TreeMenu` 使用图标附加属性 |
 | `TabMenu` | WPF `TabControl`、`TabMenuItem`、`jv:TextBox`、`jv:Button` | `AttachFuc.IsClosable`、`Icon.FontFamily` |

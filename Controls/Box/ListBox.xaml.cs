@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Junevy.Controls.Controls.Box
 {
@@ -43,5 +44,24 @@ namespace Junevy.Controls.Controls.Box
                 typeof(Orientation),
                 typeof(ListBox),
                 new PropertyMetadata(Orientation.Vertical));
+
+        /// <summary>
+        /// 横向模式下把鼠标滚轮折算成水平滚动。
+        /// </summary>
+        /// <remarks>
+        /// WPF 的 <see cref="ScrollViewer.OnMouseWheel"/> 只做竖直滚动并不会退化为水平滚动
+        /// （详见 <see cref="HorizontalWheelScrolling"/>），这里补上该退化路径。
+        /// 竖向模式以及不该由本控件接管的滚轮仍完全沿用 WPF 原生行为。
+        /// </remarks>
+        protected override void OnPreviewMouseWheel(MouseWheelEventArgs e)
+        {
+            if (HorizontalWheelScrolling.TryScroll(this, this.Orientation, e))
+            {
+                e.Handled = true;
+                return;
+            }
+
+            base.OnPreviewMouseWheel(e);
+        }
     }
 }
