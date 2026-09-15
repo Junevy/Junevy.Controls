@@ -49,41 +49,34 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
+            <!--  轨道：宽 = 2 × SwitchSize，高 = SwitchSize，尺寸与圆角均由控件按 SwitchSize 推导  -->
             <Border
                 x:Name="ToggleHost"
                 Grid.Column="0"
-                Width="{TemplateBinding SwitchWidth}"
-                Height="{TemplateBinding SwitchHeight}"
+                Width="{TemplateBinding TrackWidth}"
+                Height="{TemplateBinding SwitchSize}"
                 Padding="1"
+                Background="Transparent"
                 BorderBrush="{DynamicResource Theme.Brush.Border.Strong}"
                 BorderThickness="1"
-                CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
-                Opacity="1">
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Border
-                        x:Name="Left"
-                        Grid.Column="0"
-                        Background="{DynamicResource Theme.Brush.Accent.Primary}"
-                        CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
-                        <ContentControl />
-                    </Border>
-
-                    <Border
-                        x:Name="Right"
-                        Grid.Column="1"
-                        Background="Transparent"
-                        CornerRadius="{DynamicResource Theme.SmallCornerRadius}" />
-                </Grid>
+                CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
+                <!--  滑块：边长 = SwitchSize - 4，与边框、内边距严丝合缝；Checked 时由控件代码驱动滑动动画  -->
+                <Border
+                    x:Name="PART_Thumb"
+                    Width="{TemplateBinding ThumbSize}"
+                    Height="{TemplateBinding ThumbSize}"
+                    HorizontalAlignment="Left"
+                    Background="{DynamicResource Theme.Brush.Border.Strong}"
+                    CornerRadius="2">
+                    <!--  内圆角 2 = 外圆角(Theme.SmallCornerRadius 4) - 内缩量 2，保证内外圆角视觉吻合  -->
+                    <Border.RenderTransform>
+                        <TranslateTransform x:Name="PART_ThumbTranslate" />
+                    </Border.RenderTransform>
+                </Border>
             </Border>
-
 
             <Grid Grid.Column="1">
                 <ContentControl
@@ -103,13 +96,7 @@
 
         <ControlTemplate.Triggers>
             <Trigger Property="IsChecked" Value="True">
-                <Setter TargetName="Left" Property="Background" Value="Transparent" />
-                <Setter TargetName="Right" Property="Background" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
-            </Trigger>
-
-            <Trigger Property="IsChecked" Value="False">
-                <Setter TargetName="Left" Property="Background" Value="{DynamicResource Theme.Brush.Border.Strong}" />
-                <Setter TargetName="Right" Property="Background" Value="Transparent" />
+                <Setter TargetName="PART_Thumb" Property="Background" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
             </Trigger>
 
             <!--  Hover  -->
@@ -121,6 +108,7 @@
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="ToggleHost" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
                 <Setter TargetName="ToggleHost" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
+                <Setter TargetName="PART_Thumb" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
                 <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
                 <Setter Property="Opacity" Value="0.8" />
             </Trigger>
@@ -132,7 +120,7 @@
                 </MultiTrigger.Conditions>
                 <Setter TargetName="ToggleHost" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
                 <Setter TargetName="ToggleHost" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
-                <Setter TargetName="Right" Property="Background" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
+                <Setter TargetName="PART_Thumb" Property="Background" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
                 <Setter Property="Opacity" Value="0.8" />
             </MultiTrigger>
         </ControlTemplate.Triggers>
@@ -143,40 +131,33 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
+            <!--  轨道：宽 = 2 × SwitchSize，高 = SwitchSize，胶囊圆角 = SwitchSize / 2，由控件按 SwitchSize 推导  -->
             <Border
                 x:Name="ToggleHost"
                 Grid.Column="0"
-                Width="{TemplateBinding SwitchWidth}"
-                Height="{TemplateBinding SwitchHeight}"
+                Width="{TemplateBinding TrackWidth}"
+                Height="{TemplateBinding SwitchSize}"
                 Padding="1"
+                Background="Transparent"
                 BorderBrush="{DynamicResource Theme.Brush.Border.Strong}"
                 BorderThickness="1"
-                CornerRadius="{Binding RelativeSource={RelativeSource AncestorType=local:ToggleButton}, Path=(Border.CornerRadius)}"
-                Opacity="1">
+                CornerRadius="{TemplateBinding TrackCornerRadius}">
 
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Border
-                        x:Name="Left"
-                        Grid.Column="0"
-                        Background="{DynamicResource Theme.Brush.Accent.Primary}"
-                        CornerRadius="{Binding RelativeSource={RelativeSource AncestorType=local:ToggleButton}, Path=(Border.CornerRadius)}">
-                        <ContentControl />
-                    </Border>
-
-                    <Border
-                        x:Name="Right"
-                        Grid.Column="1"
-                        Background="Transparent"
-                        CornerRadius="{Binding RelativeSource={RelativeSource AncestorType=local:ToggleButton}, Path=(Border.CornerRadius)}" />
-                </Grid>
+                <!--  滑块：直径 = SwitchSize - 4，与边框、内边距严丝合缝；Checked 时由控件代码驱动滑动动画  -->
+                <Border
+                    x:Name="PART_Thumb"
+                    Width="{TemplateBinding ThumbSize}"
+                    Height="{TemplateBinding ThumbSize}"
+                    HorizontalAlignment="Left"
+                    Background="{DynamicResource Theme.Brush.Border.Strong}"
+                    CornerRadius="{TemplateBinding ThumbCornerRadius}">
+                    <Border.RenderTransform>
+                        <TranslateTransform x:Name="PART_ThumbTranslate" />
+                    </Border.RenderTransform>
+                </Border>
             </Border>
 
             <Grid Grid.Column="1">
@@ -199,13 +180,7 @@
 
         <ControlTemplate.Triggers>
             <Trigger Property="IsChecked" Value="True">
-                <Setter TargetName="Left" Property="Background" Value="Transparent" />
-                <Setter TargetName="Right" Property="Background" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
-            </Trigger>
-
-            <Trigger Property="IsChecked" Value="False">
-                <Setter TargetName="Left" Property="Background" Value="{DynamicResource Theme.Brush.Border.Strong}" />
-                <Setter TargetName="Right" Property="Background" Value="Transparent" />
+                <Setter TargetName="PART_Thumb" Property="Background" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
             </Trigger>
 
             <!--  Hover  -->
@@ -217,6 +192,7 @@
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="ToggleHost" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
                 <Setter TargetName="ToggleHost" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
+                <Setter TargetName="PART_Thumb" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
                 <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
                 <Setter Property="Opacity" Value="0.8" />
             </Trigger>
@@ -228,9 +204,8 @@
                 </MultiTrigger.Conditions>
                 <Setter TargetName="ToggleHost" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
                 <Setter TargetName="ToggleHost" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
-                <Setter TargetName="Right" Property="Background" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
+                <Setter TargetName="PART_Thumb" Property="Background" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
                 <Setter Property="Opacity" Value="0.8" />
-
             </MultiTrigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -321,9 +296,7 @@
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Template" Value="{StaticResource SwitchToggleButton_Radius}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="SwitchWidth" Value="40" />
-        <Setter Property="SwitchHeight" Value="20" />
-        <Setter Property="Border.CornerRadius" Value="10" />
+        <Setter Property="SwitchSize" Value="20" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
     </Style>
 

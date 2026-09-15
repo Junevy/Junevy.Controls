@@ -2,6 +2,20 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## ToggleButton
+
+### 本次更新（开关尺寸与视觉重构）— 2026-09-15
+
+- 新增 `SwitchSize` 依赖属性（默认 `20`，建议不小于 `12`）：只需设置一个属性即可调整开关整体大小，轨道宽度按 2:1 比例自动推导，任何尺寸下宽高比例恒定，不再出现设置不合理宽高导致的视觉变形。
+- **移除 `SwitchWidth` / `SwitchHeight`（破坏性变更）**：原来两个独立尺寸属性允许任意比例组合（如 40×40），会导致轨道严重变形；所有使用旧属性的代码需迁移到 `SwitchSize`。
+- 两个开关模板（`SwitchToggleButton_Radius` / `SwitchToggleButton_Rect`）由"轨道均分左右两半填充"重构为经典"轨道 + 滑块"结构：
+  - 滑块直径 = `SwitchSize` − 4（扣除左右边框 1 + 内边距 1），与轨道内壁严丝合缝，任何尺寸下都不会露出缝隙或溢出。
+  - 切换选中状态时滑块以 200ms 缓动动画（QuadraticEase EaseOut）滑动到对侧，动画行程由控件根据 `SwitchSize` 实时计算，尺寸变化后动画依然正确。
+  - 未选中滑块为 `Theme.Brush.Border.Strong`，选中为 `Theme.Brush.Accent.Primary`，禁用状态沿用原有禁用配色方案。
+- 圆角数学修正：胶囊模板轨道圆角 = `SwitchSize` / 2（正圆弧），滑块圆角 = 滑块直径 / 2，恒比轨道圆角小 2 DIP（内缩量一致），内外圆角视觉吻合；矩形模板滑块圆角 = 外圆角(4) − 内缩量(2) = 2。修复了旧实现内层直接沿用外层圆角导致内角"发胖"的问题。
+- 移除 `DefaultToggleButton` 样式中已无消费者的 `Border.CornerRadius` 设置，胶囊圆角改由 `SwitchSize` 推导。
+- 验证：控件库编译通过（net48 / net8.0-windows，0 警告 0 错误），现有测试套件全部通过。
+
 ## DialogWindow
 
 ### 本次更新（按内容自适应尺寸）— 2026-09-14

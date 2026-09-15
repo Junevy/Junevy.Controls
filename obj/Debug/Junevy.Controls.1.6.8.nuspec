@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Junevy.Controls</id>
+    <version>1.6.8</version>
+    <authors>Junevy</authors>
+    <description>Junevy WPF Controls</description>
+    <repository type="git" commit="7f48373dcac7edfea63b874717499fa587e9116e" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.8" />
+      <group targetFramework="net8.0-windows7.0" />
+    </dependencies>
+    <frameworkReferences>
+      <group targetFramework=".NETFramework4.8" />
+      <group targetFramework="net8.0-windows7.0">
+        <frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
+      </group>
+    </frameworkReferences>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="PresentationCore" targetFramework=".NETFramework4.8" />
+      <frameworkAssembly assemblyName="PresentationFramework" targetFramework=".NETFramework4.8" />
+      <frameworkAssembly assemblyName="System.Xaml" targetFramework=".NETFramework4.8" />
+      <frameworkAssembly assemblyName="WindowsBase" targetFramework=".NETFramework4.8" />
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="D:\Desktop\doc\Github_Repository\Junevy.Controls\Junevy.Controls\bin\Debug\net48\Junevy.Controls.dll" target="lib\net48\Junevy.Controls.dll" />
+    <file src="D:\Desktop\doc\Github_Repository\Junevy.Controls\Junevy.Controls\bin\Debug\net8.0-windows\Junevy.Controls.dll" target="lib\net8.0-windows7.0\Junevy.Controls.dll" />
+  </files>
+</package>

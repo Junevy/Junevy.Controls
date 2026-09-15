@@ -1,0 +1,106 @@
+{
+  "version": 4,
+  "targets": {
+    "net8.0-windows": {
+      "Junevy.Controls/1.6.8": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/Junevy.Controls.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Junevy.Controls.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.WindowsDesktop.App.WPF"
+        ]
+      }
+    }
+  },
+  "libraries": {
+    "Junevy.Controls/1.6.8": {
+      "type": "project",
+      "path": "../../Junevy.Controls.csproj",
+      "msbuildProject": "../../Junevy.Controls.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net8.0-windows": [
+      "Junevy.Controls >= 1.6.8"
+    ]
+  },
+  "packageFolders": {
+    "D:\\Documents\\Nuget\\RemoteCache\\packages": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "D:\\Desktop\\doc\\Github_Repository\\Junevy.Controls\\Junevy.Controls\\Samples\\Junevy.Controls.ToolboxDemo\\Junevy.Controls.ToolboxDemo.csproj",
+      "projectName": "Junevy.Controls.ToolboxDemo",
+      "projectPath": "D:\\Desktop\\doc\\Github_Repository\\Junevy.Controls\\Junevy.Controls\\Samples\\Junevy.Controls.ToolboxDemo\\Junevy.Controls.ToolboxDemo.csproj",
+      "packagesPath": "D:\\Documents\\Nuget\\RemoteCache\\packages",
+      "outputPath": "D:\\Desktop\\doc\\Github_Repository\\Junevy.Controls\\Junevy.Controls\\Samples\\Junevy.Controls.ToolboxDemo\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\COWAIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net8.0-windows"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "D:\\Documents\\Nuget\\Local": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net8.0-windows": {
+          "framework": "net8.0-windows7.0",
+          "targetAlias": "net8.0-windows",
+          "projectReferences": {
+            "D:\\Desktop\\doc\\Github_Repository\\Junevy.Controls\\Junevy.Controls\\Junevy.Controls.csproj": {
+              "projectPath": "D:\\Desktop\\doc\\Github_Repository\\Junevy.Controls\\Junevy.Controls\\Junevy.Controls.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "10.0.400"
+    },
+    "frameworks": {
+      "net8.0-windows": {
+        "framework": "net8.0-windows7.0",
+        "targetAlias": "net8.0-windows",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          },
+          "Microsoft.WindowsDesktop.App.WPF": {
+            "privateAssets": "none"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
