@@ -5,7 +5,7 @@
     <version>1.6.8</version>
     <authors>Junevy</authors>
     <description>Junevy WPF Controls</description>
-    <repository type="git" commit="418ecee015ae37f24ecb32b5d23d2e41d16e59f2" />
+    <repository type="git" commit="9005b14dcff7ace9c7583e5e279bb79a06fe1798" />
     <dependencies>
       <group targetFramework=".NETFramework4.8" />
       <group targetFramework="net8.0-windows7.0" />

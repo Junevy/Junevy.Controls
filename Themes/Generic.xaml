@@ -37,5 +37,7 @@
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Progress/ProgressBarWindow.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Dialog/DialogWindow.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Expander/ExpanderPanel.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Panel/SidePanel.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Badge/Badge.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

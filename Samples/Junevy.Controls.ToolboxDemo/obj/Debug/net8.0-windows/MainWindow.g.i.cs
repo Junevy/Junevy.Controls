@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 
 using Junevy.Controls.AttachedProperties;
+using Junevy.Controls.Controls.Badge;
 using Junevy.Controls.Controls.Bar;
 using Junevy.Controls.Controls.Box;
 using Junevy.Controls.Controls.Button;
@@ -18,6 +19,7 @@ using Junevy.Controls.Controls.Dialog;
 using Junevy.Controls.Controls.Expander;
 using Junevy.Controls.Controls.Image;
 using Junevy.Controls.Controls.Menu;
+using Junevy.Controls.Controls.Panel;
 using Junevy.Controls.Controls.Progress;
 using Junevy.Controls.Controls.Text;
 using Junevy.Controls.Controls.Toolbox;

@@ -1,0 +1,72 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Junevy.Controls.Controls.Panel">
+
+    <Style TargetType="{x:Type local:SidePanel}">
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Raised}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="BackdropBrush" Value="{DynamicResource Theme.Brush.Overlay.Backdrop}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:SidePanel}">
+                    <!--
+                        根 Grid 覆盖整个父容器区域：Background 为空保证收起时不拦截鼠标；
+                        ClipToBounds 将滑出可视区域的内容裁剪掉。
+                    -->
+                    <Grid x:Name="PART_Root" ClipToBounds="True">
+                        <Border
+                            x:Name="PART_Backdrop"
+                            Background="{TemplateBinding BackdropBrush}"
+                            Opacity="0"
+                            Visibility="Collapsed" />
+                        <Border
+                            x:Name="PART_Content"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{DynamicResource Theme.ControlCornerRadius}"
+                            Effect="{DynamicResource Theme.PopupShadow}">
+                            <Border.RenderTransform>
+                                <TranslateTransform x:Name="PART_Translate" />
+                            </Border.RenderTransform>
+                            <ContentPresenter
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                ContentSource="Content" />
+                        </Border>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <!--  按滑出方向停靠内容边缘，垂直/水平方向默认填满父容器  -->
+                        <Trigger Property="Side" Value="Left">
+                            <Setter TargetName="PART_Content" Property="HorizontalAlignment" Value="Left" />
+                            <Setter TargetName="PART_Content" Property="VerticalAlignment" Value="Stretch" />
+                        </Trigger>
+                        <Trigger Property="Side" Value="Right">
+                            <Setter TargetName="PART_Content" Property="HorizontalAlignment" Value="Right" />
+                            <Setter TargetName="PART_Content" Property="VerticalAlignment" Value="Stretch" />
+                        </Trigger>
+                        <Trigger Property="Side" Value="Top">
+                            <Setter TargetName="PART_Content" Property="HorizontalAlignment" Value="Stretch" />
+                            <Setter TargetName="PART_Content" Property="VerticalAlignment" Value="Top" />
+                        </Trigger>
+                        <Trigger Property="Side" Value="Bottom">
+                            <Setter TargetName="PART_Content" Property="HorizontalAlignment" Value="Stretch" />
+                            <Setter TargetName="PART_Content" Property="VerticalAlignment" Value="Bottom" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

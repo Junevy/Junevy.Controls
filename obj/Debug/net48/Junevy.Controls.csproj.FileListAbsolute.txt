@@ -100,3 +100,5 @@ D:\Desktop\WorkSpace\VMDevelop\HikIndustrialCameraDev\Controls\Junevy.Controls\o
 D:\Desktop\WorkSpace\VMDevelop\HikIndustrialCameraDev\Controls\Junevy.Controls\obj\Debug\net48\Junevy.Controls.sourcelink.json
 D:\Desktop\WorkSpace\VMDevelop\HikIndustrialCameraDev\Controls\Junevy.Controls\obj\Debug\net48\Junevy.Controls.dll
 D:\Desktop\WorkSpace\VMDevelop\HikIndustrialCameraDev\Controls\Junevy.Controls\obj\Debug\net48\Junevy.Controls.pdb
+D:\Desktop\WorkSpace\VMDevelop\HikIndustrialCameraDev\Controls\Junevy.Controls\obj\Debug\net48\Controls\Panel\SidePanel.baml
+D:\Desktop\WorkSpace\VMDevelop\HikIndustrialCameraDev\Controls\Junevy.Controls\obj\Debug\net48\Controls\Badge\Badge.baml

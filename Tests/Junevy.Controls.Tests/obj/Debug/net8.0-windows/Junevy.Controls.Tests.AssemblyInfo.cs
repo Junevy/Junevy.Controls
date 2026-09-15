@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Junevy.Controls.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+418ecee015ae37f24ecb32b5d23d2e41d16e59f2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9005b14dcff7ace9c7583e5e279bb79a06fe1798")]
 [assembly: System.Reflection.AssemblyProductAttribute("Junevy.Controls.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Junevy.Controls.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
