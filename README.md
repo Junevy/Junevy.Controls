@@ -865,7 +865,70 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 
 展开/折叠动画基于 `LayoutTransform` 缩放：动画期间周围布局同步收缩，折叠完成后不留占位空间，也不会出现布局跳变。
 
+### SidePanel
+
+`jv:SidePanel` 继承 WPF `ContentControl`，是作为浮层使用的侧滑面板：把 `IsOpen` 绑定到一个布尔值，值为 `true` 时面板从 `Side` 指定的边缘（左/右/上/下）以滑动 + 淡入动画滑出，叠加显示在兄弟内容上方；值为 `false` 时完全滑出可视区域，不占用任何布局空间。
+
+推荐直接放入 `Grid`（不指定 `Row`/`Column`）：控件会自动跨满父 Grid 的所有列/行（不会覆盖使用者显式设置的 `Grid.ColumnSpan`/`Grid.RowSpan`），面板宽度与高度由其 `Content` 决定，可通过设置内容的 `Width`/`Height` 指定。
+
+| 属性/事件/方法 | 默认值 | 效果 |
+| --- | --- | --- |
+| `IsOpen` | `false` | 是否滑出；支持双向绑定 |
+| `Side` | `Left` | 滑出方向：`Left`/`Right` 垂直填满、水平停靠对应边缘；`Top`/`Bottom` 水平填满、垂直停靠对应边缘；运行时切换立即生效 |
+| `AnimationDuration` | `250 ms` | 滑出/收回过渡动画时长；`Automatic` 或 `Forever` 视为无效，`0` 表示无过渡动画直接切换（事件仍会触发） |
+| `IsBackdropEnabled` | `true` | 是否启用遮罩层；展开时在面板背后显示半透明遮罩 |
+| `BackdropBrush` | 主题 `Theme.Brush.Overlay.Backdrop` | 遮罩层画刷 |
+| `Toggle()` | - | 切换滑出/收回状态 |
+| `Opened` / `Closed` | - | 滑出/收回动画完成后触发的冒泡路由事件；动画时长为 `0` 时随状态切换立即触发 |
+
+```xml
+<Grid>
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <!--  两列各自的业务内容  -->
+    <ContentControl Grid.Column="0" Content="{Binding LeftView}" />
+    <ContentControl Grid.Column="1" Content="{Binding RightView}" />
+
+    <!--  SidePanel 不指定 Column：自动跨满整个 Grid，从左侧滑出  -->
+    <jv:SidePanel IsOpen="{Binding IsPanelOpen, Mode=TwoWay}" Side="Left">
+        <StackPanel Width="300" Margin="8">
+            <TextBlock Text="侧滑面板内容" />
+        </StackPanel>
+    </jv:SidePanel>
+</Grid>
+```
+
+实现说明：收起时面板内容通过 `TranslateTransform` 完全平移出父容器并被裁剪，同时以透明度 0 兜底，根 Grid 的 `Background` 为空保证鼠标命中测试穿透到下层内容；展开时遮罩层淡入，命中测试由遮罩与面板正常接管。面板表面使用主题 `Surface.Raised`、`Theme.PopupShadow` 阴影与主题圆角。
+
 ## 通知控件
+
+### Badge
+
+`jv:Badge` 继承 WPF `ContentControl`，是类似手机应用右上角未读提醒的角标控件：包裹任意内容（按钮、图标、菜单项等），在内容的指定角落叠加一个小圆点或未读数角标。包裹层不参与焦点与 Tab 导航，角标本体关闭命中测试，点击穿透到被包裹的内容。
+
+| 属性 | 默认值 | 效果 |
+| --- | --- | --- |
+| `Count` | `0` | 未读数；小于等于 0 时角标隐藏，大于 `MaxCount` 显示 `99+` 形式 |
+| `MaxCount` | `99` | 数字显示上限 |
+| `IsDot` | `false` | 纯圆点模式（固定 10x10，不显示数字）；显示/隐藏仍由 `Count` 控制 |
+| `Corner` | `TopRight` | 停靠角落：`TopLeft` / `TopRight` / `BottomLeft` / `BottomRight`，运行时切换立即生效 |
+| `OffsetX` / `OffsetY` | `0` | 在角落停靠位置基础上的像素级微调 |
+
+```xml
+<jv:Badge Count="{Binding UnreadCount}" Corner="TopRight">
+    <jv:Button atc:Icon.Icon="&#xE60F;" Content="消息" />
+</jv:Badge>
+
+<!--  纯圆点："有更新"提醒  -->
+<jv:Badge Count="{Binding HasUpdate, Converter={StaticResource BoolToCount}}" IsDot="True">
+    <jv:Button Content="更新" />
+</jv:Badge>
+```
+
+停靠说明：角标以自身中心对准内容（视觉边界）的角落，自动补偿内容自身的 `Margin`；包裹层按内容自然尺寸收紧（默认 Left/Top，可通过 `HorizontalContentAlignment`/`VerticalContentAlignment` 调整），父容器拉伸包裹层不会导致角标脱离内容角落。角标为 16x16 胶囊（`Status.Danger` 背景 + `Text.OnAccent` 文字），需要自定义外观时重写模板即可。
 
 ### MessageBar、MessageBarPresenter 与 MessageBarService
 
@@ -1034,9 +1097,9 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | 输入/选择 | `CheckBox`、`TextBox`、`ComboBox`、`ComboBoxItem`、`DatePicker` |
 | 集合/数据 | `ListBox`、`ListView`、`DataGrid` |
 | 文本/状态 | `Label`、`TextBlock` |
-| 通知 | `MessageBar`、`MessageBarPresenter`、`MessageBarService`、`ToolTip` |
+| 通知 | `Badge`、`MessageBar`、`MessageBarPresenter`、`MessageBarService`、`ToolTip` |
 | 窗口 | `DialogWindow` |
-| 布局 | `ExpanderPanel`、`GroupBox` |
+| 布局 | `ExpanderPanel`、`SidePanel`、`GroupBox` |
 | 菜单/导航 | `ContextMenu`、`ContextMenuItem`、`MenuItem`、`SideMenu`、`TreeMenu`、`TreeMenuItem`、`TabMenu`、`TabMenuItem`、`ToolBar`、`ToolBarItem`、`Toolbox`、`ToolboxItem`、`ToolItem` |
 | 图像 | `ImageViewer` |
 
@@ -1062,6 +1125,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ToolTip` | WPF `ToolTip`、主题资源 | 无 |
 | `Label` | WPF `Label`、状态和图标资源 | `Icon.Icon`、`Icon.FontFamily`（仅相应模板） |
 | `TextBlock` | WPF `ContentControl`、`ContentPresenter`、标准内容模板管线 | 无 |
+| `Badge` | WPF `ContentControl`、`TranslateTransform` 停靠偏移、主题状态色令牌（`Theme.Brush.Status.Danger`、`Theme.Brush.Text.OnAccent`） | 无 |
 | `MessageBar` | WPF `ContentControl`、`DispatcherTimer`、`jv:Button` 关闭按钮、主题资源 | `Icon.FontFamily`、`Icon.IconSize` |
 | `MessageBarPresenter` | WPF `ContentControl`、承载 `MessageBar`，配合 `MessageBarService` | 无 |
 | `DialogWindow` | WPF `Window`、`WindowChrome`、`SystemCommands`、主题资源（含阴影/圆角令牌） | 无 |
@@ -1080,6 +1144,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ToolItem` | WPF `Button` 命令管线、`DefaultToolItemStyle`、WPF `DragDrop` | `Icon.FontFamily`、`Icon.IconSize`、`Icon.IconForeground` |
 | `ImageViewer` | WPF `Image`、`MatrixTransform`、`BitmapSource`、`SaveFileDialog` | 无 |
 | `ExpanderPanel` | WPF `HeaderedContentControl`、`ToggleButton`、`LayoutTransform` 过渡动画、主题资源 | 无 |
+| `SidePanel` | WPF `ContentControl`、`TranslateTransform` 滑动动画、遮罩与主题阴影令牌（`Theme.Brush.Overlay.Backdrop`、`Theme.PopupShadow`） | 无 |
 | `GroupBox` | WPF `GroupBox`、主题资源（卡片、悬停、状态令牌） | `Border.CornerRadius` |
 
 ## 开发注意事项

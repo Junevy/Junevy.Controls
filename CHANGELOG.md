@@ -2,6 +2,40 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## Badge
+
+### 本次更新（新增控件）— 2026-09-15
+
+- 新增 `Badge` 角标控件（`jv:Badge`，继承 WPF `ContentControl`）：类似手机应用右上角的未读提醒，包裹任意内容（按钮、图标、菜单项等）并在内容的角落叠加小圆点或未读数角标，包裹层自身 `Focusable=False`、`IsTabStop=False`，不参与焦点与 Tab 导航。
+- 新增依赖属性：
+  - `Count`（默认 `0`）：未读数；小于等于 0 时角标隐藏，大于 `MaxCount` 显示 `99+` 形式。
+  - `MaxCount`（默认 `99`，校验非负）：数字显示上限。
+  - `IsDot`（默认 `false`）：纯圆点模式（固定 10x10，不显示数字），显示/隐藏仍由 `Count` 控制。
+  - `Corner`（`BadgeCorner` 枚举，默认 `TopRight`）：停靠角落四选一，运行时切换立即生效。
+  - `OffsetX` / `OffsetY`（默认 `0`）：在角落停靠位置基础上的像素级微调。
+- 停靠几何：内层 Grid 按内容自然尺寸收紧（复用 `HorizontalContentAlignment`/`VerticalContentAlignment`，默认 Left/Top），保证角标锚定内容自身角落而非包裹层被父容器拉伸后的角落；停靠偏移按角标实际尺寸实时计算（角标尺寸随内容变化经 `SizeChanged` 重算），并补偿内容自身的 `Margin`，外边距不会造成角标脱离视觉角落；`OffsetX/OffsetY` 或内容替换（`ContentProperty` OverrideMetadata）即时重算。
+- 命中测试：角标 `IsHitTestVisible=False`，点击穿透到被包裹的内容。
+- 视觉：`Theme.Brush.Status.Danger` 背景 + `Theme.Brush.Text.OnAccent` 文字（深浅主题自动切换），数字角标 16x16 胶囊（最小宽 16、`Padding=4,0`、圆角 8），纯圆点 10x10（圆角 5）。
+- 默认样式注册到 `Themes/Generic.xaml`，命名空间 `Junevy.Controls.Controls.Badge` 加入 `github.com.junevy` XML 命名空间。
+- 验证：控件库编译通过（net48 / net8.0-windows，新增代码 0 警告 0 错误）；`BadgeProbe` 端到端探测 9 组断言全部通过（默认隐藏与布局无侵入、数字角标中心对准内容角落、99+ 上限、纯圆点切换、运行时切角、偏移微调、重新隐藏、命中穿透、PNG 快照）。
+
+## SidePanel
+
+### 本次更新（新增控件）— 2026-09-15
+
+- 新增 `SidePanel` 侧滑面板控件（`jv:SidePanel`，继承 WPF `ContentControl`）：作为浮层放置在布局容器（通常为 `Grid`）中，`IsOpen`（bool，双向绑定默认开启）绑定 `true` 时面板从 `Side` 指定的边缘滑出，叠加显示在兄弟内容上方；`false` 时完全滑出可视区域、不占用任何布局空间。
+- 新增依赖属性：
+  - `Side`（`SidePanelSide` 枚举：`Left`/`Right`/`Top`/`Bottom`，默认 `Left`）：滑出方向；`Left`/`Right` 垂直填满、水平停靠对应边缘，`Top`/`Bottom` 水平填满、垂直停靠对应边缘；运行时切换立即生效。
+  - `AnimationDuration`（默认 `250ms`）：滑出/收回过渡动画时长，滑动 + 淡入淡出同步过渡（CubicEase EaseInOut）；`0` 表示无动画直接切换。
+  - `IsBackdropEnabled`（默认 `true`）与 `BackdropBrush`（默认主题 `Theme.Brush.Overlay.Backdrop`）：展开时在面板背后淡入半透明遮罩。
+- 新增路由事件 `Opened`/`Closed`：滑出/收回动画完成后触发；动画时长为 `0` 时随状态切换立即触发，模板未加载时发生的状态切换会在模板应用后补发，保证事件不丢失。
+- Grid 浮层约定：直接放入 `Grid`（不指定 Row/Column）时自动跨满父 Grid 的所有列/行（`ColumnSpan`/`RowSpan` = 定义数），使用者显式设置的跨距不被覆盖；面板宽高由 `Content` 决定，可通过内容的 `Width`/`Height` 指定。
+- 收起状态的实现细节：内容经 `TranslateTransform` 平移出父容器并被根 `ClipToBounds` 裁剪，同时透明度归 0 兜底（防止主题阴影在边缘残留），根 Grid `Background` 为空保证收起时鼠标命中测试完全穿透到下层内容；展开后遮罩与面板正常接管命中测试。
+- 快速连续切换的防抖处理：状态版本号校验，旧动画完成回调不会覆盖新状态；反向切换时先清除两个轴上的残留动画，避免中途换向闪烁。
+- 面板视觉：主题 `Surface.Raised` 表面、`Theme.PopupShadow` 阴影、主题圆角、`Border.Default` 细边框，浅色/深色主题随 `DynamicResource` 自动切换。
+- 默认样式注册到 `Themes/Generic.xaml`，命名空间 `Junevy.Controls.Controls.Panel` 加入 `github.com.junevy` XML 命名空间。
+- 验证：控件库编译通过（net48 / net8.0-windows，新增代码 0 警告 0 错误）；`SidePanelProbe` 端到端探测 10 组断言全部通过（初始收起位移/透明度/遮罩折叠、自动跨满、收起命中穿透、滑出动画后事件与状态、展开命中、收回恢复、运行时切换 Side=Top、禁用遮罩、0 时长动画事件、PNG 快照）。
+
 ## ToggleButton
 
 ### 本次更新（开关尺寸与视觉重构）— 2026-09-15

@@ -1,0 +1,82 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Junevy.Controls.Controls.Badge">
+
+    <Style TargetType="{x:Type local:Badge}">
+        <!--  角标只是信息提示，不参与焦点与 Tab 导航  -->
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Status.Danger}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.OnAccent}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:Badge}">
+                    <!--
+                        内层 Grid 按内容自然尺寸收紧（默认 Left/Top，可通过 HorizontalContentAlignment/
+                        VerticalContentAlignment 调整），保证角标始终锚定在内容自身的角落上，
+                        而不是包裹层被父容器拉伸后的角落。
+                    -->
+                    <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                        <ContentPresenter ContentSource="Content" />
+
+                        <!--
+                            角标：默认对齐右上角，停靠偏移由控件按角标实际尺寸计算
+                            （中心对准内容角落），命中测试关闭，点击穿透到下层内容。
+                        -->
+                        <Border
+                            x:Name="PART_Badge"
+                            MinWidth="16"
+                            Height="16"
+                            Padding="4,0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="8"
+                            IsHitTestVisible="False"
+                            Visibility="Collapsed">
+                            <Border.RenderTransform>
+                                <TranslateTransform x:Name="PART_Translate" />
+                            </Border.RenderTransform>
+                            <TextBlock
+                                x:Name="PART_Text"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="10"
+                                Foreground="{TemplateBinding Foreground}"
+                                Text="0" />
+                        </Border>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <!--  纯圆点模式：固定小圆点，不显示数字  -->
+                        <Trigger Property="IsDot" Value="True">
+                            <Setter TargetName="PART_Badge" Property="MinWidth" Value="10" />
+                            <Setter TargetName="PART_Badge" Property="Height" Value="10" />
+                            <Setter TargetName="PART_Badge" Property="Padding" Value="0" />
+                            <Setter TargetName="PART_Badge" Property="CornerRadius" Value="5" />
+                            <Setter TargetName="PART_Text" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+
+                        <!--  按停靠角落切换对齐；TopRight 为模板默认  -->
+                        <Trigger Property="Corner" Value="TopLeft">
+                            <Setter TargetName="PART_Badge" Property="HorizontalAlignment" Value="Left" />
+                            <Setter TargetName="PART_Badge" Property="VerticalAlignment" Value="Top" />
+                        </Trigger>
+                        <Trigger Property="Corner" Value="BottomRight">
+                            <Setter TargetName="PART_Badge" Property="HorizontalAlignment" Value="Right" />
+                            <Setter TargetName="PART_Badge" Property="VerticalAlignment" Value="Bottom" />
+                        </Trigger>
+                        <Trigger Property="Corner" Value="BottomLeft">
+                            <Setter TargetName="PART_Badge" Property="HorizontalAlignment" Value="Left" />
+                            <Setter TargetName="PART_Badge" Property="VerticalAlignment" Value="Bottom" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
