@@ -49,7 +49,7 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `<DatePicker>` | 外观 + 交互 | 完整等效（含日历全套模板）；占位符通过附加属性 `atc:DatePickerAssist.PlaceHolder` 提供，原生实例可用 |
 | `<ToolTip>` | 外观 | 完整等效，任意元素的 `ToolTip` 属性自动获得主题样式 |
 
-以下控件因依赖自有依赖属性（样式触发器直接引用），**必须使用 `jv:` 前缀**：`RadioButton`、`ToggleButton`（`DisplayMode`/`SwitchWidth`/`SwitchHeight`）、`Label`（`DisplayMode`）、`TextBlock`（`Text`/`TextAlignment`/`TextWrapping`）、`ProgressBar`（`ProgressText` 等）。
+以下控件因依赖自有依赖属性（样式触发器直接引用），**必须使用 `jv:` 前缀**：`RadioButton`、`ToggleButton`（`DisplayMode`/`SwitchSize`）、`Label`（`DisplayMode`）、`TextBlock`（`Text`/`TextAlignment`/`TextWrapping`）、`ProgressBar`（`ProgressText` 等）。
 
 ## 主题
 
@@ -190,15 +190,15 @@ ThemeManager.ToggleTheme();
 | --- | --- |
 | `IsChecked` | 标准可空选中状态 |
 | `DisplayMode` | 形状状态属性；当前只由 `ExpanderButton` 样式的触发器读取 |
-| `SwitchWidth` | 开关轨道宽度，默认 `40` |
-| `SwitchHeight` | 开关轨道高度，默认 `20` |
+| `SwitchSize` | 开关整体高度，轨道宽度按 2:1 比例自动推导，默认 `20`，建议不小于 `12` |
+
+开关采用「轨道 + 滑块」结构：滑块直径 = `SwitchSize` − 4（扣除左右边框与内边距），与轨道内壁严丝合缝；胶囊模板圆角 = `SwitchSize` / 2，矩形模板使用 `Theme.SmallCornerRadius`，滑块圆角恒比轨道圆角小 2 DIP（内缩量），任意尺寸下内外圆角都保持视觉吻合。切换时滑块以缓动动画滑动到对侧。
 
 ```xml
 <jv:ToggleButton
     Content="Auto exposure"
     IsChecked="{Binding AutoExposure, Mode=TwoWay}"
-    SwitchWidth="44"
-    SwitchHeight="22"
+    SwitchSize="22"
     Template="{StaticResource SwitchToggleButton_Radius}" />
 ```
 

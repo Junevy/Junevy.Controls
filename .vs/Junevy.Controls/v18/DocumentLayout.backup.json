@@ -1,0 +1,57 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Desktop\\doc\\Github_Repository\\Junevy.Controls\\Junevy.Controls\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{D4A69964-2175-4C66-A152-188F421EC20D}|Junevy.Controls.csproj|d:\\desktop\\doc\\github_repository\\junevy.controls\\junevy.controls\\junevy.controls.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{D4A69964-2175-4C66-A152-188F421EC20D}|Junevy.Controls.csproj|solutionrelative:junevy.controls.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 1,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedHeight": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Junevy.Controls",
+              "DocumentMoniker": "D:\\Desktop\\doc\\Github_Repository\\Junevy.Controls\\Junevy.Controls\\Junevy.Controls.csproj",
+              "RelativeDocumentMoniker": "Junevy.Controls.csproj",
+              "ToolTip": "D:\\Desktop\\doc\\Github_Repository\\Junevy.Controls\\Junevy.Controls\\Junevy.Controls.csproj",
+              "RelativeToolTip": "Junevy.Controls.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-09-15T00:48:52.605Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
