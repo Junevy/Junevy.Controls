@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v8.0": {
-      "Junevy.Controls/1.6.9": {
+      "Junevy.Controls/1.7.0": {
         "runtime": {
           "Junevy.Controls.dll": {}
         }
@@ -14,7 +14,7 @@
     }
   },
   "libraries": {
-    "Junevy.Controls/1.6.9": {
+    "Junevy.Controls/1.7.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
