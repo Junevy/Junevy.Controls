@@ -5,7 +5,7 @@
     <version>1.6.8</version>
     <authors>Junevy</authors>
     <description>Junevy WPF Controls</description>
-    <repository type="git" commit="7f48373dcac7edfea63b874717499fa587e9116e" />
+    <repository type="git" commit="418ecee015ae37f24ecb32b5d23d2e41d16e59f2" />
     <dependencies>
       <group targetFramework=".NETFramework4.8" />
       <group targetFramework="net8.0-windows7.0" />
@@ -24,7 +24,7 @@
     </frameworkAssemblies>
   </metadata>
   <files>
-    <file src="D:\Desktop\doc\Github_Repository\Junevy.Controls\Junevy.Controls\bin\Debug\net48\Junevy.Controls.dll" target="lib\net48\Junevy.Controls.dll" />
-    <file src="D:\Desktop\doc\Github_Repository\Junevy.Controls\Junevy.Controls\bin\Debug\net8.0-windows\Junevy.Controls.dll" target="lib\net8.0-windows7.0\Junevy.Controls.dll" />
+    <file src="D:\Desktop\WorkSpace\VMDevelop\HikIndustrialCameraDev\Controls\Junevy.Controls\bin\Debug\net48\Junevy.Controls.dll" target="lib\net48\Junevy.Controls.dll" />
+    <file src="D:\Desktop\WorkSpace\VMDevelop\HikIndustrialCameraDev\Controls\Junevy.Controls\bin\Debug\net8.0-windows\Junevy.Controls.dll" target="lib\net8.0-windows7.0\Junevy.Controls.dll" />
   </files>
 </package>

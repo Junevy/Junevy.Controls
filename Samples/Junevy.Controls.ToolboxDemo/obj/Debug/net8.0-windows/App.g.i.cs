@@ -46,7 +46,7 @@ namespace Junevy.Controls.ToolboxDemo {
         /// InitializeComponent
         /// </summary>
         [System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "10.0.12.0")]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "10.0.11.0")]
         public void InitializeComponent() {
             if (_contentLoaded) {
                 return;
@@ -58,7 +58,7 @@ namespace Junevy.Controls.ToolboxDemo {
             
             #line default
             #line hidden
-            System.Uri resourceLocater = new System.Uri("/Junevy.Controls.ToolboxDemo;component/app.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Junevy.Controls.ToolboxDemo;V1.0.0.0;component/app.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\App.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);
@@ -72,7 +72,7 @@ namespace Junevy.Controls.ToolboxDemo {
         /// </summary>
         [System.STAThreadAttribute()]
         [System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "10.0.12.0")]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "10.0.11.0")]
         public static void Main() {
             Junevy.Controls.ToolboxDemo.App app = new Junevy.Controls.ToolboxDemo.App();
             app.InitializeComponent();

@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Junevy WPF Controls")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.6.8.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.6.8+7f48373dcac7edfea63b874717499fa587e9116e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.6.8+418ecee015ae37f24ecb32b5d23d2e41d16e59f2")]
 [assembly: System.Reflection.AssemblyProductAttribute("Junevy.Controls")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Junevy.Controls")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.6.8.0")]

@@ -1,34 +1,53 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Desktop\\doc\\Github_Repository\\Junevy.Controls\\Junevy.Controls\\",
+  "WorkspaceRootPath": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{D4A69964-2175-4C66-A152-188F421EC20D}|Junevy.Controls.csproj|d:\\desktop\\doc\\github_repository\\junevy.controls\\junevy.controls\\junevy.controls.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "AbsoluteMoniker": "D:0:0:{D4A69964-2175-4C66-A152-188F421EC20D}|Junevy.Controls.csproj|d:\\desktop\\workspace\\vmdevelop\\hikindustrialcameradev\\controls\\junevy.controls\\junevy.controls.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
       "RelativeMoniker": "D:0:0:{D4A69964-2175-4C66-A152-188F421EC20D}|Junevy.Controls.csproj|solutionrelative:junevy.controls.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4A69964-2175-4C66-A152-188F421EC20D}|Junevy.Controls.csproj|d:\\desktop\\workspace\\vmdevelop\\hikindustrialcameradev\\controls\\junevy.controls\\controls\\dialog\\dialogwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{D4A69964-2175-4C66-A152-188F421EC20D}|Junevy.Controls.csproj|solutionrelative:controls\\dialog\\dialogwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4A69964-2175-4C66-A152-188F421EC20D}|Junevy.Controls.csproj|d:\\desktop\\workspace\\vmdevelop\\hikindustrialcameradev\\controls\\junevy.controls\\changelog.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{D4A69964-2175-4C66-A152-188F421EC20D}|Junevy.Controls.csproj|solutionrelative:changelog.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4A69964-2175-4C66-A152-188F421EC20D}|Junevy.Controls.csproj|d:\\desktop\\workspace\\vmdevelop\\hikindustrialcameradev\\controls\\junevy.controls\\controls\\menu\\tabmenuitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4A69964-2175-4C66-A152-188F421EC20D}|Junevy.Controls.csproj|solutionrelative:controls\\menu\\tabmenuitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4A69964-2175-4C66-A152-188F421EC20D}|Junevy.Controls.csproj|d:\\desktop\\workspace\\vmdevelop\\hikindustrialcameradev\\controls\\junevy.controls\\controls\\menu\\tabmenu.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4A69964-2175-4C66-A152-188F421EC20D}|Junevy.Controls.csproj|solutionrelative:controls\\menu\\tabmenu.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AC2C85CB-6092-4629-8192-31E8043887C8}|..\\Junevy.Controls.Test\\Junevy.Controls.Test.csproj|d:\\desktop\\workspace\\vmdevelop\\hikindustrialcameradev\\controls\\junevy.controls.test\\vies\\settingsview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4A69964-2175-4C66-A152-188F421EC20D}|Junevy.Controls.csproj|d:\\desktop\\workspace\\vmdevelop\\hikindustrialcameradev\\controls\\junevy.controls\\themes\\generic.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{D4A69964-2175-4C66-A152-188F421EC20D}|Junevy.Controls.csproj|solutionrelative:themes\\generic.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AC2C85CB-6092-4629-8192-31E8043887C8}|..\\Junevy.Controls.Test\\Junevy.Controls.Test.csproj|d:\\desktop\\workspace\\vmdevelop\\hikindustrialcameradev\\controls\\junevy.controls.test\\vies\\trendview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AC2C85CB-6092-4629-8192-31E8043887C8}|..\\Junevy.Controls.Test\\Junevy.Controls.Test.csproj|d:\\desktop\\workspace\\vmdevelop\\hikindustrialcameradev\\controls\\junevy.controls.test\\vies\\userview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AC2C85CB-6092-4629-8192-31E8043887C8}|..\\Junevy.Controls.Test\\Junevy.Controls.Test.csproj|d:\\desktop\\workspace\\vmdevelop\\hikindustrialcameradev\\controls\\junevy.controls.test\\vies\\homeview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     }
   ],
   "DocumentGroupContainers": [
     {
-      "Orientation": 1,
+      "Orientation": 0,
       "VerticalTabListWidth": 256,
       "DocumentGroups": [
         {
-          "DockedHeight": 200,
-          "SelectedChildIndex": 0,
+          "DockedWidth": 200,
+          "SelectedChildIndex": 10,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Junevy.Controls",
-              "DocumentMoniker": "D:\\Desktop\\doc\\Github_Repository\\Junevy.Controls\\Junevy.Controls\\Junevy.Controls.csproj",
-              "RelativeDocumentMoniker": "Junevy.Controls.csproj",
-              "ToolTip": "D:\\Desktop\\doc\\Github_Repository\\Junevy.Controls\\Junevy.Controls\\Junevy.Controls.csproj",
-              "RelativeToolTip": "Junevy.Controls.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAQAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-09-15T00:48:52.605Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
@@ -48,6 +67,125 @@
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "DialogWindow.xaml",
+              "DocumentMoniker": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Controls\\Dialog\\DialogWindow.xaml",
+              "RelativeDocumentMoniker": "Controls\\Dialog\\DialogWindow.xaml",
+              "ToolTip": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Controls\\Dialog\\DialogWindow.xaml",
+              "RelativeToolTip": "Controls\\Dialog\\DialogWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-09-14T12:09:13.963Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CHANGELOG.md",
+              "DocumentMoniker": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\CHANGELOG.md",
+              "RelativeDocumentMoniker": "CHANGELOG.md",
+              "ToolTip": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\CHANGELOG.md",
+              "RelativeToolTip": "CHANGELOG.md",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2026-09-14T12:08:28.668Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TabMenuItem.cs",
+              "DocumentMoniker": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Controls\\Menu\\TabMenuItem.cs",
+              "RelativeDocumentMoniker": "Controls\\Menu\\TabMenuItem.cs",
+              "ToolTip": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Controls\\Menu\\TabMenuItem.cs",
+              "RelativeToolTip": "Controls\\Menu\\TabMenuItem.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAI8AAAByAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-13T09:58:05.172Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "TabMenu.xaml.cs",
+              "DocumentMoniker": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Controls\\Menu\\TabMenu.xaml.cs",
+              "RelativeDocumentMoniker": "Controls\\Menu\\TabMenu.xaml.cs",
+              "ToolTip": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Controls\\Menu\\TabMenu.xaml.cs",
+              "RelativeToolTip": "Controls\\Menu\\TabMenu.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADQAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-13T09:56:36.664Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Junevy.Controls.csproj",
+              "DocumentMoniker": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Junevy.Controls.csproj",
+              "RelativeDocumentMoniker": "Junevy.Controls.csproj",
+              "ToolTip": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Junevy.Controls.csproj",
+              "RelativeToolTip": "Junevy.Controls.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-09-10T15:57:44.239Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Generic.xaml",
+              "DocumentMoniker": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Themes\\Generic.xaml",
+              "RelativeDocumentMoniker": "Themes\\Generic.xaml",
+              "ToolTip": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Themes\\Generic.xaml",
+              "RelativeToolTip": "Themes\\Generic.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-09-09T16:12:24.819Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "SettingsView.xaml",
+              "DocumentMoniker": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls.Test\\Vies\\SettingsView.xaml",
+              "RelativeDocumentMoniker": "..\\Junevy.Controls.Test\\Vies\\SettingsView.xaml",
+              "ToolTip": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls.Test\\Vies\\SettingsView.xaml",
+              "RelativeToolTip": "..\\Junevy.Controls.Test\\Vies\\SettingsView.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-09-09T16:11:41.276Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "TrendView.xaml",
+              "DocumentMoniker": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls.Test\\Vies\\TrendView.xaml",
+              "RelativeDocumentMoniker": "..\\Junevy.Controls.Test\\Vies\\TrendView.xaml",
+              "ToolTip": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls.Test\\Vies\\TrendView.xaml",
+              "RelativeToolTip": "..\\Junevy.Controls.Test\\Vies\\TrendView.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-09-09T16:11:37.175Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "UserView.xaml",
+              "DocumentMoniker": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls.Test\\Vies\\UserView.xaml",
+              "RelativeDocumentMoniker": "..\\Junevy.Controls.Test\\Vies\\UserView.xaml",
+              "ToolTip": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls.Test\\Vies\\UserView.xaml",
+              "RelativeToolTip": "..\\Junevy.Controls.Test\\Vies\\UserView.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-09-09T16:11:15.407Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "HomeView.xaml",
+              "DocumentMoniker": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls.Test\\Vies\\HomeView.xaml",
+              "RelativeDocumentMoniker": "..\\Junevy.Controls.Test\\Vies\\HomeView.xaml",
+              "ToolTip": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls.Test\\Vies\\HomeView.xaml",
+              "RelativeToolTip": "..\\Junevy.Controls.Test\\Vies\\HomeView.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-09-09T16:10:36.298Z"
             }
           ]
         }
