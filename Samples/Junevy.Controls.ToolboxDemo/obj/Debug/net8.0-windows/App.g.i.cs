@@ -46,7 +46,7 @@ namespace Junevy.Controls.ToolboxDemo {
         /// InitializeComponent
         /// </summary>
         [System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "10.0.11.0")]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "9.0.18.0")]
         public void InitializeComponent() {
             if (_contentLoaded) {
                 return;
@@ -72,7 +72,7 @@ namespace Junevy.Controls.ToolboxDemo {
         /// </summary>
         [System.STAThreadAttribute()]
         [System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "10.0.11.0")]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "9.0.18.0")]
         public static void Main() {
             Junevy.Controls.ToolboxDemo.App app = new Junevy.Controls.ToolboxDemo.App();
             app.InitializeComponent();

@@ -1,7 +1,7 @@
 {
-  "version": 4,
+  "version": 3,
   "targets": {
-    "net48": {
+    ".NETFramework,Version=v4.8": {
       "Microsoft.ApplicationInsights/2.22.0": {
         "type": "package",
         "dependencies": {
@@ -627,7 +627,7 @@
         }
       }
     },
-    "net8.0-windows": {
+    "net8.0-windows7.0": {
       "Microsoft.ApplicationInsights/2.22.0": {
         "type": "package",
         "dependencies": {
@@ -2511,13 +2511,13 @@
     }
   },
   "projectFileDependencyGroups": {
-    "net48": [
+    ".NETFramework,Version=v4.8": [
       "Junevy.Controls >= 1.7.0",
       "Microsoft.NET.Test.Sdk >= 17.14.1",
       "NUnit >= 4.3.2",
       "NUnit3TestAdapter >= 5.0.0"
     ],
-    "net8.0-windows": [
+    "net8.0-windows7.0": [
       "Junevy.Controls >= 1.7.0",
       "Microsoft.NET.Test.Sdk >= 17.14.1",
       "NUnit >= 4.3.2",
@@ -2525,25 +2525,20 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Administrator\\.nuget\\packages\\": {},
-    "D:\\Visual Studio\\Toolkits\\NuGetPackages": {}
+    "D:\\Documents\\Nuget\\RemoteCache\\packages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Tests\\Junevy.Controls.Tests\\Junevy.Controls.Tests.csproj",
+      "projectUniqueName": "D:\\Desktop\\doc\\Github_Repository\\Controls\\Junevy\\Junevy.Controls\\Tests\\Junevy.Controls.Tests\\Junevy.Controls.Tests.csproj",
       "projectName": "Junevy.Controls.Tests",
-      "projectPath": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Tests\\Junevy.Controls.Tests\\Junevy.Controls.Tests.csproj",
-      "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-      "outputPath": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Tests\\Junevy.Controls.Tests\\obj\\",
+      "projectPath": "D:\\Desktop\\doc\\Github_Repository\\Controls\\Junevy\\Junevy.Controls\\Tests\\Junevy.Controls.Tests\\Junevy.Controls.Tests.csproj",
+      "packagesPath": "D:\\Documents\\Nuget\\RemoteCache\\packages",
+      "outputPath": "D:\\Desktop\\doc\\Github_Repository\\Controls\\Junevy\\Junevy.Controls\\Tests\\Junevy.Controls.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "crossTargeting": true,
-      "fallbackFolders": [
-        "D:\\Visual Studio\\Toolkits\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\COWAIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -2552,25 +2547,23 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "D:\\Desktop\\WorkSpace\\Nuget": {},
+        "D:\\Documents\\Nuget\\Local": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net48": {
-          "framework": "net48",
-          "targetAlias": "net48",
+        "net8.0-windows7.0": {
+          "targetAlias": "net8.0-windows",
           "projectReferences": {
-            "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Junevy.Controls.csproj": {
-              "projectPath": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Junevy.Controls.csproj"
+            "D:\\Desktop\\doc\\Github_Repository\\Controls\\Junevy\\Junevy.Controls\\Junevy.Controls.csproj": {
+              "projectPath": "D:\\Desktop\\doc\\Github_Repository\\Controls\\Junevy\\Junevy.Controls\\Junevy.Controls.csproj"
             }
           }
         },
-        "net8.0-windows": {
-          "framework": "net8.0-windows7.0",
-          "targetAlias": "net8.0-windows",
+        "net48": {
+          "targetAlias": "net48",
           "projectReferences": {
-            "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Junevy.Controls.csproj": {
-              "projectPath": "D:\\Desktop\\WorkSpace\\VMDevelop\\HikIndustrialCameraDev\\Controls\\Junevy.Controls\\Junevy.Controls.csproj"
+            "D:\\Desktop\\doc\\Github_Repository\\Controls\\Junevy\\Junevy.Controls\\Junevy.Controls.csproj": {
+              "projectPath": "D:\\Desktop\\doc\\Github_Repository\\Controls\\Junevy\\Junevy.Controls\\Junevy.Controls.csproj"
             }
           }
         }
@@ -2585,32 +2578,10 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "10.0.400"
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
-      "net48": {
-        "framework": "net48",
-        "targetAlias": "net48",
-        "dependencies": {
-          "Microsoft.NET.Test.Sdk": {
-            "target": "Package",
-            "version": "[17.14.1, )"
-          },
-          "NUnit": {
-            "target": "Package",
-            "version": "[4.3.2, )"
-          },
-          "NUnit3TestAdapter": {
-            "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "[5.0.0, )"
-          }
-        },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400\\RuntimeIdentifierGraph.json"
-      },
-      "net8.0-windows": {
-        "framework": "net8.0-windows7.0",
+      "net8.0-windows7.0": {
         "targetAlias": "net8.0-windows",
         "dependencies": {
           "Microsoft.NET.Test.Sdk": {
@@ -2647,7 +2618,27 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.316/PortableRuntimeIdentifierGraph.json"
+      },
+      "net48": {
+        "targetAlias": "net48",
+        "dependencies": {
+          "Microsoft.NET.Test.Sdk": {
+            "target": "Package",
+            "version": "[17.14.1, )"
+          },
+          "NUnit": {
+            "target": "Package",
+            "version": "[4.3.2, )"
+          },
+          "NUnit3TestAdapter": {
+            "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[5.0.0, )"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.316\\RuntimeIdentifierGraph.json"
       }
     }
   }

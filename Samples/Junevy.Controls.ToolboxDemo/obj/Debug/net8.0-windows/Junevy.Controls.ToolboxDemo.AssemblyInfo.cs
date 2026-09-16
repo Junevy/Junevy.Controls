@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Junevy.Controls.ToolboxDemo")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9005b14dcff7ace9c7583e5e279bb79a06fe1798")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7f1a655d6870cf08df180caabd3f9a2d2ba7c4b5")]
 [assembly: System.Reflection.AssemblyProductAttribute("Junevy.Controls.ToolboxDemo")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Junevy.Controls.ToolboxDemo")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,10 +1,10 @@
 ﻿Junevy.Controls
-
+1.7.0.0
 
 library
 C#
 .cs
-D:\Desktop\WorkSpace\VMDevelop\HikIndustrialCameraDev\Controls\Junevy.Controls\obj\Debug\net48\
+D:\Desktop\doc\Github_Repository\Controls\Junevy\Junevy.Controls\obj\Debug\net48\
 Junevy.Controls
 none
 false
@@ -12,9 +12,9 @@ TRACE;DEBUG;NETFRAMEWORK;NET48;NET30_OR_GREATER;NET35_OR_GREATER;NET40_OR_GREATE
 
 39-1643331914
 
-671155010124
+69-1851254554
 19540559201
 Controls\Badge\Badge.xaml;Controls\Bar\AppBar.xaml;Controls\Bar\MessageBar.xaml;Controls\Bar\ToolBar.xaml;Controls\Box\CheckBox.xaml;Controls\Box\ComboBox.xaml;Controls\Box\DatePicker.xaml;Controls\Box\GroupBox.xaml;Controls\Box\ListBox.xaml;Controls\Box\ListView.xaml;Controls\Box\ToolTip.xaml;Controls\Button\Button.xaml;Controls\Button\CardButton.xaml;Controls\Button\RadioButton.xaml;Controls\Button\ToggleButton.xaml;Controls\DataGrid\DataGrid.xaml;Controls\Dialog\DialogWindow.xaml;Controls\Expander\ExpanderPanel.xaml;Controls\Image\ImageViewer.xaml;Controls\Menu\ContextMenu.xaml;Controls\Menu\SideMenu.xaml;Controls\Menu\TabMenu.xaml;Controls\Menu\TreeMenu.xaml;Controls\Panel\SidePanel.xaml;Controls\Progress\ProgressBar.xaml;Controls\Progress\ProgressBarWindow.xaml;Controls\Text\Label.xaml;Controls\Text\TextBlock.xaml;Controls\Text\TextBox.xaml;Controls\Toolbox\Toolbox.xaml;Generic\Style\DefaultFocusStyle.xaml;Resources\Font\IconFont.xaml;Resources\Generic.xaml;Resources\Pictures\Image.xaml;Themes\AppColors.Dark.xaml;Themes\AppColors.Light.xaml;Themes\AppColors.xaml;Themes\Generic.xaml;Themes\ScrollBar.xaml;
 
-False
+True
 
