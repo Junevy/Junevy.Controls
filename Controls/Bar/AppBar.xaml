@@ -9,6 +9,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls;component/Resources/Font/IconFont.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/Button.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/MenuBar.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <Style
@@ -141,14 +142,16 @@
                     Style="{StaticResource CaptionButtonStyle}"
                     ToolTip="Minimize"
                     WindowChrome.IsHitTestVisibleInChrome="True" />
+                <!--
+                    Content/Command/ToolTip come only from the style so the
+                    Maximized trigger can retarget them; a local value here
+                    would outrank the trigger and pin the button to Maximize.
+                -->
                 <bt:Button
                     Grid.Column="1"
-                    Command="{x:Static SystemCommands.MaximizeWindowCommand}"
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                    Content="&#xe691;"
                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
                     FontSize="18"
-                    ToolTip="Maximize"
                     WindowChrome.IsHitTestVisibleInChrome="True">
                     <bt:Button.Style>
                         <Style BasedOn="{StaticResource CaptionButtonStyle}" TargetType="{x:Type bt:Button}">
@@ -196,6 +199,129 @@
                 Content="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.Icon)}"
                 FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
                 Foreground="{TemplateBinding Foreground}" />
+        </Grid>
+    </ControlTemplate>
+
+    <!--
+        Single-row title bar: icon, application name, menu bar, then the system
+        buttons.  Dragging is left to the host WindowChrome caption area, so the
+        only regions opted out of hit-test-visible chrome are the menu and the
+        caption buttons.
+    -->
+    <ControlTemplate x:Key="MenuBarAppBar" TargetType="{x:Type local:AppBar}">
+        <Grid
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Background="{TemplateBinding Background}">
+
+            <Grid.Resources>
+                <!--  Scoped to this template: the library never injects a global
+                      implicit Menu style.
+                -->
+                <Style
+                    BasedOn="{StaticResource JunevyMenuBarStyle}"
+                    TargetType="{x:Type Menu}" />
+            </Grid.Resources>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <!--  icon  -->
+            <ContentControl
+                Grid.Column="0"
+                Width="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
+                Height="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
+                Margin="8,0,4,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Content="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.Icon)}"
+                FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
+                FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
+                Foreground="{TemplateBinding Foreground}" />
+
+            <!--  application name  -->
+            <ContentPresenter
+                Grid.Column="1"
+                Margin="0,0,8,0"
+                VerticalAlignment="Center"
+                ContentSource="Content"
+                RecognizesAccessKey="True"
+                TextElement.FontSize="{TemplateBinding FontSize}"
+                TextElement.Foreground="{TemplateBinding Foreground}" />
+
+            <!--  menu bar  -->
+            <ContentPresenter
+                Grid.Column="2"
+                VerticalAlignment="Center"
+                Content="{TemplateBinding Menu}"
+                WindowChrome.IsHitTestVisibleInChrome="True" />
+
+            <!--  drag spacer, owned by the WindowChrome caption  -->
+            <Border Grid.Column="3" Background="Transparent" />
+
+            <!--  caption buttons  -->
+            <Grid
+                Grid.Column="4"
+                VerticalAlignment="Center"
+                WindowChrome.IsHitTestVisibleInChrome="True">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <bt:Button
+                    Grid.Column="0"
+                    Command="{x:Static SystemCommands.MinimizeWindowCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    Content="&#xe60e;"
+                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
+                    FontSize="18"
+                    Style="{StaticResource CaptionButtonStyle}"
+                    ToolTip="Minimize"
+                    WindowChrome.IsHitTestVisibleInChrome="True" />
+                <!--
+                    Content/Command/ToolTip come only from the style so the
+                    Maximized trigger can retarget them; a local value here
+                    would outrank the trigger and pin the button to Maximize.
+                -->
+                <bt:Button
+                    Grid.Column="1"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
+                    FontSize="18"
+                    WindowChrome.IsHitTestVisibleInChrome="True">
+                    <bt:Button.Style>
+                        <Style BasedOn="{StaticResource CaptionButtonStyle}" TargetType="{x:Type bt:Button}">
+                            <Setter Property="Content" Value="&#xe691;" />
+                            <Setter Property="Command" Value="{x:Static SystemCommands.MaximizeWindowCommand}" />
+                            <Setter Property="ToolTip" Value="Maximize" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                                    <Setter Property="Content" Value="&#xe772;" />
+                                    <Setter Property="Command" Value="{x:Static SystemCommands.RestoreWindowCommand}" />
+                                    <Setter Property="ToolTip" Value="Restore" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </bt:Button.Style>
+                </bt:Button>
+                <bt:Button
+                    Grid.Column="2"
+                    Command="{x:Static SystemCommands.CloseWindowCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    Content="&#xe639;"
+                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
+                    FontSize="18"
+                    Style="{StaticResource CloseCaptionButtonStyle}"
+                    ToolTip="Close" />
+            </Grid>
         </Grid>
     </ControlTemplate>
 

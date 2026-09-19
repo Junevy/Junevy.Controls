@@ -3,3 +3,16 @@
 ################################################################################
 
 /.vs/Junevy.Controls/CopilotIndices/17.14.1700.50054
+
+## Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.suo
+
+## Visual Studio / IDE
+.vs/
+.idea/
+*.DotSettings.user

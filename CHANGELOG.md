@@ -2,6 +2,20 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## AppBar
+
+### 本次更新（新增模板与依赖属性）— 2026-09-19
+
+- 新增 `MenuBarAppBar` 控件模板：单行布局「应用图标 + 应用名 + 菜单栏 + 弹性空白 + 最小化/最大化/关闭」，配合宿主 `Window` 的 `WindowChrome.WindowChrome` 作为无边框窗口标题栏使用。`SimpleAppBar` 与 `AppBar` 隐式样式未做任何改动，现有用法不受影响。
+- 新增依赖属性 `Menu`（WPF `Menu`，默认 `null`）：菜单栏内容，仅 `MenuBarAppBar` 呈现。本模板不承载 `ToolBar`，`ToolBar` 与 `Menu` 二选一。类型在代码中保持全限定 `System.Windows.Controls.Menu`，因为兄弟命名空间 `Junevy.Controls.Controls.Menu` 会在 `Junevy.Controls.Controls.Bar` 内遮蔽同名类型。
+- 新增 `Controls/Menu/MenuBar.xaml`（已注册到 `Themes/Generic.xaml`）：
+  - `JunevyMenuBarStyle`（`TargetType=Menu`）：透明背景融入标题栏，`ItemContainerStyle` 指向顶层项样式。
+  - `JunevyMenuBarItemStyle`（`TargetType=MenuItem`）：顶层项横向文字表头、`Theme.SmallCornerRadius` 悬停/按下高亮、子菜单 `Popup Placement="Bottom"` 且不画右箭头（原生 `Menu` 与 `ContextMenu` 的右向弹出语义不同）。其 `ItemContainerStyle` 指向 `JunevyContextMenuItemStyle` 并沿用该样式的 `DynamicResource` 自引用链，因此二级及更深层子菜单与 `jv:ContextMenu` 外观完全一致。
+  - 两个样式均为 keyed 资源；`Menu` 的隐式样式只在 `MenuBarAppBar` 模板的 `Grid.Resources` 内注入，作用域限于本模板，不会改变消费方应用中其他原生 `Menu` 的外观。
+- `WindowChrome` 适配：菜单栏与三个系统按钮标记 `WindowChrome.IsHitTestVisibleInChrome="True"`，图标、应用名与弹性空白保持为 chrome 拖动区（可拖动移动、双击最大化由 `WindowChrome` 处理）。
+- 修正最大化按钮的触发器优先级问题（`MenuBarAppBar` 与 `DefaultAppBar`）：按钮的 `Content`/`Command`/`ToolTip` 只由样式与样式触发器设置，不再写本地值——本地值优先级高于样式触发器，会使 `WindowState=Maximized` 的触发器失效，按钮在最大化后仍停留在「最大化」字形与命令（点击无还原效果）。`DefaultAppBar` 原模板即存在此缺陷，本次一并修正；最小化与关闭按钮不受影响。
+- 验证：控件库编译通过（net48 / net8.0-windows，0 错误，无新增警告）；临时探测工程 `AppBarMenuBarProbe` 端到端探测 17 组断言全部通过（模板已应用、`Menu` 命中模板内隐式样式、顶层项与下层项样式来源、三按钮存在/顺序/贴右边缘、菜单位于应用名与按钮之间、最大化按钮初始字形与命令、菜单区在 chrome 中可命中、空白区保持可拖动、菜单不撑破标题栏高度、子菜单弹出与向下方向、二级子菜单右向弹出、最大化后字形与命令切为还原、还原后恢复），浅色/深色主题、菜单展开、最大化窗口 PNG 快照人工核对通过。回归探测工程 `AppBarDefaultProbe` 8 组断言全部通过（`DefaultAppBar` 仍为隐式样式模板、三按钮存在、最小化/关闭字形未受影响、最大化按钮初始字形与命令、最大化后切为还原字形/命令/提示、还原后恢复原值），最大化窗口快照人工核对 `ToolBar` 布局与图标区渲染不变。探测工程验证后均已删除。
+
 ## Badge
 
 ### 本次更新（新增控件）— 2026-09-15
