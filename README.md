@@ -797,12 +797,18 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 
 ### AppBar
 
-`jv:AppBar` 继承 WPF `ContentControl`，提供应用图标、标题、工具栏以及最小化、最大化/还原、关闭按钮。系统按钮通过 WPF `SystemCommands` 操作所在窗口。
+`jv:AppBar` 继承 WPF `ContentControl`，提供应用图标、标题以及最小化、最大化/还原、关闭按钮。系统按钮通过 WPF `SystemCommands` 操作所在窗口。库内提供两套模板，`ToolBar` 与 `Menu` 二选一：
+
+| 模板资源键 | 布局 | 使用的内容属性 |
+| --- | --- | --- |
+| `DefaultAppBar`（默认） | 图标 + 标题 / 分隔线 / 工具栏，右侧系统按钮 | `ToolBar` |
+| `MenuBarAppBar` | 单行：图标 + 应用名 + 菜单栏 + 弹性空白 + 系统按钮 | `Menu` |
 
 | 属性/附加属性 | 效果 |
 | --- | --- |
 | `Content` | 应用标题或任意标题内容 |
-| `ToolBar` | `jv:ToolBar` 实例 |
+| `ToolBar` | `jv:ToolBar` 实例；仅 `DefaultAppBar` 呈现 |
+| `Menu` | WPF `Menu` 实例；仅 `MenuBarAppBar` 呈现 |
 | `atc:Icon.Icon` | 左侧应用图标，可使用图标字体或 `Image` |
 | `atc:Icon.FontFamily` | 应用图标和标题栏系统按钮字体 |
 | `atc:Icon.IconSize` | 左侧应用图标区域大小 |
@@ -828,7 +834,85 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 </jv:AppBar>
 ```
 
-依赖：所在 `Window`、WPF `SystemCommands`、内置图标字体、`ToolBar` 和 `Button` 样式。自定义无边框窗口时仍需由应用配置 `WindowChrome`、`WindowStyle` 和拖动区域。
+#### 菜单栏模板 `MenuBarAppBar`
+
+菜单使用 WPF 原生 `Menu` / `MenuItem`，业务侧照常写菜单，外观由库内 `JunevyMenuBarStyle`（`Menu`）与 `JunevyMenuBarItemStyle`（顶层项）接管：顶层项横向排列、子菜单向下弹出（`Placement="Bottom"`、不画右箭头），二级及更深层沿用 `JunevyContextMenuItemStyle` 的右向弹出外观，与 `jv:ContextMenu` 完全一致。两个样式只作为 keyed 资源注册，并在模板作用域内注入，不会改变应用中其他原生 `Menu` 的外观。
+
+```xml
+<jv:AppBar
+    Height="36"
+    atc:Icon.Icon="&#xE60F;"
+    atc:Icon.IconSize="16"
+    Content="Junevy Controls"
+    FontSize="13"
+    Foreground="{DynamicResource Theme.Brush.Text.Primary}"
+    Template="{StaticResource MenuBarAppBar}">
+    <jv:AppBar.Menu>
+        <Menu>
+            <MenuItem Header="文件(_F)">
+                <MenuItem Command="ApplicationCommands.New" Header="新建" InputGestureText="Ctrl+N" />
+                <MenuItem Command="{Binding OpenCommand}" Header="打开…" InputGestureText="Ctrl+O" />
+                <Separator />
+                <MenuItem Header="导出">
+                    <MenuItem Command="{Binding ExportPngCommand}" Header="导出为 PNG" />
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="编辑(_E)" ItemsSource="{Binding EditMenuItems}" />
+            <MenuItem Header="视图(_V)">
+                <MenuItem IsCheckable="True" Header="显示网格" />
+            </MenuItem>
+            <MenuItem Command="{Binding HelpCommand}" Header="帮助" />
+        </Menu>
+    </jv:AppBar.Menu>
+</jv:AppBar>
+```
+
+`Content` 与顶层菜单头都启用了 `RecognizesAccessKey`，`文件(_F)` 这类写法可用 `Alt+F` 导航；无子菜单的顶层项（如「帮助」）直接执行自身 `Command`/`Click`。最大化/还原按钮的字形与命令由 `WindowState` 触发器切换，`Content`、`Command`、`ToolTip` 只能通过样式设置——在按钮上写本地值会压过触发器，使按钮固定在「最大化」。
+
+#### 与 `WindowChrome` 搭配
+
+模板本身不含窗口 chrome，无边框窗口由宿主 `Window` 配置。`CaptionHeight` 应与 `AppBar` 高度一致，标题栏内需要交互的区域（菜单栏与三个系统按钮）已在模板内标记 `WindowChrome.IsHitTestVisibleInChrome="True"`，其余区域（图标、应用名、弹性空白）保持可拖动，双击最大化由 `WindowChrome` 自动处理：
+
+```xml
+<Window
+    Title="Junevy Controls"
+    WindowStyle="None"
+    UseLayoutRounding="True">
+    <WindowChrome.WindowChrome>
+        <WindowChrome
+            CaptionHeight="36"
+            CornerRadius="0"
+            GlassFrameThickness="0"
+            ResizeBorderThickness="6"
+            UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
+
+    <!--  最大化时窗口边界会比工作区大出一圈，用 Margin 内缩补偿，避免标题栏被裁切。  -->
+    <Border>
+        <Border.Style>
+            <Style TargetType="{x:Type Border}">
+                <Setter Property="Margin" Value="0" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                        <Setter Property="Margin" Value="7" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <!--  jv:AppBar 放在第 0 行  -->
+        </Grid>
+    </Border>
+</Window>
+```
+
+标题栏右键系统菜单不属于控件库职责，需要宿主窗口自行处理，例如在 `AppBar` 区域的 `MouseRightButtonUp` 中调用 `SystemCommands.ShowSystemMenu(this, point)`。
+
+依赖：所在 `Window`、WPF `SystemCommands`、内置图标字体、`Button` 样式；`DefaultAppBar` 另依赖 `ToolBar`，`MenuBarAppBar` 另依赖 WPF `Menu`/`MenuItem`、`Separator` 与 `ContextMenu` 系列样式。自定义无边框窗口时仍需由应用配置 `WindowChrome`、`WindowStyle` 和拖动区域。
 
 ## 布局控件
 
@@ -1109,7 +1193,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 
 | 控件 | 主要依赖 | 相关附加属性 |
 | --- | --- | --- |
-| `AppBar` | WPF `ContentControl`、所在 `Window`、`SystemCommands`、`Button`、`ToolBar` | `Icon.Icon`、`Icon.FontFamily`、`Icon.IconSize` |
+| `AppBar` | WPF `ContentControl`、所在 `Window`、`SystemCommands`、`Button`；`DefaultAppBar` 用 `ToolBar`，`MenuBarAppBar` 用 WPF `Menu`/`MenuItem` 与 `JunevyMenuBarStyle`、`JunevyContextMenuItemStyle` | `Icon.Icon`、`Icon.FontFamily`、`Icon.IconSize` |
 | `Button` | WPF `Button`、焦点和主题资源 | `Icon.Icon`、`Icon.FontFamily`、`Icon.IconSize`、`Border.CornerRadius` |
 | `CardButton` | `jv:Button`、主题资源 | `Icon.Icon`、`Icon.FontFamily`、`Border.CornerRadius` |
 | `ToggleButton` | WPF `ToggleButton`、圆形/矩形模板 | `Border.CornerRadius` |
