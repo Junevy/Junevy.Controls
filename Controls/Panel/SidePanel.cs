@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
@@ -11,6 +12,7 @@ namespace Junevy.Controls.Controls.Panel;
 /// 通过 <see cref="IsOpen"/> 绑定布尔值控制滑出/收回，通过 <see cref="Side"/> 配置滑出方向
 /// （左/右/上/下）。收起时面板完全滑出可视区域、不占用布局空间；
 /// 展开时以浮层形式叠加显示在兄弟内容上方，可选半透明遮罩与阴影过渡。
+/// 展开期间点击面板本体以外的区域、宿主窗口失焦或最小化时自动收回（<see cref="CloseOnOutsideClick"/>）。
 /// </summary>
 /// <remarks>
 /// 直接放入 <see cref="Grid"/>（不指定 Row/Column）时，控件自动跨满父 Grid 的所有列/行，
@@ -29,6 +31,8 @@ public class SidePanel : ContentControl
     private Border? _backdrop;
     private Border? _content;
     private TranslateTransform? _translate;
+    private Window? _hostWindow;
+    private MouseButtonEventHandler? _outsideMouseDownHandler;
     private int _stateVersion;
     private bool _pendingStateChangedEvent;
 
@@ -71,6 +75,13 @@ public class SidePanel : ContentControl
             typeof(SidePanel),
             new PropertyMetadata(null));
 
+    public static readonly DependencyProperty CloseOnOutsideClickProperty =
+        DependencyProperty.Register(
+            nameof(CloseOnOutsideClick),
+            typeof(bool),
+            typeof(SidePanel),
+            new PropertyMetadata(true, OnCloseOnOutsideClickChanged));
+
     public static readonly RoutedEvent OpenedEvent =
         EventManager.RegisterRoutedEvent(
             nameof(Opened),
@@ -90,6 +101,12 @@ public class SidePanel : ContentControl
         DefaultStyleKeyProperty.OverrideMetadata(
             typeof(SidePanel),
             new FrameworkPropertyMetadata(typeof(SidePanel)));
+    }
+
+    public SidePanel()
+    {
+        Loaded += OnPanelLoaded;
+        Unloaded += OnPanelUnloaded;
     }
 
     /// <summary>是否滑出；支持双向绑定，绑定 <c>true</c> 时面板从 <see cref="Side"/> 指定的边缘滑出。</summary>
@@ -125,6 +142,16 @@ public class SidePanel : ContentControl
     {
         get => (Brush?)GetValue(BackdropBrushProperty);
         set => SetValue(BackdropBrushProperty, value);
+    }
+
+    /// <summary>
+    /// 展开时点击面板本体以外的区域是否自动收回；同时决定宿主窗口失焦、最小化时是否收回。
+    /// 置为 <c>false</c> 时收回完全由宿主通过 <see cref="IsOpen"/> 或 <see cref="Toggle"/> 控制。
+    /// </summary>
+    public bool CloseOnOutsideClick
+    {
+        get => (bool)GetValue(CloseOnOutsideClickProperty);
+        set => SetValue(CloseOnOutsideClickProperty, value);
     }
 
     /// <summary>滑出动画完成后触发。</summary>
@@ -216,6 +243,150 @@ public class SidePanel : ContentControl
         var panel = (SidePanel)d;
         panel.ApplyBackdropState(animate: false);
     }
+
+    private static void OnCloseOnOutsideClickChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var panel = (SidePanel)d;
+
+        if (panel.CloseOnOutsideClick)
+        {
+            panel.AttachHostWindow(Window.GetWindow(panel));
+        }
+        else
+        {
+            panel.DetachHostWindow();
+        }
+    }
+
+    #region 点击外部自动收回
+
+    private void OnPanelLoaded(object sender, RoutedEventArgs e)
+    {
+        if (CloseOnOutsideClick)
+        {
+            AttachHostWindow(Window.GetWindow(this));
+        }
+    }
+
+    private void OnPanelUnloaded(object sender, RoutedEventArgs e)
+    {
+        DetachHostWindow();
+    }
+
+    private void AttachHostWindow(Window? window)
+    {
+        if (window is null || ReferenceEquals(_hostWindow, window))
+        {
+            return;
+        }
+
+        DetachHostWindow();
+        _hostWindow = window;
+        _outsideMouseDownHandler = OnOutsideMouseDown;
+
+        // handledEventsToo：面板所在 Grid 的兄弟内容常把 MouseDown 标记为已处理，
+        // 不能因此漏掉"点到面板之外"这件事；预览路由 + 接管已处理事件才能全覆盖。
+        _hostWindow.AddHandler(Mouse.PreviewMouseDownEvent, _outsideMouseDownHandler, true);
+        _hostWindow.Deactivated += OnHostDeactivated;
+        _hostWindow.StateChanged += OnHostStateChanged;
+    }
+
+    private void DetachHostWindow()
+    {
+        if (_hostWindow is null)
+        {
+            return;
+        }
+
+        if (_outsideMouseDownHandler is not null)
+        {
+            _hostWindow.RemoveHandler(Mouse.PreviewMouseDownEvent, _outsideMouseDownHandler);
+            _outsideMouseDownHandler = null;
+        }
+
+        _hostWindow.Deactivated -= OnHostDeactivated;
+        _hostWindow.StateChanged -= OnHostStateChanged;
+        _hostWindow = null;
+    }
+
+    private void OnOutsideMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (!IsOpen || !CloseOnOutsideClick || _content is null)
+        {
+            return;
+        }
+
+        if (IsClickInsidePanel(e))
+        {
+            return;
+        }
+
+        CloseFromOutside();
+    }
+
+    /// <summary>
+    /// 判定点击是否落在滑动本体上。遮罩虽是模板的一部分，语义上却代表"面板以外"，
+    /// 所以基准是 <c>PART_Content</c>；另外补一次几何判定，避免本面板被其他浮层遮罩盖住时
+    /// 命中的是别人的遮罩而被误判成外部点击。
+    /// </summary>
+    private bool IsClickInsidePanel(MouseButtonEventArgs e)
+    {
+        var content = _content;
+        if (content is null)
+        {
+            return true;
+        }
+
+        var source = e.OriginalSource as Visual ?? e.Source as Visual;
+        if (source is not null && IsWithinContent(source))
+        {
+            return true;
+        }
+
+        var point = e.GetPosition(content);
+        return point.X >= 0d && point.Y >= 0d && point.X <= content.ActualWidth && point.Y <= content.ActualHeight;
+    }
+
+    private void OnHostDeactivated(object? sender, EventArgs e)
+    {
+        CloseFromOutside();
+    }
+
+    private void OnHostStateChanged(object? sender, EventArgs e)
+    {
+        if (_hostWindow?.WindowState == WindowState.Minimized)
+        {
+            CloseFromOutside();
+        }
+    }
+
+    private void CloseFromOutside()
+    {
+        if (IsOpen && CloseOnOutsideClick)
+        {
+            // SetCurrentValue：宿主绑定 IsOpen 时收回要回写绑定，不能盖掉本地值。
+            SetCurrentValue(IsOpenProperty, false);
+        }
+    }
+
+    private bool IsWithinContent(Visual source)
+    {
+        DependencyObject? current = source;
+
+        while (current is not null)
+        {
+            if (ReferenceEquals(current, _content))
+            {
+                return true;
+            }
+
+            current = current is Visual visual ? VisualTreeHelper.GetParent(visual) : null;
+        }
+
+        return false;
+    }
+
+    #endregion
 
     private static bool IsValidAnimationDuration(object value)
     {
@@ -317,11 +488,11 @@ public class SidePanel : ContentControl
         bool isOpen = IsOpen;
         var slideAnimation = new DoubleAnimation(isOpen ? closedOffset : 0d, isOpen ? 0d : closedOffset, duration)
         {
-            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut },
+            EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut },
         };
         var fadeAnimation = new DoubleAnimation(isOpen ? 0d : 1d, isOpen ? 1d : 0d, duration)
         {
-            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut },
+            EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut },
         };
 
         slideAnimation.Completed += (_, _) =>
@@ -369,7 +540,7 @@ public class SidePanel : ContentControl
         _backdrop.Visibility = Visibility.Visible;
         var fadeAnimation = new DoubleAnimation(IsOpen ? 1d : 0d, duration)
         {
-            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut },
+            EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut },
         };
 
         if (!IsOpen)

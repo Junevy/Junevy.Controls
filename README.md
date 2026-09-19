@@ -912,7 +912,13 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 
 标题栏右键系统菜单不属于控件库职责，需要宿主窗口自行处理，例如在 `AppBar` 区域的 `MouseRightButtonUp` 中调用 `SystemCommands.ShowSystemMenu(this, point)`。
 
-依赖：所在 `Window`、WPF `SystemCommands`、内置图标字体、`Button` 样式；`DefaultAppBar` 另依赖 `ToolBar`，`MenuBarAppBar` 另依赖 WPF `Menu`/`MenuItem`、`Separator` 与 `ContextMenu` 系列样式。自定义无边框窗口时仍需由应用配置 `WindowChrome`、`WindowStyle` 和拖动区域。
+**系统按钮的命令处理由 `AppBar` 自动补齐。** WPF 只声明了 `SystemCommands` 的 `Minimize/Maximize/Restore/Close` 四个路由命令，**不提供任何处理器**：命令找不到绑定时，`CommandSource` 会把按钮自动置灰。因此 `AppBar` 在套用模板时会检查所在 `Window`，为其中尚未注册的那几个命令补上标准绑定（执行时调用 `SystemCommands.MaximizeWindow(window)` 等；可用性按 `ResizeMode`/`WindowState` 判定，`ResizeMode=NoResize` 时最大化/还原按钮自动禁用，与系统语义一致）。规则：
+
+- 宿主窗口已自行 `CommandBindings.Add(...)` 的那几个命令，`AppBar` 一律不覆盖，宿主可继续自定义或禁用对应按钮。
+- 同一窗口内多个 `AppBar`、切换模板都只会注册一组绑定。
+- 若希望完全自行接管，直接在窗口上注册四个绑定即可（官方 WindowChrome 示例写法）。
+
+依赖：所在 `Window`、WPF `SystemCommands`（按钮命令绑定由 `AppBar` 自动补齐）、内置图标字体、`Button` 样式；`DefaultAppBar` 另依赖 `ToolBar`，`MenuBarAppBar` 另依赖 WPF `Menu`/`MenuItem`、`Separator` 与 `ContextMenu` 系列样式。自定义无边框窗口时仍需由应用配置 `WindowChrome`、`WindowStyle` 和拖动区域。
 
 ## 布局控件
 
@@ -951,7 +957,7 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 
 ### SidePanel
 
-`jv:SidePanel` 继承 WPF `ContentControl`，是作为浮层使用的侧滑面板：把 `IsOpen` 绑定到一个布尔值，值为 `true` 时面板从 `Side` 指定的边缘（左/右/上/下）以滑动 + 淡入动画滑出，叠加显示在兄弟内容上方；值为 `false` 时完全滑出可视区域，不占用任何布局空间。
+`jv:SidePanel` 继承 WPF `ContentControl`，是作为浮层使用的侧滑面板：把 `IsOpen` 绑定到一个布尔值，值为 `true` 时面板从 `Side` 指定的边缘（左/右/上/下）以滑动 + 淡入动画滑出，叠加显示在兄弟内容上方；值为 `false` 时完全滑出可视区域，不占用任何布局空间。展开期间点击面板以外的区域、切换宿主窗口失焦或最小化都会自动收回（可用 `CloseOnOutsideClick` 关闭）。
 
 推荐直接放入 `Grid`（不指定 `Row`/`Column`）：控件会自动跨满父 Grid 的所有列/行（不会覆盖使用者显式设置的 `Grid.ColumnSpan`/`Grid.RowSpan`），面板宽度与高度由其 `Content` 决定，可通过设置内容的 `Width`/`Height` 指定。
 
@@ -962,6 +968,7 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 | `AnimationDuration` | `250 ms` | 滑出/收回过渡动画时长；`Automatic` 或 `Forever` 视为无效，`0` 表示无过渡动画直接切换（事件仍会触发） |
 | `IsBackdropEnabled` | `true` | 是否启用遮罩层；展开时在面板背后显示半透明遮罩 |
 | `BackdropBrush` | 主题 `Theme.Brush.Overlay.Backdrop` | 遮罩层画刷 |
+| `CloseOnOutsideClick` | `true` | 展开时是否启用"点击外部即收回"：面板本体以外的点击、宿主窗口失焦、宿主窗口最小化都会收回面板；置为 `false` 后收回完全由宿主通过 `IsOpen`/`Toggle()` 控制 |
 | `Toggle()` | - | 切换滑出/收回状态 |
 | `Opened` / `Closed` | - | 滑出/收回动画完成后触发的冒泡路由事件；动画时长为 `0` 时随状态切换立即触发 |
 
@@ -985,7 +992,9 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 </Grid>
 ```
 
-实现说明：收起时面板内容通过 `TranslateTransform` 完全平移出父容器并被裁剪，同时以透明度 0 兜底，根 Grid 的 `Background` 为空保证鼠标命中测试穿透到下层内容；展开时遮罩层淡入，命中测试由遮罩与面板正常接管。面板表面使用主题 `Surface.Raised`、`Theme.PopupShadow` 阴影与主题圆角。
+实现说明：收起时面板内容通过 `TranslateTransform` 完全平移出父容器并被裁剪，同时以透明度 0 兜底，根 Grid 的 `Background` 为空保证鼠标命中测试穿透到下层内容；展开时遮罩层淡入，命中测试由遮罩与面板正常接管。面板表面使用主题 `Surface.Raised`、`Theme.PopupShadow` 阴影与主题圆角。滑出/收回动画采用 `SineEase`（`EaseInOut`）曲线：`250 ms` 内约 15 帧的采样下，`CubicEase` 的峰值速度达平均速度的 1.875 倍，中段单帧位移接近 68 DIP（约 85 物理像素）而首尾两帧几乎不动，观感上就是"起步一顿、中间一跳"；`SineEase` 的峰值/均值比为 π/2 ≈ 1.57，同帧数下峰值位移降到约 38 DIP 且首帧即有位移，实测帧间隔与硬件渲染档位（`RenderCapability.Tier=2`）均无变化，属于曲线分布而非性能问题。
+
+自动收回（`CloseOnOutsideClick=true`）在宿主窗口上以 `AddHandler(Mouse.PreviewMouseDownEvent, handler, handledEventsToo: true)` 实现：预览路由保证先于兄弟控件收到点击，接管已处理事件保证兄弟控件把 `MouseDown` 标记为已处理后也不会漏判，处理过程不设置 `Handled`，因此面板以外的按钮等控件照常响应同一次点击。点击是否落在面板本体上按"祖先链命中 `PART_Content` 或点击点位于 `PART_Content` 范围内"判定，因此遮罩本身的点击属于"外部"，多个抽屉叠放时也不会把压在别人遮罩下的本体误判为外部点击。面板内的 `ComboBox`、`ContextMenu` 等弹层内容位于独立的 `PopupRoot` 顶层窗口，宿主窗口级处理收不到其中的点击，故不会误收回。宿主窗口 `Deactivated` 与 `StateChanged`（最小化）同样触发收回，语义与 `Toolbox` 一致；收回通过 `SetCurrentValue` 写回 `IsOpen`，双向绑定时数据源同步更新。面板卸载或属性置为 `false` 时，宿主窗口上的处理句柄会被完整摘除。
 
 ## 通知控件
 
@@ -1193,7 +1202,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 
 | 控件 | 主要依赖 | 相关附加属性 |
 | --- | --- | --- |
-| `AppBar` | WPF `ContentControl`、所在 `Window`、`SystemCommands`、`Button`；`DefaultAppBar` 用 `ToolBar`，`MenuBarAppBar` 用 WPF `Menu`/`MenuItem` 与 `JunevyMenuBarStyle`、`JunevyContextMenuItemStyle` | `Icon.Icon`、`Icon.FontFamily`、`Icon.IconSize` |
+| `AppBar` | WPF `ContentControl`、所在 `Window`、`SystemCommands`（命令绑定由控件自动补齐）、`Button`；`DefaultAppBar` 用 `ToolBar`，`MenuBarAppBar` 用 WPF `Menu`/`MenuItem` 与 `JunevyMenuBarStyle`、`JunevyContextMenuItemStyle` | `Icon.Icon`、`Icon.FontFamily`、`Icon.IconSize` |
 | `Button` | WPF `Button`、焦点和主题资源 | `Icon.Icon`、`Icon.FontFamily`、`Icon.IconSize`、`Border.CornerRadius` |
 | `CardButton` | `jv:Button`、主题资源 | `Icon.Icon`、`Icon.FontFamily`、`Border.CornerRadius` |
 | `ToggleButton` | WPF `ToggleButton`、圆形/矩形模板 | `Border.CornerRadius` |
@@ -1228,7 +1237,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ToolItem` | WPF `Button` 命令管线、`DefaultToolItemStyle`、WPF `DragDrop` | `Icon.FontFamily`、`Icon.IconSize`、`Icon.IconForeground` |
 | `ImageViewer` | WPF `Image`、`MatrixTransform`、`BitmapSource`、`SaveFileDialog` | 无 |
 | `ExpanderPanel` | WPF `HeaderedContentControl`、`ToggleButton`、`LayoutTransform` 过渡动画、主题资源 | 无 |
-| `SidePanel` | WPF `ContentControl`、`TranslateTransform` 滑动动画、遮罩与主题阴影令牌（`Theme.Brush.Overlay.Backdrop`、`Theme.PopupShadow`） | 无 |
+| `SidePanel` | WPF `ContentControl`、`TranslateTransform` 滑动动画（`SineEase`）、遮罩与主题阴影令牌（`Theme.Brush.Overlay.Backdrop`、`Theme.PopupShadow`）、宿主窗口级点击/失焦/最小化自动收回 | 无 |
 | `GroupBox` | WPF `GroupBox`、主题资源（卡片、悬停、状态令牌） | `Border.CornerRadius` |
 
 ## 开发注意事项
