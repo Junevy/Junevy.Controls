@@ -14,7 +14,11 @@
   - 两个样式均为 keyed 资源；`Menu` 的隐式样式只在 `MenuBarAppBar` 模板的 `Grid.Resources` 内注入，作用域限于本模板，不会改变消费方应用中其他原生 `Menu` 的外观。
 - `WindowChrome` 适配：菜单栏与三个系统按钮标记 `WindowChrome.IsHitTestVisibleInChrome="True"`，图标、应用名与弹性空白保持为 chrome 拖动区（可拖动移动、双击最大化由 `WindowChrome` 处理）。
 - 修正最大化按钮的触发器优先级问题（`MenuBarAppBar` 与 `DefaultAppBar`）：按钮的 `Content`/`Command`/`ToolTip` 只由样式与样式触发器设置，不再写本地值——本地值优先级高于样式触发器，会使 `WindowState=Maximized` 的触发器失效，按钮在最大化后仍停留在「最大化」字形与命令（点击无还原效果）。`DefaultAppBar` 原模板即存在此缺陷，本次一并修正；最小化与关闭按钮不受影响。
+- 修复系统按钮点击后变灰、无法还原窗口（`MenuBarAppBar` 与 `DefaultAppBar`）。根因：WPF 只**声明**了 `SystemCommands` 的 `Minimize/Maximize/Restore/CloseWindowCommand` 四个 `RoutedCommand`，**从不注册任何处理器**（`dotnet/wpf` 的 `SystemCommands.cs` 仅有命令声明与 `PostMessage(WM_SYSCOMMAND)` 静态方法；`Window`/`WindowChrome` 内均无 `SystemCommands` 绑定）。命令在可视化树上找不到 `CommandBinding` 时 `CanExecute` 恒为 `false`，而 `ButtonBase : CommandSource` 会据此自动禁用按钮——因此窗口最大化后重新模板化的还原按钮直接不可点击，宿主未自行注册绑定时三个按钮同样会在部分场景下失效。
+- 新增 `Common/WindowSystemCommands.cs`（internal）：`EnsureRegistered(Window)` 为宿主 `Window` 补齐缺失的 `SystemCommands` 绑定，已注册的命令一律不覆盖、不重复注册（可多 `AppBar`、多次切换模板复用）。执行体调用 `SystemCommands.MinimizeWindow/MaximizeWindow/RestoreWindow`、`window.Close()`；`CanExecute` 按系统语义判定——`ResizeMode=NoResize` 时禁用最大化/还原，最大化/还原仅在 `WindowState` 与可调整大小状态匹配时可用；补齐后触发一次 `CommandManager.InvalidateRequerySuggested()`，让早于绑定生成的按钮重新查询可用性。
+- `AppBar` 在 `OnApplyTemplate` 与首次 `Loaded` 时调用上述方法（每个实例只请求一次）。消费方若要完全接管，可自行注册这四个命令——先注册即生效，`AppBar` 不会替换；`DialogWindow` 与 `ProgressBarWindow` 已在自身构造函数内注册，行为不变，本次未改动。
 - 验证：控件库编译通过（net48 / net8.0-windows，0 错误，无新增警告）；临时探测工程 `AppBarMenuBarProbe` 端到端探测 17 组断言全部通过（模板已应用、`Menu` 命中模板内隐式样式、顶层项与下层项样式来源、三按钮存在/顺序/贴右边缘、菜单位于应用名与按钮之间、最大化按钮初始字形与命令、菜单区在 chrome 中可命中、空白区保持可拖动、菜单不撑破标题栏高度、子菜单弹出与向下方向、二级子菜单右向弹出、最大化后字形与命令切为还原、还原后恢复），浅色/深色主题、菜单展开、最大化窗口 PNG 快照人工核对通过。回归探测工程 `AppBarDefaultProbe` 8 组断言全部通过（`DefaultAppBar` 仍为隐式样式模板、三按钮存在、最小化/关闭字形未受影响、最大化按钮初始字形与命令、最大化后切为还原字形/命令/提示、还原后恢复原值），最大化窗口快照人工核对 `ToolBar` 布局与图标区渲染不变。探测工程验证后均已删除。
+- 系统按钮修复的验证：先复现根因——未注册绑定的宿主上四个 `SystemCommands` 命令 `CanExecute` 全为 `false`、`Execute` 无效果，仅缺少 `RestoreWindowCommand` 绑定时可稳定复现「最大化后还原按钮不可点击」；同时以 `WM_NCHITTEST`（返回 `HTCLIENT`）、`WindowFromPoint`、WPF 命中测试排除 `WindowChrome` 因素。修复后临时探测工程 `AppBarMaxProbe` 12 组断言在 net48 与 net8.0-windows、宿主绑定「全部缺失 / 部分注册 / 全部注册」三种组合下共 6 次运行全部通过（三按钮 `IsEnabled=True`；点击后窗口最大化、字形切为还原、命令切为 `RestoreWindowCommand` 且还原按钮保持可点击；再次点击窗口还原、命令与字形还原后可用性不变；`DefaultAppBar` 按钮同样可用；两个 `AppBar` 只注册一组共 4 条绑定；宿主已注册的 `[exec] Maximize`/`[exec] Restore` 处理器仍然优先生效）。另以 Win32 `SendInput` 真实点击（非 `Invoke`）完成最大化→还原往返，坐标落在还原按钮上且 `IsMouseOver=True`，最大化窗口快照人工核对菜单栏渲染正常。控件库重新编译通过（0 错误，40 项均为改动之外的既有警告）。探测工程验证后已删除。
 
 ## Badge
 
@@ -34,6 +38,17 @@
 - 验证：控件库编译通过（net48 / net8.0-windows，新增代码 0 警告 0 错误）；`BadgeProbe` 端到端探测 9 组断言全部通过（默认隐藏与布局无侵入、数字角标中心对准内容角落、99+ 上限、纯圆点切换、运行时切角、偏移微调、重新隐藏、命中穿透、PNG 快照）。
 
 ## SidePanel
+
+### 本次更新（点击外部自动收回 + 滑动曲线优化）— 2026-09-19
+
+- 新增依赖属性 `CloseOnOutsideClick`（bool，默认 `true`）：展开时点击面板本体以外的区域、宿主窗口失焦（`Deactivated`）或最小化（`StateChanged`）都自动收回面板；置为 `false` 后收回完全由宿主通过 `IsOpen`/`Toggle()` 控制。
+- 修复"展开后点击其他（空白）区域不会自动折叠"。根因：`SidePanel` 此前**没有任何输入处理**——`PART_Backdrop` 只做视觉呈现（无 `MouseDown` 处理），`IsBackdropEnabled=false` 时面板以外根本没有命中面，因此空白区域点击完全无响应。
+- 实现方式：在宿主 `Window` 上 `AddHandler(Mouse.PreviewMouseDownEvent, handler, handledEventsToo: true)`。预览路由保证先于兄弟控件取得点击，`handledEventsToo` 保证兄弟控件已把 `MouseDown` 标记为处理后仍不漏判；处理过程**不设置** `Handled`，所以面板以外的按钮等控件照常响应同一次点击。挂接/摘除时机与 `Toolbox` 的宿主窗口管理语义保持一致：`Loaded` 且开关为 `true` 时挂接，`Unloaded` 或开关置 `false` 时完整摘除三类句柄（幂等，重复挂接先 detach）。
+- 内/外判定基准为 `PART_Content`（遮罩虽是模板组成部分，语义上属于"面板以外"），并采用"祖先链命中本体 + 点击点几何位于本体范围内"双条件：后者保证多个抽屉叠放时，压在别人遮罩下的本体检索不会被误判为外部点击。收回通过 `SetCurrentValue(IsOpenProperty, false)` 写回，双向绑定时数据源同步更新且不破坏绑定。
+- 面板内 `ComboBox`、`ContextMenu` 等弹层内容位于独立 `PopupRoot` 顶层窗口，宿主窗口级处理收不到其中的点击，因此操作面板内弹层不会误收回。
+- 滑动/淡入曲线由 `CubicEase`（EaseInOut）改为 `SineEase`（EaseInOut），时长仍为 `250ms`（滑动、本体淡入、遮罩淡出三处同步替换）。用户反馈的"展开时有点卡顿"经实测确认**不是性能也不是掉帧**：`RenderCapability.Tier=2`（全硬件渲染）、DPI 125%、60Hz，动画期间帧间隔中位 14~17ms 无 >20ms 空洞、`Measure`/`Arrange` 计数为 0（无重排）、UI 线程排队延迟 ≤4ms；关闭 `Effect`、关闭 `ClipToBounds`、加 `BitmapCache`、换成 200 行重内容各变体测得的帧数与帧间隔均与基线一致（仅人为把阴影 `BlurRadius` 调到 120 才复现出 9 帧/29.8ms/5 个 >20ms 空洞）。真正的原因是曲线速度分布：`CubicEase` 峰值速度为均速 1.875 倍，250ms 内仅约 15 帧时中段单帧位移达 63~68 DIP（约 80~85 物理像素）而首三帧仅 0.4/3.0/8.2 DIP，观感即"起步停顿 + 中段一跳"；`SineEase` 峰/均值比为 π/2≈1.57，实测同一动画的逐帧位移由 `0.4 3.0 8.2 … 68.4 …` 变为 `4.0 31.0 … 38.2 … 4.0`，峰值位移下降约 44% 且首帧即有位移。`ExpanderPanel` 等其他控件的曲线未改动。
+- 附带确认（对使用方有意义）：宿主应用必须自行合并 `Themes/Generic.xaml`，否则 `Theme.Brush.Overlay.Backdrop` 解析为 `null`，遮罩 `Background` 为空而不参与命中测试——这也是遮罩看起来"完全没反应"的常见外部原因。
+- 验证：控件库编译通过（net48 / net8.0-windows，0 错误，40 项均为改动之外的既有警告）。临时探测工程 `SidePanelDismissProbe` 以 Win32 `SendInput` 真实点击（非 `RaiseEvent` 合成）跑 11 组用例、123 项断言，连续两轮全部通过且每次点击前都断言"命中的元素正是目标"（避免点错位置也判通过的静默假阳性）：遮罩空白点击收回、面板内按钮点击保持展开且 `Click` 触发、`IsBackdropEnabled=false` 时点击兄弟按钮既收回又 `e.Handled=false`、`CloseOnOutsideClick=false` 时遮罩点击与失焦均不收回、双向绑定回写 `IsOpen`、失焦收回、最小化收回、双抽屉几何判定（A 保持 + B 收回）、`PopupRoot` 下拉项真实点击选中 `Beta` 且面板不收回、句柄随属性切换与 `Unloaded` 正确摘除。临时性能探测工程 `SidePanelPerfProbe` 输出上述帧间隔/逐帧位移/曲线数学对照表。两个探测工程验证后均已删除。
 
 ### 本次更新（新增控件）— 2026-09-15
 
