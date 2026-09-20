@@ -32,7 +32,7 @@ xmlns:jv="github.com.junevy"
 xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Controls"
 ```
 
-`jv` 包含控件库的全部公开控件。`atc` 用于 `Icon`、`TitleAssist`、`DataGridAssist`、`DatePickerAssist` 和 `ExpanderBehavior` 附加属性。
+`jv` 包含控件库的全部公开控件。`atc` 用于 `Icon`、`TitleAssist`、`PlaceholderAssist`、`DataGridAssist`、`DatePickerAssist` 和 `ExpanderBehavior` 附加属性。
 
 ### 官方同名控件自动生效
 
@@ -176,10 +176,14 @@ ThemeManager.ToggleTheme();
 多个模板通过 WPF 的 `Border.CornerRadius` 依赖属性读取控件圆角，例如 `Button`、`TextBox`、`ComboBox`、`ToggleButton` 和 `ListView`：
 
 ```xml
-<jv:Button Border.CornerRadius="8" Content="Run" />
+<!--  经样式 Setter 设置（推荐）  -->
+<Style x:Key="RoundButton" BasedOn="{StaticResource {x:Type jv:Button}}" TargetType="{x:Type jv:Button}">
+    <Setter Property="Border.CornerRadius" Value="8" />
+</Style>
+<jv:Button Content="Run" Style="{StaticResource RoundButton}" />
 ```
 
-这不是 Junevy 自定义附加属性，而是 WPF `Border` 的依赖属性附加写法。
+这不是 Junevy 自定义附加属性，而是 WPF `Border` 的依赖属性附加写法。注意：逐实例 attribute 写法 `<jv:Button Border.CornerRadius="8" Content="Run" />` 会被 WPF 标记编译器拒绝（MC3015——`Border` 未提供附加属性的 Get/Set 访问器），请使用样式 Setter 或代码 `SetValue` 设置。
 
 ## 按钮控件
 
@@ -1310,6 +1314,14 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ExpanderPanel` | WPF `HeaderedContentControl`、`ToggleButton`、`LayoutTransform` 过渡动画、主题资源 | 无 |
 | `SidePanel` | WPF `ContentControl`、`TranslateTransform` 滑动动画（`SineEase`）、遮罩与主题阴影令牌（`Theme.Brush.Overlay.Backdrop`、`Theme.PopupShadow`）、宿主窗口级点击/失焦/最小化自动收回 | 无 |
 | `GroupBox` | WPF `GroupBox`、主题资源（卡片、悬停、状态令牌） | `Border.CornerRadius` |
+
+## 示例程序（Showcase）
+
+`Samples/Junevy.Controls.Showcase` 是使用本控件库开发的分类展示程序，运行：`dotnet run --project Samples/Junevy.Controls.Showcase`（net8.0-windows）。
+
+- **主窗口**：无边框 + `WindowChrome` + `jv:AppBar`（默认模板 DefaultAppBar；一个程序仅一个 AppBar，此处展示默认状态，工具栏按钮演示 `ThemeManager` 主题切换与打开 `jv:SidePanel` 设置抽屉）、`jv:SideMenu` 分类导航、`MessageBarService` 通知宿主。
+- **分类页**：按钮 / 输入与选择（PlaceholderAssist、TitleAssist、ShowClear、DatePickerAssist、Slider 数值框）/ 集合与数据（虚拟数据：ListBox 竖向+横向、ListView GridView、DataGrid、EmptyText 空态）/ 文本与状态（Label 全模式、TextBlock、ToolTip）/ 通知（Badge、MessageBar、MessageBarService）/ 布局（GroupBox、ExpanderPanel、Border.CornerRadius）/ 菜单与导航（ContextMenu、TreeMenu、TabMenu、ToolBar、Toolbox）/ 窗口与图像（ImageViewer、DialogWindow）。
+- **注意**：`jv:Button` 默认 `IsTextScaled=True`（文字随按钮尺寸等比缩放），内容自适应布局中应设 `IsTextScaled="False"`；展示页经页面隐式样式统一关闭，并保留一个固定尺寸的缩放演示。
 
 ## 开发注意事项
 

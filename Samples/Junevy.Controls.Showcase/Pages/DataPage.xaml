@@ -1,0 +1,135 @@
+<UserControl
+    x:Class="Junevy.Controls.Showcase.Pages.DataPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Controls"
+    xmlns:jv="github.com.junevy">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel MaxWidth="1080">
+
+            <TextBlock FontSize="20" FontWeight="Bold" Text="集合与数据" />
+            <TextBlock
+                Margin="0,4,0,4"
+                FontSize="12"
+                Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                Text="jv:ListBox（竖向/横向滑动）/ jv:ListView（GridView）/ DataGrid。以下数据均为虚拟数据（SampleData）。" />
+
+            <jv:GroupBox Header="jv:ListBox（竖向）" Margin="0,2,0,0">
+                <jv:ListBox
+                    Height="180"
+                    ItemsSource="{Binding Devices}">
+                    <jv:ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="8,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    FontWeight="Bold"
+                                    Text="{Binding Name}" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Margin="12,0,0,0"
+                                    Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                                    Text="{Binding IP}" />
+                                <TextBlock
+                                    Grid.Column="2"
+                                    Foreground="{DynamicResource Theme.Brush.Accent.Primary}"
+                                    Text="{Binding Status}" />
+                            </Grid>
+                        </DataTemplate>
+                    </jv:ListBox.ItemTemplate>
+                </jv:ListBox>
+            </jv:GroupBox>
+
+            <jv:GroupBox Header="jv:ListBox（横向滑动，Orientation=Horizontal）" Margin="0,16,0,0">
+                <jv:ListBox
+                    Height="110"
+                    ItemsSource="{Binding Tiles}"
+                    Orientation="Horizontal">
+                    <jv:ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border
+                                Width="120"
+                                Margin="4"
+                                Background="{DynamicResource Theme.Brush.Surface.Raised}"
+                                BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                                BorderThickness="1"
+                                CornerRadius="8">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{DynamicResource IconFont}"
+                                        FontSize="22"
+                                        Foreground="{DynamicResource Theme.Brush.Accent.Primary}"
+                                        Text="&#xE60C;" />
+                                    <TextBlock
+                                        HorizontalAlignment="Center"
+                                        FontSize="11"
+                                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                                        Text="{Binding Name}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </jv:ListBox.ItemTemplate>
+                </jv:ListBox>
+            </jv:GroupBox>
+
+            <jv:GroupBox Header="jv:ListView（GridView 视图）" Margin="0,16,0,0">
+                <jv:ListView
+                    Height="180"
+                    ItemsSource="{Binding Devices}">
+                    <jv:ListView.View>
+                        <GridView>
+                            <GridViewColumn
+                                Width="160"
+                                DisplayMemberBinding="{Binding Name}"
+                                Header="设备" />
+                            <GridViewColumn
+                                Width="100"
+                                DisplayMemberBinding="{Binding Status}"
+                                Header="状态" />
+                            <GridViewColumn
+                                Width="180"
+                                DisplayMemberBinding="{Binding IP}"
+                                Header="IP 地址" />
+                        </GridView>
+                    </jv:ListView.View>
+                </jv:ListView>
+            </jv:GroupBox>
+
+            <jv:GroupBox Header="DataGrid（虚拟数据 + 排序）" Margin="0,16,0,0">
+                <jv:DataGrid
+                    Height="220"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding Results}">
+                    <jv:DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding Time}" Header="时间" />
+                        <DataGridTextColumn Binding="{Binding Device}" Header="设备" />
+                        <DataGridTextColumn Binding="{Binding Result}" Header="结果" />
+                    </jv:DataGrid.Columns>
+                </jv:DataGrid>
+            </jv:GroupBox>
+
+            <jv:GroupBox Header="DataGrid 空态提示（atc:DataGridAssist.EmptyText）" Margin="0,16,0,0">
+                <jv:DataGrid
+                    Height="140"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    atc:DataGridAssist.EmptyText="暂无检测结果（空态演示）">
+                    <jv:DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding Time}" Header="时间" />
+                        <DataGridTextColumn Binding="{Binding Device}" Header="设备" />
+                        <DataGridTextColumn Binding="{Binding Result}" Header="结果" />
+                    </jv:DataGrid.Columns>
+                </jv:DataGrid>
+            </jv:GroupBox>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

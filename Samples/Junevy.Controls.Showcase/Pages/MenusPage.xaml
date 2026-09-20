@@ -1,0 +1,149 @@
+<UserControl
+    x:Class="Junevy.Controls.Showcase.Pages.MenusPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Controls"
+    xmlns:jv="github.com.junevy"
+    xmlns:sample="clr-namespace:Junevy.Controls.Showcase">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel MaxWidth="1080">
+            <StackPanel.Resources>
+                <!--  内容自适应场景关闭等比缩放（jv:Button 默认 IsTextScaled=True 会占满可用空间）  -->
+                <Style BasedOn="{StaticResource {x:Type jv:Button}}" TargetType="{x:Type jv:Button}">
+                    <Setter Property="IsTextScaled" Value="False" />
+                </Style>
+            </StackPanel.Resources>
+
+            <TextBlock FontSize="20" FontWeight="Bold" Text="菜单与导航" />
+            <TextBlock
+                Margin="0,4,0,4"
+                FontSize="12"
+                Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                Text="jv:ContextMenu / jv:TreeMenu（TreeMenuItem + ExpanderBehavior）/ jv:TabMenu / jv:ToolBar / jv:Toolbox。jv:SideMenu 已作为本程序左侧导航使用。" />
+
+            <jv:GroupBox Header="jv:ContextMenu（右键按钮打开）">
+                <StackPanel>
+                    <jv:Button Content="右键打开上下文菜单" HorizontalAlignment="Left">
+                        <jv:Button.ContextMenu>
+                            <jv:ContextMenu>
+                                <jv:ContextMenuItem
+                                    Command="{Binding PanelToggleCommand, Source={x:Static sample:SampleData.Instance}}"
+                                    Header="打开"
+                                    Icon="&#xE60F;"
+                                    InputGestureText="Ctrl+O" />
+                                <jv:ContextMenuItem Header="保存" Icon="&#xE611;" InputGestureText="Ctrl+S" />
+                                <Separator />
+                                <jv:ContextMenuItem Header="自动滚动" IsCheckable="True" IsChecked="True" />
+                                <jv:ContextMenuItem Header="导出">
+                                    <jv:ContextMenuItem Header="导出为 PNG" />
+                                    <jv:ContextMenuItem Header="导出为 JPEG" />
+                                </jv:ContextMenuItem>
+                            </jv:ContextMenu>
+                        </jv:Button.ContextMenu>
+                    </jv:Button>
+                    <TextBlock
+                        Margin="0,10,0,0"
+                        FontSize="12"
+                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        Text="上下文菜单中请使用原生 MenuItem 或 jv:ContextMenuItem；jv:MenuItem 是导航数据控件，仅用于 SideMenu/TreeMenu。" />
+                </StackPanel>
+            </jv:GroupBox>
+
+            <jv:GroupBox Header="jv:TreeMenu（双击文件夹展开，双击叶节点触发 NavigateCommand）" Margin="0,16,0,0">
+                <StackPanel>
+                    <jv:TreeMenu
+                        x:Name="TreeNav"
+                        Height="200"
+                        DisplayMode="Normal"
+                        atc:Icon.FontFamily="{DynamicResource IconFont}"
+                        atc:Icon.IconSize="16" />
+                    <TextBlock
+                        Margin="0,10,0,0"
+                        FontSize="12"
+                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        Text="默认容器样式已启用 atc:ExpanderBehavior.Enable：双击/Enter 展开或折叠文件夹，激活叶节点时执行 NavigateCommand（本页以 MessageBarService 反馈）。" />
+                </StackPanel>
+            </jv:GroupBox>
+
+            <jv:GroupBox Header="jv:TabMenu（可关闭页签 + TabClosing 拦截）" Margin="0,16,0,0">
+                <StackPanel>
+                    <jv:TabMenu
+                        Height="220"
+                        CanCloseLastTab="False"
+                        TabClosing="OnTabClosing">
+                        <jv:TabMenuItem Header="相机 1" Icon="&#xE66B;">
+                            <TextBlock Margin="16" Text="相机 1 的内容区域（虚拟数据演示页签内容）。" />
+                        </jv:TabMenuItem>
+                        <jv:TabMenuItem Header="日志">
+                            <TextBlock Margin="16" Text="日志页签内容。" />
+                        </jv:TabMenuItem>
+                        <jv:TabMenuItem Header="保护页">
+                            <TextBlock Margin="16" Text="尝试关闭此页签：TabClosing 事件会取消并弹出提示。" />
+                        </jv:TabMenuItem>
+                    </jv:TabMenu>
+                    <TextBlock
+                        Margin="0,10,0,0"
+                        FontSize="12"
+                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        Text="IsClosable 控制是否显示关闭按钮（默认 True）；双击文字标题可重命名（CanRename）；CanCloseLastTab=False 保护最后一个页签。" />
+                </StackPanel>
+            </jv:GroupBox>
+
+            <jv:GroupBox Header="jv:ToolBar（横向 / 纵向）" Margin="0,16,0,0">
+                <StackPanel>
+                    <jv:ToolBar
+                        HorizontalAlignment="Left"
+                        FontFamily="{DynamicResource IconFont}"
+                        FontSize="16"
+                        Foreground="{DynamicResource Theme.Brush.Text.Primary}">
+                        <jv:ToolBarItem Icon="&#xE60F;" ToolTip="设置" />
+                        <jv:ToolBarItem Icon="&#xE611;" ToolTip="刷新" />
+                        <jv:ToolBarItem Icon="&#xE932;" ToolTip="告警" />
+                        <jv:ToolBarItem Icon="&#xE60C;" ToolTip="截图" />
+                    </jv:ToolBar>
+                    <jv:ToolBar
+                        Width="48"
+                        Margin="0,8,0,0"
+                        HorizontalAlignment="Left"
+                        FontFamily="{DynamicResource IconFont}"
+                        FontSize="16"
+                        Foreground="{DynamicResource Theme.Brush.Text.Primary}"
+                        Orientation="Vertical">
+                        <jv:ToolBarItem Icon="&#xE60F;" ToolTip="设置" />
+                        <jv:ToolBarItem Icon="&#xE611;" ToolTip="刷新" />
+                        <jv:ToolBarItem Icon="&#xE932;" ToolTip="告警" />
+                    </jv:ToolBar>
+                    <TextBlock
+                        Margin="0,10,0,0"
+                        FontSize="12"
+                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        Text="ToolBarItem.Icon 是按钮自身属性；ToolBar 继承 WPF ItemsControl，也支持 ItemsSource + ItemContainerStyle 绑定。" />
+                </StackPanel>
+            </jv:GroupBox>
+
+            <jv:GroupBox Header="jv:Toolbox（悬浮工具箱：悬停分组打开 Popup，工具可拖放）" Margin="0,16,0,0">
+                <StackPanel>
+                    <jv:Toolbox HorizontalAlignment="Left">
+                        <jv:ToolboxItem Icon="&#xE60F;" Title="基础工具">
+                            <jv:ToolItem Icon="&#xE611;" Title="刷新" />
+                            <jv:ToolItem Icon="&#xE60C;" Title="截图" />
+                            <jv:ToolItem Icon="&#xE650;" Title="移动" />
+                            <jv:ToolItem Icon="&#xE932;" Title="检测" />
+                        </jv:ToolboxItem>
+                        <jv:ToolboxItem Icon="&#xE66B;" Title="视觉工具">
+                            <jv:ToolItem Icon="&#xE981;" Title="定位" />
+                            <jv:ToolItem Icon="&#xE60F;" Title="标定" />
+                        </jv:ToolboxItem>
+                    </jv:Toolbox>
+                    <TextBlock
+                        Margin="0,10,0,0"
+                        FontSize="12"
+                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        Text="任意时刻最多展开一个分组；ToolItem 按住可发起 Copy 拖放（IsDragEnabled 默认 True，十字指针）；图标颜色由 atc:Icon.IconForeground 控制、标题颜色由 Foreground 控制。" />
+                </StackPanel>
+            </jv:GroupBox>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

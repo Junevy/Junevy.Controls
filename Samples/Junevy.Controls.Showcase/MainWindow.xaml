@@ -1,0 +1,165 @@
+<Window
+    x:Class="Junevy.Controls.Showcase.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Controls"
+    xmlns:jv="github.com.junevy"
+    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+    Title="Junevy.Controls Showcase"
+    Width="1280"
+    Height="800"
+    MinWidth="1024"
+    MinHeight="640"
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="None"
+    ResizeMode="CanResize"
+    UseLayoutRounding="True"
+    Background="Transparent"
+    FontSize="13"
+    Foreground="{DynamicResource Theme.Brush.Text.Primary}">
+
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome
+            CaptionHeight="56"
+            CornerRadius="0"
+            GlassFrameThickness="0"
+            ResizeBorderThickness="6"
+            UseAeroCaptionButtons="False" />
+    </shell:WindowChrome.WindowChrome>
+
+    <!--  最大化时窗口边界会比工作区大出一圈，用 Margin 内缩补偿，避免标题栏被裁切。  -->
+    <Border>
+        <Border.Style>
+            <Style TargetType="{x:Type Border}">
+                <Setter Property="Margin" Value="0" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                        <Setter Property="Margin" Value="7" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+        <Border Background="{DynamicResource Theme.Brush.Background.App}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!--  AppBar（一个程序只能存在一个，此处以默认模板 DefaultAppBar 展示默认状态）  -->
+                <jv:AppBar
+                    Grid.Row="0"
+                    Height="56"
+                    atc:Icon.FontFamily="{DynamicResource IconFont}"
+                    atc:Icon.Icon="&#xE66B;"
+                    atc:Icon.IconSize="26"
+                    Content="Junevy.Controls Showcase"
+                    FontSize="14"
+                    Foreground="{DynamicResource Theme.Brush.Text.Secondary}">
+                    <jv:AppBar.ToolBar>
+                        <!--  IsHitTestVisibleInChrome 可继承：让工具栏按钮在标题栏区域内可点击，同时保留标题区拖动  -->
+                        <jv:ToolBar
+                            HorizontalAlignment="Left"
+                            BorderBrush="Transparent"
+                            FontFamily="{DynamicResource IconFont}"
+                            FontSize="16"
+                            Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type jv:AppBar}}}"
+                            WindowChrome.IsHitTestVisibleInChrome="True">
+                            <jv:ToolBarItem
+                                Click="OnToggleThemeClick"
+                                Icon="&#xE611;"
+                                ToolTip="切换浅色/深色主题" />
+                            <jv:ToolBarItem
+                                Click="OnOpenSettingsClick"
+                                Icon="&#xE60F;"
+                                ToolTip="打开设置面板（SidePanel 演示）" />
+                        </jv:ToolBar>
+                    </jv:AppBar.ToolBar>
+                </jv:AppBar>
+
+                <!--  内容区：SideMenu 分类导航 + 页面宿主  -->
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border
+                        Grid.Column="0"
+                        Background="{DynamicResource Theme.Brush.Surface.Base}"
+                        BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                        BorderThickness="0,0,1,0">
+                        <jv:SideMenu
+                            x:Name="NavMenu"
+                            Width="200"
+                            Margin="0,8"
+                            DisplayMode="Horizontal"
+                            ItemHeight="44"
+                            SelectionChanged="OnNavSelectionChanged"
+                            atc:Icon.FontFamily="{DynamicResource IconFont}"
+                            atc:Icon.IconSize="18">
+                            <jv:MenuItem Title="按钮控件" Icon="&#xE981;" />
+                            <jv:MenuItem Title="输入与选择" Icon="&#xE60C;" />
+                            <jv:MenuItem Title="集合与数据" Icon="&#xE66B;" />
+                            <jv:MenuItem Title="文本与状态" Icon="&#xE651;" />
+                            <jv:MenuItem Title="通知" Icon="&#xE932;" />
+                            <jv:MenuItem Title="布局控件" Icon="&#xE650;" />
+                            <jv:MenuItem Title="菜单与导航" Icon="&#xE65D;" />
+                            <jv:MenuItem Title="窗口与图像" Icon="&#xE611;" />
+                        </jv:SideMenu>
+                    </Border>
+
+                    <ContentControl
+                        x:Name="PageHost"
+                        Grid.Column="1"
+                        Focusable="False" />
+
+                    <!--  SidePanel：不指定 Column 时自动跨满父 Grid，从右侧滑出  -->
+                    <jv:SidePanel x:Name="SettingsPanel" Side="Right">
+                        <StackPanel Width="320" Margin="24,20">
+                            <TextBlock
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Text="设置面板（jv:SidePanel）" />
+                            <TextBlock
+                                Margin="0,6,0,16"
+                                FontSize="12"
+                                Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                                Text="点击面板外部、宿主窗口失焦或最小化时自动收回（CloseOnOutsideClick 默认开启）。"
+                                TextWrapping="Wrap" />
+                            <jv:TextBox
+                                Margin="0,0,0,12"
+                                atc:PlaceholderAssist.Placeholder="项目名称"
+                                atc:TitleAssist.Title="Project" />
+                            <jv:ComboBox Margin="0,0,0,12" atc:PlaceholderAssist.Placeholder="选择采集模式...">
+                                <jv:ComboBoxItem Content="Continuous" />
+                                <jv:ComboBoxItem Content="Trigger" />
+                            </jv:ComboBox>
+                            <jv:Slider
+                                Margin="0,0,0,16"
+                                Maximum="100"
+                                TickFrequency="10"
+                                TickPlacement="BottomRight"
+                                Value="40"
+                                ValueFormatString="F0" />
+                            <StackPanel Orientation="Horizontal">
+                                <jv:ToggleButton Content="开机自启" IsChecked="True" />
+                                <jv:Button
+                                    Margin="16,0,0,0"
+                                    Click="OnCloseSettingsClick"
+                                    Content="关闭面板"
+                                    IsTextScaled="False" />
+                            </StackPanel>
+                        </StackPanel>
+                    </jv:SidePanel>
+                </Grid>
+
+                <!--  MessageBarService 宿主：覆盖在内容之上，不占用布局空间  -->
+                <jv:MessageBarPresenter
+                    x:Name="NotificationPresenter"
+                    Grid.RowSpan="2"
+                    Margin="16,0,16,24" />
+            </Grid>
+        </Border>
+    </Border>
+</Window>

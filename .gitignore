@@ -16,3 +16,6 @@
 .vs/
 .idea/
 *.DotSettings.user
+
+## WorkBuddy 临时工作区（探针、临时输出等）
+.workbuddy/tmp/
