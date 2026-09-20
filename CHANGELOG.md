@@ -2,6 +2,28 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## Slider
+
+### 本次更新（新增控件）— 2026-09-20
+
+- 新增 `Slider` 滑块控件：`Controls/Box/Slider.cs`（`jv:Slider`，继承 `System.Windows.Controls.Slider`）+ `Controls/Box/Slider.xaml`（已注册到 `Themes/Generic.xaml`）。官方的拖拽、轨道分页、方向键/`Home`/`End`、刻度、选择区段行为全部沿用，新增能力是在滑块上/下/左/右任意一侧放置一个可手动键入数值的数值框（模板部件 `PART_ValueBox`，外观复用库内 `DefaultTextBoxStyle`）。命名空间 `Junevy.Controls.Controls.Box` 已在 `github.com.junevy` 的 `XmlnsDefinition` 内，`AssemblyInfo.cs` 无需改动。
+- 新增依赖属性：
+  - `ShowValueBox`（bool，默认 `true`）：数值框显隐；`false` 时数值框 `Collapsed`，轨道立即占满腾出的空间，运行时切换即时生效。
+  - `ValueBoxSide`（`SliderValueBoxSide` 枚举 `Left`/`Top`/`Right`/`Bottom`，默认 `Right`）：数值框停靠侧，横竖滑块均可任选四侧；主轴侧限宽 `120`，交叉轴侧限宽 `160`、限高 `28`，避免数值框挤扁轨道。枚举文件 `Controls/Box/SliderValueBoxSide.cs`。
+  - `ValueFormatString`（string，默认 `null`）：数值框显示格式（`F1`、`0.00`、`p0` 等），仅影响显示，键入时仍按数值解析。
+- 键入与提交：输入过程中不改值，回车（`PreviewKeyDown`，不置 `Handled`，宿主的默认按钮等行为不受影响）或数值框失焦时提交；按当前区域性以 `NumberStyles.Float | AllowThousands` 解析，越界夹取到 `Minimum`/`Maximum`，非法文本（空串、非数字、`NaN`、无穷）不改值并把显示还原为当前值。写回一律用 `SetCurrentValue(ValueProperty, …)`，双向绑定不被截断。`OnValueChanged`/`OnMaximumChanged`/`OnMinimumChanged` 三个既有 protected 重写负责同步显示，未新增事件。
+- 模板结构：横竖共用一套 5×5 网格模板（中心单元格放 `PART_Track`，四周 Auto 行/列放刻度与数值框，未使用的行/列自动收为 0）。交叉轴尺寸一律固定并居中——轨道细条 `4`、滑块 `16x16` 圆形、刻度 `4`，避免 `Track` 分配给元素的交叉轴空间影响视觉厚度。已分页段取 `Theme.Brush.Accent.Primary`、未分页段 `Theme.Brush.Surface.Sunken`、禁用态 `Theme.Brush.State.DisabledSurface`/`DisabledBorder`、选择区段 `Theme.Brush.Accent.Secondary`，焦点框沿用 `DefaultControlFocusVisualStyle`，深浅主题自动切换。
+- 隐式样式：`DefaultSliderStyle`（keyed）+ 原生 `Slider` 与 `local:Slider` 各一条隐式样式。合并 `Themes/Generic.xaml` 后原生写法 `<Slider>` 直接获得本库外观；数值框的显隐与停靠侧绑定到 `jv:Slider` 自有属性，原生实例上绑定失败落到 `FallbackValue=Collapsed`，因此自动缺席且不留空隙。
+- 实测确认的 WPF 平台约束（决定了实现方式，后续维护不要回退）：
+  - `ControlTemplate.Triggers` 内的 `DataTrigger` 使用 `RelativeSource={RelativeSource TemplatedParent}` **不会解析**（setter 永不生效，实测数值框四侧全部停在默认位置）。因此数值框的显隐与停靠侧改由 `SliderValueBoxStyle` 的 `Style.Triggers` + `AncestorType={x:Type local:Slider}` 绑定驱动，模板内的 `PART_ValueBox` 不得再写任何与停靠侧相关的本地值（本地值会压过样式）。
+  - 模板**不得**写 `PART_Track` 的 `Orientation`/`IsDirectionReversed`/`Value`/`Minimum`/`Maximum`：`Track.OnPreApplyTemplate` 会把这些属性经 `BindToTemplatedParent` 自动绑定到控件本体，但仅在属性仍为默认值时绑定；触发器一旦写入非默认值即顶掉该绑定，使用方再也改不动 `Slider.IsDirectionReversed`。
+  - 官方纵向滑块本就是**最小值在下、向上增大**（`Track` 纵向 Normal 布局为 `|Inc|Thumb|Dec|`），模板不做任何反向处理。
+  - `Track.IsDirectionReversed` 的依赖属性元数据不含 `AffectsMeasure`/`AffectsArrange`，运行时翻转方向需由外部再触发一次重排（探测中以改高度 + `UpdateLayout` 复现）。
+  - `Slider` 定位 `PART_SelectionRange` 时只写 `Canvas.Left`/`Canvas.Top` 与主轴长度（横向 `Width`、纵向 `Height`），交叉轴厚度与居中必须由模板提供，故套一层 `Canvas` 宿主；该宿主 `IsHitTestVisible=False`，保证区段覆盖处的点击仍落到分页按钮。
+  - 原实现的自写越界夹取（`Math.Max/Min`）已删除：`RangeBase.Value` 自带强制回调会把值夹进 `[Minimum, Maximum]`，去掉后全部越界断言仍通过（见下方变异反证）；保留的是 `NaN`/无穷拦截——强制回调对这两个值不做夹取，放行即会污染 `Value`。
+  - `ValueFormatString` 原样交给 BCL，控件不做二次解释：.NET 自定义数字格式串会按字面复制无法识别的字符，实测 11 个畸形候选（`(bad format`、`0.0.0`、`%%`、`\q`、`e+e`、`#.#.#`、`..`、`0#`、`#0`、`0E+0%`、`'abc`）在 .NET 8.0.31 与 .NET Framework 4.8 上都不抛 `FormatException`，故 `catch (FormatException)` 分支为防御性代码（`double.ToString(string, IFormatProvider)` 的公开契约允许抛出）。
+- 验证：控件库编译通过（net48 / net8.0-windows，0 错误，20 项均为改动之外的既有警告，三个新增文件 0 警告 0 错误）。临时探测工程 `SliderProbe` 跑 18 组用例、165 项断言，连续两轮全部通过；输入全部走 Win32 `SetCursorPos` + `SendInput` 真实点击/拖拽/键入（非 `RaiseEvent` 合成），每次点击前先断言"命中的元素正是目标"，并打印按下/抬起/`Thumb.DragStarted` 计数时间线。覆盖点：模板部件与隐式样式（含原生 `<Slider>` 反向对照——数值框自动缺席、轨道细条与滑块仍齐备）、`Value` 驱动滑块几何（含 0/100 端点）、数值框外观继承库内 `TextBox`、真实点击轨道半区按 `LargeChange` 分页、方向键/`Home`/`End`（横向忽略上下键、纵向向上增大，焦点归属逐例断言）、键入 + 回车提交、越界夹取与非法还原（含 `NaN`/`1E999`）、小数与负区间（zh-CN 区域性、千分位按分组解析）、失焦提交、真实拖拽后 `Track → Value` 反向同步、隐藏数值框不占布局、四侧布局不重叠与运行时切换、`ValueFormatString` 与 BCL 输出逐串对照、纵向（默认方向、轨道厚度、分页方向、`IsDirectionReversed` 可反向）、刻度显隐与位置、禁用态、主题切换、选择区段几何与点击穿透。**变异反证**三组：把 `Left` 侧停靠列改错并在纵向触发器里写入 `PART_Track.IsDirectionReversed` → 5 项断言失败（用例 12、14 精确复现）；删除自写夹取 → 全部通过，据此确认该夹取冗余并删除；去掉区段宿主的 `IsHitTestVisible=False` → 2 项失败并复现"区段吞点击"。`slider_light.png`/`slider_dark.png`/`slider_selection.png`（含选择区段可见状态）快照人工核对，四侧布局、刻度位置、禁用态与深浅主题配色与库内风格一致。探测工程验证后已删除。
+
 ## AppBar
 
 ### 本次更新（新增模板与依赖属性）— 2026-09-19
@@ -39,11 +61,21 @@
 
 ## SidePanel
 
+### 本次修复（收回时机与宿主切换按钮冲突）— 2026-09-20
+
+- 修复 2026-09-19 的 `CloseOnOutsideClick` 引入的回归：宿主按最常见写法「按钮 + `IsOpen` 双向绑定 + 命令把布尔值取反」控制面板时，点击按钮后面板**折叠后立刻又展开**。
+- 根因（实测时间线，非推测）：收回动作当时发生在窗口级 `PreviewMouseDown`（按下），而按钮的 `Click` 由 `ButtonBase` 在**抬起**阶段触发、且早于 `MouseUpEvent` 冒泡到宿主窗口。按下瞬间控件把 `IsOpen` 写成 `false` 并经双向绑定回写数据源，命令随后读到的是已被收回的 `false`，取反得到 `true` → 面板重新展开。改动前代码的探测记录：`889ms 窗口看到按下 IsOpen=True` → `890ms IsOpen=False vm=False`（控件写回）→ `958ms 宿主按钮 Click vm=False` → `959ms IsOpen=True vm=True`（命令取反）→ `1220ms Opened`。
+- 修复方式：收回判定拆成"按下标记 + 抬起执行"两步。窗口级 `PreviewMouseDown`（`handledEventsToo: true`）只记录"本次手势起于面板本体之外、且按下时面板已展开"，**不再立即写值**；窗口级 `Mouse.MouseUpEvent`（同样接管已处理事件）在按钮命令已同步执行完之后才判定：宿主此时若已自行收回（切换按钮场景）或本次点击本就是把面板打开（按下时为收起态，挂起条件不成立），控件都不再重复动作。
+- 语义变化（对使用方可见）：外部点击的收回时机由"按下"改为"抬起"，与 WPF `Popup`  light-dismiss 及常见抽屉实现一致；内/外结论仍以**按下位置**为准（按下后拖出或拖入本体不改变本次判定），因此遮罩、空白区、兄弟按钮点击的收回结果与 2026-09-19 版本完全相同。
+- 未改动部分：`Deactivated`/最小化收回、`CloseOnOutsideClick=false` 的整体关闭、`SetCurrentValue` 写回（不破坏绑定）、`PopupRoot` 内点击天然豁免、句柄随 `Loaded`/`Unloaded`/属性切换幂等挂摘。`Controls/Panel/SidePanel.cs` 之外的文件无改动。
+- 验证：控件库重新编译通过（net48 / net8.0-windows，0 错误，40 项均为改动之外的既有警告）。临时探测工程 `SidePanelToggleProbe` 以 Win32 `SendInput` 真实点击跑 12 组用例、84 项断言，连续两轮全部通过；每次点击前断言"命中的元素正是目标"，点击后断言"按下与抬起确实送达窗口"（区分环境吞点击与控件逻辑错误），并逐用例打印 `IsOpen`/VM 值/`Opened`/`Closed`/`Click` 时间线。**反向对照**：同一探测回跑改动前的提交版本，用例 1、2、12 复现回弹（时间线见上），证明断言确实能捕获该缺陷而非静默假通过。覆盖点：无遮罩时按钮命令收回不回弹、遮罩开启且按钮在面板 Grid 之外（AppBar 场景）收回不回弹、收起态点击按钮展开后不被同一次抬起收回、`CloseOnOutsideClick=false` 时完全由命令掌控、遮罩点击收回并回写绑定、空白区点击收回、面板内按钮点击保持展开、`ButtonBase` 已 `Handled` 抬起的兄弟按钮仍触发收回、失焦收回、面板内 `ComboBox` 下拉项真实选中且面板不收回、开关关闭时遮罩与失焦均不收回、连续两次点击（展开动画期间反向）最终状态与事件计数正确；`case1_closed`/`case2_closed`/`case3_open` PNG 快照人工核对收回与展开的视觉状态正确。探测工程验证后已删除。
+
+
 ### 本次更新（点击外部自动收回 + 滑动曲线优化）— 2026-09-19
 
 - 新增依赖属性 `CloseOnOutsideClick`（bool，默认 `true`）：展开时点击面板本体以外的区域、宿主窗口失焦（`Deactivated`）或最小化（`StateChanged`）都自动收回面板；置为 `false` 后收回完全由宿主通过 `IsOpen`/`Toggle()` 控制。
 - 修复"展开后点击其他（空白）区域不会自动折叠"。根因：`SidePanel` 此前**没有任何输入处理**——`PART_Backdrop` 只做视觉呈现（无 `MouseDown` 处理），`IsBackdropEnabled=false` 时面板以外根本没有命中面，因此空白区域点击完全无响应。
-- 实现方式：在宿主 `Window` 上 `AddHandler(Mouse.PreviewMouseDownEvent, handler, handledEventsToo: true)`。预览路由保证先于兄弟控件取得点击，`handledEventsToo` 保证兄弟控件已把 `MouseDown` 标记为处理后仍不漏判；处理过程**不设置** `Handled`，所以面板以外的按钮等控件照常响应同一次点击。挂接/摘除时机与 `Toolbox` 的宿主窗口管理语义保持一致：`Loaded` 且开关为 `true` 时挂接，`Unloaded` 或开关置 `false` 时完整摘除三类句柄（幂等，重复挂接先 detach）。
+- 实现方式（本节描述为当时的实现，收回时机已在 2026-09-20 由"按下"改为"抬起"，见上一节）：在宿主 `Window` 上 `AddHandler(Mouse.PreviewMouseDownEvent, handler, handledEventsToo: true)`。预览路由保证先于兄弟控件取得点击，`handledEventsToo` 保证兄弟控件已把 `MouseDown` 标记为处理后仍不漏判；处理过程**不设置** `Handled`，所以面板以外的按钮等控件照常响应同一次点击。挂接/摘除时机与 `Toolbox` 的宿主窗口管理语义保持一致：`Loaded` 且开关为 `true` 时挂接，`Unloaded` 或开关置 `false` 时完整摘除三类句柄（幂等，重复挂接先 detach）。
 - 内/外判定基准为 `PART_Content`（遮罩虽是模板组成部分，语义上属于"面板以外"），并采用"祖先链命中本体 + 点击点几何位于本体范围内"双条件：后者保证多个抽屉叠放时，压在别人遮罩下的本体检索不会被误判为外部点击。收回通过 `SetCurrentValue(IsOpenProperty, false)` 写回，双向绑定时数据源同步更新且不破坏绑定。
 - 面板内 `ComboBox`、`ContextMenu` 等弹层内容位于独立 `PopupRoot` 顶层窗口，宿主窗口级处理收不到其中的点击，因此操作面板内弹层不会误收回。
 - 滑动/淡入曲线由 `CubicEase`（EaseInOut）改为 `SineEase`（EaseInOut），时长仍为 `250ms`（滑动、本体淡入、遮罩淡出三处同步替换）。用户反馈的"展开时有点卡顿"经实测确认**不是性能也不是掉帧**：`RenderCapability.Tier=2`（全硬件渲染）、DPI 125%、60Hz，动画期间帧间隔中位 14~17ms 无 >20ms 空洞、`Measure`/`Arrange` 计数为 0（无重排）、UI 线程排队延迟 ≤4ms；关闭 `Effect`、关闭 `ClipToBounds`、加 `BitmapCache`、换成 200 行重内容各变体测得的帧数与帧间隔均与基线一致（仅人为把阴影 `BlurRadius` 调到 120 才复现出 9 帧/29.8ms/5 个 >20ms 空洞）。真正的原因是曲线速度分布：`CubicEase` 峰值速度为均速 1.875 倍，250ms 内仅约 15 帧时中段单帧位移达 63~68 DIP（约 80~85 物理像素）而首三帧仅 0.4/3.0/8.2 DIP，观感即"起步停顿 + 中段一跳"；`SineEase` 峰/均值比为 π/2≈1.57，实测同一动画的逐帧位移由 `0.4 3.0 8.2 … 68.4 …` 变为 `4.0 31.0 … 38.2 … 4.0`，峰值位移下降约 44% 且首帧即有位移。`ExpanderPanel` 等其他控件的曲线未改动。

@@ -47,9 +47,10 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `<ListBox>` / `<ListView>` | 外观 + 交互 | 外观完整等效；水平滑动（`Orientation`）为本库 `jv:` 实例专有属性，原生实例沿用 WPF 原生排列 |
 | `<DataGrid>` | 外观 + 交互 | 完整等效（含专属模板）；空态提示通过附加属性 `atc:DataGridAssist.EmptyText` 提供，原生与 `jv:` 实例均可用 |
 | `<DatePicker>` | 外观 + 交互 | 完整等效（含日历全套模板）；占位符通过附加属性 `atc:DatePickerAssist.PlaceHolder` 提供，原生实例可用 |
+| `<Slider>` | 外观 + 交互 | 完整等效（轨道、滑块、分页、刻度、选择区段）；数值框（`ShowValueBox`/`ValueBoxSide`/`ValueFormatString`）为本库 `jv:Slider` 专有，原生实例上自动折叠 |
 | `<ToolTip>` | 外观 | 完整等效，任意元素的 `ToolTip` 属性自动获得主题样式 |
 
-以下控件因依赖自有依赖属性（样式触发器直接引用），**必须使用 `jv:` 前缀**：`RadioButton`、`ToggleButton`（`DisplayMode`/`SwitchSize`）、`Label`（`DisplayMode`）、`TextBlock`（`Text`/`TextAlignment`/`TextWrapping`）、`ProgressBar`（`ProgressText` 等）。
+以下控件因依赖自有依赖属性（样式触发器直接引用），**必须使用 `jv:` 前缀**：`RadioButton`、`ToggleButton`（`DisplayMode`/`SwitchSize`）、`Label`（`DisplayMode`）、`TextBlock`（`Text`/`TextAlignment`/`TextWrapping`）、`ProgressBar`（`ProgressText` 等）、`Slider`（`ShowValueBox`/`ValueBoxSide`/`ValueFormatString`，原生实例仅有外观）。
 
 ## 主题
 
@@ -317,6 +318,33 @@ ThemeManager.ToggleTheme();
 **占位符**：`atc:DatePickerAssist.PlaceHolder` 为附加属性（未选日期且文本为空时显示），官方原生实例同样支持，不设置则无占位文案。
 
 依赖：WPF `DatePicker`/`Calendar` 标准行为（`SelectedDateFormat`、`FirstDayOfWeek`、`BlackoutDates` 等）、主题滚动条与阴影令牌；附加属性 `atc:DatePickerAssist.PlaceHolder`（占位符）。
+
+### Slider
+
+`jv:Slider` 继承 WPF `Slider`，完整保留官方的拖拽、轨道分页、方向键与 `Home`/`End`、刻度、选择区段行为，另在滑块的上/下/左/右任意一侧附加一个可手动键入数值的数值框（模板部件 `PART_ValueBox`，外观复用库内 `jv:TextBox`）。合并 `Themes/Generic.xaml` 后，原生写法 `<Slider>` 与 `jv:Slider` 外观完全一致，数值框属 `jv:Slider` 专有——原生实例上自动折叠且不占布局。
+
+| 属性 | 默认值 | 效果 |
+| --- | --- | --- |
+| `ShowValueBox` | `true` | 是否显示数值框；`false` 时整体 `Collapsed`，轨道立即占满腾出的空间，运行时切换即时生效 |
+| `ValueBoxSide` | `Right` | 数值框停靠侧：`Left`/`Top`/`Right`/`Bottom` 四选一，横竖滑块均可任选。主轴侧限宽 `120`、交叉轴侧限宽 `160` 限高 `28`，避免数值框把轨道挤扁 |
+| `ValueFormatString` | `null` | 数值框的显示格式（如 `F1`、`0.00`、`p0`），仅影响显示；`null` 时按当前区域性直接输出数值 |
+
+**键入与提交**：输入过程中不改值，回车或数值框失焦时提交。按当前区域性解析（`NumberStyles.Float \| AllowThousands`，千分位按分组解析而非小数点），越界自动夹取到 `Minimum`/`Maximum`，非法文本（空串、非数字、`NaN`、无穷）不改值并把显示还原为当前值。写回使用 `SetCurrentValue`，双向绑定不受影响；回车不置 `Handled`，宿主的默认按钮等行为保持不变。
+
+**方向与官方部件**：纵向滑块沿用 WPF 官方默认方向——最小值在下、向上增大，`Slider.IsDirectionReversed` 仍可由使用方设置（模板不写 `PART_Track` 的任何属性，否则会顶掉 `Track` 自身对方向/范围/值的自动绑定）。`TickPlacement` 在纵向时 `TopLeft` 为左侧刻度、`BottomRight` 为右侧刻度，与官方主题一致；`IsSelectionRangeEnabled` 配合 `SelectionStart`/`SelectionEnd` 的选择区段画在轨道之上，宿主层 `IsHitTestVisible=False`，点击照常落到轨道分页。
+
+```xml
+<jv:Slider Minimum="0"
+           Maximum="100"
+           Value="{Binding Volume}"
+           ShowValueBox="True"
+           ValueBoxSide="Right"
+           ValueFormatString="F0"
+           TickPlacement="BottomRight"
+           TickFrequency="10" />
+```
+
+依赖：WPF `Slider`/`Track`/`Thumb`/`RepeatButton`/`TickBar` 标准部件契约、`DefaultTextBoxStyle`（数值框）、主题令牌（`Theme.Brush.Accent.Primary`、`Theme.Brush.Accent.Secondary`、`Theme.Brush.Surface.Sunken`、`Theme.Brush.Border.Default`、`Theme.Brush.State.DisabledSurface`、`Theme.SmallCornerRadius`）与 `DefaultControlFocusVisualStyle`。
 
 ## 集合与数据控件
 
@@ -968,7 +996,7 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 | `AnimationDuration` | `250 ms` | 滑出/收回过渡动画时长；`Automatic` 或 `Forever` 视为无效，`0` 表示无过渡动画直接切换（事件仍会触发） |
 | `IsBackdropEnabled` | `true` | 是否启用遮罩层；展开时在面板背后显示半透明遮罩 |
 | `BackdropBrush` | 主题 `Theme.Brush.Overlay.Backdrop` | 遮罩层画刷 |
-| `CloseOnOutsideClick` | `true` | 展开时是否启用"点击外部即收回"：面板本体以外的点击、宿主窗口失焦、宿主窗口最小化都会收回面板；置为 `false` 后收回完全由宿主通过 `IsOpen`/`Toggle()` 控制 |
+| `CloseOnOutsideClick` | `true` | 展开时是否启用"点击外部即收回"：面板本体以外的点击（在鼠标抬起时判定，与宿主的切换按钮命令不冲突）、宿主窗口失焦、宿主窗口最小化都会收回面板；置为 `false` 后收回完全由宿主通过 `IsOpen`/`Toggle()` 控制 |
 | `Toggle()` | - | 切换滑出/收回状态 |
 | `Opened` / `Closed` | - | 滑出/收回动画完成后触发的冒泡路由事件；动画时长为 `0` 时随状态切换立即触发 |
 
@@ -994,7 +1022,7 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 
 实现说明：收起时面板内容通过 `TranslateTransform` 完全平移出父容器并被裁剪，同时以透明度 0 兜底，根 Grid 的 `Background` 为空保证鼠标命中测试穿透到下层内容；展开时遮罩层淡入，命中测试由遮罩与面板正常接管。面板表面使用主题 `Surface.Raised`、`Theme.PopupShadow` 阴影与主题圆角。滑出/收回动画采用 `SineEase`（`EaseInOut`）曲线：`250 ms` 内约 15 帧的采样下，`CubicEase` 的峰值速度达平均速度的 1.875 倍，中段单帧位移接近 68 DIP（约 85 物理像素）而首尾两帧几乎不动，观感上就是"起步一顿、中间一跳"；`SineEase` 的峰值/均值比为 π/2 ≈ 1.57，同帧数下峰值位移降到约 38 DIP 且首帧即有位移，实测帧间隔与硬件渲染档位（`RenderCapability.Tier=2`）均无变化，属于曲线分布而非性能问题。
 
-自动收回（`CloseOnOutsideClick=true`）在宿主窗口上以 `AddHandler(Mouse.PreviewMouseDownEvent, handler, handledEventsToo: true)` 实现：预览路由保证先于兄弟控件收到点击，接管已处理事件保证兄弟控件把 `MouseDown` 标记为已处理后也不会漏判，处理过程不设置 `Handled`，因此面板以外的按钮等控件照常响应同一次点击。点击是否落在面板本体上按"祖先链命中 `PART_Content` 或点击点位于 `PART_Content` 范围内"判定，因此遮罩本身的点击属于"外部"，多个抽屉叠放时也不会把压在别人遮罩下的本体误判为外部点击。面板内的 `ComboBox`、`ContextMenu` 等弹层内容位于独立的 `PopupRoot` 顶层窗口，宿主窗口级处理收不到其中的点击，故不会误收回。宿主窗口 `Deactivated` 与 `StateChanged`（最小化）同样触发收回，语义与 `Toolbox` 一致；收回通过 `SetCurrentValue` 写回 `IsOpen`，双向绑定时数据源同步更新。面板卸载或属性置为 `false` 时，宿主窗口上的处理句柄会被完整摘除。
+自动收回（`CloseOnOutsideClick=true`）在宿主窗口上分两阶段完成：`AddHandler(Mouse.PreviewMouseDownEvent, …, handledEventsToo: true)` 只记录"本次按下起于面板本体之外、且当时已展开"，`AddHandler(Mouse.MouseUpEvent, …, handledEventsToo: true)` 再执行收回。抬起阶段按钮的 `Click` 已由 `ButtonBase` 触发完毕（它早于事件冒泡到窗口），因此「按钮 + `IsOpen` 双向绑定 + 命令把布尔值取反」这一最常见写法不会互相打架：命令已把面板收回时控件不再重复写值，按下时还是收起态（本次点击负责展开）时也不会刚展开就被同一次抬起收回去。接管已处理事件（`handledEventsToo`）保证兄弟控件把鼠标事件标记为 `Handled` 也不漏判，处理过程自身不设置 `Handled`，面板以外的控件照常响应。点击是否落在面板本体上按"祖先链命中 `PART_Content` 或按下点位于 `PART_Content` 范围内"判定，因此遮罩本身的点击属于"外部"，多个抽屉叠放时也不会把压在别人遮罩下的本体误判为外部点击；内/外结论以按下位置为准，按下后拖出或拖入本体不改变本次判定。面板内的 `ComboBox`、`ContextMenu` 等弹层内容位于独立的 `PopupRoot` 顶层窗口，宿主窗口级处理收不到其中的点击，故不会误收回。宿主窗口 `Deactivated` 与 `StateChanged`（最小化）同样触发收回，语义与 `Toolbox` 一致；收回通过 `SetCurrentValue` 写回 `IsOpen`，双向绑定时数据源同步更新。面板卸载或属性置为 `false` 时，宿主窗口上的两个鼠标句柄与失焦/状态句柄会被完整摘除。
 
 ## 通知控件
 
@@ -1187,7 +1215,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | --- | --- |
 | 应用栏 | `AppBar` |
 | 按钮 | `Button`、`CardButton`、`ToggleButton`、`RadioButton` |
-| 输入/选择 | `CheckBox`、`TextBox`、`ComboBox`、`ComboBoxItem`、`DatePicker` |
+| 输入/选择 | `CheckBox`、`TextBox`、`ComboBox`、`ComboBoxItem`、`DatePicker`、`Slider` |
 | 集合/数据 | `ListBox`、`ListView`、`DataGrid` |
 | 文本/状态 | `Label`、`TextBlock` |
 | 通知 | `Badge`、`MessageBar`、`MessageBarPresenter`、`MessageBarService`、`ToolTip` |
@@ -1215,6 +1243,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ListView` | WPF `ListView`、`GridView`、虚拟化和转换器 | `Border.CornerRadius` |
 | `DataGrid` | WPF `DataGrid`、标准列/行/单元格容器、虚拟化、主题滚动条 | `atc:DataGridAssist.EmptyText` |
 | `DatePicker` | WPF `DatePicker`/`Calendar`、官方模板部件契约、主题阴影令牌 | `atc:DatePickerAssist.PlaceHolder` |
+| `Slider` | WPF `Slider`/`Track`/`Thumb`/`RepeatButton`/`TickBar` 部件契约、`DefaultTextBoxStyle`（数值框）、主色与下沉面等主题令牌、`DefaultControlFocusVisualStyle` | `atc:AttachFuc.IsClosable`（数值框默认关闭清空按钮） |
 | `ToolTip` | WPF `ToolTip`、主题资源 | 无 |
 | `Label` | WPF `Label`、状态和图标资源 | `Icon.Icon`、`Icon.FontFamily`（仅相应模板） |
 | `TextBlock` | WPF `ContentControl`、`ContentPresenter`、标准内容模板管线 | 无 |

@@ -26,6 +26,7 @@
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Box/ListView.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Box/GroupBox.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Box/DatePicker.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Box/Slider.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Box/ToolTip.xaml" />
 
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Text/Label.xaml" />

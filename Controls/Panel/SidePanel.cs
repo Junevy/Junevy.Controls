@@ -32,7 +32,9 @@ public class SidePanel : ContentControl
     private Border? _content;
     private TranslateTransform? _translate;
     private Window? _hostWindow;
-    private MouseButtonEventHandler? _outsideMouseDownHandler;
+    private MouseButtonEventHandler? _gestureDownHandler;
+    private MouseButtonEventHandler? _gestureUpHandler;
+    private bool _pendingOutsideDismiss;
     private int _stateVersion;
     private bool _pendingStateChangedEvent;
 
@@ -145,7 +147,9 @@ public class SidePanel : ContentControl
     }
 
     /// <summary>
-    /// 展开时点击面板本体以外的区域是否自动收回；同时决定宿主窗口失焦、最小化时是否收回。
+    /// 展开时点击面板本体以外的区域是否自动收回（在鼠标抬起时判定，此时宿主按钮的命令已执行完毕，
+    /// 与「按钮 + <see cref="IsOpen"/> 双向绑定 + 命令取反」的宿主用法不冲突）；
+    /// 同时决定宿主窗口失焦、最小化时是否收回。
     /// 置为 <c>false</c> 时收回完全由宿主通过 <see cref="IsOpen"/> 或 <see cref="Toggle"/> 控制。
     /// </summary>
     public bool CloseOnOutsideClick
@@ -282,11 +286,13 @@ public class SidePanel : ContentControl
 
         DetachHostWindow();
         _hostWindow = window;
-        _outsideMouseDownHandler = OnOutsideMouseDown;
+        _gestureDownHandler = OnHostGestureDown;
+        _gestureUpHandler = OnHostGestureUp;
 
-        // handledEventsToo：面板所在 Grid 的兄弟内容常把 MouseDown 标记为已处理，
-        // 不能因此漏掉"点到面板之外"这件事；预览路由 + 接管已处理事件才能全覆盖。
-        _hostWindow.AddHandler(Mouse.PreviewMouseDownEvent, _outsideMouseDownHandler, true);
+        // handledEventsToo：面板所在 Grid 的兄弟内容常把鼠标按下/抬起标记为已处理，
+        // 不能因此漏掉"点到面板之外"这件事；接管已处理事件才能全覆盖。
+        _hostWindow.AddHandler(Mouse.PreviewMouseDownEvent, _gestureDownHandler, true);
+        _hostWindow.AddHandler(Mouse.MouseUpEvent, _gestureUpHandler, true);
         _hostWindow.Deactivated += OnHostDeactivated;
         _hostWindow.StateChanged += OnHostStateChanged;
     }
@@ -298,29 +304,51 @@ public class SidePanel : ContentControl
             return;
         }
 
-        if (_outsideMouseDownHandler is not null)
+        if (_gestureDownHandler is not null)
         {
-            _hostWindow.RemoveHandler(Mouse.PreviewMouseDownEvent, _outsideMouseDownHandler);
-            _outsideMouseDownHandler = null;
+            _hostWindow.RemoveHandler(Mouse.PreviewMouseDownEvent, _gestureDownHandler);
+            _gestureDownHandler = null;
         }
 
+        if (_gestureUpHandler is not null)
+        {
+            _hostWindow.RemoveHandler(Mouse.MouseUpEvent, _gestureUpHandler);
+            _gestureUpHandler = null;
+        }
+
+        _pendingOutsideDismiss = false;
         _hostWindow.Deactivated -= OnHostDeactivated;
         _hostWindow.StateChanged -= OnHostStateChanged;
         _hostWindow = null;
     }
 
-    private void OnOutsideMouseDown(object sender, MouseButtonEventArgs e)
+    /// <summary>
+    /// 按下阶段只记录"本次手势起于面板之外"，不立即收回。
+    /// 宿主的典型用法是「按钮 + IsOpen 双向绑定 + 命令把值取反」，而按钮的 Click 由
+    /// <c>ButtonBase</c> 在抬起阶段触发，早于事件冒泡到宿主窗口：若按下时就把 <see cref="IsOpen"/>
+    /// 写成 false，命令读到的已是被收回的 false，取反后又是 true，表现为"折叠后立即再次展开"。
+    /// </summary>
+    private void OnHostGestureDown(object sender, MouseButtonEventArgs e)
     {
-        if (!IsOpen || !CloseOnOutsideClick || _content is null)
+        _pendingOutsideDismiss =
+            IsOpen
+            && CloseOnOutsideClick
+            && _content is not null
+            && !IsClickInsidePanel(e);
+    }
+
+    /// <summary>
+    /// 抬起阶段执行收回：此时按钮命令已同步跑完。宿主若已自行收回面板（本用例）
+    /// 或本次点击把面板打开（按下时还是收起态，因而不成立挂起条件），都不会再重复动作。
+    /// </summary>
+    private void OnHostGestureUp(object sender, MouseButtonEventArgs e)
+    {
+        if (!_pendingOutsideDismiss)
         {
             return;
         }
 
-        if (IsClickInsidePanel(e))
-        {
-            return;
-        }
-
+        _pendingOutsideDismiss = false;
         CloseFromOutside();
     }
 
