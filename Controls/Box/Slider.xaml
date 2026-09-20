@@ -1,0 +1,337 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
+    xmlns:local="clr-namespace:Junevy.Controls.Controls.Box">
+
+    <!--
+        ============================================================
+        Slider（官方同名控件隐式接管 + jv:Slider 派生控件）
+        - PART_Track：轨道，Track 自动排布两个分页按钮与滑块，并自行把
+          Orientation / 方向 / 范围 / 值绑定到控件本体，模板不去碰
+        - PART_SelectionRange：选择区段，由 Slider 代码写 Canvas.Left/Top 与
+          主轴长度，故套一层 Canvas 负责交叉轴厚度与居中
+        - PART_ValueBox：仅 jv:Slider 使用的数值框，显隐与停靠侧由
+          SliderValueBoxStyle 驱动（原生 Slider 无相应属性，绑定失败落到 FallbackValue）
+        横竖共用一套模板：交叉轴尺寸一律固定并居中，避免 Track 分配给元素的
+        交叉轴空间影响轨道/滑块的视觉厚度。
+        App 合并 Themes/Generic.xaml 后 <Slider> 直接生效，数值框需 jv:Slider。
+        ============================================================
+    -->
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Text/TextBox.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <!--  滑块：16px 圆形握手，悬停描边高亮，拖拽中填充主色  -->
+    <Style x:Key="SliderThumbStyle" TargetType="{x:Type Thumb}">
+        <Setter Property="Width" Value="16" />
+        <Setter Property="Height" Value="16" />
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Strong}" />
+        <Setter Property="Cursor" Value="SizeWE" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Border
+                        x:Name="ThumbBorder"
+                        Width="16"
+                        Height="16"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        SnapsToDevicePixels="True"
+                        UseLayoutRounding="True" />
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ThumbBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
+                        </Trigger>
+                        <Trigger Property="IsDragging" Value="True">
+                            <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
+                            <Setter TargetName="ThumbBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.PrimaryPressed}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
+                            <Setter TargetName="ThumbBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
+                        </Trigger>
+
+                        <!--  纵向时拖拽光标改为上下方向  -->
+                        <DataTrigger Binding="{Binding Orientation, RelativeSource={RelativeSource AncestorType={x:Type Slider}}}" Value="Vertical">
+                            <Setter Property="Cursor" Value="SizeNS" />
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  分页按钮：外层撑满可点区域，内层 4px 圆角 Border 即轨道底色  -->
+    <Style x:Key="SliderRepeatButtonStyle" TargetType="{x:Type RepeatButton}">
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Grid Background="Transparent">
+                        <Border
+                            x:Name="Rail"
+                            Height="4"
+                            VerticalAlignment="Center"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{DynamicResource Theme.SmallCornerRadius}" />
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding Orientation, RelativeSource={RelativeSource AncestorType={x:Type Slider}}}" Value="Vertical">
+                            <Setter TargetName="Rail" Property="Width" Value="4" />
+                            <Setter TargetName="Rail" Property="Height" Value="Auto" />
+                            <Setter TargetName="Rail" Property="HorizontalAlignment" Value="Center" />
+                            <Setter TargetName="Rail" Property="VerticalAlignment" Value="Stretch" />
+                        </DataTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Rail" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  值较小一侧（横向为左、纵向为下）已填充段用主色，未填充段沿用下沉底色  -->
+    <Style
+        x:Key="SliderDecreaseRepeatButtonStyle"
+        BasedOn="{StaticResource SliderRepeatButtonStyle}"
+        TargetType="{x:Type RepeatButton}">
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
+    </Style>
+
+    <!--
+        数值框：借用库内 TextBox 外观，关掉清空按钮，尺寸收紧以贴合滑块。
+        显隐与停靠侧一律由本样式驱动 —— ControlTemplate.Triggers 里的
+        DataTrigger 不支持 RelativeSource=TemplatedParent（绑定不解析，setter 永不生效），
+        改走 AncestorType 绑定；原生 Slider 没有这两个属性，绑定失败后落到 FallbackValue。
+        因此模板内的 PART_ValueBox 不能写任何与停靠侧相关的本地值，否则会压过样式。
+    -->
+    <Style
+        x:Key="SliderValueBoxStyle"
+        BasedOn="{StaticResource DefaultTextBoxStyle}"
+        TargetType="{x:Type TextBox}">
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="Padding" Value="6,2" />
+        <Setter Property="TextAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="atc:AttachFuc.IsClosable" Value="False" />
+        <Setter Property="Grid.Row" Value="0" />
+        <Setter Property="Grid.RowSpan" Value="5" />
+        <Setter Property="Grid.Column" Value="4" />
+        <Setter Property="Margin" Value="8,0,0,0" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="MaxWidth" Value="120" />
+        <Setter Property="MaxHeight" Value="32" />
+        <Setter Property="Visibility" Value="{Binding ShowValueBox, RelativeSource={RelativeSource AncestorType={x:Type local:Slider}}, Converter={StaticResource BoolToVisibility}, FallbackValue=Collapsed}" />
+        <Style.Triggers>
+            <!--  主轴侧（横向左/右）限宽，交叉轴侧（纵向上的上/下）限高，避免数值框把轨道挤扁  -->
+            <DataTrigger Binding="{Binding ValueBoxSide, RelativeSource={RelativeSource AncestorType={x:Type local:Slider}}}" Value="Left">
+                <Setter Property="Grid.Column" Value="0" />
+                <Setter Property="Margin" Value="0,0,8,0" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ValueBoxSide, RelativeSource={RelativeSource AncestorType={x:Type local:Slider}}}" Value="Right">
+                <Setter Property="Grid.Column" Value="4" />
+                <Setter Property="Margin" Value="8,0,0,0" />
+                <Setter Property="HorizontalAlignment" Value="Right" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ValueBoxSide, RelativeSource={RelativeSource AncestorType={x:Type local:Slider}}}" Value="Top">
+                <Setter Property="Grid.Row" Value="0" />
+                <Setter Property="Grid.RowSpan" Value="1" />
+                <Setter Property="Grid.Column" Value="2" />
+                <Setter Property="Margin" Value="0,0,0,8" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="MaxWidth" Value="160" />
+                <Setter Property="MaxHeight" Value="28" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ValueBoxSide, RelativeSource={RelativeSource AncestorType={x:Type local:Slider}}}" Value="Bottom">
+                <Setter Property="Grid.Row" Value="4" />
+                <Setter Property="Grid.RowSpan" Value="1" />
+                <Setter Property="Grid.Column" Value="2" />
+                <Setter Property="Margin" Value="0,8,0,0" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="MaxWidth" Value="160" />
+                <Setter Property="MaxHeight" Value="28" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <ControlTemplate x:Key="DefaultSliderTemplate" TargetType="{x:Type Slider}">
+        <!--
+            5x5 网格：中心单元格放轨道，四周 Auto 行/列分别承载刻度与数值框；
+            未使用的行/列自动收为 0，因此隐藏数值框时不占据任何布局空间。
+            0 1 [2] 3 4 行：上侧数值框 / 上刻度 / 轨道 / 下刻度 / 下侧数值框
+        -->
+        <Grid Background="Transparent">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TickBar
+                x:Name="TopTick"
+                Grid.Row="1"
+                Grid.Column="2"
+                Height="4"
+                Margin="0,2"
+                Fill="{DynamicResource Theme.Brush.Text.Secondary}"
+                Placement="Top"
+                Visibility="Collapsed" />
+            <TickBar
+                x:Name="BottomTick"
+                Grid.Row="3"
+                Grid.Column="2"
+                Height="4"
+                Margin="0,2"
+                Fill="{DynamicResource Theme.Brush.Text.Secondary}"
+                Placement="Bottom"
+                Visibility="Collapsed" />
+
+            <!--  轨道：Track 自动排布两个分页按钮与滑块，并把 Minimum/Maximum/Value/方向绑到本体  -->
+            <Track x:Name="PART_Track" Grid.Row="2" Grid.Column="2">
+                <Track.Thumb>
+                    <Thumb x:Name="SliderThumb" Style="{StaticResource SliderThumbStyle}" />
+                </Track.Thumb>
+                <Track.DecreaseRepeatButton>
+                    <RepeatButton Command="{x:Static Slider.DecreaseLarge}" Style="{StaticResource SliderDecreaseRepeatButtonStyle}" />
+                </Track.DecreaseRepeatButton>
+                <Track.IncreaseRepeatButton>
+                    <RepeatButton Command="{x:Static Slider.IncreaseLarge}" Style="{StaticResource SliderRepeatButtonStyle}" />
+                </Track.IncreaseRepeatButton>
+            </Track>
+
+            <!--
+                选择区段：Slider 代码只负责写 Canvas.Left/Top 与主轴长度
+                （横向 Width、纵向 Height），交叉轴的厚度与居中得由宿主给，
+                所以叠一层 Canvas 盖在轨道之上；IsHitTestVisible=False 保证点击仍能落到轨道。
+            -->
+            <Canvas
+                x:Name="SelectionRangeHost"
+                Grid.Row="2"
+                Grid.Column="2"
+                Height="4"
+                ClipToBounds="True"
+                IsHitTestVisible="False"
+                VerticalAlignment="Center">
+                <Border
+                    x:Name="PART_SelectionRange"
+                    Height="4"
+                    Background="{DynamicResource Theme.Brush.Accent.Secondary}"
+                    CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
+                    Visibility="Hidden" />
+            </Canvas>
+
+            <!--
+                数值框：布局、显隐、停靠侧全部由 SliderValueBoxStyle 驱动，
+                此处只留名字，避免本地值压过样式触发器。
+            -->
+            <TextBox x:Name="PART_ValueBox" Style="{StaticResource SliderValueBoxStyle}" />
+        </Grid>
+
+        <ControlTemplate.Triggers>
+            <!--  刻度显示（沿用官方语义：纵向时 TopLeft 在左、BottomRight 在右）  -->
+            <Trigger Property="TickPlacement" Value="TopLeft">
+                <Setter TargetName="TopTick" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="TickPlacement" Value="BottomRight">
+                <Setter TargetName="BottomTick" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="TickPlacement" Value="Both">
+                <Setter TargetName="TopTick" Property="Visibility" Value="Visible" />
+                <Setter TargetName="BottomTick" Property="Visibility" Value="Visible" />
+            </Trigger>
+
+            <Trigger Property="IsSelectionRangeEnabled" Value="True">
+                <Setter TargetName="PART_SelectionRange" Property="Visibility" Value="Visible" />
+            </Trigger>
+
+            <!--
+                纵向：刻度与选择区段换到左右两侧，交叉轴厚度跟着交换。
+                这里刻意不写 PART_Track 的任何属性：Track 在 OnPreApplyTemplate 里会把
+                Orientation / IsDirectionReversed / Minimum / Maximum / Value 自动绑定到本体
+                （仅当自身仍为默认值时）。模板触发器一旦写入非默认值就顶掉这条绑定，
+                用户再也改不动 Slider.IsDirectionReversed；而且官方纵向滑块本就是
+                最小值在下、向上增大（Track 的 Normal 布局），手动反向反而与平台相反。
+            -->
+            <Trigger Property="Orientation" Value="Vertical">
+                <Setter TargetName="TopTick" Property="Grid.Row" Value="2" />
+                <Setter TargetName="TopTick" Property="Grid.Column" Value="1" />
+                <Setter TargetName="TopTick" Property="Width" Value="4" />
+                <Setter TargetName="TopTick" Property="Height" Value="Auto" />
+                <Setter TargetName="TopTick" Property="Margin" Value="2,0" />
+                <Setter TargetName="TopTick" Property="Placement" Value="Left" />
+
+                <Setter TargetName="BottomTick" Property="Grid.Row" Value="2" />
+                <Setter TargetName="BottomTick" Property="Grid.Column" Value="3" />
+                <Setter TargetName="BottomTick" Property="Width" Value="4" />
+                <Setter TargetName="BottomTick" Property="Height" Value="Auto" />
+                <Setter TargetName="BottomTick" Property="Margin" Value="2,0" />
+                <Setter TargetName="BottomTick" Property="Placement" Value="Right" />
+
+                <Setter TargetName="SelectionRangeHost" Property="Width" Value="4" />
+                <Setter TargetName="SelectionRangeHost" Property="Height" Value="Auto" />
+                <Setter TargetName="SelectionRangeHost" Property="VerticalAlignment" Value="Stretch" />
+                <Setter TargetName="SelectionRangeHost" Property="HorizontalAlignment" Value="Center" />
+                <Setter TargetName="PART_SelectionRange" Property="Width" Value="4" />
+                <Setter TargetName="PART_SelectionRange" Property="Height" Value="Auto" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style x:Key="DefaultSliderStyle" TargetType="{x:Type Slider}">
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="IsTabStop" Value="True" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+        <Setter Property="Template" Value="{StaticResource DefaultSliderTemplate}" />
+        <Style.Triggers>
+            <Trigger Property="Orientation" Value="Vertical">
+                <Setter Property="MinWidth" Value="28" />
+                <Setter Property="MinHeight" Value="0" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--  隐式样式（官方类型）：<Slider> 自动获得本库外观，但数值框属 jv:Slider 专有  -->
+    <Style BasedOn="{StaticResource DefaultSliderStyle}" TargetType="{x:Type Slider}" />
+
+    <!--  隐式样式（派生类型）：jv:Slider 复用同一模板，由依赖属性驱动数值框  -->
+    <Style BasedOn="{StaticResource DefaultSliderStyle}" TargetType="{x:Type local:Slider}" />
+</ResourceDictionary>
