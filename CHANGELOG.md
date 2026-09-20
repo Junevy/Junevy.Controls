@@ -2,6 +2,57 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## TextBox / ComboBox
+
+### 本次更新（占位符统一为 PlaceholderAssist 附加属性，破坏性变更）— 2026-09-20
+
+- 新增附加属性 **`atc:PlaceholderAssist.Placeholder`**（类 `Junevy.Controls.AttachedProperties.PlaceholderAssist`，类型 `object`，默认 `null`）：在 `TextBox` / `ComboBox` 内部显示占位内容，提示用户应输入或选择什么。内容为任意对象，可直接设为 iconfont 字形文本（占位符字体族跟随 `atc:Icon.FontFamily`，两个控件的默认样式均已内置 iconfont）。占位内容仅在控件无值时显示——`TextBox` 为文本为空且未聚焦，`ComboBox` 为未选中项；有值后自动隐藏。`jv:` 派生类型与原生 `<TextBox>`/`<ComboBox>` 借用默认外观的场景均生效。
+- **破坏性变更（升级需同步修改 XAML）**：
+  - **`ComboBox.PlaceHolder` 依赖属性已删除**（string，原默认值 `"Select an item..."`）。旧写法 `PlaceHolder="..."`（直接属性语法）不再存在，引用它的 XAML 会直接报编译错误，需改为 `atc:PlaceholderAssist.Placeholder="..."`。为保持 UI 连续性，`jv:ComboBox` 的隐式样式保留历史默认文案 `"Select an item..."`（未设置占位符时仍显示）；原生 `<ComboBox>` 默认无占位内容（与旧行为一致）。
+  - **`TextBox` 占位符不再读取 `Tag`**：默认模板原先把 `Tag` 当占位文本，现改为读取 `atc:PlaceholderAssist.Placeholder`。原来写在 `Tag` 上的占位文案会静默失效（不报编译错误，但不再显示），需改为附加属性写法；`Tag` 恢复为普通用途。
+  - 注意区分：`DatePicker` 的占位符仍是 `atc:DatePickerAssist.PlaceHolder`（string），本次不涉及。
+- 实现要点：两个控件的占位符呈现元素由 `TextBlock` 改为 `ContentPresenter`（占位内容为 `object`，可承载任意内容）；禁用态触发器对占位符颜色的 Setter 相应改为附加属性形式 `Property="TextElement.Foreground"`。`ComboBox` 默认样式新增 `atc:Icon.FontFamily` Setter（与 TextBox 一致，为占位符 iconfont 提供字体）。
+- 验证：net48 / net8.0-windows 双目标编译 0 错误（既有可空性警告数量不变）；离屏渲染探针 10 组断言全部通过——`jv:TextBox` 有占位符且空文本未聚焦时显示、有文本时隐藏、未设置时无内容、原生 `<TextBox>` 经附加属性生效、`Tag` 不再被模板消费（占位内容来自附加属性而非 Tag）；`jv:ComboBox` 默认文案保留、显式 iconfont 占位符未选中时显示、选中后隐藏、原生 `<ComboBox>` 生效、iconfont 字体族正确传递到占位符呈现器；渲染快照人工核对显示正常。探针验证后已删除。
+
+## TextBox / ComboBox
+
+### 本次更新（新增 TitleAssist 附加属性）— 2026-09-20
+
+- 新增附加属性集 **`atc:TitleAssist`**（类 `Junevy.Controls.AttachedProperties.TitleAssist`），为 `TextBox` 与 `ComboBox` 在输入框外侧显示用途标题，内容为任意 `object`（可直接设 iconfont 字形文本）：
+  - `Title`（object，默认 `null`）：标题内容；为 `null` 时不显示标题且不占用布局空间。
+  - `TitlePlacement`（枚举 `TitlePlacement`：`Top`/`Bottom`/`Left`/`Right`，默认 `Top`）：标题方位，与输入框间距固定 4 DIP。
+  - `TitleFontFamily`（默认 `null`）/ `TitleFontSize`（默认 `NaN`）/ `TitleForeground`（默认 `null`）/ `TitleFontWeight`（默认 `Normal`）：标题字体样式自定义；字体族/字号未设置时继承控件自身取值，颜色未设置时由默认样式提供主题次级文本色（`Theme.Brush.Text.Secondary`）。
+- 实现要点（后续维护勿回退）：
+  - 两个控件模板的 TargetType 是原生类型，模板通过 `{TemplateBinding atc:TitleAssist.*}` 读取，`jv:` 派生类型与原生 `<TextBox>`/`<ComboBox>` 借用默认外观的场景均生效。
+  - 模板外层为 3×3 Grid，四个方位各一个 `ContentPresenter`（`TitleTop`/`TitleBottom`/`TitleLeft`/`TitleRight`），模板触发器按 `TitlePlacement` 切换显隐（无标题时全部折叠）。
+  - 「未设置即继承」通过 `PriorityBinding` 实现：首选绑定（附加属性值经 `NullToUnsetValueConverter`，null/NaN 返回 `UnsetValue`）失败后自动落到第二绑定（控件自身 `FontFamily`/`FontSize`/`Foreground`）。**勿回退为单 Binding**——单绑定转换器返回 `UnsetValue` 时属性会被置为元数据默认值（字号 12），阻断属性继承（已实测验证）。
+  - 新增 `Converters/NullToUnsetValueConverter.cs`、`AttachedProperties/TitlePlacement.cs`。
+- 验证：net48 / net8.0-windows 双目标编译 0 错误（既有可空性警告数量不变）；离屏渲染探针 12 组断言全部通过——`jv:TextBox` 四个方位标题可见性与几何位置正确（以输入框 Border 为基准，间距 4 DIP）、无标题时不占布局空间、原生 `<TextBox>`、`jv:ComboBox`、iconfont 字形 + 自定义字体族/字号/字重/颜色、未设置字号时正确继承控件自身值（而非元数据默认 12）；渲染快照人工核对四个方位与 iconfont 标题显示正常。探针验证后已删除。
+
+## TextBox / TreeMenu
+
+### 本次更新（API 归属整理）— 2026-09-20
+
+- **`ShowClear` 由附加属性改为 `jv:TextBox` 自身依赖属性（破坏性变更）**：上一轮引入的 `atc:TextBoxAssist.ShowClear`（类 `Junevy.Controls.AttachedProperties.TextBoxAssist`）已删除。判定依据：全库检索确认除 TextBox 自身模板外没有任何控件消费该属性语义——`Slider` 数值框只是复用 TextBox 外观并在样式里显式关闭清空按钮，不构成独立消费者，故按语义归属收编为 `TextBox.ShowClear` 依赖属性（bool，默认 `false`，`DefaultTextBoxStyle` 默认样式仍设为 `true`）。XAML 用法由 `atc:TextBoxAssist.ShowClear="True"` 改为 `ShowClear="True"`（直接属性语法仅 `jv:TextBox` 可用）。
+  - 实现要点（后续维护勿回退）：`DefaultTextBoxStyle` 与 `DefaultTextBoxTemplate` 的 TargetType 是原生 `TextBox`（库支持原生实例借用外观），因此样式 Setter 与模板绑定统一使用限定形式——`<Setter Property="local:TextBox.ShowClear" ... />` 与 `{Binding Path=(local:TextBox.ShowClear), RelativeSource={RelativeSource TemplatedParent}}`。依赖属性值可经 `SetValue` 写入任意 TextBox 实例的属性存储，原生实例行为不变。
+  - `Slider.xaml` 数值框样式同步改为 `<Setter Property="txt:TextBox.ShowClear" Value="False" />`（`txt` = `clr-namespace:Junevy.Controls.Controls.Text`）。
+- **`DisplayMode` 枚举迁出 `AttachedProperties` 目录**：唯一消费者是 TreeMenu，参照 `LabelDisplayMode` 位于 `Controls/Text/` 的先例迁至 `Controls/Menu/DisplayMode.cs`，命名空间 `Junevy.Controls.AttachedProperties` → `Junevy.Controls.Controls.Menu`。`TreeMenu.xaml` 中 `x:Static atc:DisplayMode.Icon` 同步改为 `x:Static local:DisplayMode.Icon`；若有外部代码通过 `using Junevy.Controls.AttachedProperties` 使用该枚举，需同步更新 using（枚举成员与数值不变，XAML 中 `DisplayMode="Icon"` 的常规用法不受影响）。
+- 验证：net48 / net8.0-windows 双目标编译 0 错误（40 项均为改动前既有可空性警告，本次改动文件 0 警告）；离屏渲染探针实测 5 组用例全部符合预期——`jv:TextBox` 默认（样式置 `true`）清空按钮可见、显式 `ShowClear=false` 隐藏、显式 `ShowClear=true` 可见、原生 `<TextBox>` 隐式样式借用外观时清空按钮可见、原生实例 `SetValue(JvTextBox.ShowClearProperty, false)` 后隐藏；渲染快照人工核对与预期一致；TreeMenu（`DisplayMode=Icon`）模板加载与渲染无异常，确认 `x:Static local:DisplayMode.Icon` 解析正常。探针验证后已删除。
+
+## TextBox
+
+### 本次更新（附加属性重构 + 清空按钮修复）— 2026-09-20
+
+- **附加属性语义化重构（破坏性变更，升级需同步修改 XAML）**：
+  - 删除 `AttachedProperties.AttachFuc` 杂烩类，按归属控件拆分：
+    - `TextBox` 清空按钮显隐改用新附加属性 **`atc:TextBoxAssist.ShowClear`**（bool，类 `Junevy.Controls.AttachedProperties.TextBoxAssist`，默认 `false`）。`DefaultTextBoxStyle` 默认样式将其设为 `true`，常规用法无需手动设置；`Slider` 数值框等复用 TextBox 外观的场景显式设为 `false` 关闭。
+    - `TabMenu` 页签关闭按钮显隐改用 **`TabMenu.IsClosable`** 控件自身依赖属性（bool，默认 `true`），不再走附加属性。
+  - 删除 `AttachFuc.DisplayMode`（已注册但无模板读取的死属性）与历史拼写兼容属性 `AttachFuc.DispalyMode`。`AttachedProperties.DisplayMode` 枚举保留，`TreeMenu.DisplayMode` 仍正常使用。
+  - 旧写法 `atc:AttachFuc.IsClosable` / `atc:AttachFuc.DisplayMode` / `atc:AttachFuc.DispalyMode` 在新版本中不再存在，引用它们的 XAML 会直接报编译错误，需按上表改为新 API。README 附加属性章节与控件依赖速查表已同步更新。
+- **修复清空按钮字形错误导致的"✕ 不居中"**：清空按钮字形由 `E606` 改为 **`E639`**，与 `TabMenu` 页签、`MessageBar`、`ProgressBarWindow` 的关闭按钮统一。经离屏渲染放大确认，`E606` 实际是三维坐标轴图标（em 框内墨迹天然不对称），并非关闭"✕"——此前"不居中"的观感即源于此；换成 `E639` 后字形在按钮内自然居中。
+- **修复清空按钮悬停色块超出 TextBox**：按钮加 `Margin=1`，悬停色块整体收在边框内侧，不再压住边框线与圆角。
+- 验证：离屏渲染探针（net8.0-windows，`Themes/Generic.xaml` 实际加载）4 倍 DPI 像素级测量：清空按钮四周均位于 TextBox 边框内侧 1.6px（无越界）；`✕` 墨迹外接框中心与按钮几何中心偏差 dx=-0.16px、dy=-0.21px（视觉居中）；`ShowClear=false/true` 动态切换按钮正常隐藏/显示。控件库 net8.0-windows 与 net48 双目标编译通过，0 错误，无新增警告。
+
 ## Slider
 
 ### 本次更新（新增控件）— 2026-09-20

@@ -42,6 +42,12 @@ namespace Junevy.Controls.Controls.Menu
         public static readonly DependencyProperty CanCloseLastTabProperty =
             DependencyProperty.Register(nameof(CanCloseLastTab), typeof(bool), typeof(TabMenu), new PropertyMetadata(true));
 
+        /// <summary>
+        /// 是否在每个页签上显示关闭按钮。仅影响页签外观，页签仍可通过命令关闭。
+        /// </summary>
+        public static readonly DependencyProperty IsClosableProperty =
+            DependencyProperty.Register(nameof(IsClosable), typeof(bool), typeof(TabMenu), new PropertyMetadata(true));
+
         public static readonly DependencyProperty HeaderCornerRadiusProperty =
             DependencyProperty.Register(
                 nameof(HeaderCornerRadius),
@@ -60,6 +66,12 @@ namespace Junevy.Controls.Controls.Menu
         {
             get => (bool)GetValue(CanCloseLastTabProperty);
             set => SetValue(CanCloseLastTabProperty, value);
+        }
+
+        public bool IsClosable
+        {
+            get => (bool)GetValue(IsClosableProperty);
+            set => SetValue(IsClosableProperty, value);
         }
 
         public CornerRadius HeaderCornerRadius

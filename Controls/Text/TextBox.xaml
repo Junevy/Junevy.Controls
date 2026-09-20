@@ -14,6 +14,7 @@
 
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
     <cvt:NullToCollapsedConverter x:Key="NullToCollapsed" />
+    <cvt:NullToUnsetValueConverter x:Key="NullToUnsetValue" />
 
     <Style
         x:Key="TextBoxCloseButtonStyle"
@@ -30,9 +31,149 @@
 
     <ControlTemplate x:Key="DefaultTextBoxTemplate" TargetType="TextBox">
         <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!--  标题（TitleAssist）：位置由 TitlePlacement 驱动，四个方位各一个呈现器，
+                  由模板触发器切换显隐；标题为空时全部折叠，不占用布局空间。
+                  字体族/字号/颜色未设置（null/NaN）时首选绑定返回 UnsetValue 失败，
+                  PriorityBinding 落到第二绑定继承控件自身取值  -->
+            <ContentPresenter
+                x:Name="TitleTop"
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="0,0,0,4"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Bottom"
+                Content="{TemplateBinding atc:TitleAssist.Title}"
+                IsHitTestVisible="False"
+                TextElement.FontWeight="{TemplateBinding atc:TitleAssist.TitleFontWeight}"
+                Visibility="Visible">
+                <TextElement.FontFamily>
+                    <PriorityBinding>
+                        <Binding Converter="{StaticResource NullToUnsetValue}" Path="(atc:TitleAssist.TitleFontFamily)" RelativeSource="{RelativeSource TemplatedParent}" />
+                        <Binding Path="FontFamily" RelativeSource="{RelativeSource TemplatedParent}" />
+                    </PriorityBinding>
+                </TextElement.FontFamily>
+                <TextElement.FontSize>
+                    <PriorityBinding>
+                        <Binding Converter="{StaticResource NullToUnsetValue}" Path="(atc:TitleAssist.TitleFontSize)" RelativeSource="{RelativeSource TemplatedParent}" />
+                        <Binding Path="FontSize" RelativeSource="{RelativeSource TemplatedParent}" />
+                    </PriorityBinding>
+                </TextElement.FontSize>
+                <TextElement.Foreground>
+                    <PriorityBinding>
+                        <Binding Converter="{StaticResource NullToUnsetValue}" Path="(atc:TitleAssist.TitleForeground)" RelativeSource="{RelativeSource TemplatedParent}" />
+                        <Binding Path="Foreground" RelativeSource="{RelativeSource TemplatedParent}" />
+                    </PriorityBinding>
+                </TextElement.Foreground>
+            </ContentPresenter>
+
+            <ContentPresenter
+                x:Name="TitleBottom"
+                Grid.Row="2"
+                Grid.Column="1"
+                Margin="0,4,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Content="{TemplateBinding atc:TitleAssist.Title}"
+                IsHitTestVisible="False"
+                TextElement.FontWeight="{TemplateBinding atc:TitleAssist.TitleFontWeight}"
+                Visibility="Collapsed">
+                <TextElement.FontFamily>
+                    <PriorityBinding>
+                        <Binding Converter="{StaticResource NullToUnsetValue}" Path="(atc:TitleAssist.TitleFontFamily)" RelativeSource="{RelativeSource TemplatedParent}" />
+                        <Binding Path="FontFamily" RelativeSource="{RelativeSource TemplatedParent}" />
+                    </PriorityBinding>
+                </TextElement.FontFamily>
+                <TextElement.FontSize>
+                    <PriorityBinding>
+                        <Binding Converter="{StaticResource NullToUnsetValue}" Path="(atc:TitleAssist.TitleFontSize)" RelativeSource="{RelativeSource TemplatedParent}" />
+                        <Binding Path="FontSize" RelativeSource="{RelativeSource TemplatedParent}" />
+                    </PriorityBinding>
+                </TextElement.FontSize>
+                <TextElement.Foreground>
+                    <PriorityBinding>
+                        <Binding Converter="{StaticResource NullToUnsetValue}" Path="(atc:TitleAssist.TitleForeground)" RelativeSource="{RelativeSource TemplatedParent}" />
+                        <Binding Path="Foreground" RelativeSource="{RelativeSource TemplatedParent}" />
+                    </PriorityBinding>
+                </TextElement.Foreground>
+            </ContentPresenter>
+
+            <ContentPresenter
+                x:Name="TitleLeft"
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="0,0,4,0"
+                VerticalAlignment="Center"
+                Content="{TemplateBinding atc:TitleAssist.Title}"
+                IsHitTestVisible="False"
+                TextElement.FontWeight="{TemplateBinding atc:TitleAssist.TitleFontWeight}"
+                Visibility="Collapsed">
+                <TextElement.FontFamily>
+                    <PriorityBinding>
+                        <Binding Converter="{StaticResource NullToUnsetValue}" Path="(atc:TitleAssist.TitleFontFamily)" RelativeSource="{RelativeSource TemplatedParent}" />
+                        <Binding Path="FontFamily" RelativeSource="{RelativeSource TemplatedParent}" />
+                    </PriorityBinding>
+                </TextElement.FontFamily>
+                <TextElement.FontSize>
+                    <PriorityBinding>
+                        <Binding Converter="{StaticResource NullToUnsetValue}" Path="(atc:TitleAssist.TitleFontSize)" RelativeSource="{RelativeSource TemplatedParent}" />
+                        <Binding Path="FontSize" RelativeSource="{RelativeSource TemplatedParent}" />
+                    </PriorityBinding>
+                </TextElement.FontSize>
+                <TextElement.Foreground>
+                    <PriorityBinding>
+                        <Binding Converter="{StaticResource NullToUnsetValue}" Path="(atc:TitleAssist.TitleForeground)" RelativeSource="{RelativeSource TemplatedParent}" />
+                        <Binding Path="Foreground" RelativeSource="{RelativeSource TemplatedParent}" />
+                    </PriorityBinding>
+                </TextElement.Foreground>
+            </ContentPresenter>
+
+            <ContentPresenter
+                x:Name="TitleRight"
+                Grid.Row="1"
+                Grid.Column="2"
+                Margin="4,0,0,0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Content="{TemplateBinding atc:TitleAssist.Title}"
+                IsHitTestVisible="False"
+                TextElement.FontWeight="{TemplateBinding atc:TitleAssist.TitleFontWeight}"
+                Visibility="Collapsed">
+                <TextElement.FontFamily>
+                    <PriorityBinding>
+                        <Binding Converter="{StaticResource NullToUnsetValue}" Path="(atc:TitleAssist.TitleFontFamily)" RelativeSource="{RelativeSource TemplatedParent}" />
+                        <Binding Path="FontFamily" RelativeSource="{RelativeSource TemplatedParent}" />
+                    </PriorityBinding>
+                </TextElement.FontFamily>
+                <TextElement.FontSize>
+                    <PriorityBinding>
+                        <Binding Converter="{StaticResource NullToUnsetValue}" Path="(atc:TitleAssist.TitleFontSize)" RelativeSource="{RelativeSource TemplatedParent}" />
+                        <Binding Path="FontSize" RelativeSource="{RelativeSource TemplatedParent}" />
+                    </PriorityBinding>
+                </TextElement.FontSize>
+                <TextElement.Foreground>
+                    <PriorityBinding>
+                        <Binding Converter="{StaticResource NullToUnsetValue}" Path="(atc:TitleAssist.TitleForeground)" RelativeSource="{RelativeSource TemplatedParent}" />
+                        <Binding Path="Foreground" RelativeSource="{RelativeSource TemplatedParent}" />
+                    </PriorityBinding>
+                </TextElement.Foreground>
+            </ContentPresenter>
+
             <!--  澶栧眰 Border  -->
             <Border
                 x:Name="Border"
+                Grid.Row="1"
+                Grid.Column="1"
                 Background="{TemplateBinding Background}"
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
@@ -67,34 +208,40 @@
                         HorizontalScrollBarVisibility="Hidden"
                         VerticalScrollBarVisibility="Hidden" />
 
-                    <!--  鍗犱綅绗?TextBlock  -->
-                    <TextBlock
+                    <!--  占位符（PlaceholderAssist）：无值且未聚焦时显示；
+                          字体族跟随 Icon.FontFamily，占位内容可设 iconfont 字形  -->
+                    <ContentPresenter
                         x:Name="PlaceholderText"
                         Grid.Column="1"
                         Margin="{TemplateBinding Padding}"
-                        Padding="2,0,0,0"
                         HorizontalAlignment="Left"
                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                        FontSize="{TemplateBinding FontSize}"
-                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        Content="{TemplateBinding atc:PlaceholderAssist.Placeholder}"
                         IsHitTestVisible="False"
-                        Text="{TemplateBinding Tag}"
+                        TextElement.FontFamily="{TemplateBinding atc:Icon.FontFamily}"
+                        TextElement.FontSize="{TemplateBinding FontSize}"
+                        TextElement.Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
                         Visibility="Collapsed" />
 
-                    <!--  <bt:Button  -->
+                    <!--  清空按钮：显式 TextBlock 承载字形——图标字体默认行高的 ascent/descent 不对称，
+                          自动生成的文本行会让字形整体偏上；强制行高 = 字号（BlockLineHeight）使字形随 em 框居中，
+                          FontSize 变化时自适应。Margin=1 使悬停色块整体收在边框内侧，不压边框线与圆角  -->
                     <bt:Button
-                        x:Name="PART_CloseButton"
+                        x:Name="PART_ClearButton"
                         Grid.Column="2"
-                        Width="28"
-                        Margin="0"
+                        Width="26"
+                        Margin="1"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Stretch"
-                        Content="&#xe639;"
-                        FontSize="{TemplateBinding FontSize}"
-                        FontFamily="{TemplateBinding atc:Icon.FontFamily}"
-                        Foreground="{TemplateBinding Foreground}"
                         Style="{StaticResource TextBoxCloseButtonStyle}"
-                        Visibility="{TemplateBinding atc:AttachFuc.IsClosable, Converter={StaticResource BoolToVisibility}}" />
+                        Visibility="{Binding Path=(local:TextBox.ShowClear), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock
+                            FontFamily="{TemplateBinding atc:Icon.FontFamily}"
+                            FontSize="{TemplateBinding FontSize}"
+                            Foreground="{TemplateBinding Foreground}"
+                            Text="&#xe639;"
+                            TextAlignment="Center" />
+                    </bt:Button>
                 </Grid>
             </Border>
 
@@ -102,6 +249,25 @@
         </Grid>
 
         <ControlTemplate.Triggers>
+            <!--  标题（TitleAssist）：无标题时四个方位全部折叠；位置触发器只切换对应方位的显隐  -->
+            <Trigger Property="atc:TitleAssist.Title" Value="{x:Null}">
+                <Setter TargetName="TitleTop" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="TitleBottom" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="TitleLeft" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="TitleRight" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="atc:TitleAssist.TitlePlacement" Value="Bottom">
+                <Setter TargetName="TitleTop" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="TitleBottom" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="atc:TitleAssist.TitlePlacement" Value="Left">
+                <Setter TargetName="TitleTop" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="TitleLeft" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="atc:TitleAssist.TitlePlacement" Value="Right">
+                <Setter TargetName="TitleTop" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="TitleRight" Property="Visibility" Value="Visible" />
+            </Trigger>
 
             <!--<Trigger Property="" Value="{x:Null}">
                 <Setter TargetName="PART_ICON" Property="Visibility" Value="Collapsed" />
@@ -138,7 +304,7 @@
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="Border" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
                 <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
-                <Setter TargetName="PlaceholderText" Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
+                <Setter TargetName="PlaceholderText" Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
                 <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
             </Trigger>
         </ControlTemplate.Triggers>
@@ -197,7 +363,8 @@
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
-        <Setter Property="atc:AttachFuc.IsClosable" Value="True" />
+        <Setter Property="local:TextBox.ShowClear" Value="True" />
+        <Setter Property="atc:TitleAssist.TitleForeground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="Template" Value="{StaticResource DefaultTextBoxTemplate}" />
     </Style>
 

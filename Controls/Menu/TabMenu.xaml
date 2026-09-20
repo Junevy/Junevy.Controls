@@ -118,7 +118,7 @@
                                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=(attach:Icon.FontFamily)}"
                                     Foreground="{TemplateBinding Foreground}"
                                     Template="{StaticResource NoBorderButtonTemplate}"
-                                    Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=(attach:AttachFuc.IsClosable), Converter={StaticResource BoolToVisibility}}" />
+                                    Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=IsClosable, Converter={StaticResource BoolToVisibility}}" />
                             </Grid>
                         </Grid>
                     </Border>
@@ -151,7 +151,6 @@
     <!--  2. TabControl 的完整样式  -->
     <Style TargetType="{x:Type local:TabMenu}">
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
-        <Setter Property="attach:AttachFuc.IsClosable" Value="True" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Background.App}" />
         <Setter Property="HeaderCornerRadius" Value="{DynamicResource Theme.SmallCornerRadius}" />

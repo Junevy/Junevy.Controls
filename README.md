@@ -32,7 +32,7 @@ xmlns:jv="github.com.junevy"
 xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Controls"
 ```
 
-`jv` 包含控件库的全部公开控件。`atc` 用于 `Icon`、`AttachFuc` 和 `ExpanderBehavior` 附加属性。
+`jv` 包含控件库的全部公开控件。`atc` 用于 `Icon`、`TitleAssist`、`DataGridAssist`、`DatePickerAssist` 和 `ExpanderBehavior` 附加属性。
 
 ### 官方同名控件自动生效
 
@@ -42,8 +42,8 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | --- | --- | --- |
 | `<Button>` | 外观 + 交互 | 完整等效 |
 | `<CheckBox>` | 外观 + 交互 | 完整等效 |
-| `<TextBox>` | 外观 + 交互 | 占位符通过 `Tag` 提供；清空按钮的 Click 处理在 `jv:TextBox` 中，原生实例上仅外观 |
-| `<ComboBox>` | 外观 + 交互 | 占位符（`PlaceHolder`）与主体单击切换折叠逻辑在 `jv:ComboBox` 中，原生实例走 WPF 原生行为 |
+| `<TextBox>` | 外观 + 交互 | 占位符通过附加属性 `atc:PlaceholderAssist.Placeholder` 提供（不再使用 `Tag`）；清空按钮的 Click 处理在 `jv:TextBox` 中，原生实例上仅外观 |
+| `<ComboBox>` | 外观 + 交互 | 占位符通过附加属性 `atc:PlaceholderAssist.Placeholder` 提供（`jv:ComboBox` 默认显示 "Select an item..."），主体单击切换折叠逻辑在 `jv:ComboBox` 中，原生实例走 WPF 原生行为 |
 | `<ListBox>` / `<ListView>` | 外观 + 交互 | 外观完整等效；水平滑动（`Orientation`）为本库 `jv:` 实例专有属性，原生实例沿用 WPF 原生排列 |
 | `<DataGrid>` | 外观 + 交互 | 完整等效（含专属模板）；空态提示通过附加属性 `atc:DataGridAssist.EmptyText` 提供，原生与 `jv:` 实例均可用 |
 | `<DatePicker>` | 外观 + 交互 | 完整等效（含日历全套模板）；占位符通过附加属性 `atc:DatePickerAssist.PlaceHolder` 提供，原生实例可用 |
@@ -112,23 +112,64 @@ ThemeManager.ToggleTheme();
     Foreground="{DynamicResource Theme.Brush.Text.Primary}" />
 ```
 
-### AttachFuc
-
-| 附加属性 | 默认值 | 实际效果 |
-| --- | --- | --- |
-| `atc:AttachFuc.IsClosable` | `false` | `TextBox` 中控制清空按钮；`TabMenu` 中控制每个页签的关闭按钮。两个控件的默认样式会将它设为 `true`。 |
-| `atc:AttachFuc.DisplayMode` | `Normal` | 已注册，当前默认模板没有读取它。 |
-| `atc:AttachFuc.DispalyMode` | `Normal` | `DisplayMode` 的历史拼写兼容属性，当前默认模板没有读取它。新代码不要使用。 |
-
-```xml
-<jv:TextBox Width="220" atc:AttachFuc.IsClosable="True" Tag="Search..." />
-```
-
 ### ExpanderBehavior
 
 `atc:ExpanderBehavior.Enable` 用于 `TreeViewItem`。启用后，双击非叶节点会展开或折叠；双击叶节点会调用最近的 `TreeMenu.NavigateCommand`，命令参数是对应的 `TreeMenuItem`。
 
 `TreeMenu` 的默认容器样式已经自动启用该行为，通常不需要手动设置。
+
+### TitleAssist
+
+`atc:TitleAssist` 为 `TextBox` 和 `ComboBox` 在输入框外侧显示一个标题，提示该输入框的用途。标题内容为任意对象（`object`），可以直接设为 iconfont 字形文本。
+
+| 附加属性 | 默认值 | 实际效果 |
+| --- | --- | --- |
+| `atc:TitleAssist.Title` | `null` | 标题内容；为 `null` 时不显示标题，也不占用布局空间 |
+| `atc:TitleAssist.TitlePlacement` | `Top` | 标题位置：`Top` / `Bottom` / `Left` / `Right`，标题与输入框间距固定 4 DIP |
+| `atc:TitleAssist.TitleFontFamily` | `null` | 标题字体族；为 `null` 时继承控件自身字体。标题为 iconfont 字形时需设置为 iconfont |
+| `atc:TitleAssist.TitleFontSize` | `NaN` | 标题字号；`NaN` 时继承控件自身字号 |
+| `atc:TitleAssist.TitleForeground` | `null` | 标题颜色；为 `null` 时由默认样式提供主题次级文本色 |
+| `atc:TitleAssist.TitleFontWeight` | `Normal` | 标题字重 |
+
+标题同时支持 `jv:TextBox` / `jv:ComboBox` 与原生 `<TextBox>` / `<ComboBox>` 借用默认外观的场景（附加属性经模板绑定生效）。
+
+```xml
+<jv:TextBox
+    Width="220"
+    atc:TitleAssist.Title="Server IP"
+    atc:TitleAssist.TitlePlacement="Left"
+    Tag="192.168.1.100" />
+
+<!-- iconfont 标题 -->
+<jv:ComboBox
+    Width="220"
+    atc:TitleAssist.Title="&#xE60F; Settings"
+    atc:TitleAssist.TitleFontFamily="{DynamicResource IconFont}"
+    atc:TitleAssist.TitleFontSize="16"
+    atc:TitleAssist.TitleFontWeight="Bold"
+    atc:TitleAssist.TitleForeground="OrangeRed" />
+```
+
+### PlaceholderAssist
+
+`atc:PlaceholderAssist.Placeholder` 为 `TextBox` 和 `ComboBox` 在输入框内部显示占位内容，提示用户应输入或选择什么。内容为任意对象（`object`），可以直接设为 iconfont 字形文本（字体族跟随 `atc:Icon.FontFamily`）。
+
+| 附加属性 | 默认值 | 实际效果 |
+| --- | --- | --- |
+| `atc:PlaceholderAssist.Placeholder` | `null` | 占位内容；仅在控件无值时显示——`TextBox` 为文本为空且未聚焦，`ComboBox` 为未选中项，有值后自动隐藏 |
+
+占位符同时支持 `jv:TextBox` / `jv:ComboBox` 与原生 `<TextBox>` / `<ComboBox>` 借用默认外观的场景（附加属性经模板绑定生效）。`jv:ComboBox` 的隐式样式保留历史默认占位文案 "Select an item..."；`TextBox` 的占位符改由本附加属性提供，`Tag` 不再被模板消费、恢复普通用途。
+
+```xml
+<jv:TextBox
+    Width="220"
+    atc:PlaceholderAssist.Placeholder="Server IP" />
+
+<!-- iconfont 占位符 -->
+<jv:ComboBox
+    Width="220"
+    atc:PlaceholderAssist.Placeholder="&#xE60F; Device" />
+```
 
 ### Border.CornerRadius
 
@@ -239,17 +280,18 @@ ThemeManager.ToggleTheme();
 
 | 属性/附加属性 | 效果 |
 | --- | --- |
-| `Tag` | 默认模板把 `Tag` 当作占位文本；文本为空且未聚焦时显示 |
+| `atc:PlaceholderAssist.Placeholder` | 占位文本（支持 iconfont 字形），文本为空且未聚焦时显示；`Tag` 不再被模板消费 |
 | `atc:Icon.Icon` | 前置图标；为空时图标区域折叠 |
-| `atc:Icon.FontFamily` | 图标和清空按钮字体 |
-| `atc:AttachFuc.IsClosable` | 是否显示清空按钮，默认样式为 `true` |
+| `atc:Icon.FontFamily` | 图标、清空按钮和占位符字体 |
+| `ShowClear`（依赖属性） | 是否显示清空按钮，默认样式为 `true`。复用 TextBox 外观又不需要清空按钮的场景（如 `Slider` 数值框）会显式设为 `false`；原生 `<TextBox>` 借用默认外观时，可在样式内以 `txt:TextBox.ShowClear` 限定形式设置 |
+| `atc:TitleAssist.Title` 系列 | 在输入框外侧显示用途标题，位置可选 `Top`/`Bottom`/`Left`/`Right`，支持 iconfont 与自定义字体样式，详见 [TitleAssist](#titleassist) |
 
 ```xml
 <jv:TextBox
     Width="260"
     atc:Icon.Icon="&#xE60C;"
-    atc:AttachFuc.IsClosable="True"
-    Tag="Camera name"
+    ShowClear="True"
+    atc:PlaceholderAssist.Placeholder="Camera name"
     Text="{Binding CameraName, UpdateSourceTrigger=PropertyChanged}" />
 ```
 
@@ -257,21 +299,21 @@ ThemeManager.ToggleTheme();
 
 `jv:ComboBox` 继承 WPF `ComboBox`，支持标准 `ItemsSource`、`ItemTemplate`、可编辑模式、键盘操作和选择绑定。不可编辑时，单击主体区域与单击箭头按钮等效：展开未打开的下拉，再次单击则折叠。`jv:ComboBoxItem` 是对应的公开容器类型；绑定数据时通常不需要手动创建它。
 
-额外属性 `PlaceHolder` 会在没有选中项时显示占位文本。
+占位符统一由附加属性 `atc:PlaceholderAssist.Placeholder` 提供（未选中项时显示；`jv:ComboBox` 未设置时默认显示 "Select an item..."），详见 [PlaceholderAssist](#placeholderassist)。`atc:TitleAssist.Title` 系列附加属性可在下拉框外侧显示用途标题，详见 [TitleAssist](#titleassist)。
 
 ```xml
 <jv:ComboBox
     Width="220"
     DisplayMemberPath="Name"
     ItemsSource="{Binding Cameras}"
-    PlaceHolder="Select a camera..."
+    atc:PlaceholderAssist.Placeholder="Select a camera..."
     SelectedItem="{Binding SelectedCamera, Mode=TwoWay}" />
 ```
 
 也可以直接声明项目：
 
 ```xml
-<jv:ComboBox PlaceHolder="Select mode...">
+<jv:ComboBox atc:PlaceholderAssist.Placeholder="Select mode...">
     <jv:ComboBoxItem Content="Continuous" />
     <jv:ComboBoxItem Content="Trigger" />
 </jv:ComboBox>
@@ -292,7 +334,7 @@ ThemeManager.ToggleTheme();
 <jv:GroupBox Header="采集设置" IsCollapsed="{Binding IsAdvancedCollapsed}">
     <StackPanel>
         <jv:TextBox Width="200" />
-        <jv:ComboBox Width="200" PlaceHolder="Select mode...">
+        <jv:ComboBox Width="200" atc:PlaceholderAssist.Placeholder="Select mode...">
             <jv:ComboBoxItem Content="Continuous" />
         </jv:ComboBox>
     </StackPanel>
@@ -625,7 +667,7 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
 | `CanCloseLastTab` | 是否允许关闭最后一个页签，默认 `true` |
 | `HeaderCornerRadius` | 页签头圆角 |
 | `ContentCornerRadius` | 内容区域圆角 |
-| `atc:AttachFuc.IsClosable` | 是否显示关闭按钮，默认样式为 `true` |
+| `IsClosable` | 是否显示关闭按钮，默认 `true` |
 | `TabClosing` | 关闭前事件；设置 `TabCloseEventArgs.Cancel=true` 可取消 |
 | `TabClosed` | 成功关闭后的事件 |
 | `CloseTab(TabMenuItem)` | 通过代码关闭指定页签 |
@@ -1236,14 +1278,14 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ToggleButton` | WPF `ToggleButton`、圆形/矩形模板 | `Border.CornerRadius` |
 | `RadioButton` | WPF `RadioButton`、`ShapeMode`、焦点资源 | `Icon.FontFamily` 用于选中符号 |
 | `CheckBox` | WPF `CheckBox`、焦点资源 | `Icon.FontFamily`、`Border.CornerRadius` |
-| `TextBox` | WPF `TextBox`、`jv:Button` 清空按钮 | `Icon.Icon`、`Icon.FontFamily`、`AttachFuc.IsClosable`、`Border.CornerRadius` |
-| `ComboBox` | WPF `ComboBox`、`ComboBoxItem`、`jv:ToggleButton` | `Border.CornerRadius` |
+| `TextBox` | WPF `TextBox`、`jv:Button` 清空按钮 | `Icon.Icon`、`Icon.FontFamily`、`ShowClear`（依赖属性）、`PlaceholderAssist.Placeholder`、`TitleAssist.Title` 系列、`Border.CornerRadius` |
+| `ComboBox` | WPF `ComboBox`、`ComboBoxItem`、`jv:ToggleButton` | `PlaceholderAssist.Placeholder`、`TitleAssist.Title` 系列、`Border.CornerRadius` |
 | `ComboBoxItem` | WPF `ComboBoxItem`、`DefaultComboBoxItemStyle` | 无 |
 | `ListBox` | WPF `ListBox`、`ListBoxItem`、虚拟化和滚动资源 | 无 |
 | `ListView` | WPF `ListView`、`GridView`、虚拟化和转换器 | `Border.CornerRadius` |
 | `DataGrid` | WPF `DataGrid`、标准列/行/单元格容器、虚拟化、主题滚动条 | `atc:DataGridAssist.EmptyText` |
 | `DatePicker` | WPF `DatePicker`/`Calendar`、官方模板部件契约、主题阴影令牌 | `atc:DatePickerAssist.PlaceHolder` |
-| `Slider` | WPF `Slider`/`Track`/`Thumb`/`RepeatButton`/`TickBar` 部件契约、`DefaultTextBoxStyle`（数值框）、主色与下沉面等主题令牌、`DefaultControlFocusVisualStyle` | `atc:AttachFuc.IsClosable`（数值框默认关闭清空按钮） |
+| `Slider` | WPF `Slider`/`Track`/`Thumb`/`RepeatButton`/`TickBar` 部件契约、`DefaultTextBoxStyle`（数值框）、主色与下沉面等主题令牌、`DefaultControlFocusVisualStyle` | `ShowClear`（数值框显式关闭清空按钮） |
 | `ToolTip` | WPF `ToolTip`、主题资源 | 无 |
 | `Label` | WPF `Label`、状态和图标资源 | `Icon.Icon`、`Icon.FontFamily`（仅相应模板） |
 | `TextBlock` | WPF `ContentControl`、`ContentPresenter`、标准内容模板管线 | 无 |
@@ -1257,7 +1299,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `SideMenu` | WPF `ListBox`、`ListBoxItem`、导航数据模板 | `Icon.FontFamily`、`Icon.IconSize` |
 | `TreeMenu` | WPF `TreeView`、`TreeMenuItem`、`jv:ToggleButton` | `Icon.FontFamily`、`Icon.IconSize`、`ExpanderBehavior.Enable` |
 | `TreeMenuItem` | `jv:MenuItem`、`ObservableCollection<TreeMenuItem>` | 通过所在 `TreeMenu` 使用图标附加属性 |
-| `TabMenu` | WPF `TabControl`、`TabMenuItem`、`jv:TextBox`、`jv:Button` | `AttachFuc.IsClosable`、`Icon.FontFamily` |
+| `TabMenu` | WPF `TabControl`、`TabMenuItem`、`jv:TextBox`、`jv:Button` | `IsClosable`（控件自身属性）、`Icon.FontFamily` |
 | `TabMenuItem` | WPF `TabItem`、`DefaultTabMenuItemStyle`、`TabMenu.CloseTabCommand` | 继承所在 `TabMenu` 的相关附加属性 |
 | `ToolBar` | WPF `ItemsControl`、`ToolBarItem`、虚拟化面板 | 无；图标由项目自身属性提供 |
 | `ToolBarItem` | WPF `Button`、`DefaultToolBarItemStyle` | 无 |
