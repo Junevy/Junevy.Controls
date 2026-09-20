@@ -97,7 +97,7 @@
                             <Setter TargetName="IconModeTitle" Property="Visibility" Value="Collapsed" />
                         </Trigger>
 
-                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=DisplayMode}" Value="{x:Static atc:DisplayMode.Icon}">
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=DisplayMode}" Value="{x:Static local:DisplayMode.Icon}">
                             <Setter TargetName="NormalLayout" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="IconLayout" Property="Visibility" Value="Visible" />
                         </DataTrigger>
