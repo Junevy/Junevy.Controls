@@ -1,0 +1,102 @@
+<UserControl
+    x:Class="Junevy.Controls.Showcase.Pages.TextStatePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Controls"
+    xmlns:jv="github.com.junevy">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel MaxWidth="1080">
+            <StackPanel.Resources>
+                <!--  内容自适应场景关闭等比缩放（jv:Button 默认 IsTextScaled=True 会占满可用空间）  -->
+                <Style BasedOn="{StaticResource {x:Type jv:Button}}" TargetType="{x:Type jv:Button}">
+                    <Setter Property="IsTextScaled" Value="False" />
+                </Style>
+            </StackPanel.Resources>
+
+            <TextBlock FontSize="20" FontWeight="Bold" Text="文本与状态" />
+            <TextBlock
+                Margin="0,4,0,4"
+                FontSize="12"
+                Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                Text="jv:Label（DisplayMode）/ jv:TextBlock / ToolTip（官方控件主题接管）。" />
+
+            <jv:GroupBox Header="jv:Label（DisplayMode 全模式）">
+                <StackPanel>
+                    <WrapPanel>
+                        <jv:Label Content="Error（默认）" DisplayMode="Error" />
+                        <jv:Label Content="Success" DisplayMode="Success" />
+                        <jv:Label Content="Warning" DisplayMode="Warning" />
+                    </WrapPanel>
+                    <WrapPanel Margin="0,8,0,0">
+                        <jv:Label Content="BorderlessError" DisplayMode="BorderlessError" />
+                        <jv:Label Content="BorderlessWarning" DisplayMode="BorderlessWarning" />
+                        <jv:Label Content="BorderlessNotice" DisplayMode="BorderlessNotice" />
+                        <jv:Label
+                            atc:Icon.Icon="&#xE651;"
+                            Content="Neutral + 自定义图标"
+                            DisplayMode="Neutral" />
+                    </WrapPanel>
+                    <TextBlock
+                        Margin="0,10,0,0"
+                        FontSize="12"
+                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        Text="各模式通过样式触发器注入默认图标（atc:Icon.Icon），可用局部值覆盖；图标为空时折叠图标区域；Neutral 模式背景跟随 Background。" />
+                </StackPanel>
+            </jv:GroupBox>
+
+            <jv:GroupBox Header="jv:TextBlock（左内容 + 右文本）" Margin="0,16,0,0">
+                <StackPanel>
+                    <StackPanel.Resources>
+                        <DataTemplate x:Key="IconTemplate">
+                            <Border
+                                Width="30"
+                                Height="30"
+                                Background="{DynamicResource Theme.Brush.Accent.Primary}"
+                                CornerRadius="6">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontFamily="{DynamicResource IconFont}"
+                                    FontSize="16"
+                                    Foreground="{DynamicResource Theme.Brush.Text.OnAccent}"
+                                    Text="&#xE66B;" />
+                            </Border>
+                        </DataTemplate>
+                    </StackPanel.Resources>
+                    <jv:TextBlock
+                        Width="320"
+                        ContentTemplate="{StaticResource IconTemplate}"
+                        Text="Inspection Station"
+                        FontSize="16" />
+                    <jv:TextBlock
+                        Width="320"
+                        Margin="0,8,0,0"
+                        ContentTemplate="{StaticResource IconTemplate}"
+                        Text="标题超宽时以省略号截断显示 Inspect"
+                        FontSize="14" />
+                </StackPanel>
+            </jv:GroupBox>
+
+            <jv:GroupBox Header="ToolTip（合并 Generic.xaml 后任意元素自动生效）" Margin="0,16,0,0">
+                <StackPanel>
+                    <WrapPanel>
+                        <TextBlock
+                            Margin="0,4"
+                            Text="悬浮到我这里查看原生 ToolTip"
+                            ToolTip="取值范围 1.0 - 16.0，调整后立即生效" />
+                        <jv:Button
+                            Margin="16,0,0,0"
+                            Content="按钮 ToolTip"
+                            ToolTip="jv:Button 上的 ToolTip 同样获得主题样式" />
+                        <jv:CheckBox
+                            Margin="16,0,0,0"
+                            Content="复选框 ToolTip"
+                            ToolTip="任意 FrameworkElement 的 ToolTip 属性" />
+                    </WrapPanel>
+                </StackPanel>
+            </jv:GroupBox>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

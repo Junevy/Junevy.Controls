@@ -2,6 +2,27 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## 示例程序
+
+### 本次更新（新增 Showcase 展示程序）— 2026-09-20
+
+- 新增 `Samples/Junevy.Controls.Showcase`（net8.0-windows，已加入解决方案 Samples 分组并纳入 git 追踪）：使用本控件库的分类展示程序，运行方式 `dotnet run --project Samples/Junevy.Controls.Showcase`。
+- 主窗口演示：无边框窗口 + `WindowChrome` + `jv:AppBar` 默认模板（DefaultAppBar，一个程序仅一个，展示默认状态；应用侧给 `jv:ToolBar` 设置 `WindowChrome.IsHitTestVisibleInChrome="True"` 使工具栏按钮在标题栏区内可点击，该附加属性可继承）、`jv:SideMenu` 八分类导航、`jv:SidePanel` 设置抽屉（CloseOnOutsideClick 自动收回）、`MessageBarService` 通知宿主、`ThemeManager` 浅色/深色切换。
+- 分类页与虚拟数据（`SampleData`）：
+  - 按钮：Button（图标/禁用/无边框样式/圆角）、CardButton 指标卡、ToggleButton 胶囊/矩形模板、RadioButton 圆形/方形分组。
+  - 输入与选择：CheckBox 三态；TextBox 演示 PlaceholderAssist（含 iconfont 占位符）、Icon 前置图标、ShowClear、原生 TextBox 借用外观；TitleAssist 四方位标题 + iconfont/自定义字体样式；ComboBox（ItemsSource 绑定、声明项、可编辑、默认文案、原生占位）；DatePicker（DatePickerAssist.PlaceHolder）；Slider（ValueBoxSide 四侧、ValueFormatString、竖向、ShowValueBox=False）。
+  - 集合与数据：ListBox 竖向/横向滑动、ListView GridView、DataGrid（虚拟数据 + 只读 + 排序）、DataGridAssist.EmptyText 空态提示。
+  - 文本与状态：Label 全部 DisplayMode、TextBlock、ToolTip。
+  - 通知：Badge（数值/圆点/四角/MaxCount/偏移微调）、MessageBar 布局内声明（IsShown/Show/Hide）、MessageBarService 五种外观 + Clear。
+  - 布局：GroupBox（默认折叠/初始折叠/不可折叠/标题内交互元素）、ExpanderPanel（四方向 + AnimationDuration + ToggleCommand）、Border.CornerRadius 样式 Setter 用法。
+  - 菜单与导航：ContextMenu（命令/快捷键/IsCheckable/子菜单）、TreeMenu（NavigateCommand + ExpanderBehavior 默认启用）、TabMenu（CanCloseLastTab=False + TabClosing 拦截「保护页」）、ToolBar 横/纵向、Toolbox 显式分组。
+  - 窗口与图像：ImageViewer（FitToWindow/ActualSize，源为库内 pack URI 图片）、DialogWindow 代码实例化（内容含 TitleAssist 控件）。
+- 实现备注（后续维护注意）：
+  - `Border.CornerRadius` 的逐实例 attribute 写法（`<jv:Button Border.CornerRadius="8">`）会被 WPF 标记编译器拒绝（MC3015，`Border` 未提供附加属性 Get/Set 访问器），须改经样式 Setter 或代码 `SetValue` 设置；README 用法已同步修正。
+  - `jv:Button` 默认 `IsTextScaled=True`：Viewbox 缩放宿主使按钮测量值占满可用空间（实测 600x200 容器内 DesiredSize 达 320x200），内容自适应布局（WrapPanel/横向 StackPanel）中应设 `IsTextScaled="False"`；展示页经页面隐式样式统一关闭，并保留一个固定尺寸（180x56）的缩放正面演示。
+  - `Badge` 隐式样式将 `Foreground` 设为 `Text.OnAccent`（白色）并沿视觉树继承，包裹依赖继承前景色的内容时需显式设置前景色。
+- 验证：Showcase（net8.0-windows）编译 0 错误 0 警告；离屏渲染探针（2x DPI）渲染主窗口浅色/深色主题、SidePanel 打开/收回、8 个分类页、MessageBar 泵 Dispatcher 帧（Visibility=Visible、Opacity=1.00）与角标行放大裁剪；断言全部通过——AppBar ToolBarItem 数量 ≥2、SidePanel IsOpen 读写回读一致、jv:TextBox 占位符空值显示/有值隐藏、MessageBar 动画完成后可见；渲染快照人工核对正常。探针验证后已删除。
+
 ## TextBox / ComboBox
 
 ### 本次更新（占位符统一为 PlaceholderAssist 附加属性，破坏性变更）— 2026-09-20

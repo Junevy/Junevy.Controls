@@ -1,0 +1,144 @@
+<UserControl
+    x:Class="Junevy.Controls.Showcase.Pages.ButtonsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Controls"
+    xmlns:jv="github.com.junevy">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel MaxWidth="1080">
+
+            <TextBlock FontSize="20" FontWeight="Bold" Text="按钮控件" />
+            <TextBlock
+                Margin="0,4,0,4"
+                FontSize="12"
+                Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                Text="jv:Button / jv:CardButton / jv:ToggleButton / jv:RadioButton，保留 WPF 标准行为（Command、IsChecked、分组）。" />
+
+            <jv:GroupBox Header="jv:Button">
+                <StackPanel>
+                    <StackPanel.Resources>
+                        <!--  内容自适应场景关闭等比缩放：jv:Button 默认 IsTextScaled=True，测量会占满可用空间  -->
+                        <Style BasedOn="{StaticResource {x:Type jv:Button}}" TargetType="{x:Type jv:Button}">
+                            <Setter Property="IsTextScaled" Value="False" />
+                        </Style>
+                        <Style x:Key="CornerRadius16Button" BasedOn="{StaticResource {x:Type jv:Button}}" TargetType="{x:Type jv:Button}">
+                            <Setter Property="Border.CornerRadius" Value="16" />
+                        </Style>
+                    </StackPanel.Resources>
+                    <WrapPanel>
+                        <jv:Button Content="确认" IsDefault="True" />
+                        <jv:Button Content="取消" />
+                        <jv:Button
+                            atc:Icon.Icon="&#xE611;"
+                            atc:Icon.IconSize="16"
+                            Content="刷新" />
+                        <jv:Button Content="禁用状态" IsEnabled="False" />
+                        <jv:Button Content="无边框样式" Style="{StaticResource NoBorderButtonStyle}" />
+                        <jv:Button
+                            Content="圆角 16（Border.CornerRadius）"
+                            Style="{StaticResource CornerRadius16Button}" />
+                    </WrapPanel>
+                    <TextBlock
+                        Margin="0,10,0,0"
+                        FontSize="12"
+                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        Text="atc:Icon.Icon 提供前置图标（E611）；没有图标时不保留前置空白；圆角经样式 Setter 设置 Border.CornerRadius 附加用法（逐实例 attribute 写法会被标记编译器拒绝）。" />
+                    <WrapPanel Margin="0,12,0,0">
+                        <jv:Button
+                            Width="180"
+                            Height="56"
+                            Content="IsTextScaled=True（随按钮缩放）"
+                            IsTextScaled="True" />
+                    </WrapPanel>
+                    <TextBlock
+                        Margin="0,10,0,0"
+                        FontSize="12"
+                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        Text="jv:Button 默认 IsTextScaled=True：文字/图标随按钮尺寸等比缩放，需给按钮显式尺寸；内容自适应布局中应设 IsTextScaled=False（本页其余按钮经页面隐式样式关闭）。" />
+                </StackPanel>
+            </jv:GroupBox>
+
+            <jv:GroupBox Header="jv:CardButton（指标卡 / 快捷入口）" Margin="0,16,0,0">
+                <WrapPanel>
+                    <jv:CardButton
+                        Title="在线相机"
+                        Content="12"
+                        MainColor="{DynamicResource Theme.Brush.Status.Success}"
+                        atc:Icon.FontFamily="{DynamicResource IconFont}"
+                        atc:Icon.Icon="&#xE66B;" />
+                    <jv:CardButton
+                        Title="待处理告警"
+                        Content="3"
+                        MainColor="{DynamicResource Theme.Brush.Status.Danger}"
+                        atc:Icon.FontFamily="{DynamicResource IconFont}"
+                        atc:Icon.Icon="&#xE932;" />
+                    <jv:CardButton
+                        Title="离线设备"
+                        Content="1"
+                        MainColor="{DynamicResource Theme.Brush.Status.Warning}"
+                        atc:Icon.FontFamily="{DynamicResource IconFont}"
+                        atc:Icon.Icon="&#xE60C;" />
+                </WrapPanel>
+            </jv:GroupBox>
+
+            <jv:GroupBox Header="jv:ToggleButton（开关）" Margin="0,16,0,0">
+                <StackPanel>
+                    <WrapPanel>
+                        <jv:ToggleButton
+                            Content="自动曝光"
+                            IsChecked="True"
+                            SwitchSize="22"
+                            Template="{StaticResource SwitchToggleButton_Radius}" />
+                        <jv:ToggleButton
+                            Content="自动对焦"
+                            IsChecked="False"
+                            SwitchSize="22"
+                            Template="{StaticResource SwitchToggleButton_Radius}" />
+                        <jv:ToggleButton
+                            Content="矩形模板"
+                            IsChecked="True"
+                            SwitchSize="22"
+                            Template="{StaticResource SwitchToggleButton_Rect}" />
+                        <jv:ToggleButton
+                            Content="禁用开关"
+                            IsChecked="True"
+                            IsEnabled="False"
+                            SwitchSize="22"
+                            Template="{StaticResource SwitchToggleButton_Radius}" />
+                        <jv:ToggleButton
+                            IsChecked="False"
+                            SwitchSize="20"
+                            Template="{StaticResource SwitchToggleButton_Radius}" />
+                    </WrapPanel>
+                    <TextBlock
+                        Margin="0,10,0,0"
+                        FontSize="12"
+                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        Text="开关需显式选择 SwitchToggleButton_Radius（胶囊）或 SwitchToggleButton_Rect（矩形）模板；SwitchSize 为整体高度，轨道宽度按 2:1 自动推导。" />
+                </StackPanel>
+            </jv:GroupBox>
+
+            <jv:GroupBox Header="jv:RadioButton（DisplayMode）" Margin="0,16,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <jv:RadioButton Content="自动模式" GroupName="ShowcaseMode" IsChecked="True" />
+                        <jv:RadioButton Content="手动模式" GroupName="ShowcaseMode" />
+                        <jv:RadioButton Content="外部触发" GroupName="ShowcaseMode" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <jv:RadioButton Content="方形标记 A" DisplayMode="Rectangular" GroupName="ShowcaseShape" IsChecked="True" />
+                        <jv:RadioButton Content="方形标记 B" DisplayMode="Rectangular" GroupName="ShowcaseShape" />
+                        <jv:RadioButton Content="方形标记 C" DisplayMode="Rectangular" GroupName="ShowcaseShape" />
+                    </StackPanel>
+                </Grid>
+            </jv:GroupBox>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,49 @@
+<UserControl
+    x:Class="Junevy.Controls.Showcase.Pages.WindowImagePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:jv="github.com.junevy">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel MaxWidth="1080">
+            <StackPanel.Resources>
+                <!--  内容自适应场景关闭等比缩放（jv:Button 默认 IsTextScaled=True 会占满可用空间）  -->
+                <Style BasedOn="{StaticResource {x:Type jv:Button}}" TargetType="{x:Type jv:Button}">
+                    <Setter Property="IsTextScaled" Value="False" />
+                </Style>
+            </StackPanel.Resources>
+
+            <TextBlock FontSize="20" FontWeight="Bold" Text="窗口与图像" />
+            <TextBlock
+                Margin="0,4,0,4"
+                FontSize="12"
+                Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                Text="jv:ImageViewer（缩放/平移/右键保存）/ jv:DialogWindow（无边框圆角对话框宿主）。" />
+
+            <jv:GroupBox Header="jv:ImageViewer（滚轮缩放 0.05x-64x，左键拖动平移，右键菜单保存）">
+                <StackPanel>
+                    <jv:ImageViewer
+                        x:Name="Viewer"
+                        Height="380"
+                        Source="pack://application:,,,/Junevy.Controls;component/Resources/Pictures/camera.png" />
+                    <StackPanel Margin="0,12,0,0" Orientation="Horizontal">
+                        <jv:Button Click="OnFitToWindowClick" Content="FitToWindow()" />
+                        <jv:Button Margin="12,0,0,0" Click="OnActualSizeClick" Content="ActualSize()" />
+                    </StackPanel>
+                </StackPanel>
+            </jv:GroupBox>
+
+            <jv:GroupBox Header="jv:DialogWindow（代码实例化弹出）" Margin="0,16,0,0">
+                <StackPanel>
+                    <jv:Button Click="OnOpenDialogClick" Content="打开对话框（无边框、圆角、主题化标题栏）" HorizontalAlignment="Left" />
+                    <TextBlock
+                        Margin="0,10,0,0"
+                        FontSize="12"
+                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        Text="未启用 SizeToContent 覆盖时窗口尺寸完全跟随内容；标题栏可拖动、边缘可缩放、Esc 可关闭；内容按窗口圆角裁剪。" />
+                </StackPanel>
+            </jv:GroupBox>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
