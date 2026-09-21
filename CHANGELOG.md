@@ -2,6 +2,26 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## Toolbox
+
+### 本次更新（拖拽发起即收起弹出窗口）— 2026-09-21
+
+- **行为变更**：从 Popup 内的 `ToolItem` 发起拖放的那一刻（移动超出系统拖拽阈值、进入 `DoDragDrop` 之前），所属弹出窗口立即收起；旧行为为拖拽全程弹窗保持展开，拖放结束后才按指针位置决定是否收起。
+- **收起方式满足「不参与命中测试」**：弹出层内容 `PART_PopupRoot` 先置为 `Collapsed`（不渲染、命中测试不可达，避免 `PopupAnimation=Fade` 淡出期间残留可见/可命中，拖放落点不会被弹层拦截），再经 `IsOpen=false` 关闭弹层；再次展开时由 `ToolboxItem.SetIsOpen` 恢复内容可见性。
+- **状态一致性**：收起即清空 `ActiveItem` 与活动项状态（与正常收起一致）；`_dragOwner` 拖拽标记保留至拖拽完成，拖拽期间 `RequestOpen`（悬停触发器/弹层）与 `SetActiveItem`（点击/键盘切换入口）被短路，弹窗不会在拖拽中重新展开；`ClosePopup` 顺带取消未决的悬停展开计时器，消除「快速按下并拖动」与 `OpenDelay`（默认 150ms）展开延迟的竞态。
+- 实现位置：`Toolbox.NotifyDragStarted`（收起弹窗 + 保持拖拽标记）、`Toolbox.RequestOpen`/`SetActiveItem`（拖拽进行中短路）、`ToolboxItem.HidePopupForDrag`（新增 internal 方法：`PART_PopupRoot` 置 `Collapsed`）、`ToolboxItem.SetIsOpen`（展开前恢复 `Visible`）。
+- README 的 Toolbox 章节同步补充拖拽收起行为说明。
+- 验证：net48 / net8.0-windows 双目标编译 0 错误（既有可空性警告数量不变）；离屏渲染探针断言全部通过（Toolbox 15 组 + Slider 10 组）——悬停展开回归（`RequestOpen` 路径正常）、拖拽进行中 `Popup.IsOpen=False` 且 `PART_PopupRoot.Visibility=Collapsed`、`ActiveItem` 清空、拖拽进行中 `RequestOpen`/`Toggle` 均不重新展开、拖拽结束后保持收起、再次悬停可正常展开且 `PopupRoot` 恢复 `Visible`、`ClosePopup` 后状态干净。探针验证后已删除。
+
+## Slider
+
+### 本次更新（滑块、轨道与选择区段全部改为直角）— 2026-09-21
+
+- `SliderThumbStyle` 滑块移除 `ThumbBorder` 的 `CornerRadius="2"`：由 16px 方形 + 2px 小圆角改为 16px 直角方形握手。
+- 轨道（`SliderRepeatButtonStyle` 内层 `Rail`）与选择区段（`PART_SelectionRange`）移除 `CornerRadius="{DynamicResource Theme.SmallCornerRadius}"`，统一为直角矩形；Slider 自此不再依赖 `Theme.SmallCornerRadius` 令牌（README 依赖清单同步移除）。
+- 数值框外观仍复用库内 `jv:TextBox`（其圆角来自 TextBox 默认样式的 `Theme.ControlCornerRadius`），本次未改动；悬停描边高亮、拖拽填充主色、禁用置灰等状态行为不变，横/纵滑块共用同一模板一并生效。
+- 验证：离屏渲染探针 10 组断言全部通过——横向状态下 `ThumbBorder`、`Rail`、`PART_SelectionRange` 三处模板部件的 `CornerRadius` 回读均为 `0,0,0,0`，`IsSelectionRangeEnabled` 时选择区段可见性正常；纵向滑块同模板复验（三处 `CornerRadius` 回读均为 0）。探针验证后已删除。
+
 ## TextBox / ComboBox
 
 ### 本次更新（TitleAssist 新增 TitleWidth 固定宽度附加属性）— 2026-09-21
