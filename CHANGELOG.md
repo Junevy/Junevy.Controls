@@ -2,6 +2,39 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## TextBox / ComboBox
+
+### 本次更新（TitleAssist 新增 TitleWidth 固定宽度附加属性）— 2026-09-21
+
+- `atc:TitleAssist` 新增 **`TitleWidth`** 附加属性（double，默认 `NaN`），为标题区域指定固定宽度（DIP），面向表单式布局场景：`TitlePlacement=Left` 时各输入框标题长短不一会导致输入框左缘参差不齐，统一设置 `TitleWidth` 后所有输入框按同一间距整列对齐。
+- **四个方位统一生效**：`Top` / `Bottom` / `Left` / `Right` 的标题呈现器均消费该宽度（默认模板经 `Width="{TemplateBinding atc:TitleAssist.TitleWidth}"` 绑定）。
+- **对齐行为**：`Left` 方位标题内容在固定宽度内**右对齐贴合输入框**（保持固定 4 DIP 间距），`Right`/`Top`/`Bottom` 方位保持默认对齐；`TitleWidth` 为 `NaN` 时呈现器自适应标题内容，与既有行为完全一致（无破坏性变更）。
+- 实现：`AttachedProperties/TitleAssist.cs` 注册 `TitleWidthProperty`（`RegisterAttached`，NaN 默认值）+ `GetTitleWidth`/`SetTitleWidth` 访问器；`jv:TextBox` 与 `jv:ComboBox` 两份默认模板的 4 个标题呈现器（`TitleTop`/`TitleBottom`/`TitleLeft`/`TitleRight`）统一加宽度绑定，其中 `TitleLeft` 呈现器设 `TextBlock.TextAlignment="Right"`（经附加属性继承送达内部文本；自动宽度下无视觉影响）。
+- Showcase 输入页新增「固定宽度表单对齐」演示（用户名 / 电子邮箱地址 / 部门三行，`TitleWidth=110`，标题长短不一、输入框整列对齐）；README 的 TitleAssist 示例同步修正了旧版 `Tag` 占位符残留写法（改用 `atc:PlaceholderAssist.Placeholder`）。
+- 验证：net48 / net8.0-windows 双目标编译 0 错误；离屏渲染探针 15 组断言全部通过——固定宽度生效（TextBox/ComboBox 的 `TitleLeft`、`TitleTop` 呈现器 `ActualWidth==120`）、未设置时自适应回归（NaN 默认值、呈现器宽度 41.6）、`TitleWidth=120` 时两个不同长度标题的输入框左缘精确同位（144 DIP）且自动宽度用例不受影响（65.6 DIP）、`TextAlignment=Right` 经继承链生效、像素级断言标题墨迹右缘距呈现器右缘仅 0.5 DIP（右对齐贴边）；渲染快照人工核对正常。探针验证后已删除。
+
+## Slider
+
+### 本次更新（滑块外观微调：正圆改为 2px 小圆角方形）— 2026-09-21
+
+- `SliderThumbStyle` 滑块由 16px 正圆（`CornerRadius=8`）改为 16px 方形握手 + **2px 小圆角**：拖动滑块时与轨道、数值框的直角风格更协调，消除正圆带来的割裂感。
+- 轨道与选择区段的圆角（`Theme.SmallCornerRadius`）不变；悬停描边高亮、拖拽填充主色、禁用置灰等状态行为不变；横/纵滑块共用同一滑块样式，一并生效。
+- 验证：net48 / net8.0-windows 双目标编译 0 错误；离屏渲染探针 4 组断言通过（普通/选择区段/纵向/禁用四种状态下 `ThumbBorder.CornerRadius` 回读均为 2）；渲染快照人工核对正常。探针验证后已删除。
+
+## TextBox
+
+### 本次更新（新增内部命令按钮 CommandButton）— 2026-09-20
+
+- `jv:TextBox` 内部新增命令按钮（模板部件 `PART_CommandButton`，与清空按钮同位显示在文本框内右侧），配套 4 个依赖属性（均注册在 `Junevy.Controls.Controls.Text.TextBox` 上，可直接设在 `jv:TextBox` 或原生 `TextBox` 实例上；样式/模板中需 `local:TextBox.*` 限定形式引用）：
+  - **`ShowCommandButton`**（bool，默认 `false`）：是否显示命令按钮。
+  - **`CommandButtonCommand`**（ICommand）：命令按钮点击时执行的命令，可绑定 ViewModel 命令；按钮可用性随命令 `CanExecute` 自动启停（`CanExecute=false` 时按钮禁用置灰）。
+  - **`CommandButtonCommandParameter`**（object）：传递给命令的参数。
+  - **`CommandButtonContent`**（object）：按钮内容（文本或 iconfont 字形），字体族跟随 `atc:Icon.FontFamily`，字号/颜色继承控件自身取值；为 `null` 时显示空白占位，建议显式设置。
+- **与清空按钮互斥**：`ShowClear=true`（清空按钮显示）时命令按钮强制隐藏；需要显示命令按钮应设 `ShowClear="False"` + `ShowCommandButton="True"`。互斥由默认模板 `MultiTrigger` 实现：仅「`ShowCommandButton=true` 且 `ShowClear=false`」时命令按钮 `Visible`，其余状态保持元素默认 `Collapsed`。
+- 实现：命令/参数/内容经 `RelativeSource TemplatedParent` 绑定送达模板内 `bt:Button`（复用 `TextBoxCloseButtonStyle` 无边框样式，宽 26、`Focusable=False` 不参与 Tab 焦点，与清空按钮一致）；`NoBorder` 系列极简模板不含该按钮（与清空按钮处理一致）。
+- Showcase 输入页新增演示（命令经 `MessageBarService` 弹出通知，参数演示 `CommandButtonCommandParameter`）。
+- 验证：net48 / net8.0-windows 双目标编译 0 错误（既有可空性警告数量不变，新增代码零警告）；离屏渲染探针 17 组断言全部通过——默认态命令按钮隐藏、`ShowCommandButton=true`+`ShowClear=false` 时显示且清空按钮折叠、两开关同开时清空按钮胜出（互斥）、运行时动态切换往返、内容字形渲染、`Command`/`CommandParameter` 模板绑定送达按钮、`CanExecute=false` 自动禁用；渲染快照人工核对正常（含禁用置灰态）。探针验证后已删除。
+
 ## 示例程序
 
 ### 本次更新（新增 Showcase 展示程序）— 2026-09-20

@@ -10,6 +10,7 @@ namespace Junevy.Controls.AttachedProperties
     /// 标题内容为任意 <see cref="object"/>，设为 iconfont 字形文本时需同时指定
     /// <see cref="TitleFontFamily"/>；标题位置由 <see cref="TitlePlacement"/> 控制，
     /// 字体样式可通过配套附加属性自定义，未设置的样式项自动继承控件自身取值。
+    /// 通过 <see cref="TitleWidth"/> 可为标题区域指定固定宽度，用于表单式布局中输入框整列对齐。
     /// </para>
     /// </summary>
     public class TitleAssist
@@ -37,6 +38,12 @@ namespace Junevy.Controls.AttachedProperties
         /// </summary>
         public static readonly DependencyProperty TitleFontSizeProperty =
             DependencyProperty.RegisterAttached("TitleFontSize", typeof(double), typeof(TitleAssist), new PropertyMetadata(double.NaN));
+
+        /// <summary>
+        /// 标识 <see cref="GetTitleWidth"/>/<see cref="SetTitleWidth"/> 的附加属性。
+        /// </summary>
+        public static readonly DependencyProperty TitleWidthProperty =
+            DependencyProperty.RegisterAttached("TitleWidth", typeof(double), typeof(TitleAssist), new PropertyMetadata(double.NaN));
 
         /// <summary>
         /// 标识 <see cref="GetTitleForeground"/>/<see cref="SetTitleForeground"/> 的附加属性。
@@ -112,6 +119,23 @@ namespace Junevy.Controls.AttachedProperties
         public static void SetTitleFontSize(DependencyObject obj, double value)
         {
             obj.SetValue(TitleFontSizeProperty, value);
+        }
+
+        /// <summary>
+        /// 读取标题区域固定宽度；<see cref="double.NaN"/> 时自适应标题内容。
+        /// </summary>
+        public static double GetTitleWidth(DependencyObject obj)
+        {
+            return (double)obj.GetValue(TitleWidthProperty);
+        }
+
+        /// <summary>
+        /// 在指定控件上设置标题区域固定宽度（DIP），四个方位统一生效；
+        /// 用于表单式布局中使不同长度的标题仍保持一致的标题—输入框间距、输入框整列对齐。
+        /// </summary>
+        public static void SetTitleWidth(DependencyObject obj, double value)
+        {
+            obj.SetValue(TitleWidthProperty, value);
         }
 
         /// <summary>
