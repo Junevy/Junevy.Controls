@@ -7,6 +7,7 @@
 ## 验证方法
 - UI 布局/居中类问题用「离屏渲染探针」验证：WPF 控制台工程 + RenderTargetBitmap 按 4x DPI 渲染 + 像素级 bbox/质心分析；96dpi 单倍渲染量化噪声大（±0.5px），不能作为定论依据。模板判定以墨迹外接框为准，质心受笔画质量分布影响。
 - 探针中 pack://application URI 需先 new Application()；结论写入文件再读（PowerShell 工具输出会被吞）。
+- 像素墨迹检测（2026-09-21）：Pbgra32 是预乘 alpha，半透明边缘过渡像素（白底×低alpha）按亮度阈值会误判为暗色，bbox 必须只统计 alpha≥250 的像素；浅色主题 Border.Default 为深色，测试按钮需设 BorderThickness=0，否则 bbox=按钮轮廓而非文字。
 - 探针点击类断言勿用手动 new 的 ButtonAutomationPeer：分离 peer 未接入事件源，IInvokeProvider.Invoke 静默跳过（不抛异常）；应断言 Command/CommandParameter 绑定送达 + 经按钮属性执行，CanExecute=false → IsEnabled=false 通过即证明命令管线激活。
 - `Control.ApplyTemplate()` 在模板**已应用**时返回 false（不是报错），`!ApplyTemplate()` 判断会把正常情况当失败——忽略返回值直接 `Template.FindName`。探针工程放 `.workbuddy/tmp/X/` 时 ProjectReference 相对路径是 `..\..\..\<库>.csproj`（三层）。
 - 沙箱下 Remove-Item 可能静默失效或报管道绑定错误，删除文件用 [System.IO.File]::Delete / [System.IO.Directory]::EnumerateFiles 可靠。
@@ -18,7 +19,7 @@
 - 部分 XAML/CS 文件存在历史 GBK 乱码注释（如 TextBox.xaml 旧注释），Edit 按 UTF-8 写入不影响匹配行，但不要大规模重写旧注释。
 - ControlTemplate.Triggers 内 DataTrigger + TemplatedParent 绑定不生效（Slider 数值框实测）；SystemCommands 命令需自行注册绑定（AppBar 已处理）。
 - `Border.CornerRadius` 每实例特性语法不通过标记编译（MC3015），须用 Style Setter；README 已修正。
-- `jv:Button.IsTextScaled` 默认 true，Viewbox 测量使 DesiredSize 填满可用空间（内容自适应布局需显式 `IsTextScaled="False"`）；是否修库待定。
+- `jv:Button.IsTextScaled` 默认 true，经 ShrinkBox（internal Decorator）只缩小不放大：空间充足保持原始字号，被挤压（尺寸<内容自然尺寸）时等比缩小；false=完全固定字号（2026-09-21 已修库）。悬停/按压反馈为降透明度（Button.Hover/Pressed/Disabled.Opacity 资源 0.8/0.65/0.5），不再有固定悬停底色。该方案已推广（2026-09-21）：其余可交互控件用公共键 `Control.Hover.Opacity`(0.8)/`Control.Pressed.Opacity`(0.65)（Generic/Style/FeedbackOpacity.xaml，Button.* 键保持独立勿合并）——A 类（CardButton/ToolBarItem/ToolboxItem/ToolItem，背景暴露给用户）与 B 类（MessageBar/ProgressBarWindow 关闭按钮、ImageViewer 工具按钮、DialogWindow 标题栏按钮、ToggleButton Expander、DatePicker 日历导航/头部/下拉按钮）转透明度；C 类（MenuBar/ContextMenu/TabMenu/SideMenu/TreeMenu、ListBox/ListView/DataGrid 行与表头、GroupBox/ExpanderPanel 标题行、DatePicker 日期/月单元格等中性表面列表/菜单项）保留 Surface.Hover 灰底——灰底是行项正确 affordance，勿再改成透明度。DialogWindow 关闭按钮危险色悬停是 Windows 惯例，保留。
 - Badge 隐式样式 Foreground=Text.OnAccent（白）会继承进被包裹内容；相邻角标可能互相遮挡。
 
 ## 附加属性现状（2026-09-20 第二轮整理后）

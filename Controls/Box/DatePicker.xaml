@@ -3,6 +3,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Box">
 
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/FeedbackOpacity.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
     <!--
         ============================================================
         DatePicker / Calendar 全套主题（官方同名控件，隐式样式接管）：
@@ -30,11 +34,12 @@
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}" />
         </Border>
         <ControlTemplate.Triggers>
+            <!--  悬停/按压整体降透明度，不覆盖底色（与 Button 反馈一致）  -->
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Host" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                <Setter Property="Opacity" Value="{StaticResource Control.Hover.Opacity}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="Host" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Pressed}" />
+                <Setter Property="Opacity" Value="{StaticResource Control.Pressed.Opacity}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.4" />
@@ -52,11 +57,12 @@
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.FontWeight="SemiBold" TextElement.Foreground="{TemplateBinding Foreground}" />
         </Border>
         <ControlTemplate.Triggers>
+            <!--  悬停/按压整体降透明度，不覆盖底色（与 Button 反馈一致）  -->
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Host" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                <Setter Property="Opacity" Value="{StaticResource Control.Hover.Opacity}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="Host" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Pressed}" />
+                <Setter Property="Opacity" Value="{StaticResource Control.Pressed.Opacity}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.4" />
@@ -275,11 +281,12 @@
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Border>
         <ControlTemplate.Triggers>
+            <!--  悬停/按压整体降透明度，不覆盖底色（与 Button 反馈一致）  -->
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Host" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                <Setter Property="Opacity" Value="{StaticResource Control.Hover.Opacity}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="Host" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Pressed}" />
+                <Setter Property="Opacity" Value="{StaticResource Control.Pressed.Opacity}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.5" />

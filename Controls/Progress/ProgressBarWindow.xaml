@@ -6,6 +6,7 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls;component/Resources/Font/IconFont.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/FeedbackOpacity.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/Button.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
@@ -40,13 +41,12 @@
                             TextElement.Foreground="{TemplateBinding Foreground}" />
                     </Border>
                     <ControlTemplate.Triggers>
+                        <!--  悬停/按压整体降透明度，不覆盖底色（与 Button 反馈一致）  -->
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
-                            <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+                            <Setter Property="Opacity" Value="{StaticResource Control.Hover.Opacity}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Pressed}" />
-                            <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+                            <Setter Property="Opacity" Value="{StaticResource Control.Pressed.Opacity}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.5" />

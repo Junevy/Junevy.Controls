@@ -2,6 +2,27 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## 悬停/按压反馈统一（透明度方案推广至其余可交互控件）
+
+### 本次更新（CardButton、ToolBarItem、ToolboxItem、ToolItem 及各内部图标按钮悬停/按压改为透明度反馈）— 2026-09-21
+
+- 新增公共资源字典 `Generic/Style/FeedbackOpacity.xaml`，定义 **`Control.Hover.Opacity`（0.8）** 与 **`Control.Pressed.Opacity`（0.65）** 两个通用透明度键；Button 继续使用其独立的 `Button.Hover.Opacity` / `Button.Pressed.Opacity` / `Button.Disabled.Opacity`（已文档化，保持不变）。
+- **A 类——背景暴露给用户的按钮/卡片类**（与 Button 同构问题：鲜艳背景悬停会被浅蓝灰底覆盖）：`CardButton`、`ToolBarItem`、`ToolboxItem`（触发按钮）、`ToolItem` 的 `IsMouseOver`/`IsPressed` 触发器不再把底色替换为 `Theme.Brush.Surface.Hover`/`Surface.Pressed`，改为整体 `Opacity` 反馈（悬停 0.8、按压 0.65）。其中 `ToolBarItem` 按压反馈由原字面量 `Opacity=0.7` 统一为 `0.65`（与 Button 一致）。
+- **B 类——控件内部图标小按钮**：`MessageBar` / `ProgressBarWindow` 右上角关闭按钮、`ImageViewer` 工具栏图标按钮、`DialogWindow` 标题栏按钮、`ToggleButton` 的 Expander 展开按钮、`DatePicker` 日历导航/头部/下拉按钮，悬停/按压同样改为降透明度；关闭按钮悬停时额外的文字加深（Foreground Setter）一并移除（整体变淡本身即为反馈）。
+- **C 类——中性表面上的列表/菜单项保留灰底高亮**（悬停灰底是行项的正确 affordance，降透明度会让行内容变淡、悬停感知几乎消失）：`MenuBar` / `ContextMenu` / `TabMenu` / `SideMenu` / `TreeMenu` 项、`ListBox` / `ListView` / `DataGrid` 行与表头、`DatePicker` 日历日期/月份单元格、`GroupBox` / `ExpanderPanel` 标题行均未改动。
+- `DialogWindow` 关闭按钮的悬停危险色（Windows 关闭按钮惯例，透明背景无鲜艳覆盖问题）保留不变；各控件禁用态行为均未改动。
+- 验证：net48 / net8.0-windows 双目标编译 0 错误（既有可空性警告数量不变，新增代码零警告）；离屏渲染探针 71 组断言全部通过——12 组模板（CardButton / ToolBarItem / ToolboxItem / ToolItem / ToggleButton Expander / MessageBar 关闭按钮 / ProgressBarWindow 关闭按钮 / ImageViewer 工具按钮 / DialogWindow 标题栏按钮 / DatePicker 日历导航 / 头部 / 下拉按钮）悬停/按压触发器均为仅 Opacity（0.8/0.65）且无固定 Background Setter；CardButton 红底（200×100 @4x）正常态中心像素 R=255 G=0 B=0 A=255，悬停模拟态 R=204 G=0 B=0 A=204（红色纯度保持、整体变淡，未掺灰蓝——旧方案悬停为 Surface.Hover 时 G/B 约为 190/200）；渲染快照人工核对正常。探针验证后已删除。
+
+## Button
+
+### 本次更新（悬停/按压改为透明度反馈；IsTextScaled 改为只缩小不放大）— 2026-09-21
+
+- **悬停/按压反馈改为降透明度**：`ButtonTemplate`、`JvButtonTemplate` 的 `IsMouseOver`/`IsPressed` 触发器不再把底色替换为 `Theme.Brush.Surface.Hover`/`Surface.Pressed`（旧行为下红色等鲜艳背景按钮一悬停即变浅蓝），改为整体 `Opacity` 反馈——悬停 `0.8`、按压 `0.65`（触发器靠后者生效，按压覆盖悬停）；禁用逻辑保持 `Opacity=0.5` + 底色重置 `Surface.Base` + 描边 `State.DisabledBorder`。三个透明度集中在 `Button.xaml` 资源 `Button.Hover.Opacity` / `Button.Pressed.Opacity` / `Button.Disabled.Opacity`，便于统一调整。
+- **无边框模板一并透明度化**：`NoBorderButtonTemplate` 移除悬停警告黄/按压危险红的固定底色，统一按上述透明度反馈（透明背景下表现为内容整体变淡）。
+- **IsTextScaled 语义修正——只缩小不放大**：新增模板内部缩放宿主 `ShrinkBox`（internal `Decorator`，仅 `JvButtonTemplate` 消费）：测量按无约束尺寸取得内容自然尺寸，并把期望尺寸钳制在可用空间内；布局按自然尺寸居中排版后经 `RenderTransform` 视觉等比缩小，缩放系数以 1 为上限。空间充足时保持原始字号（与官方 Button 一致），仅当按钮被挤压（显式尺寸或布局约束小于内容自然尺寸）时文字/图标等比缩小并保持居中——修复「未设置 Height 时默认字体非常大」的问题（旧实现 Viewbox 会把内容放大填满按钮）。`IsTextScaled=False` 仍为完全固定字号（挤压时也不缩小）。
+- Showcase 按钮页移除整页 `IsTextScaled=False` 规避隐式样式（默认值已安全），缩放演示改为「内容超出按钮时文字等比缩小」示例；README 的 Button 章节补充悬停/按压反馈与 `IsTextScaled` 说明（此前未收录该依赖属性）。
+- 验证：net48 / net8.0-windows 双目标编译 0 错误（既有可空性警告数量不变，新增代码零警告）；离屏渲染探针 21 组断言全部通过——拉伸 400×260 与显式 180×56 场景文字墨迹与参考基准逐像素同尺寸（95×47 @4x，修复前会等比放大填满容器）、挤压（Width=44）文字等比缩小且宽高比不变（2.03 vs 2.02）、`IsTextScaled=False` 固定字号回归、无限空间下 DesiredSize 等于自然尺寸（Δ=0）、三个模板悬停/按压触发器均为仅 Opacity（0.8/0.65）且无固定底色 Setter、禁用态实时生效（Opacity=0.5 + 底色/描边重置）；渲染快照人工核对正常。探针验证后已删除。
+
 ## Toolbox
 
 ### 本次更新（拖拽发起即收起弹出窗口）— 2026-09-21
