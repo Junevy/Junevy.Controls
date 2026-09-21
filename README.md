@@ -397,7 +397,7 @@ ThemeManager.ToggleTheme();
 
 ### Slider
 
-`jv:Slider` 继承 WPF `Slider`，完整保留官方的拖拽、轨道分页、方向键与 `Home`/`End`、刻度、选择区段行为，另在滑块的上/下/左/右任意一侧附加一个可手动键入数值的数值框（模板部件 `PART_ValueBox`，外观复用库内 `jv:TextBox`）。合并 `Themes/Generic.xaml` 后，原生写法 `<Slider>` 与 `jv:Slider` 外观完全一致，数值框属 `jv:Slider` 专有——原生实例上自动折叠且不占布局。
+`jv:Slider` 继承 WPF `Slider`，完整保留官方的拖拽、轨道分页、方向键与 `Home`/`End`、刻度、选择区段行为，另在滑块的上/下/左/右任意一侧附加一个可手动键入数值的数值框（模板部件 `PART_ValueBox`，外观复用库内 `jv:TextBox`）。合并 `Themes/Generic.xaml` 后，原生写法 `<Slider>` 与 `jv:Slider` 外观完全一致，数值框属 `jv:Slider` 专有——原生实例上自动折叠且不占布局。视觉上滑块为 16px 直角方形握手，轨道与选择区段均为直角矩形（无圆角），悬停描边高亮、拖拽填充主色。
 
 | 属性 | 默认值 | 效果 |
 | --- | --- | --- |
@@ -420,7 +420,7 @@ ThemeManager.ToggleTheme();
            TickFrequency="10" />
 ```
 
-依赖：WPF `Slider`/`Track`/`Thumb`/`RepeatButton`/`TickBar` 标准部件契约、`DefaultTextBoxStyle`（数值框）、主题令牌（`Theme.Brush.Accent.Primary`、`Theme.Brush.Accent.Secondary`、`Theme.Brush.Surface.Sunken`、`Theme.Brush.Border.Default`、`Theme.Brush.State.DisabledSurface`、`Theme.SmallCornerRadius`）与 `DefaultControlFocusVisualStyle`。
+依赖：WPF `Slider`/`Track`/`Thumb`/`RepeatButton`/`TickBar` 标准部件契约、`DefaultTextBoxStyle`（数值框）、主题令牌（`Theme.Brush.Accent.Primary`、`Theme.Brush.Accent.Secondary`、`Theme.Brush.Surface.Sunken`、`Theme.Brush.Border.Default`、`Theme.Brush.State.DisabledSurface`）与 `DefaultControlFocusVisualStyle`。
 
 ## 集合与数据控件
 
@@ -845,6 +845,8 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
 一级 `ToolboxItem` 的 Hover 背景覆盖完整触发区域，并使用 `Theme.SmallCornerRadius`（默认 4 DIP）裁切圆角；该背景不属于图标内容，也不会改变图标大小或布局。
 
 Popup 内的 `ToolItem` 在 `IsDragEnabled="True"` 且 `IsEnabled="True"` 时显示十字形鼠标指针，提示该项可以拖动到设计画布；关闭拖动或禁用工具项后会恢复系统默认指针。一级 `ToolboxItem` 仍使用默认指针，因为它负责展开和切换分组。
+
+从 Popup 内发起拖放的那一刻（移动超出系统拖拽阈值），弹出窗口立即收起：内容先置为 `Collapsed`（不渲染、不参与命中测试，落点不会被残留弹层拦截）再关闭弹层，拖拽全程保持隐藏；`ActiveItem` 同步清空，拖拽期间悬停触发器或点击不会重新展开，松开落点后可正常再次悬停/点击展开。
 
 绑定普通数据集合时，`Toolbox` 自动为外层数据生成 `ToolboxItem`，`ToolboxItem` 自动为内层数据生成 `ToolItem`。使用两级 `ItemContainerStyle` 绑定分组和工具属性；普通内层数据对象还会成为所生成 `ToolItem` 的默认 `DragData`。显式提供 `ToolboxItem` 或 `ToolItem` 时，WPF 会直接使用该实例，调用方应自行设置其属性和 `DragData`，不要在 `ItemTemplate` 中再创建同类型容器。
 

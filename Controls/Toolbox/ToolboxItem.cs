@@ -140,6 +140,12 @@ public sealed class ToolboxItem : HeaderedItemsControl
     {
         if (value)
         {
+            // 拖拽收起时弹出层内容曾被置为 Collapsed，重新展开前恢复可见。
+            if (_popupRoot is not null)
+            {
+                _popupRoot.Visibility = Visibility.Visible;
+            }
+
             ApplyOwnerLayout();
         }
 
@@ -151,6 +157,16 @@ public sealed class ToolboxItem : HeaderedItemsControl
         }
 
         SetValue(IsOpenPropertyKey, value);
+    }
+
+    // 拖拽发起时立即收起弹出窗口：内容置为 Collapsed（不渲染、不参与命中测试），
+    // 由 Toolbox 随后关闭弹层；再次展开时由 SetIsOpen 恢复可见性。
+    internal void HidePopupForDrag()
+    {
+        if (_popupRoot is not null)
+        {
+            _popupRoot.Visibility = Visibility.Collapsed;
+        }
     }
 
     internal void RequestFocusFirstEnabledTool()

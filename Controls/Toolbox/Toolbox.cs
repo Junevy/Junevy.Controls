@@ -174,7 +174,7 @@ public sealed class Toolbox : ItemsControl
 
     internal void RequestOpen(ToolboxItem item)
     {
-        if (!IsEligibleRequest(item))
+        if (IsDragInProgress || !IsEligibleRequest(item))
         {
             return;
         }
@@ -285,6 +285,11 @@ public sealed class Toolbox : ItemsControl
 
         _dragOwner = item;
         _closeTimer.Stop();
+        // 拖拽发起即收起弹出窗口：内容先置为 Collapsed（不渲染、不参与命中测试）再关闭弹层，
+        // 使拖拽全程弹层保持隐藏；ClosePopup 会清空 _dragOwner，随后恢复标记以挡住拖拽期间的重新展开。
+        item.HidePopupForDrag();
+        ClosePopup();
+        _dragOwner = item;
     }
 
     internal void NotifyDragCompleted(ToolboxItem item)
@@ -395,6 +400,11 @@ public sealed class Toolbox : ItemsControl
 
     private void SetActiveItem(ToolboxItem item)
     {
+        if (IsDragInProgress)
+        {
+            return;
+        }
+
         _closeTimer.Stop();
         if (ReferenceEquals(_activeItem, item))
         {
