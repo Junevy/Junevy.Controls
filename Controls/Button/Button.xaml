@@ -3,7 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
     xmlns:cvt="clr-namespace:Junevy.Controls.Converters"
-    xmlns:local="clr-namespace:Junevy.Controls.Controls.Button">
+    xmlns:local="clr-namespace:Junevy.Controls.Controls.Button"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
@@ -11,6 +12,14 @@
 
     <cvt:NullToCollapsedConverter x:Key="NullToVisibility" />
     <cvt:IncreaseFontsizeConverter x:Key="IncreaseFontSize" />
+
+    <!--
+        状态反馈透明度：悬停/按压不再替换固定底色（避免鲜艳背景色被主题色覆盖），
+        统一降低整体不透明度；模板触发器靠后者生效——按压覆盖悬停，禁用覆盖按压。
+    -->
+    <sys:Double x:Key="Button.Hover.Opacity">0.8</sys:Double>
+    <sys:Double x:Key="Button.Pressed.Opacity">0.65</sys:Double>
+    <sys:Double x:Key="Button.Disabled.Opacity">0.5</sys:Double>
 
     <!--  官方 Button 模板：固定字号，无缩放宿主（官方类型没有 IsTextScaled 属性）  -->
     <ControlTemplate x:Key="ButtonTemplate" TargetType="Button">
@@ -65,13 +74,13 @@
 
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Hover.Opacity}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Pressed}" />
+                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Pressed.Opacity}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="ContentBorder" Property="Opacity" Value="0.5" />
+                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Disabled.Opacity}" />
                 <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
                 <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
             </Trigger>
@@ -80,8 +89,9 @@
 
     <!--
         jv:Button 专属模板：双内容宿主。
-        NormalHost 固定字号；IsTextScaled=True 时切换到 ScaledHost（Viewbox 等比缩放），
-        文字/图标作为整体随按钮尺寸缩放且始终居中；按钮自适应内容大小时缩放系数为 1。
+        NormalHost 固定字号；IsTextScaled=True 时切换到 ScaledHost（ShrinkBox 钳制 Viewbox）：
+        缩放系数以 1 为上限——空间充足时保持原始字号（与官方 Button 一致），
+        仅在按钮被挤压（显式尺寸或布局约束小于内容自然尺寸）时等比缩小（只缩小不放大）。
         注意：模板触发器中 DataTrigger + TemplatedParent 绑定不生效，这里必须用
         TargetType=local:Button 的 Property 触发器直接读依赖属性。
     -->
@@ -130,41 +140,47 @@
                         TextElement.Foreground="{TemplateBinding Foreground}" />
                 </Grid>
 
-                <Viewbox
-                    x:Name="ScaledHost"
-                    Stretch="Uniform"
-                    Visibility="Collapsed">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                <!--
+                    缩放宿主：ShrinkBox 把 Viewbox 的可用尺寸钳制在内容自然尺寸内，
+                    使 Viewbox 的等比缩放系数恒不超过 1（只缩小不放大，详见 ShrinkBox 注释）。
+                -->
+                <local:ShrinkBox>
+                    <Viewbox
+                        x:Name="ScaledHost"
+                        Stretch="Uniform"
+                        Visibility="Collapsed">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
 
-                        <ContentPresenter
-                            x:Name="ScaledIconPresenter"
-                            Grid.Column="0"
-                            Width="{TemplateBinding atc:Icon.IconSize}"
-                            Margin="0,0,4,0"
-                            VerticalAlignment="Center"
-                            Content="{TemplateBinding atc:Icon.Icon}"
-                            Focusable="False"
-                            TextElement.FontFamily="{TemplateBinding atc:Icon.FontFamily}"
-                            TextElement.FontSize="{TemplateBinding atc:Icon.IconSize}"
-                            TextElement.Foreground="{TemplateBinding Foreground}"
-                            Visibility="{TemplateBinding atc:Icon.Icon, Converter={StaticResource NullToVisibility}}" />
+                            <ContentPresenter
+                                x:Name="ScaledIconPresenter"
+                                Grid.Column="0"
+                                Width="{TemplateBinding atc:Icon.IconSize}"
+                                Margin="0,0,4,0"
+                                VerticalAlignment="Center"
+                                Content="{TemplateBinding atc:Icon.Icon}"
+                                Focusable="False"
+                                TextElement.FontFamily="{TemplateBinding atc:Icon.FontFamily}"
+                                TextElement.FontSize="{TemplateBinding atc:Icon.IconSize}"
+                                TextElement.Foreground="{TemplateBinding Foreground}"
+                                Visibility="{TemplateBinding atc:Icon.Icon, Converter={StaticResource NullToVisibility}}" />
 
-                        <ContentPresenter
-                            x:Name="ScaledContentPresenter"
-                            Grid.Column="1"
-                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                            ContentSource="Content"
-                            RecognizesAccessKey="True"
-                            TextElement.FontFamily="{TemplateBinding FontFamily}"
-                            TextElement.FontSize="{TemplateBinding FontSize}"
-                            TextElement.Foreground="{TemplateBinding Foreground}" />
-                    </Grid>
-                </Viewbox>
+                            <ContentPresenter
+                                x:Name="ScaledContentPresenter"
+                                Grid.Column="1"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                ContentSource="Content"
+                                RecognizesAccessKey="True"
+                                TextElement.FontFamily="{TemplateBinding FontFamily}"
+                                TextElement.FontSize="{TemplateBinding FontSize}"
+                                TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Grid>
+                    </Viewbox>
+                </local:ShrinkBox>
             </Grid>
         </Border>
 
@@ -174,13 +190,13 @@
                 <Setter TargetName="ScaledHost" Property="Visibility" Value="Visible" />
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Hover.Opacity}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Pressed}" />
+                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Pressed.Opacity}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="ContentBorder" Property="Opacity" Value="0.5" />
+                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Disabled.Opacity}" />
                 <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
                 <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
             </Trigger>
@@ -210,16 +226,15 @@
         </Border>
 
         <ControlTemplate.Triggers>
+            <!--  透明背景：悬停/按压的反馈为内容整体变淡  -->
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Status.Warning}" />
+                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Hover.Opacity}" />
             </Trigger>
-
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Status.Danger}" />
+                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Pressed.Opacity}" />
             </Trigger>
-
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="ContentBorder" Property="Opacity" Value="0.5" />
+                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Disabled.Opacity}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>

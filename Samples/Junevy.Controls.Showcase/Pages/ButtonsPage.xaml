@@ -18,10 +18,7 @@
             <jv:GroupBox Header="jv:Button">
                 <StackPanel>
                     <StackPanel.Resources>
-                        <!--  内容自适应场景关闭等比缩放：jv:Button 默认 IsTextScaled=True，测量会占满可用空间  -->
-                        <Style BasedOn="{StaticResource {x:Type jv:Button}}" TargetType="{x:Type jv:Button}">
-                            <Setter Property="IsTextScaled" Value="False" />
-                        </Style>
+                        <!--  jv:Button 默认 IsTextScaled=True 已是只缩小不放大，内容自适应场景无需再显式关闭  -->
                         <Style x:Key="CornerRadius16Button" BasedOn="{StaticResource {x:Type jv:Button}}" TargetType="{x:Type jv:Button}">
                             <Setter Property="Border.CornerRadius" Value="16" />
                         </Style>
@@ -46,16 +43,16 @@
                         Text="atc:Icon.Icon 提供前置图标（E611）；没有图标时不保留前置空白；圆角经样式 Setter 设置 Border.CornerRadius 附加用法（逐实例 attribute 写法会被标记编译器拒绝）。" />
                     <WrapPanel Margin="0,12,0,0">
                         <jv:Button
-                            Width="180"
+                            Width="150"
                             Height="56"
-                            Content="IsTextScaled=True（随按钮缩放）"
+                            Content="IsTextScaled=True：内容超出按钮时文字等比缩小"
                             IsTextScaled="True" />
                     </WrapPanel>
                     <TextBlock
                         Margin="0,10,0,0"
                         FontSize="12"
                         Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
-                        Text="jv:Button 默认 IsTextScaled=True：文字/图标随按钮尺寸等比缩放，需给按钮显式尺寸；内容自适应布局中应设 IsTextScaled=False（本页其余按钮经页面隐式样式关闭）。" />
+                        Text="jv:Button 默认 IsTextScaled=True，缩放只缩小不放大：空间充足时保持原始字号，按钮被挤压（显式尺寸或布局约束小于内容）时文字/图标等比缩小并保持居中；设为 False 恢复完全固定字号（挤压时不缩小）。" />
                 </StackPanel>
             </jv:GroupBox>
 

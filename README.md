@@ -217,6 +217,16 @@ ThemeManager.ToggleTheme();
 </StackPanel>
 ```
 
+悬停/按压不替换固定底色，而是降低整体不透明度：悬停 `0.8`、按压 `0.65`、禁用 `0.5`（定义于 `Button.xaml` 资源 `Button.Hover.Opacity` / `Button.Pressed.Opacity` / `Button.Disabled.Opacity`）。鲜艳背景色（如红色）悬停时只变淡、不变色；`NoBorderButtonStyle` 透明背景下的反馈为内容整体变淡。
+
+同一反馈方案已推广至其余可交互控件（公共资源键 `Control.Hover.Opacity` / `Control.Pressed.Opacity`，定义于 `Generic/Style/FeedbackOpacity.xaml`）：**背景可自定义的按钮/卡片类**（`CardButton`、`ToolBarItem`、`ToolboxItem`、`ToolItem`）与**内部图标小按钮**（`MessageBar` / `ProgressBarWindow` 关闭按钮、`ImageViewer` 工具栏按钮、`DialogWindow` 标题栏按钮、`ToggleButton` Expander 展开按钮、`DatePicker` 日历导航/头部/下拉按钮）悬停/按压均为降透明度，鲜艳背景不再被灰底覆盖；`MenuBar` / `ContextMenu` / `TabMenu` / `SideMenu` / `TreeMenu`、`ListBox` / `ListView` / `DataGrid`、`GroupBox` / `ExpanderPanel` 等中性表面上的列表/菜单项仍保留 `Surface.Hover` 灰底悬停高亮。
+
+独有依赖属性 `IsTextScaled`（默认 `true`）：内容等比缩放**只缩小不放大**——空间充足（按钮尺寸不小于内容自然尺寸）时保持原始字号，与官方 `Button` 一致；仅当按钮被挤压（显式尺寸或布局约束小于内容自然尺寸）时，文字/图标作为整体等比缩小并保持居中。需要大字内容应直接设置 `FontSize`；设为 `false` 恢复完全固定字号（被挤压时也不缩小）。
+
+```xml
+<jv:Button Width="120" Height="48" Content="被挤压时文字等比缩小" IsTextScaled="True" />
+```
+
 `NoBorderButtonStyle` 是可直接使用的无边框样式，适合标题栏等紧凑操作区。自定义普通按钮样式时，优先基于隐式类型样式 `{StaticResource {x:Type jv:Button}}`，避免与其他控件字典中的同名内部资源冲突。
 
 ### CardButton
@@ -1353,7 +1363,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 
 - **主窗口**：无边框 + `WindowChrome` + `jv:AppBar`（默认模板 DefaultAppBar；一个程序仅一个 AppBar，此处展示默认状态，工具栏按钮演示 `ThemeManager` 主题切换与打开 `jv:SidePanel` 设置抽屉）、`jv:SideMenu` 分类导航、`MessageBarService` 通知宿主。
 - **分类页**：按钮 / 输入与选择（PlaceholderAssist、TitleAssist、ShowClear、DatePickerAssist、Slider 数值框）/ 集合与数据（虚拟数据：ListBox 竖向+横向、ListView GridView、DataGrid、EmptyText 空态）/ 文本与状态（Label 全模式、TextBlock、ToolTip）/ 通知（Badge、MessageBar、MessageBarService）/ 布局（GroupBox、ExpanderPanel、Border.CornerRadius）/ 菜单与导航（ContextMenu、TreeMenu、TabMenu、ToolBar、Toolbox）/ 窗口与图像（ImageViewer、DialogWindow）。
-- **注意**：`jv:Button` 默认 `IsTextScaled=True`（文字随按钮尺寸等比缩放），内容自适应布局中应设 `IsTextScaled="False"`；展示页经页面隐式样式统一关闭，并保留一个固定尺寸的缩放演示。
+- **注意**：`jv:Button` 默认 `IsTextScaled=True`，内容缩放**只缩小不放大**——空间充足时保持原始字号，仅按钮被挤压时文字/图标等比缩小并保持居中，内容自适应布局无需再显式关闭；展示页保留一个固定尺寸的等比缩小演示。
 
 ## 开发注意事项
 

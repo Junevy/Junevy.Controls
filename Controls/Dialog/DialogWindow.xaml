@@ -4,6 +4,10 @@
     xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Dialog">
 
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/FeedbackOpacity.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
     <!--  标题栏按钮图形（描边风格，不依赖图标字体）  -->
     <Geometry x:Key="DialogWindowMinimizeGeometry">M 0,5 L 10,5</Geometry>
     <Geometry x:Key="DialogWindowMaximizeGeometry">M 0.5,0.5 L 9.5,0.5 L 9.5,9.5 L 0.5,9.5 Z</Geometry>
@@ -27,11 +31,12 @@
         </Border>
 
         <ControlTemplate.Triggers>
+            <!--  悬停/按压整体降透明度，不覆盖底色（与 Button 反馈一致）  -->
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="BackgroundBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                <Setter Property="Opacity" Value="{StaticResource Control.Hover.Opacity}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="BackgroundBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Pressed}" />
+                <Setter Property="Opacity" Value="{StaticResource Control.Pressed.Opacity}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />

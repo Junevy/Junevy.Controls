@@ -6,6 +6,7 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls;component/Resources/Font/IconFont.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/FeedbackOpacity.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
@@ -26,14 +27,14 @@
         </Border>
 
         <ControlTemplate.Triggers>
-            <!--  Hover  -->
+            <!--  Hover：整体降透明度，不覆盖底色（鲜艳背景悬停不再变色）  -->
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Host" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                <Setter Property="Opacity" Value="{StaticResource Control.Hover.Opacity}" />
             </Trigger>
 
-            <!--  Pressed（按住鼠标）  -->
+            <!--  Pressed（按住鼠标）：整体降透明度  -->
             <Trigger Property="IsMouseCaptured" Value="True">
-                <Setter TargetName="Host" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Pressed}" />
+                <Setter Property="Opacity" Value="{StaticResource Control.Pressed.Opacity}" />
             </Trigger>
 
             <!--  Disabled（最后声明，保证覆盖所有状态）  -->
