@@ -75,7 +75,8 @@
 
             <!--  标题（TitleAssist）：位置由 TitlePlacement 驱动，四个方位各一个呈现器，
                   由模板触发器切换显隐；标题为空时全部折叠，不占用布局空间。
-                  字体族/字号/颜色未设置（null/NaN）时经 NullToUnsetValue 回退为继承值  -->
+                  字体族/字号/颜色未设置（null/NaN）时经 NullToUnsetValue 回退为继承值；
+                  TitleWidth 非 NaN 时为标题区域固定宽度（表单对齐用），NaN 时自适应内容  -->
             <ContentPresenter
                 x:Name="TitleTop"
                 Grid.Row="0"
@@ -86,7 +87,8 @@
                 Content="{TemplateBinding atc:TitleAssist.Title}"
                 IsHitTestVisible="False"
                 TextElement.FontWeight="{TemplateBinding atc:TitleAssist.TitleFontWeight}"
-                Visibility="Visible">
+                Visibility="Visible"
+                Width="{TemplateBinding atc:TitleAssist.TitleWidth}">
                 <TextElement.FontFamily>
                     <PriorityBinding>
                         <Binding Converter="{StaticResource NullToUnsetValue}" Path="(atc:TitleAssist.TitleFontFamily)" RelativeSource="{RelativeSource TemplatedParent}" />
@@ -117,7 +119,8 @@
                 Content="{TemplateBinding atc:TitleAssist.Title}"
                 IsHitTestVisible="False"
                 TextElement.FontWeight="{TemplateBinding atc:TitleAssist.TitleFontWeight}"
-                Visibility="Collapsed">
+                Visibility="Collapsed"
+                Width="{TemplateBinding atc:TitleAssist.TitleWidth}">
                 <TextElement.FontFamily>
                     <PriorityBinding>
                         <Binding Converter="{StaticResource NullToUnsetValue}" Path="(atc:TitleAssist.TitleFontFamily)" RelativeSource="{RelativeSource TemplatedParent}" />
@@ -146,8 +149,10 @@
                 VerticalAlignment="Center"
                 Content="{TemplateBinding atc:TitleAssist.Title}"
                 IsHitTestVisible="False"
+                TextBlock.TextAlignment="Right"
                 TextElement.FontWeight="{TemplateBinding atc:TitleAssist.TitleFontWeight}"
-                Visibility="Collapsed">
+                Visibility="Collapsed"
+                Width="{TemplateBinding atc:TitleAssist.TitleWidth}">
                 <TextElement.FontFamily>
                     <PriorityBinding>
                         <Binding Converter="{StaticResource NullToUnsetValue}" Path="(atc:TitleAssist.TitleFontFamily)" RelativeSource="{RelativeSource TemplatedParent}" />
@@ -178,7 +183,8 @@
                 Content="{TemplateBinding atc:TitleAssist.Title}"
                 IsHitTestVisible="False"
                 TextElement.FontWeight="{TemplateBinding atc:TitleAssist.TitleFontWeight}"
-                Visibility="Collapsed">
+                Visibility="Collapsed"
+                Width="{TemplateBinding atc:TitleAssist.TitleWidth}">
                 <TextElement.FontFamily>
                     <PriorityBinding>
                         <Binding Converter="{StaticResource NullToUnsetValue}" Path="(atc:TitleAssist.TitleFontFamily)" RelativeSource="{RelativeSource TemplatedParent}" />

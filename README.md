@@ -120,12 +120,13 @@ ThemeManager.ToggleTheme();
 
 ### TitleAssist
 
-`atc:TitleAssist` 为 `TextBox` 和 `ComboBox` 在输入框外侧显示一个标题，提示该输入框的用途。标题内容为任意对象（`object`），可以直接设为 iconfont 字形文本。
+`atc:TitleAssist` 为 `TextBox` 和 `ComboBox` 在输入框外侧显示一个标题，提示该输入框的用途。标题内容为任意对象（`object`），可以直接设为 iconfont 字形文本。`TitleWidth` 可为标题区域指定固定宽度，用于表单式布局中输入框整列对齐。
 
 | 附加属性 | 默认值 | 实际效果 |
 | --- | --- | --- |
 | `atc:TitleAssist.Title` | `null` | 标题内容；为 `null` 时不显示标题，也不占用布局空间 |
 | `atc:TitleAssist.TitlePlacement` | `Top` | 标题位置：`Top` / `Bottom` / `Left` / `Right`，标题与输入框间距固定 4 DIP |
+| `atc:TitleAssist.TitleWidth` | `NaN` | 标题区域固定宽度（DIP），四个方位统一生效；`NaN` 时自适应标题内容。表单式布局中统一设置后，不同长度的标题保持一致的标题—输入框间距，输入框整列对齐（`Left` 方位标题自动右对齐贴合输入框） |
 | `atc:TitleAssist.TitleFontFamily` | `null` | 标题字体族；为 `null` 时继承控件自身字体。标题为 iconfont 字形时需设置为 iconfont |
 | `atc:TitleAssist.TitleFontSize` | `NaN` | 标题字号；`NaN` 时继承控件自身字号 |
 | `atc:TitleAssist.TitleForeground` | `null` | 标题颜色；为 `null` 时由默认样式提供主题次级文本色 |
@@ -138,7 +139,7 @@ ThemeManager.ToggleTheme();
     Width="220"
     atc:TitleAssist.Title="Server IP"
     atc:TitleAssist.TitlePlacement="Left"
-    Tag="192.168.1.100" />
+    atc:PlaceholderAssist.Placeholder="192.168.1.100" />
 
 <!-- iconfont 标题 -->
 <jv:ComboBox
@@ -148,6 +149,18 @@ ThemeManager.ToggleTheme();
     atc:TitleAssist.TitleFontSize="16"
     atc:TitleAssist.TitleFontWeight="Bold"
     atc:TitleAssist.TitleForeground="OrangeRed" />
+
+<!-- 固定宽度表单对齐：标题长短不一致时输入框仍整列对齐 -->
+<jv:TextBox
+    Width="260"
+    atc:TitleAssist.Title="用户名"
+    atc:TitleAssist.TitlePlacement="Left"
+    atc:TitleAssist.TitleWidth="110" />
+<jv:ComboBox
+    Width="260"
+    atc:TitleAssist.Title="电子邮箱地址"
+    atc:TitleAssist.TitlePlacement="Left"
+    atc:TitleAssist.TitleWidth="110" />
 ```
 
 ### PlaceholderAssist
@@ -280,7 +293,7 @@ ThemeManager.ToggleTheme();
 
 ### TextBox
 
-`jv:TextBox` 继承 WPF `TextBox`，提供占位文本、前置图标和清空按钮。点击清空按钮会调用 `Clear()` 并重新聚焦输入框。
+`jv:TextBox` 继承 WPF `TextBox`，提供占位文本、前置图标、清空按钮和内部命令按钮。点击清空按钮会调用 `Clear()` 并重新聚焦输入框；命令按钮用于在输入框内直接触发命令（如提交、检索）。
 
 | 属性/附加属性 | 效果 |
 | --- | --- |
@@ -288,7 +301,11 @@ ThemeManager.ToggleTheme();
 | `atc:Icon.Icon` | 前置图标；为空时图标区域折叠 |
 | `atc:Icon.FontFamily` | 图标、清空按钮和占位符字体 |
 | `ShowClear`（依赖属性） | 是否显示清空按钮，默认样式为 `true`。复用 TextBox 外观又不需要清空按钮的场景（如 `Slider` 数值框）会显式设为 `false`；原生 `<TextBox>` 借用默认外观时，可在样式内以 `txt:TextBox.ShowClear` 限定形式设置 |
-| `atc:TitleAssist.Title` 系列 | 在输入框外侧显示用途标题，位置可选 `Top`/`Bottom`/`Left`/`Right`，支持 iconfont 与自定义字体样式，详见 [TitleAssist](#titleassist) |
+| `ShowCommandButton`（依赖属性） | 是否显示内部命令按钮，默认 `false`。**与清空按钮互斥**：`ShowClear="True"`（清空按钮显示）时命令按钮强制隐藏，需组合 `ShowClear="False"` + `ShowCommandButton="True"` 使用 |
+| `CommandButtonCommand`（依赖属性） | 命令按钮点击时执行的命令（ICommand），可绑定 ViewModel 命令；按钮可用性随命令 `CanExecute` 自动启停 |
+| `CommandButtonCommandParameter`（依赖属性） | 传递给 `CommandButtonCommand` 的命令参数 |
+| `CommandButtonContent`（依赖属性） | 命令按钮内容（文本或 iconfont 字形），字体族跟随 `atc:Icon.FontFamily`，字号/颜色继承控件自身取值；为 `null` 时显示空白占位，建议显式设置 |
+| `atc:TitleAssist.Title` 系列（含 `TitleWidth` 固定宽度） | 在输入框外侧显示用途标题，位置可选 `Top`/`Bottom`/`Left`/`Right`，支持 iconfont 与自定义字体样式，详见 [TitleAssist](#titleassist) |
 
 ```xml
 <jv:TextBox
@@ -297,6 +314,19 @@ ThemeManager.ToggleTheme();
     ShowClear="True"
     atc:PlaceholderAssist.Placeholder="Camera name"
     Text="{Binding CameraName, UpdateSourceTrigger=PropertyChanged}" />
+```
+
+命令按钮示例（与清空按钮互斥，需 `ShowClear="False"`）：
+
+```xml
+<jv:TextBox
+    Width="260"
+    ShowClear="False"
+    ShowCommandButton="True"
+    CommandButtonContent="&#xE611;"
+    CommandButtonCommand="{Binding SearchCommand}"
+    CommandButtonCommandParameter="{Binding SearchKeyword}"
+    atc:PlaceholderAssist.Placeholder="Search camera" />
 ```
 
 ### ComboBox 与 ComboBoxItem
@@ -1282,7 +1312,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ToggleButton` | WPF `ToggleButton`、圆形/矩形模板 | `Border.CornerRadius` |
 | `RadioButton` | WPF `RadioButton`、`ShapeMode`、焦点资源 | `Icon.FontFamily` 用于选中符号 |
 | `CheckBox` | WPF `CheckBox`、焦点资源 | `Icon.FontFamily`、`Border.CornerRadius` |
-| `TextBox` | WPF `TextBox`、`jv:Button` 清空按钮 | `Icon.Icon`、`Icon.FontFamily`、`ShowClear`（依赖属性）、`PlaceholderAssist.Placeholder`、`TitleAssist.Title` 系列、`Border.CornerRadius` |
+| `TextBox` | WPF `TextBox`、`jv:Button` 清空按钮、`jv:Button` 命令按钮 | `Icon.Icon`、`Icon.FontFamily`、`ShowClear`（依赖属性）、`ShowCommandButton`/`CommandButtonCommand`/`CommandButtonCommandParameter`/`CommandButtonContent`（依赖属性）、`PlaceholderAssist.Placeholder`、`TitleAssist.Title` 系列、`Border.CornerRadius` |
 | `ComboBox` | WPF `ComboBox`、`ComboBoxItem`、`jv:ToggleButton` | `PlaceholderAssist.Placeholder`、`TitleAssist.Title` 系列、`Border.CornerRadius` |
 | `ComboBoxItem` | WPF `ComboBoxItem`、`DefaultComboBoxItemStyle` | 无 |
 | `ListBox` | WPF `ListBox`、`ListBoxItem`、虚拟化和滚动资源 | 无 |

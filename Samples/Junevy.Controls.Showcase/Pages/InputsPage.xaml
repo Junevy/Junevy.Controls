@@ -13,7 +13,7 @@
                 Margin="0,4,0,4"
                 FontSize="12"
                 Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
-                Text="jv:CheckBox / jv:TextBox / jv:ComboBox / DatePicker / jv:Slider。本页重点演示附加属性：PlaceholderAssist、TitleAssist、Icon、ShowClear、DatePickerAssist。" />
+                Text="jv:CheckBox / jv:TextBox / jv:ComboBox / DatePicker / jv:Slider。本页重点演示附加属性：PlaceholderAssist、TitleAssist、Icon、ShowClear、CommandButton、DatePickerAssist。" />
 
             <jv:GroupBox Header="jv:CheckBox">
                 <WrapPanel>
@@ -24,7 +24,7 @@
                 </WrapPanel>
             </jv:GroupBox>
 
-            <jv:GroupBox Header="jv:TextBox —— PlaceholderAssist / Icon / ShowClear" Margin="0,16,0,0">
+            <jv:GroupBox Header="jv:TextBox —— PlaceholderAssist / Icon / ShowClear / CommandButton" Margin="0,16,0,0">
                 <StackPanel>
                     <WrapPanel>
                         <jv:TextBox
@@ -48,6 +48,15 @@
                             atc:Icon.Icon="&#xE60C;"
                             atc:PlaceholderAssist.Placeholder="ShowClear=False 无清空按钮"
                             ShowClear="False" />
+                        <jv:TextBox
+                            Width="240"
+                            atc:Icon.FontFamily="{DynamicResource IconFont}"
+                            atc:PlaceholderAssist.Placeholder="命令按钮（与清空互斥）"
+                            ShowClear="False"
+                            ShowCommandButton="True"
+                            CommandButtonContent="&#xE611;"
+                            CommandButtonCommand="{Binding TextBoxCommandButtonCommand}"
+                            CommandButtonCommandParameter="来自 TextBox 命令按钮" />
                         <TextBox
                             Width="240"
                             atc:PlaceholderAssist.Placeholder="原生 TextBox 借用外观" />
@@ -88,11 +97,34 @@
                             atc:TitleAssist.TitleForeground="OrangeRed"
                             atc:PlaceholderAssist.Placeholder="iconfont 标题 ComboBox" />
                     </WrapPanel>
+                    <!--  TitleWidth 固定宽度：表单式布局中不同长度的标题保持一致间距，输入框整列对齐  -->
+                    <StackPanel Margin="0,10,0,0">
+                        <jv:TextBox
+                            Width="260"
+                            HorizontalAlignment="Left"
+                            atc:TitleAssist.Title="用户名"
+                            atc:TitleAssist.TitlePlacement="Left"
+                            atc:TitleAssist.TitleWidth="110" />
+                        <jv:ComboBox
+                            Width="260"
+                            Margin="0,8,0,0"
+                            HorizontalAlignment="Left"
+                            atc:TitleAssist.Title="电子邮箱地址"
+                            atc:TitleAssist.TitlePlacement="Left"
+                            atc:TitleAssist.TitleWidth="110" />
+                        <jv:TextBox
+                            Width="260"
+                            Margin="0,8,0,0"
+                            HorizontalAlignment="Left"
+                            atc:TitleAssist.Title="部门"
+                            atc:TitleAssist.TitlePlacement="Left"
+                            atc:TitleAssist.TitleWidth="110" />
+                    </StackPanel>
                     <TextBlock
                         Margin="0,10,0,0"
                         FontSize="12"
                         Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
-                        Text="标题内容为 object（可直接设 iconfont 字形）；TitlePlacement 四方位、间距固定 4 DIP；字体族/字号未设置时继承控件自身值，颜色未设置时取主题次级文本色。" />
+                        Text="标题内容为 object（可直接设 iconfont 字形）；TitlePlacement 四方位、间距固定 4 DIP；字体族/字号未设置时继承控件自身值，颜色未设置时取主题次级文本色。TitleWidth 为标题区域固定宽度（默认 NaN 自适应）：表单式布局中统一设置后，不同长度的标题保持一致的标题—输入框间距，输入框整列对齐（左方位标题自动右对齐贴合输入框）。" />
                 </StackPanel>
             </jv:GroupBox>
 

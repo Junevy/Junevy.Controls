@@ -48,10 +48,16 @@ namespace Junevy.Controls.Showcase
         /// <summary>ExpanderPanel ToggleCommand 演示：切换时经 MessageBarService 弹出通知。</summary>
         public RelayCommand PanelToggleCommand { get; }
 
+        /// <summary>TextBox 命令按钮（CommandButton）演示：点击时经 MessageBarService 弹出通知。</summary>
+        public RelayCommand TextBoxCommandButtonCommand { get; }
+
         private SampleData()
         {
             PanelToggleCommand = new RelayCommand(() =>
                 MessageBarService.Show("ExpanderPanel", "ToggleCommand 已执行"));
+
+            TextBoxCommandButtonCommand = new RelayCommand(() =>
+                MessageBarService.Show("TextBox", "命令按钮已点击"));
 
             Devices =
             [
