@@ -2,6 +2,20 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## Button 浮起阴影开关 `ShowShadow`
+
+### 本次更新（新增 `jv:Button.ShowShadow` 依赖属性，逐实例或样式级关掉常态浮起阴影）— 2026-09-23
+
+- **动因**：上一节的常态浮起阴影落地后，实测在「左 ComboBox + 右 Button」这类同排平级控件场景违和——同排控件一半浮起、一半贴平。`jv:ComboBox` 自身只在展开的下拉面板上用 `Theme.PopupShadow`，闭合态完全贴平，因此差异全部由按钮承担。
+- **新增依赖属性** `ShowShadow`（`bool`，默认 `true`）：`Controls/Button/Button.xaml.cs` 用 `DependencyProperty.Register` 注册，与同族的 `IsTextScaled` 写法一致（CLR 属性 + `XxxProperty` 字段 + XML 文档注释）。`Controls/Button/Button.xaml` 的 `JvButtonTemplate` 增加 `<Trigger Property="ShowShadow" Value="False">` → `ContentBorder` 的 `Effect={x:Null}`。用真实 DP 而不是 `DataTrigger`+`TemplatedParent`，因为模板触发器里后者取不到宿主值。它排在 `IsPressed`/`IsEnabled` 之前，三者对 `Effect` 的目标一致（都是 `null`），因此按压或禁用时不可能被 `ShowShadow=True` 冒回阴影。
+- **边界**：开关只管常态。`IsPressed` 与 `IsEnabled=False` 触发器本就有各自的 `Effect={x:Null}`，与 `ShowShadow` 无关；关掉阴影不会丢掉悬停 0.8 / 按压 0.65 反馈，也不改变尺寸（Effect 挂在无子元素的背景层上，不参与测量）与文字 ClearType。三种关法：逐实例 `ShowShadow="False"`、局部样式 Setter、基于隐式样式 `{StaticResource {x:Type jv:Button}}` 的 Setter 做全 App 批量关闭；只想调淡而非关掉仍可用应用级 `Theme.ButtonShadow` 覆盖（上一节能力）。
+- **Showcase**：`Samples/Junevy.Controls.Showcase/Pages/ButtonsPage.xaml` 的「jv:Button」组新增对照演示行——`jv:ComboBox` + 默认浮起按钮 + `ShowShadow=False` 按钮同行，配一行说明。
+- **版本号**：`1.8.1`——上一节的 Button 常态阴影与 SideMenu 条目阴影已随 `1.8.0` 发布，本轮新增公开依赖属性 `ShowShadow` 属功能性新增，落在 `1.8.0` 之后的下一个版本（`Junevy.Controls.csproj` 的 `Version` 已改为 `1.8.1`，仍是版本单一来源，`AssemblyInfo.cs` 不含显式版本特性）。
+- 文档：README 的 Button 小节新增 `ShowShadow` 段落（逐实例与全局样式两种写法示例），并说明只影响常态阴影、不影响反馈与尺寸。
+- 验证：`.workbuddy/tmp/ButtonShadowProbe/` 由 37 项扩到 **50 项全部通过**，新增的第 10 节覆盖：默认值为 `true` 且背景层带 `Effect`；逐实例 `false` 后背景层 `Effect` 为 `null`；样式 Setter 批量关同样生效；**同文案孪生按钮**（`关阴影` 两份，只差 `ShowShadow`）宽高逐字段一致；像素级 A/B——同一张「两令牌归零」基线帧差分下，关阴影按钮下方 1-14px 压暗 `0.00`、孪生默认按钮 `15.65`、常规按钮 `15.47`；**真实鼠标**移到该按钮上 `IsMouseOver=True` 且根 `Grid` 不透明度仍 `0.8`、阴影不被悬停冒回；运行期 `true`↔`false` 来回切换即时生效（16/0.18 ↔ null）。**变异反证**：注释掉模板里的 `ShowShadow` 触发器 → 6 项 FAIL（逐实例、样式、像素基线、孪生 A/B、悬停不冒回、再关掉），证明生效的是触发器而不是碰巧为 null。快照 `button-showshadow-off.png` 人工核对：同排两枚「关阴影」按钮一枚浮起一枚贴平。
+- Showcase 页面级验证：`.workbuddy/tmp/ShowcaseShadowDemoProbe/` 直接承载 `ButtonsPage`，**12 项全部通过**——XAML 上的 `ShowShadow="False"` 确实落到 DP、演示行两按钮高度一致、像素差分（默认浮起 `22.40` vs `ShowShadow=False` `0.00` vs 同行 `jv:ComboBox` `0.00`，即关掉后与 ComboBox 完全同级）、深色主题下默认按钮重新解析为 18/6/0.40 而关阴影按钮仍 `null`；浅色/深色整页截图人工核对正常。
+- 回归：`Junevy.Controls.csproj` Release 双目标框（net8.0-windows + net48）`-t:Rebuild` 0 错误、警告数与改动前一致（40 个既有可空性提示）；Showcase 工程 0 错误 0 警告；`ButtonShadowProbe` 原 37 项、`SideMenuShadowProbe` 23 项、`TransparentBgProbe` 37 项断言重跑全部通过。探针工程为临时宿主，不入库。
+
 ## Button 浮起阴影
 
 ### 本次更新（新增 `Theme.ButtonShadow`，`jv:Button` 常态浮起、按压即贴回地面）— 2026-09-23

@@ -259,6 +259,18 @@ ThemeManager.ToggleTheme();
 </Application.Resources>
 ```
 
+独有依赖属性 `ShowShadow`（默认 `true`）：常态浮起阴影的开关。与 `ComboBox`、`TextBox` 等没有浮起感的同级控件并排时（表单行、工具条、对话框底栏），一半浮起一半贴平会显得突兀，可对单个按钮设 `false`，或用样式 Setter 批量/全局关闭。只影响常态阴影：按压与禁用本就不显示阴影，悬停/按压的降透明度反馈、尺寸与文字渲染均不受影响。
+
+```xml
+<!--  逐个关闭  -->
+<jv:Button Content="确定" ShowShadow="False" />
+
+<!--  整个 App 内所有 jv:Button 默认不带浮起阴影  -->
+<Style TargetType="{x:Type jv:Button}" BasedOn="{StaticResource {x:Type jv:Button}}">
+    <Setter Property="ShowShadow" Value="False" />
+</Style>
+```
+
 独有依赖属性 `IsTextScaled`（默认 `true`）：内容等比缩放**只缩小不放大**——空间充足（按钮尺寸不小于内容自然尺寸）时保持原始字号，与官方 `Button` 一致；仅当按钮被挤压（显式尺寸或布局约束小于内容自然尺寸）时，文字/图标作为整体等比缩小并保持居中。需要大字内容应直接设置 `FontSize`；设为 `false` 恢复完全固定字号（被挤压时也不缩小）。
 
 ```xml

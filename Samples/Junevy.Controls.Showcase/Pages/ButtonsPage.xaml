@@ -53,6 +53,30 @@
                         FontSize="12"
                         Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
                         Text="jv:Button 默认 IsTextScaled=True，缩放只缩小不放大：空间充足时保持原始字号，按钮被挤压（显式尺寸或布局约束小于内容）时文字/图标等比缩小并保持居中；设为 False 恢复完全固定字号（挤压时不缩小）。" />
+
+                    <StackPanel Margin="0,16,0,0" Orientation="Horizontal">
+                        <jv:ComboBox
+                            Width="140"
+                            VerticalAlignment="Center"
+                            SelectedIndex="0">
+                            <jv:ComboBoxItem Content="Continuous" />
+                            <jv:ComboBoxItem Content="Trigger" />
+                        </jv:ComboBox>
+                        <jv:Button
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            Content="默认浮起" />
+                        <jv:Button
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            Content="ShowShadow=False"
+                            ShowShadow="False" />
+                    </StackPanel>
+                    <TextBlock
+                        Margin="0,10,0,0"
+                        FontSize="12"
+                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        Text="常态浮起阴影可用 ShowShadow 关掉：与 ComboBox / TextBox 等没有浮起感的同级控件并排时逐个设 False，或用基于隐式样式的 Setter 批量关闭。只影响常态阴影，悬停/按压反馈与尺寸不变。" />
                 </StackPanel>
             </jv:GroupBox>
 
