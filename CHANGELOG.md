@@ -2,6 +2,16 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## DataGrid
+
+### 本次更新（控件模板重构为官方 Aero2 宿主结构，修复行不生成/列头随滚动位移问题）— 2026-09-23
+
+- **问题修复（严重）**：旧模板在 `ScrollViewer` 内容 Grid 中直接声明 `<DataGridRowsPresenter x:Name="PART_RowsPresenter"/>` 且缺少 `ItemsPresenter`。经对照 WPF 官方源码确认：`DataGridRowsPresenter` 必须由 `ItemsPresenter` 从 DataGrid 默认 `ItemsPanel`（静态构造函数注册的 `DataGridRowsPresenter` 工厂，运行时自动命名 `PART_RowsPresenter`）实例化才会被置 `IsItemsHost=true` 并挂为 `InternalItemsHost`；模板中直接声明的面板 `IsItemsHost=false`，行容器不会生成（用户怀疑正确）。同时旧结构把列头放进 `ScrollViewer` 的滚动内容中，垂直滚动时列头会随行滚出视口；`PART_ScrollContentPresenter` 为空壳，滚动管线断裂。
+- **模板重构（对齐官方 `Aero2.NormalColor.xaml` 的 DataGrid 模板）**：`Border → ScrollViewer（Focusable=false，自定义 Template）→ ItemsPresenter`。ScrollViewer 自定义模板内 3×3 Grid：(0,0) 全选按钮、(0,1) `PART_ColumnHeadersPresenter`（列头固定不随行滚动）、(1,0-1) `PART_ScrollContentPresenter`（`CanContentScroll` 经 TemplateBinding 绑定 ScrollViewer）、(1,2) `PART_VerticalScrollBar`、(2,1) 横向滚动条 `PART_HorizontalScrollBar`（首列宽度绑定 `NonFrozenColumnsViewportHorizontalOffset`，冻结列场景与列头保持对齐）；ScrollViewer 的 `Content` 即 `ItemsPresenter`，由它实例化行宿主并经 ScrollContentPresenter 呈现——完整接通 DataGrid 内部 `EnsureInternalScrollControls` 的 `FindVisualParent<ScrollContentPresenter/ScrollViewer>` 滚动管线。
+- **保留 Junevy 视觉**：外层圆角 Border、底部 1px 收边线（声明在滚动条之下，无横向滚动条时可见、出现时被覆盖）、空态提示 `atc:DataGridAssist.EmptyText`（随模板迁入 ScrollViewer 模板内，绑定由 `TemplatedParent` 改为 `AncestorType={x:Type DataGrid}`，功能不变）、全选按钮/列头/行/单元格样式均未改动。
+- **样式补充（官方行为）**：`DefaultDataGridStyle` 增加官方 MultiTrigger——`IsGrouping=true` 且 `VirtualizingPanel.IsVirtualizingWhenGrouping=false` 时强制 `ScrollViewer.CanContentScroll=false`（分组面板按像素滚动才能正确布局）。
+- 验证：net8.0-windows 探针工程（离屏渲染 @4x）断言全部通过——行生成（1000 项仅生成 9 个 `DataGridRow` 容器）、宿主链（`PART_RowsPresenter` 命名正确、`IsItemsHost=True`、位于 `ScrollContentPresenter` 与 `ScrollViewer` 之内）、垂直滚动（`ScrollToVerticalOffset(500)` 后 `VerticalOffset=500.00`）、虚拟化（滚动后容器数 10，`VirtualizationMode=Recycling`，二次滚动保持 10）、列头固定（垂直滚动前后列头 Y=0.8 不变）、列头对齐（水平滚动 120 后第 2 列列头与行单元格 X 坐标 Δ=0.00）、空态提示可见；渲染快照人工核对正常（列头与单元格对齐、底部横向滚动条正常显示）。探针工程保留于 `.workbuddy/tmp/DataGridProbe/`。
+
 ## 悬停/按压反馈统一（透明度方案推广至其余可交互控件）
 
 ### 本次更新（CardButton、ToolBarItem、ToolboxItem、ToolItem 及各内部图标按钮悬停/按压改为透明度反馈）— 2026-09-21

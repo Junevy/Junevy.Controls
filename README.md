@@ -516,7 +516,7 @@ ThemeManager.ToggleTheme();
 
 ### DataGrid
 
-`jv:DataGrid` 继承 WPF `DataGrid`，提供专属控件模板（完整实现官方模板部件契约 `PART_ColumnHeadersPresenter` / `PART_RowsPresenter` / `PART_ScrollContentPresenter`）与库内统一的卡片式视觉：Sunken 列标题（悬停高亮、排序方向箭头）、透明单元格（行悬停与选中色直接透出、键盘焦点时底边切换为焦点色）、行悬停/选中高亮。默认启用行列虚拟化，关闭新增行、删除行和行高调整，并使用整行单选。合并 `Themes/Generic.xaml` 后，原生写法 `<DataGrid>` 直接生效，无需 `jv:` 前缀。
+`jv:DataGrid` 继承 WPF `DataGrid`，提供专属控件模板（官方 Aero2 宿主结构：`ScrollViewer`（自定义模板：列头、行视口 `PART_ScrollContentPresenter` 与纵/横滚动条）→ `ItemsPresenter` → `DataGridRowsPresenter`（DataGrid 默认 ItemsPanel，运行时命名 `PART_RowsPresenter`）；列头 `PART_ColumnHeadersPresenter` 位于 ScrollViewer 模板内，垂直滚动时保持固定）与库内统一的卡片式视觉：Sunken 列标题（悬停高亮、排序方向箭头）、透明单元格（行悬停与选中色直接透出、键盘焦点时底边切换为焦点色）、行悬停/选中高亮。默认启用行列虚拟化，关闭新增行、删除行和行高调整，并使用整行单选。合并 `Themes/Generic.xaml` 后，原生写法 `<DataGrid>` 直接生效，无需 `jv:` 前缀。
 
 ```xml
 <jv:DataGrid AutoGenerateColumns="False"
