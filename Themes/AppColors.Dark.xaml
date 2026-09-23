@@ -279,6 +279,8 @@
     <CornerRadius x:Key="Theme.SmallCornerRadius">4</CornerRadius>
     <CornerRadius x:Key="Theme.ControlCornerRadius">6</CornerRadius>
     <CornerRadius x:Key="Theme.LargeCornerRadius">8</CornerRadius>
+    <!--  Toolbox 容器取直角：圆角处既不画背景也不画内容，是个透明缺口，与左侧控件接壤时会漏出背后表面形成小角  -->
+    <CornerRadius x:Key="Theme.ToolboxCornerRadius">0</CornerRadius>
     <Thickness x:Key="Theme.ControlPadding">12,6</Thickness>
     <Thickness x:Key="Theme.ContentMargin">8,4</Thickness>
 

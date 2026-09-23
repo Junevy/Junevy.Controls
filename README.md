@@ -77,6 +77,7 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `TransparentBackground.Small` / `TransparentBackground.Large` | 4px / 16px 方格的棋盘格 |
 | `TransparentBackground.Geometry` | 棋盘格单个 16×16 单元内的两块 8×8 方格（纯几何，无颜色） |
 | `Theme.ControlCornerRadius` | 默认控件圆角 |
+| `Theme.ToolboxCornerRadius` | `Toolbox` 容器专用圆角，默认 `0`（直角） |
 | `Theme.ControlPadding` | 默认控件内边距 |
 | `Theme.PopupShadow` | 阴影令牌（`DropShadowEffect`），用于弹层、悬浮卡片 |
 | `Theme.ButtonShadow` | `jv:Button` 专用的向下浮起阴影令牌（与 `Theme.PopupShadow` 同族，按控件尺寸收紧） |
@@ -914,6 +915,14 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
 <jv:Toolbox ItemContainerStyle="{StaticResource CompactToolboxItemStyle}" ... />
 ```
 
+
+`Toolbox` 容器（`DefaultToolboxStyle` 与 `CompactToolboxStyle` 的根 `Border`）取**直角**，圆角令牌是专用的 `Theme.ToolboxCornerRadius`（默认 `0`）。原因：WPF 的 `Border` 圆角只裁自己的背景/描边，不裁子元素——角上要么是一个透明缺口（容器有 `Padding`，内容让开了角，于是漏出容器背后的表面；与左侧接壤的控件并排时就是一个小角），要么是内容顶在圆弧外的方角。需要恢复圆角时在 `Application.Resources` 覆盖该键即可，不会影响全局 `Theme.ControlCornerRadius`：
+
+```xml
+<Application.Resources>
+    <CornerRadius x:Key="Theme.ToolboxCornerRadius">6</CornerRadius>
+</Application.Resources>
+```
 
 一级 `ToolboxItem` 的 Hover 背景覆盖完整触发区域，并使用 `Theme.SmallCornerRadius`（默认 4 DIP）裁切圆角；该背景不属于图标内容，也不会改变图标大小或布局。
 

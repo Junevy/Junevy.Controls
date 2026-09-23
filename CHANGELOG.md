@@ -2,6 +2,20 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## Toolbox 容器改直角 `Theme.ToolboxCornerRadius`
+
+### 本次更新（新增 `Theme.ToolboxCornerRadius`（值 0），Toolbox 容器不再带圆角）— 2026-09-23
+
+- **动因**：用户反馈 Toolbox 的圆角在深色模式下显示异常、浅色模式下也别扭——它左边与另一个控件接壤时，圆角处会露出一个小角。
+- **机制（实测，不是推测）**：WPF 的 `Border.CornerRadius` 只裁自己的背景与描边，**不裁子元素**，于是同一个圆角会同时产生两种伪影：内容铺到角上时，方的内容顶在圆弧外（探针里 `A 角点 = 0000FF`，即子元素蓝）；内容被 `Padding` 让开时，角上既不画背景也没有内容，成为一个**透明缺口**，漏出容器背后的表面（探针里 `B 角点 = FFFFFF`，即背后的画布白）。Toolbox 容器属于后者（默认 `Padding=4`、紧凑档 `Padding=1`），所以左侧与相邻面板接壤处就是那一小块漏底；深色下漏出的表面与容器底色反差大，读起来就成了「异常」。因此不需要额外加 `Clip`，把容器改成直角即同时消除两种表现。
+- **新增资源键** `Theme.ToolboxCornerRadius`（`CornerRadius`，浅色与深色字典各一份，均取 `0`，放在 Layout tokens 区）：只给 Toolbox 容器用，**不改全局** `Theme.ControlCornerRadius`（仍为 6），其他控件零影响。
+- **控件改动**：`Controls/Toolbox/Toolbox.xaml` 里 `DefaultToolboxStyle` 与 `CompactToolboxStyle` 两处模板根 `Border` 的 `CornerRadius` 由 `{DynamicResource Theme.ControlCornerRadius}` 改为 `{DynamicResource Theme.ToolboxCornerRadius}`。范围只到容器：条目悬停高亮 `PART_HoverSurface` 仍是 4、悬停弹出的 `PART_PopupRoot` 仍是 6 且仍带 `Theme.PopupShadow`（浮层该有圆角，与容器不是一回事）。
+- **可覆盖性**：宿主在 `Application.Resources` 写同名键即可恢复圆角（探针实测覆盖后活容器立刻变 6，移除后回落 0），不必改库。
+- **版本号**：`1.8.1`——与 `ShowShadow` 同属 `1.8.0` 发布之后的未发布迭代。
+- 文档：README「主题」资源键表补 `Theme.ToolboxCornerRadius` 一行；Toolbox 小节说明容器取直角、两种伪影的机制与覆盖方式。
+- 验证：net8.0-windows 探针工程（`.workbuddy/tmp/ToolboxCornerProbe/`）**19 项断言全部通过**——令牌层（浅色 `Toolbox=0/0/0/0`，同时 `Control` 仍 6、`Small` 仍 4，证明没动全局）；机制层（上述 A/B 两个角点像素）；控件层（两个样式的根 `Border` 实测 `CornerRadius` 为 0，条目高亮仍 4、Popup 根仍 6 且 `Effect` 仍是 `DropShadowEffect`）；像素层（把 Toolbox 紧贴同色邻居放在纯红画布上，容器四角各取 3×3 均无红色漏出，浅色与 `ApplyTheme(Dark)` 后各测一次）；覆盖层（写同名键 6 → 活容器立刻 6 且红色角点重新漏出，移除后回落 0）。**变异反证**：把浅色字典里的令牌值改回 `6` 重跑 → 6 项 FAIL（令牌值、两个容器实测、浅色两个像素角、移除覆盖后的回落），证明断言真的挂在这个值上。快照 `toolbox-corner-light.png`、`toolbox-corner-dark.png` 人工核对：容器与左侧邻居严丝合缝，角上不再漏底。探针工程为临时宿主，不入库。
+- 回归：`Junevy.Controls.csproj` Release 双目标框（net8.0-windows + net48）`-t:Rebuild` 0 错误、警告数与改动前一致（40 个既有可空性提示）；Showcase 工程 0 错误 0 警告；`ButtonShadowProbe` 50 项、`ShowcaseShadowDemoProbe` 12 项、`SideMenuShadowProbe` 23 项、`TransparentBgProbe` 37 项断言重跑全部通过。
+
 ## Button 浮起阴影开关 `ShowShadow`
 
 ### 本次更新（新增 `jv:Button.ShowShadow` 依赖属性，逐实例或样式级关掉常态浮起阴影）— 2026-09-23
