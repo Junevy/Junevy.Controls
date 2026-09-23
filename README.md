@@ -73,8 +73,14 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `Theme.Brush.Status.Success` | 成功状态 |
 | `Theme.Brush.Status.Warning` | 警告状态 |
 | `Theme.Brush.Status.Danger` | 错误/危险状态 |
+| `TransparentBackground` | 透明图像背景的棋盘格（中档，8px 方格） |
+| `TransparentBackground.Small` / `TransparentBackground.Large` | 4px / 16px 方格的棋盘格 |
+| `TransparentBackground.Geometry` | 棋盘格单个 16×16 单元内的两块 8×8 方格（纯几何，无颜色） |
 | `Theme.ControlCornerRadius` | 默认控件圆角 |
 | `Theme.ControlPadding` | 默认控件内边距 |
+| `Theme.PopupShadow` | 阴影令牌（`DropShadowEffect`），用于弹层、悬浮卡片 |
+| `Theme.ButtonShadow` | `jv:Button` 专用的向下浮起阴影令牌（与 `Theme.PopupShadow` 同族，按控件尺寸收紧） |
+| `Theme.SideMenuItemShadow` | `SideMenu` 选中条目专用的极淡柔光令牌（只向下散开） |
 
 运行时切换主题：
 
@@ -87,6 +93,24 @@ ThemeManager.ToggleTheme();
 ```
 
 `ThemeManager` 会替换现有主题字典，不要同时手动合并浅色和深色字典。
+
+### 透明背景棋盘格 `TransparentBackground`
+
+用于表示「图像/颜色本身是透明的」那种棋盘格底纹，常见于图片查看器、颜色选择器、图层面板。三个键都是 `DrawingBrush`（矢量绘制、`TileMode=Tile`），方格尺寸由资源自身决定，**不会随控件尺寸拉伸**；配色取自当前主题，切换主题后自动换色。
+
+```xml
+<!-- 必须用 DynamicResource，否则切换主题时不会刷新 -->
+<Border Width="320" Height="200" Background="{DynamicResource TransparentBackground}" />
+
+<!-- 三档方格尺寸：4px / 8px / 16px -->
+<Border Background="{DynamicResource TransparentBackground.Small}" />
+<Border Background="{DynamicResource TransparentBackground.Large}" />
+
+<!-- 只需要几何体时（自绘、蒙版、非棋盘格配色）：一个 16x16 单元内的两块 8x8 方格 -->
+<Path Data="{DynamicResource TransparentBackground.Geometry}" Fill="Gray" />
+```
+
+`ImageViewer` 的棋盘格背景（`CheckerboardBrush`）默认就是 `TransparentBackground`（中档），可覆盖为其他档位。`Resources/Pictures/Image.xaml` 里的 `whiteCheckBoard` 是历史遗留位图，不会随主题变色且会随尺寸拉伸，新代码请改用上述资源。
 
 ## 附加属性
 
@@ -220,6 +244,20 @@ ThemeManager.ToggleTheme();
 悬停/按压不替换固定底色，而是降低整体不透明度：悬停 `0.8`、按压 `0.65`、禁用 `0.5`（定义于 `Button.xaml` 资源 `Button.Hover.Opacity` / `Button.Pressed.Opacity` / `Button.Disabled.Opacity`）。鲜艳背景色（如红色）悬停时只变淡、不变色；`NoBorderButtonStyle` 透明背景下的反馈为内容整体变淡。
 
 同一反馈方案已推广至其余可交互控件（公共资源键 `Control.Hover.Opacity` / `Control.Pressed.Opacity`，定义于 `Generic/Style/FeedbackOpacity.xaml`）：**背景可自定义的按钮/卡片类**（`CardButton`、`ToolBarItem`、`ToolboxItem`、`ToolItem`）与**内部图标小按钮**（`MessageBar` / `ProgressBarWindow` 关闭按钮、`ImageViewer` 工具栏按钮、`DialogWindow` 标题栏按钮、`ToggleButton` Expander 展开按钮、`DatePicker` 日历导航/头部/下拉按钮）悬停/按压均为降透明度，鲜艳背景不再被灰底覆盖；`MenuBar` / `ContextMenu` / `TabMenu` / `SideMenu` / `TreeMenu`、`ListBox` / `ListView` / `DataGrid`、`GroupBox` / `ExpanderPanel` 等中性表面上的列表/菜单项仍保留 `Surface.Hover` 灰底悬停高亮。
+
+`jv:Button` 常态带一层只向下散开的浮起阴影，按压或禁用时自动消失（贴回地面），与降透明度的状态反馈叠加使用。阴影取自新令牌 `Theme.ButtonShadow`（浅色 `BlurRadius=16 / ShadowDepth=5 / Opacity=0.18`，深色 `18 / 6 / 0.40`），与 `Theme.PopupShadow` 同族同强度，只按控件尺寸收紧模糊与偏移：实测按钮下方 1–9px 相对压暗 `8.47%`，MessageBar 弹层同距离为 `9.50%`；`5–9px / 1–5px` 衰减比 `0.58` 对弹层 `0.63`，即同一族形状而非另立一套观感。Effect 只挂在模板内**不含任何子元素**的背景层 `Border` 上，文字仍走 ClearType；官方 `Button`、`NoBorderButtonStyle` 与 `CardButton`（自带模板）都不带这层阴影。宿主 App 在 `Application.Resources` 写同名键即可整体调淡或关掉（应用自身条目的优先级高于 `ThemeManager` 追加的主题字典，因此这一份覆盖值会同时用于浅色与深色，需要分档时自行取两套参数）：
+
+```xml
+<Application.Resources>
+    <DropShadowEffect
+        x:Key="Theme.ButtonShadow"
+        BlurRadius="10"
+        Direction="270"
+        Opacity="0.08"
+        ShadowDepth="3"
+        Color="#1A0D1520" />
+</Application.Resources>
+```
 
 独有依赖属性 `IsTextScaled`（默认 `true`）：内容等比缩放**只缩小不放大**——空间充足（按钮尺寸不小于内容自然尺寸）时保持原始字号，与官方 `Button` 一致；仅当按钮被挤压（显式尺寸或布局约束小于内容自然尺寸）时，文字/图标作为整体等比缩小并保持居中。需要大字内容应直接设置 `FontSize`；设为 `false` 恢复完全固定字号（被挤压时也不缩小）。
 
@@ -655,6 +693,19 @@ ThemeManager.ToggleTheme();
 ```
 
 `NavigationItems` 可以是包含 `Title` 和 `Icon` 属性的普通 ViewModel 集合，也可以是 `jv:MenuItem` 集合。
+
+被选中的条目会套用 `Theme.SideMenuItemShadow`（由 `ItemContainerStyle` 的 `IsSelected` 触发器驱动）：只给选中那条加一层**只向下散开**的极淡柔光，未选中条目保持原样。阴影靠 `ShadowDepth` 从边缘推到下方、靠大 `BlurRadius` 做出渐变，因此不会紧贴胶囊四周形成一圈「描边感」；挂在条目模板的背景层 `Border` 上，文字与其同级，不会因位图特效而丢失 ClearType。实测浅色下方 1-9px 相对压暗 2.15%（同图 `MessageBar` 的 `Theme.PopupShadow` 为 9.48%，即约 1/4 强度），上边缘压暗为 0。
+
+要整体调淡或关掉，在应用资源里覆盖同名键即可（`ThemeManager` 的主题字典走 `MergedDictionaries`，应用自身直接定义的同名键优先级更高）：
+
+```xml
+<Application.Resources>
+    <ResourceDictionary>
+        <!-- 完全去掉选中项阴影 -->
+        <DropShadowEffect x:Key="Theme.SideMenuItemShadow" Opacity="0" />
+    </ResourceDictionary>
+</Application.Resources>
+```
 
 ### TreeMenu 与 TreeMenuItem
 
@@ -1276,6 +1327,7 @@ _dialogService.ShowDialog(nameof(DeviceSettingView), parameters, result =>
 | --- | --- |
 | `Source` | 要显示的 `ImageSource` |
 | `BackgroundImage` | 自定义背景图；为空时使用内置棋盘背景 |
+| `CheckerboardBrush` | 透明像素下可见的棋盘格画刷，默认取 `TransparentBackground`（见「主题」） |
 | 鼠标滚轮 | 以鼠标位置为中心缩放，范围约为 `0.05x` 到 `64x` |
 | 按住鼠标左键拖动 | 平移图像 |
 | `FitToWindow()` | 按查看器尺寸等比适应并居中，要求 `Source` 是 `BitmapSource` |

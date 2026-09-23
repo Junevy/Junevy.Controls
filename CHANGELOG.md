@@ -2,6 +2,52 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## Button 浮起阴影
+
+### 本次更新（新增 `Theme.ButtonShadow`，`jv:Button` 常态浮起、按压即贴回地面）— 2026-09-23
+
+- **新增资源键** `Theme.ButtonShadow`（`Themes/AppColors.Light.xaml`、`Themes/AppColors.Dark.xaml` 各一份，`DropShadowEffect`）：浅色 `BlurRadius=16 / ShadowDepth=5 / Direction=270 / Opacity=0.18`，深色 `18 / 6 / 270 / 0.40`，颜色沿用 `Theme.Color.Effect.Shadow`。取向是**与 MessageBar 弹层（`Theme.PopupShadow`）同族同强度**，只把模糊与偏移按小控件尺寸收紧：实测按钮下方 1-9px 相对压暗 8.47%，弹层同距离为 9.50%；`5-9px / 1-5px` 衰减比 0.58 对弹层 0.63，即同一族渐变形状而非另立一套观感。
+- **控件改动**：`Controls/Button/Button.xaml` 的 `JvButtonTemplate` 拆成三层——根 `Grid`（`RootHost`，承载悬停/按压/禁用的整体降透明度）、无子元素的背景层 `Border`（`ContentBorder`，底色/描边/圆角 + `Effect={DynamicResource Theme.ButtonShadow}`）、内容层 `Border`（`ContentHost`，只负责 `Padding` + `BorderThickness` 内缩）。`Effect` 只挂背景层是因为 WPF 位图特效会让被作用元素内的文字退出 ClearType。`IsPressed` 与 `IsEnabled=False` 触发器各加一条 `Effect={x:Null}`：按压即「贴回地面」，禁用态不该带浮起感。状态反馈的 `Opacity` 目标由 `ContentBorder` 改为 `RootHost`，否则只有背景变淡、文字不变。
+- **作用域**：只有 `jv:Button` 的默认模板带阴影。官方 `Button`（`ButtonTemplate`）、`NoBorderButtonStyle` 均未改动；`jv:CardButton` 虽派生自 `jv:Button`，但自带 `CardButtonTemplate`，实测子树内无任何 `Effect`。全库检索确认没有其他控件模板内嵌 `jv:Button`。
+- **迭代说明**：初版取 `10/3/0.18`，压暗强度对但衰减过硬（比值 0.22，读起来像贴边而不是散开），放宽到现值 `16/5` 后为 0.58，与弹层的 0.63 落在同一族。
+- **踩坑（已修）**：把 `Padding` 从背景层移到内容宿主后，按钮实测尺寸从 `45.6x24.8` 缩到 `44x23.2`——`Border` 即使不画描边也会把 `BorderThickness` 计入内容内缩，拆分时漏了这一项。现由 `ContentHost` 这层无刷 `Border` 复现，并把尺寸写成硬断言防回归。
+- **可覆盖性**：触发器用 `DynamicResource` 取该键，宿主在 `Application.Resources` 写同名键即可整体调淡或关掉，移除后回落主题值（已实测）。
+- **版本号**：保持 `1.8.0` 不变——与棋盘格资源、SideMenu 条目阴影同属尚未发布的 1.8.0 迭代。
+- 文档：README 资源键表补 `Theme.ButtonShadow` 一行；Button 小节说明常态阴影、按压/禁用时消失、ClearType 处理、不受影响的作用域与覆盖方式。
+- 验证：net8.0-windows 探针工程（`.workbuddy/tmp/ButtonShadowProbe/`）37 项断言全部通过——结构（`RootHost`/`ContentBorder`/`ContentHost` 齐备、背景层与内容层同级、背景层 `VisualTreeHelper.GetChildrenCount == 0` 证明文字未被包进特效层、浅色参数 16/5/270/0.18）；作用域（官方 `Button`、`NoBorderButtonStyle`、`CardButton` 子树均无 `Effect`，带缩放宿主的 `jv:Button` 有）；尺寸基线（`jv:Button` 与未改动的官方 `Button` 逐字段一致 45.6x24.8，窄按钮 90x28.8，无边框 60x27.2）；像素剖面（向下 1-5 / 5-9 / 9-14px = 27.31 / 15.89 / 5.66，向上 1-5px = 2.97，上方不足下方的四分之一；与 `Theme.PopupShadow` 参照比较强度与衰减比）；**真实鼠标按压**（`SetForegroundWindow` + 前台校验 + 首次点击激活补偿，实测 `IsPressed=True`、背景层 `Effect` 归零、根 `Grid` 不透明度 0.65、抬起后阴影复现 16/0.18、`Click` 计数正常）；悬停 0.8 / 禁用 0.5 且禁用时不带阴影；`ApplyTheme(Dark)` 后活按钮重新解析为 18/6/0.40；`IsTextScaled` 两个宿主切换正常；应用级同名键覆盖优先于主题字典且移除后回落。**三项变异反证**：删掉模板上的 `Effect` 特性 → 12 项 FAIL；删掉 `IsPressed` 的 `Effect={x:Null}` → 仅「按压时阴影归零」1 项 FAIL；删掉 `ContentHost` 的 `BorderThickness` → 3 项尺寸断言 FAIL 并复现 44x23.2。快照 `button-light.png`、`button-pressed.png`、`button-dark.png` 人工核对：常态胶囊下方柔和渐隐、按压后干净贴地。
+- 真机验证：`.workbuddy/tmp/ShowcaseButtonProbe/` 直接驱动运行中的 Showcase（UIA 定位 + 屏幕截图，不依赖库内部对象），7 项断言全部通过——以「按住不放的那一帧」作为同环境无阴影参照，浅色下 5 个 `jv:Button` 的近带（下缘 6-11px）回弹 15.81-16.47 级、远带（26-31px）漂移 0.00，深色下回弹 7.22-7.76 级；「禁用状态」「无边框样式」回弹 0.00，证明阴影确实只落在应有的按钮上且未被容器裁掉。
+- 回归：`Junevy.Controls.csproj` Release 双目标框（net8.0-windows + net48）0 错误、警告数与改动前一致（40 个既有可空性提示）；Showcase 工程 0 错误；`.workbuddy/tmp/SideMenuShadowProbe/` 23 项、`.workbuddy/tmp/TransparentBgProbe/` 37 项断言重跑全部通过。探针工程为临时宿主，不入库。
+
+## SideMenu 选中项阴影
+
+### 本次更新（新增 `Theme.SideMenuItemShadow`，阴影只作用于被选中的导航条目）— 2026-09-23
+
+- **新增资源键** `Theme.SideMenuItemShadow`（`Themes/AppColors.Light.xaml`、`Themes/AppColors.Dark.xaml` 各一份，`DropShadowEffect`）：浅色 `BlurRadius=12 / ShadowDepth=5 / Direction=270 / Opacity=0.05`，深色 `14 / 5 / 270 / 0.20`，颜色沿用 `Theme.Color.Effect.Shadow`，随主题字典整体替换自动换色换强度。取向是**只向下散开的极淡柔光**：靠 `ShadowDepth` 把阴影核心从条目边缘推到下方 5px，四周（尤其上边缘）几乎不留压暗，避免紧贴胶囊形成一圈「描边感」。深色取值更重，是因为深色阴影色本身为 `#99000000`、深色菜单面（`#2B2B30`）可见压暗余量小，需更高的 `Opacity` 才能与浅色达到同样的绝对压暗量（浅色实测 5.49 级 / 深色 4.27 级）。
+- **控件改动**：`Controls/Menu/SideMenu.xaml` 的 `ItemContainerStyle` —— `IsSelected` 触发器除原有的 `Surface.Selected` 背景外，再给条目加 `Effect`；未选中条目完全不变。`IsEnabled=False` 触发器补一条 `Effect={x:Null}`，否则「禁用且被选中」的条目会带着浮起阴影，与灰态语义矛盾。同时把条目模板从「`Border` 包 `ContentPresenter`」改为「`Grid` 内背景层 `Border` 与 `ContentPresenter` 同级」，`Effect` 只挂在背景层上：WPF 的位图特效会让被作用元素内的文字退出 ClearType，若沿用旧结构，选中项的标题会比其他条目发虚。改后阴影不影响任何文字渲染，且 `Root` 仍是背景/圆角的唯一承载者，各状态触发器无需改动。
+- **迭代说明**：同一轮里先做过「给 SideMenu 模板根 `Border` 加贴边阴影（`Theme.SideMenuShadow`，朝内容侧投影）」，实测偏淡且与外层容器分隔线叠加后观感不理想，已回滚删除，未发布，键名一并改为条目用途。条目阴影本身也调了三版：`8/2/0.35` 太立体 → `6/1/0.20` 压到扁平后，实测阴影几乎全部贴在胶囊四周一圈（上边缘 1-5px 处仍有 3.40 级压暗，5-9px 处已归零），读起来像描边而不是投影 → 现值 `12/5/0.05` 用偏移换方向、用大模糊换渐变，上边缘压暗降到 0.00。
+- **可覆盖性**：触发器用 `DynamicResource` 取该键，宿主在 `Application.Resources` 里直接定义同名键即可整体调淡或关掉（应用自身条目的优先级高于 `ThemeManager` 追加的 `MergedDictionaries`），已实测覆盖生效且移除后回落主题值。
+- **版本号**：保持 `1.8.0` 不变——与棋盘格资源同属尚未发布的 1.8.0 迭代。
+- 文档：README「主题」资源键表补充 `Theme.PopupShadow` / `Theme.SideMenuItemShadow` 两行，SideMenu 小节说明条目阴影与关闭方式。
+- 验证：net8.0-windows 探针工程（`.workbuddy/tmp/SideMenuShadowProbe/`）23 项断言全部通过——模板根 `Border` 的 `Effect` 确认为 `null`（回滚生效）；选中项背景层 `Effect` 为 `DropShadowEffect` 且浅色参数 12/5/270/0.05，其余 4 个未选中条目 `Effect` 全为 `null`；承载阴影的 `Border` 无子元素，证明文字未被包进特效层；条目 `ActualHeight` 仍为 44。**选中/未选中两次渲染差分**：下方 1-9px 条带压暗 5.49/255（相对 2.15%），同图 `Theme.PopupShadow` 参照为 9.48%，即条目阴影约为 MessageBar 弹层的 1/4，并另设「相对压暗 ≤ 4%」的硬阈值守住扁平取向；**分布剖面**（本轮新增，直接对着「不要描边感」这条验收）向下 1-5 / 5-9 / 9-14 / 14-20px = 7.50 / 3.48 / 0.20 / 0.00，向上 1-5 / 5-9px = 0.00 / 0.00——即阴影确实向下散开、有渐变而非硬边、发散范围在 14px 内归零、上边缘完全没有压暗。条带外（菜单右侧 40px 处）差分 < 0.2 证明不外溢；选中底色实测 226.89 与 `#D6E4FF` 理论值 226.9 吻合，证明背景层重构后选中色未被阴影污染。**反向对照**：取消选中后条带回到基线、重新选中压暗量复现（Δ<0.2）；禁用且选中时条目 `Effect` 归零、恢复启用后回到 12/0.05；`ApplyTheme(Dark)` 后活条目重新解析为 14/5/0.20，相对深色菜单面（43.57）压暗 4.27 级。把浅色令牌临时改回上一版的贴边参数 `6/1/0.20` 重跑，5 项断言转为 FAIL，且剖面实测为「下方 1-5px=9.25、5-9px 起全部 0.00、上方 1-5px=3.40」——正是被否掉的描边形态，证明分布断言真的能捕获该缺陷而不是恒真。另实测宿主覆盖路径：在 `Application.Resources` 直接写同名键后，活条目的 `Effect` 立即换成覆盖值（`Opacity=0` 即关掉阴影），移除后回落主题字典的值。快照 `sidemenu-light.png`、`sidemenu-dark.png` 与 Showcase 真机截图（浅色首页、深色首页、深色「菜单与导航」页）人工核对：胶囊下方一圈柔和渐隐、上边缘干净。探针工程为临时宿主，不入库。
+- 回归：`Junevy.Controls.csproj` Release 双目标框（net8.0-windows + net48）0 错误、警告数与改动前一致（40 个既有可空性提示）；Showcase 工程 0 错误 0 警告；`.workbuddy/tmp/TransparentBgProbe/` 37 项断言重跑全部通过。
+
+## 透明背景棋盘格资源 `TransparentBackground`
+
+### 本次更新（新增随主题切换的棋盘格 DrawingBrush 与 Geometry 资源，并归并 ImageViewer 的私有实现）— 2026-09-23
+
+- **新增资源键**（`Themes/AppColors.Light.xaml` 与 `Themes/AppColors.Dark.xaml` 各一份，随主题字典整体替换而换色）：
+  - `TransparentBackground.Geometry` —— 纯几何资源：一个 16×16 单元内的两块 8×8 方格（`GeometryGroup` + 两个 `RectangleGeometry`，`Rect=0,0,8,8` 与 `8,8,8,8`），不含颜色，供第三方自绘、做蒙版或自定义配色。
+  - `TransparentBackground.Small` / `TransparentBackground` / `TransparentBackground.Large` —— 三档棋盘格 `DrawingBrush`，`TileMode=Tile`、`Viewbox` 固定 `0,0,16,16 Absolute`，只有 `Viewport` 取 `8/16/32`，因此方格实际为 **4px / 8px / 16px**，且**不随控件尺寸拉伸**（矢量平铺，非位图）。
+  - 配色资源 `Theme.Color.TransparentBackground.Base/.Alt` 与 `Theme.Brush.TransparentBackground.Base/.Alt`：浅色 `#FFFFFF` / `#E0E4EA`，深色 `#2B2B30` / `#232327`（沿用原 ImageViewer 取值，视觉无回归）。
+- **归并（破坏性）**：删除 `ImageViewer` 私有的同一套棋盘格定义 `Theme.Brush.ImageViewer.Checkerboard` 及其 `Theme.Color/Brush.ImageViewer.Checkerboard.Base/.Alt` 共 5 个键——两处独立定义会各自漂移、导致深浅配色不一致。`Controls/Image/ImageViewer.xaml` 的样式默认值改为 `CheckerboardBrush = {DynamicResource TransparentBackground}`，档位与外观均与改动前一致。迁移：`{DynamicResource Theme.Brush.ImageViewer.Checkerboard}` → `{DynamicResource TransparentBackground}`。
+- **用法约束**：必须用 `DynamicResource`（`StaticResource` 会在加载期固化，切换主题不刷新）。`Resources/Pictures/Image.xaml` 的 `whiteCheckBoard` 位图保留不动，但已在 README 标注为历史遗留（不随主题变、会拉伸）。
+- **版本号**：`Junevy.Controls.csproj` 的 `Version` 由 `1.7.9` 升到 **`1.8.0`**——新增公开资源键属功能性新增，同时删除 `Theme.Brush.ImageViewer.Checkerboard` 系列旧键为破坏性变更，按语义化版本取次版本号递增（`AssemblyInfo.cs` 不含显式版本特性，版本单一来源仍是 csproj）。
+- 文档：README「主题」新增资源键行与《透明背景棋盘格》小节（含三档与 Geometry 用法），ImageViewer 属性表补充 `CheckerboardBrush`。
+- Showcase：`Samples/Junevy.Controls.Showcase/Pages/WindowImagePage.xaml`「窗口与图像」页新增 `TransparentBackground` 演示组——三档棋盘格并排 + 用 `Path` 引用 `TransparentBackground.Geometry` 自绘，配合标题栏的主题切换按钮可直接看到换色效果。
+- 验证：net8.0-windows 探针工程（`.workbuddy/tmp/TransparentBgProbe/`）37 项断言全部通过——资源解析（同一 `Geometry` 被三个 `DrawingGroup` 通过 `StaticResource` 共享引用可正常加载，无 Freezable 多引用异常）、Geometry 结构（Bounds=16×16、两块 8×8 位置逐块核对）、三档 `TileMode/Viewbox/Viewport` 参数、浅色配色取值、离屏渲染像素扫描（方格步长 4/8/16px；320×80 与 80×320 非方形控件横纵步长均为 8px 证明未被拉伸；全图仅 2 种颜色；单 16×16 单元四象限对角同色邻角异色证明是棋盘格而非条纹）、`ImageViewer` 默认 `CheckerboardBrush` 实际解析为非 null 的 Medium 档、`ThemeManager.ApplyTheme(Dark)` 后活元素 `DynamicResource` 重新解析到新 brush 实例且配色变为 `#2B2B30/#232327`、`ToggleTheme()` 回浅色后恢复 `#FFFFFF/#E0E4EA`。变异反证两次：把主题字典回退到改动前（无新键）→ 26 项 FAIL；把 Geometry 两块方格改成重叠的 `0,0,8,8` → 8 项 FAIL（步长、象限、颜色数均报错），确认断言可捕获缺陷。渲染快照 `board-light.png`、`board-dark.png`（三档并排）人工核对正常。探针工程为临时宿主，不入库。另用 `.workbuddy/tmp/ShowcaseBoardProbe/` 真实承载 `WindowImagePage` 跑 11 项断言：页面可视树中确实存在 Viewport 8/16/32 三档平铺画刷、`Path` 成功引用 `TransparentBackground.Geometry`（Bounds=16×16）、`ImageViewer.CheckerboardBrush` 走通用键解析为 16 档、`ApplyTheme(Dark)` 后页面画刷 alt 色由 `E0E4EA` 变为 `232327`；整页浅色/深色快照人工核对正常。
+
+
+
 ## DataGrid
 
 ### 本次更新（控件模板重构为官方 Aero2 宿主结构，修复行不生成/列头随滚动位移问题）— 2026-09-23

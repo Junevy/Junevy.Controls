@@ -96,93 +96,108 @@
         TargetType=local:Button 的 Property 触发器直接读依赖属性。
     -->
     <ControlTemplate x:Key="JvButtonTemplate" TargetType="{x:Type local:Button}">
-        <Border
-            x:Name="ContentBorder"
+        <!--
+            根 Grid 承载「整体变淡」的状态反馈；背景层 Border 不含任何子元素，阴影只挂在它身上，
+            避免位图特效让按钮文字退出 ClearType。MinWidth/MinHeight 移到根 Grid。
+            内容层用一层无刷 Border 复现「Padding + BorderThickness」的内缩，
+            使拆分后的测量结果与拆分前完全一致（Border 即使无边框画也保留边框占位）。
+        -->
+        <Grid
+            x:Name="RootHost"
             MinWidth="{TemplateBinding MinWidth}"
             MinHeight="{TemplateBinding MinHeight}"
-            Padding="{TemplateBinding Padding}"
-            Background="{TemplateBinding Background}"
-            BorderBrush="{TemplateBinding BorderBrush}"
-            BorderThickness="{TemplateBinding BorderThickness}"
-            CornerRadius="{TemplateBinding Border.CornerRadius}"
             SnapsToDevicePixels="True"
             UseLayoutRounding="True">
+            <Border
+                x:Name="ContentBorder"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding Border.CornerRadius}"
+                Effect="{DynamicResource Theme.ButtonShadow}"
+                SnapsToDevicePixels="True"
+                UseLayoutRounding="True" />
 
-            <Grid>
-                <Grid x:Name="NormalHost">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+            <Border
+                x:Name="ContentHost"
+                Padding="{TemplateBinding Padding}"
+                BorderThickness="{TemplateBinding BorderThickness}">
+                <Grid>
+                    <Grid x:Name="NormalHost">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                    <ContentPresenter
-                        x:Name="IconPresenter"
-                        Grid.Column="0"
-                        Width="{TemplateBinding atc:Icon.IconSize}"
-                        Margin="0,0,4,0"
-                        VerticalAlignment="Center"
-                        Content="{TemplateBinding atc:Icon.Icon}"
-                        Focusable="False"
-                        TextElement.FontFamily="{TemplateBinding atc:Icon.FontFamily}"
-                        TextElement.FontSize="{TemplateBinding atc:Icon.IconSize}"
-                        TextElement.Foreground="{TemplateBinding Foreground}"
-                        Visibility="{TemplateBinding atc:Icon.Icon, Converter={StaticResource NullToVisibility}}" />
+                        <ContentPresenter
+                            x:Name="IconPresenter"
+                            Grid.Column="0"
+                            Width="{TemplateBinding atc:Icon.IconSize}"
+                            Margin="0,0,4,0"
+                            VerticalAlignment="Center"
+                            Content="{TemplateBinding atc:Icon.Icon}"
+                            Focusable="False"
+                            TextElement.FontFamily="{TemplateBinding atc:Icon.FontFamily}"
+                            TextElement.FontSize="{TemplateBinding atc:Icon.IconSize}"
+                            TextElement.Foreground="{TemplateBinding Foreground}"
+                            Visibility="{TemplateBinding atc:Icon.Icon, Converter={StaticResource NullToVisibility}}" />
 
-                    <ContentPresenter
-                        x:Name="ContentPresenter"
-                        Grid.Column="1"
-                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                        ContentSource="Content"
-                        RecognizesAccessKey="True"
-                        TextElement.FontFamily="{TemplateBinding FontFamily}"
-                        TextElement.FontSize="{TemplateBinding FontSize}"
-                        TextElement.Foreground="{TemplateBinding Foreground}" />
+                        <ContentPresenter
+                            x:Name="ContentPresenter"
+                            Grid.Column="1"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            ContentSource="Content"
+                            RecognizesAccessKey="True"
+                            TextElement.FontFamily="{TemplateBinding FontFamily}"
+                            TextElement.FontSize="{TemplateBinding FontSize}"
+                            TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Grid>
+
+                    <!--
+                        缩放宿主：ShrinkBox 把 Viewbox 的可用尺寸钳制在内容自然尺寸内，
+                        使 Viewbox 的等比缩放系数恒不超过 1（只缩小不放大，详见 ShrinkBox 注释）。
+                    -->
+                    <local:ShrinkBox>
+                        <Viewbox
+                            x:Name="ScaledHost"
+                            Stretch="Uniform"
+                            Visibility="Collapsed">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <ContentPresenter
+                                    x:Name="ScaledIconPresenter"
+                                    Grid.Column="0"
+                                    Width="{TemplateBinding atc:Icon.IconSize}"
+                                    Margin="0,0,4,0"
+                                    VerticalAlignment="Center"
+                                    Content="{TemplateBinding atc:Icon.Icon}"
+                                    Focusable="False"
+                                    TextElement.FontFamily="{TemplateBinding atc:Icon.FontFamily}"
+                                    TextElement.FontSize="{TemplateBinding atc:Icon.IconSize}"
+                                    TextElement.Foreground="{TemplateBinding Foreground}"
+                                    Visibility="{TemplateBinding atc:Icon.Icon, Converter={StaticResource NullToVisibility}}" />
+
+                                <ContentPresenter
+                                    x:Name="ScaledContentPresenter"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    ContentSource="Content"
+                                    RecognizesAccessKey="True"
+                                    TextElement.FontFamily="{TemplateBinding FontFamily}"
+                                    TextElement.FontSize="{TemplateBinding FontSize}"
+                                    TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </Grid>
+                        </Viewbox>
+                    </local:ShrinkBox>
                 </Grid>
-
-                <!--
-                    缩放宿主：ShrinkBox 把 Viewbox 的可用尺寸钳制在内容自然尺寸内，
-                    使 Viewbox 的等比缩放系数恒不超过 1（只缩小不放大，详见 ShrinkBox 注释）。
-                -->
-                <local:ShrinkBox>
-                    <Viewbox
-                        x:Name="ScaledHost"
-                        Stretch="Uniform"
-                        Visibility="Collapsed">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-
-                            <ContentPresenter
-                                x:Name="ScaledIconPresenter"
-                                Grid.Column="0"
-                                Width="{TemplateBinding atc:Icon.IconSize}"
-                                Margin="0,0,4,0"
-                                VerticalAlignment="Center"
-                                Content="{TemplateBinding atc:Icon.Icon}"
-                                Focusable="False"
-                                TextElement.FontFamily="{TemplateBinding atc:Icon.FontFamily}"
-                                TextElement.FontSize="{TemplateBinding atc:Icon.IconSize}"
-                                TextElement.Foreground="{TemplateBinding Foreground}"
-                                Visibility="{TemplateBinding atc:Icon.Icon, Converter={StaticResource NullToVisibility}}" />
-
-                            <ContentPresenter
-                                x:Name="ScaledContentPresenter"
-                                Grid.Column="1"
-                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                ContentSource="Content"
-                                RecognizesAccessKey="True"
-                                TextElement.FontFamily="{TemplateBinding FontFamily}"
-                                TextElement.FontSize="{TemplateBinding FontSize}"
-                                TextElement.Foreground="{TemplateBinding Foreground}" />
-                        </Grid>
-                    </Viewbox>
-                </local:ShrinkBox>
-            </Grid>
-        </Border>
+            </Border>
+        </Grid>
 
         <ControlTemplate.Triggers>
             <Trigger Property="IsTextScaled" Value="True">
@@ -190,15 +205,18 @@
                 <Setter TargetName="ScaledHost" Property="Visibility" Value="Visible" />
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Hover.Opacity}" />
+                <Setter TargetName="RootHost" Property="Opacity" Value="{StaticResource Button.Hover.Opacity}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Pressed.Opacity}" />
+                <Setter TargetName="RootHost" Property="Opacity" Value="{StaticResource Button.Pressed.Opacity}" />
+                <!--  按压即「贴回地面」：阴影随浮起感一起消失  -->
+                <Setter TargetName="ContentBorder" Property="Effect" Value="{x:Null}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Disabled.Opacity}" />
+                <Setter TargetName="RootHost" Property="Opacity" Value="{StaticResource Button.Disabled.Opacity}" />
                 <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
                 <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
+                <Setter TargetName="ContentBorder" Property="Effect" Value="{x:Null}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>

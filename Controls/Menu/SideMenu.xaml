@@ -164,15 +164,17 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="ListBoxItem">
-                                <Border
-                                    x:Name="Root"
-                                    Background="{TemplateBinding Background}"
-                                    CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
+                                <!--  Root 只做背景层，阴影挂在它身上；内容与其同级，避免 Effect 让文字退出 ClearType  -->
+                                <Grid>
+                                    <Border
+                                        x:Name="Root"
+                                        Background="{TemplateBinding Background}"
+                                        CornerRadius="{DynamicResource Theme.SmallCornerRadius}" />
                                     <ContentPresenter
                                         HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                         RecognizesAccessKey="True" />
-                                </Border>
+                                </Grid>
 
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
@@ -181,11 +183,13 @@
 
                                     <Trigger Property="IsSelected" Value="True">
                                         <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Selected}" />
+                                        <Setter TargetName="Root" Property="Effect" Value="{DynamicResource Theme.SideMenuItemShadow}" />
                                     </Trigger>
 
                                     <Trigger Property="IsEnabled" Value="False">
                                         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
                                         <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
+                                        <Setter TargetName="Root" Property="Effect" Value="{x:Null}" />
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
