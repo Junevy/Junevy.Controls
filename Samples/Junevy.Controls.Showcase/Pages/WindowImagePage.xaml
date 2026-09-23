@@ -33,6 +33,46 @@
                 </StackPanel>
             </jv:GroupBox>
 
+            <jv:GroupBox Margin="0,16,0,0" Header="TransparentBackground（透明背景棋盘格：随主题换色，方格不随控件尺寸拉伸）">
+                <StackPanel>
+                    <UniformGrid Columns="4" Rows="1">
+                        <Border
+                            Margin="0,0,8,0"
+                            Background="{DynamicResource TransparentBackground.Small}"
+                            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                            BorderThickness="1"
+                            Height="96" />
+                        <Border
+                            Margin="0,0,8,0"
+                            Background="{DynamicResource TransparentBackground}"
+                            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                            BorderThickness="1"
+                            Height="96" />
+                        <Border
+                            Margin="0,0,8,0"
+                            Background="{DynamicResource TransparentBackground.Large}"
+                            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                            BorderThickness="1"
+                            Height="96" />
+                        <Path
+                            Data="{DynamicResource TransparentBackground.Geometry}"
+                            Fill="{DynamicResource Theme.Brush.Accent.Primary}"
+                            Stretch="Uniform"
+                            Height="96" />
+                    </UniformGrid>
+                    <TextBlock
+                        Margin="0,10,0,0"
+                        FontSize="12"
+                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        Text="左起三格为 Small（4px 方格）/ 默认（8px）/ Large（16px）；最右侧是纯几何资源 TransparentBackground.Geometry（单个 16×16 单元内的两块 8×8 方格），用 Path 自绘上色。" />
+                    <TextBlock
+                        Margin="0,6,0,0"
+                        FontSize="12"
+                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        Text="引用时必须用 DynamicResource，切换标题栏主题后配色随之改变；上方 ImageViewer 的默认棋盘背景就是 TransparentBackground。" />
+                </StackPanel>
+            </jv:GroupBox>
+
             <jv:GroupBox Header="jv:DialogWindow（代码实例化弹出）" Margin="0,16,0,0">
                 <StackPanel>
                     <jv:Button Click="OnOpenDialogClick" Content="打开对话框（无边框、圆角、主题化标题栏）" HorizontalAlignment="Left" />

@@ -121,15 +121,39 @@
 
     <!--
         ============================================================
-        ImageViewer checkerboard (geometry-drawn transparency grid)
+        TransparentBackground (geometry-drawn transparency checkerboard)
+        One 16x16 unit holds two 8x8 cells; the three keys only differ
+        in Viewport, so cell size scales without distorting the pattern.
         ============================================================
     -->
-    <Color x:Key="Theme.Color.ImageViewer.Checkerboard.Base">#2B2B30</Color>
-    <Color x:Key="Theme.Color.ImageViewer.Checkerboard.Alt">#232327</Color>
-    <SolidColorBrush x:Key="Theme.Brush.ImageViewer.Checkerboard.Base" Color="{StaticResource Theme.Color.ImageViewer.Checkerboard.Base}" />
-    <SolidColorBrush x:Key="Theme.Brush.ImageViewer.Checkerboard.Alt" Color="{StaticResource Theme.Color.ImageViewer.Checkerboard.Alt}" />
+    <Color x:Key="Theme.Color.TransparentBackground.Base">#2B2B30</Color>
+    <Color x:Key="Theme.Color.TransparentBackground.Alt">#232327</Color>
+    <SolidColorBrush x:Key="Theme.Brush.TransparentBackground.Base" Color="{StaticResource Theme.Color.TransparentBackground.Base}" />
+    <SolidColorBrush x:Key="Theme.Brush.TransparentBackground.Alt" Color="{StaticResource Theme.Color.TransparentBackground.Alt}" />
+
+    <!--  The dark cells of a single 16x16 unit, reusable as plain geometry.  -->
+    <GeometryGroup x:Key="TransparentBackground.Geometry">
+        <RectangleGeometry Rect="0,0,8,8" />
+        <RectangleGeometry Rect="8,8,8,8" />
+    </GeometryGroup>
+
     <DrawingBrush
-        x:Key="Theme.Brush.ImageViewer.Checkerboard"
+        x:Key="TransparentBackground.Small"
+        TileMode="Tile"
+        Viewbox="0,0,16,16"
+        ViewboxUnits="Absolute"
+        Viewport="0,0,8,8"
+        ViewportUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="{StaticResource Theme.Brush.TransparentBackground.Base}" Geometry="M0,0 H16 V16 H0 Z" />
+                <GeometryDrawing Brush="{StaticResource Theme.Brush.TransparentBackground.Alt}" Geometry="{StaticResource TransparentBackground.Geometry}" />
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush
+        x:Key="TransparentBackground"
         TileMode="Tile"
         Viewbox="0,0,16,16"
         ViewboxUnits="Absolute"
@@ -137,8 +161,23 @@
         ViewportUnits="Absolute">
         <DrawingBrush.Drawing>
             <DrawingGroup>
-                <GeometryDrawing Brush="{StaticResource Theme.Brush.ImageViewer.Checkerboard.Base}" Geometry="M0,0 H16 V16 H0 Z" />
-                <GeometryDrawing Brush="{StaticResource Theme.Brush.ImageViewer.Checkerboard.Alt}" Geometry="M0,0 H8 V8 H0 Z M8,8 H16 V16 H8 Z" />
+                <GeometryDrawing Brush="{StaticResource Theme.Brush.TransparentBackground.Base}" Geometry="M0,0 H16 V16 H0 Z" />
+                <GeometryDrawing Brush="{StaticResource Theme.Brush.TransparentBackground.Alt}" Geometry="{StaticResource TransparentBackground.Geometry}" />
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush
+        x:Key="TransparentBackground.Large"
+        TileMode="Tile"
+        Viewbox="0,0,16,16"
+        ViewboxUnits="Absolute"
+        Viewport="0,0,32,32"
+        ViewportUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="{StaticResource Theme.Brush.TransparentBackground.Base}" Geometry="M0,0 H16 V16 H0 Z" />
+                <GeometryDrawing Brush="{StaticResource Theme.Brush.TransparentBackground.Alt}" Geometry="{StaticResource TransparentBackground.Geometry}" />
             </DrawingGroup>
         </DrawingBrush.Drawing>
     </DrawingBrush>
@@ -249,6 +288,31 @@
         Direction="270"
         Opacity="0.40"
         ShadowDepth="8"
+        Color="{StaticResource Theme.Color.Effect.Shadow}" />
+
+    <!--
+        小控件（jv:Button）专用：与 Theme.PopupShadow 同族同强度，
+        只把模糊与偏移按控件尺寸收紧，避免大弹层的柔光在小按钮上糊成一团。
+    -->
+    <DropShadowEffect
+        x:Key="Theme.ButtonShadow"
+        BlurRadius="18"
+        Direction="270"
+        Opacity="0.40"
+        ShadowDepth="6"
+        Color="{StaticResource Theme.Color.Effect.Shadow}" />
+
+    <!--
+        SideMenu 选中项专用：只向下散开的柔光，靠偏移把阴影从条目四周推到下方，
+        避免紧贴边缘形成一圈「描边感」；只作用于条目背景层。
+        深色主题阴影色本身更浓（#99000000），但深色底面上可见压暗余量小，故不透明度仍需高于浅色。
+    -->
+    <DropShadowEffect
+        x:Key="Theme.SideMenuItemShadow"
+        BlurRadius="14"
+        Direction="270"
+        Opacity="0.20"
+        ShadowDepth="5"
         Color="{StaticResource Theme.Color.Effect.Shadow}" />
 
 </ResourceDictionary>

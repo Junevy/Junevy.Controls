@@ -71,7 +71,7 @@
 
     <Style TargetType="{x:Type local:ImageViewer}">
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Background.App}" />
-        <Setter Property="CheckerboardBrush" Value="{DynamicResource Theme.Brush.ImageViewer.Checkerboard}" />
+        <Setter Property="CheckerboardBrush" Value="{DynamicResource TransparentBackground}" />
         <Setter Property="Focusable" Value="True" />
         <Setter Property="Template">
             <Setter.Value>
