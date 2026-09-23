@@ -22,6 +22,15 @@
 - `jv:Button.IsTextScaled` 默认 true，经 ShrinkBox（internal Decorator）只缩小不放大：空间充足保持原始字号，被挤压（尺寸<内容自然尺寸）时等比缩小；false=完全固定字号（2026-09-21 已修库）。悬停/按压反馈为降透明度（Button.Hover/Pressed/Disabled.Opacity 资源 0.8/0.65/0.5），不再有固定悬停底色。该方案已推广（2026-09-21）：其余可交互控件用公共键 `Control.Hover.Opacity`(0.8)/`Control.Pressed.Opacity`(0.65)（Generic/Style/FeedbackOpacity.xaml，Button.* 键保持独立勿合并）——A 类（CardButton/ToolBarItem/ToolboxItem/ToolItem，背景暴露给用户）与 B 类（MessageBar/ProgressBarWindow 关闭按钮、ImageViewer 工具按钮、DialogWindow 标题栏按钮、ToggleButton Expander、DatePicker 日历导航/头部/下拉按钮）转透明度；C 类（MenuBar/ContextMenu/TabMenu/SideMenu/TreeMenu、ListBox/ListView/DataGrid 行与表头、GroupBox/ExpanderPanel 标题行、DatePicker 日期/月单元格等中性表面列表/菜单项）保留 Surface.Hover 灰底——灰底是行项正确 affordance，勿再改成透明度。DialogWindow 关闭按钮危险色悬停是 Windows 惯例，保留。
 - Badge 隐式样式 Foreground=Text.OnAccent（白）会继承进被包裹内容；相邻角标可能互相遮挡。
 
+## DataGrid 宿主机制（2026-09-23 已修复，勿回退）
+- **官方宿主链**：Border → ScrollViewer(Focusable=false，**自定义 ScrollViewer.Template**：3x3 Grid 放全选按钮/PART_ColumnHeadersPresenter/PART_ScrollContentPresenter/PART_VerticalScrollBar/PART_HorizontalScrollBar) → **Content=ItemsPresenter**。ItemsPresenter 实例化 DataGrid 默认 ItemsPanel（DataGrid 静态构造函数注册的 DataGridRowsPresenter 工厂，运行时自动命名 PART_RowsPresenter）。
+- **模板内严禁直接声明 DataGridRowsPresenter**：非 ItemsPresenter 实例化的面板 IsItemsHost=false，行容器不生成（2026-09-23 前的旧模板即此缺陷：行不生成、列头随滚动滚走、ScrollContentPresenter 空壳）。`PART_RowsPresenter` 名字是运行时自动命名，模板不写它。
+- DataGrid 内部经 `EnsureInternalScrollControls` 从 ItemsHost 向上 `FindVisualParent<ScrollContentPresenter/ScrollViewer>` 接滚动管线 → 行宿主必须位于 ScrollContentPresenter 之内；列头水平同步靠 HorizontalScrollOffset ← ScrollViewer.ContentHorizontalOffset 绑定。
+- 列头必须放 ScrollViewer **模板**内（非 Content），垂直滚动才固定；横向滚动条首列宽度绑 `NonFrozenColumnsViewportHorizontalOffset`（冻结列对齐）。
+- ScrollViewer 模板内 TemplatedParent 是 ScrollViewer——引用 DataGrid 属性一律 `AncestorType={x:Type DataGrid}`（空态 EmptyText 绑定同理）。
+- 官方 MultiTrigger 已补入样式：IsGrouping && !VirtualizingPanel.IsVirtualizingWhenGrouping → CanContentScroll=false。
+- 验证探针保留于 `.workbuddy/tmp/DataGridProbe/`（net8，离屏渲染 @4x：行生成/宿主链/滚动/Recycling 虚拟化/列头固定与水平对齐/空态）。
+
 ## 附加属性现状（2026-09-20 第二轮整理后）
 - `TextBox.ShowClear`：已从附加属性收编为 jv:TextBox 自身 DP（bool，默认 false；DefaultTextBoxStyle 置 true）。关键约束：DefaultTextBoxStyle / DefaultTextBoxTemplate 的 TargetType 是原生 TextBox，样式与模板中必须用限定形式——`Property="local:TextBox.ShowClear"`、`{Binding Path=(local:TextBox.ShowClear), RelativeSource={RelativeSource TemplatedParent}}`；原生 TextBox 实例可经 SetValue 生效（外观借用不受影响）。`TextBoxAssist` 类已删除。
 - `TabMenu.IsClosable`：控件自身 DP；`AttachFuc` 已删除（含 DispalyMode 拼写兼容属性）。

@@ -165,10 +165,25 @@
     </Style>
 
     <!--
-        DataGrid 控件模板（官方模板部件契约）：
-        PART_ColumnHeadersPresenter / PART_RowsPresenter / PART_ScrollContentPresenter 均按
-        WPF DataGrid 模板约定命名，DataGrid 内部会将 RowsPresenter 移交给 ScrollContentPresenter
-        完成滚动；滚动条由主题级隐式 ScrollBar 样式提供。
+        DataGrid 控件模板（官方 Aero2 结构，部件契约见 WPF 官方源码）：
+
+        Border
+        └─ ScrollViewer（Focusable=false，自带自定义 Template）
+           ├─ ScrollViewer.Template 内 3x3 Grid：
+           │   (0,0) 全选按钮、(0,1) PART_ColumnHeadersPresenter —— 列头不随行滚动
+           │   (1,0-1) PART_ScrollContentPresenter —— 行滚动视口
+           │   (1,2) PART_VerticalScrollBar、(2,1) PART_HorizontalScrollBar
+           └─ Content = ItemsPresenter —— 由它实例化 DataGrid 默认 ItemsPanel
+               （DataGridRowsPresenter，运行时被 DataGrid 自动命名为 PART_RowsPresenter，
+                经 OnIsItemsHostChanged 挂为 InternalItemsHost，并向上找到
+                ScrollContentPresenter/ScrollViewer 接通滚动管线）
+
+        注意：
+        1. 模板内不得直接声明 DataGridRowsPresenter —— 非由 ItemsPresenter 实例化的
+           面板 IsItemsHost=false，DataGrid 不会向其生成行容器。
+        2. 列头必须位于 ScrollViewer 的模板内（而非其 Content），才能在垂直滚动时保持固定。
+        3. ScrollViewer 模板内 TemplatedParent 是 ScrollViewer，
+           引用 DataGrid 自身属性一律用 RelativeSource AncestorType={x:Type DataGrid}。
     -->
     <ControlTemplate x:Key="DefaultDataGridTemplate" TargetType="DataGrid">
         <Border
@@ -180,106 +195,127 @@
             CornerRadius="{DynamicResource Theme.ControlCornerRadius}"
             SnapsToDevicePixels="True"
             UseLayoutRounding="True">
-            <ScrollViewer Focusable="False">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+            <ScrollViewer x:Name="DG_ScrollViewer" Focusable="False">
+                <ScrollViewer.Template>
+                    <ControlTemplate TargetType="ScrollViewer">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
-                    <!--  HeadersVisibility=All 时的左上角全选按钮  -->
-                    <Button
-                        Command="{x:Static DataGrid.SelectAllCommand}"
-                        Focusable="False"
-                        Style="{StaticResource DefaultDataGridSelectAllButtonStyle}"
-                        Visibility="{Binding HeadersVisibility,
-                                             ConverterParameter={x:Static DataGridHeadersVisibility.All},
-                                             Converter={x:Static DataGrid.HeadersVisibilityConverter},
-                                             RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"
-                        Width="{Binding CellsPanelHorizontalOffset, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                            <!--  HeadersVisibility=All 时的左上角全选按钮  -->
+                            <Button
+                                Command="{x:Static DataGrid.SelectAllCommand}"
+                                Focusable="False"
+                                Style="{StaticResource DefaultDataGridSelectAllButtonStyle}"
+                                Visibility="{Binding HeadersVisibility,
+                                                     ConverterParameter={x:Static DataGridHeadersVisibility.All},
+                                                     Converter={x:Static DataGrid.HeadersVisibilityConverter},
+                                                     RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"
+                                Width="{Binding CellsPanelHorizontalOffset, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
 
-                    <!--  列标题容器  -->
-                    <DataGridColumnHeadersPresenter
-                        x:Name="PART_ColumnHeadersPresenter"
-                        Grid.Column="1"
-                        Visibility="{Binding HeadersVisibility,
-                                             ConverterParameter={x:Static DataGridHeadersVisibility.Column},
-                                             Converter={x:Static DataGrid.HeadersVisibilityConverter},
-                                             RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                            <!--  列标题容器（固定不随行滚动）  -->
+                            <DataGridColumnHeadersPresenter
+                                x:Name="PART_ColumnHeadersPresenter"
+                                Grid.Column="1"
+                                Visibility="{Binding HeadersVisibility,
+                                                     ConverterParameter={x:Static DataGridHeadersVisibility.Column},
+                                                     Converter={x:Static DataGrid.HeadersVisibilityConverter},
+                                                     RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
 
-                    <!--  HeadersVisibility=None 的兜底容器（RowsPresenter 之后会被移入 ScrollContentPresenter）  -->
-                    <Grid
-                        Grid.Row="1"
-                        Grid.ColumnSpan="2"
-                        Visibility="{Binding HeadersVisibility,
-                                             ConverterParameter={x:Static DataGridHeadersVisibility.None},
-                                             Converter={x:Static DataGrid.HeadersVisibilityConverter},
-                                             RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}">
-                        <DataGridRowsPresenter x:Name="PART_RowsPresenter" />
-                    </Grid>
+                            <!--  行滚动视口：DataGrid 默认 ItemsPanel（DataGridRowsPresenter）由此呈现  -->
+                            <ScrollContentPresenter
+                                x:Name="PART_ScrollContentPresenter"
+                                Grid.Row="1"
+                                Grid.ColumnSpan="2"
+                                CanContentScroll="{TemplateBinding CanContentScroll}" />
 
-                    <!--  行滚动视口：DataGrid 内部会把 PART_RowsPresenter 设为其 Content  -->
-                    <ScrollContentPresenter
-                        x:Name="PART_ScrollContentPresenter"
-                        Grid.Row="1"
-                        Grid.ColumnSpan="2"
-                        CanContentScroll="{TemplateBinding ScrollViewer.CanContentScroll}" />
+                            <!--  纵向滚动条（ScrollViewer 部件契约命名）  -->
+                            <ScrollBar
+                                x:Name="PART_VerticalScrollBar"
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                Orientation="Vertical"
+                                Maximum="{TemplateBinding ScrollableHeight}"
+                                Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                ViewportSize="{TemplateBinding ViewportHeight}"
+                                Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" />
 
-                    <!--  空态提示：Items 为空且 EmptyText 非空时显示在内容区中央  -->
-                    <TextBlock
-                        Grid.Row="1"
-                        Grid.ColumnSpan="2"
-                        Margin="16"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        FontSize="13"
-                        Foreground="{DynamicResource Theme.Brush.Text.Tertiary}"
-                        IsHitTestVisible="False"
-                        Text="{Binding Path=(atc:DataGridAssist.EmptyText), RelativeSource={RelativeSource TemplatedParent}}">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Style.Triggers>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding Items.Count, RelativeSource={RelativeSource TemplatedParent}}" Value="0" />
-                                            <Condition
-                                                Binding="{Binding Path=(atc:DataGridAssist.EmptyText),
-                                                                  RelativeSource={RelativeSource TemplatedParent},
-                                                                  Converter={StaticResource NullToVisibility}}"
-                                                Value="Visible" />
-                                        </MultiDataTrigger.Conditions>
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </MultiDataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                            <!--  底部收边线：先声明置于滚动条之下，无横向滚动条时提供 1px 闭合线  -->
+                            <Rectangle
+                                Grid.Row="2"
+                                Grid.ColumnSpan="3"
+                                Height="1"
+                                VerticalAlignment="Bottom"
+                                Fill="{DynamicResource Theme.Brush.Border.Subtle}" />
 
-                    <!--  底部收边线  -->
-                    <Rectangle
-                        x:Name="PART_BottomLeftCorner"
-                        Grid.Row="2"
-                        Height="1"
-                        Fill="{DynamicResource Theme.Brush.Border.Subtle}" />
-                    <Rectangle
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        Height="1"
-                        Fill="{DynamicResource Theme.Brush.Border.Subtle}" />
-                    <Rectangle
-                        x:Name="PART_LowerRightCorner"
-                        Grid.Row="2"
-                        Grid.Column="2"
-                        Height="1"
-                        Fill="{DynamicResource Theme.Brush.Border.Subtle}" />
-                </Grid>
+                            <!--  横向滚动条：首列宽度跟随冻结列视口偏移，保证与列头对齐  -->
+                            <Grid Grid.Row="2" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="{Binding NonFrozenColumnsViewportHorizontalOffset, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ScrollBar
+                                    x:Name="PART_HorizontalScrollBar"
+                                    Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    Maximum="{TemplateBinding ScrollableWidth}"
+                                    Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                    ViewportSize="{TemplateBinding ViewportWidth}"
+                                    Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" />
+                            </Grid>
+
+                            <!--
+                                空态提示：Items 为空且 EmptyText 非空时显示在内容区中央。
+                                位于 ScrollViewer 模板内，须以 AncestorType 引用 DataGrid。
+                            -->
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.ColumnSpan="2"
+                                Margin="16"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="13"
+                                Foreground="{DynamicResource Theme.Brush.Text.Tertiary}"
+                                IsHitTestVisible="False"
+                                Text="{Binding Path=(atc:DataGridAssist.EmptyText), RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding Items.Count, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" Value="0" />
+                                                    <Condition
+                                                        Binding="{Binding Path=(atc:DataGridAssist.EmptyText),
+                                                                          RelativeSource={RelativeSource AncestorType={x:Type DataGrid}},
+                                                                          Converter={StaticResource NullToVisibility}}"
+                                                        Value="Visible" />
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </MultiDataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                    </ControlTemplate>
+                </ScrollViewer.Template>
+
+                <!--
+                    官方宿主链核心：ItemsPresenter 作为 ScrollViewer 的内容。
+                    它实例化 DataGrid 静态构造函数中注册的默认 ItemsPanel
+                    （DataGridRowsPresenter，自动命名 PART_RowsPresenter），
+                    并将其放入 PART_ScrollContentPresenter 中呈现。
+                -->
+                <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
             </ScrollViewer>
         </Border>
     </ControlTemplate>
@@ -307,6 +343,16 @@
         <Setter Property="CanUserResizeRows" Value="False" />
         <Setter Property="SelectionMode" Value="Single" />
         <Setter Property="SelectionUnit" Value="FullRow" />
+        <!--  官方行为：分组且分组内虚拟化关闭时强制按像素滚动，否则分组面板无法正确布局  -->
+        <Style.Triggers>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsGrouping" Value="true" />
+                    <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false" />
+                </MultiTrigger.Conditions>
+                <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
+            </MultiTrigger>
+        </Style.Triggers>
     </Style>
 
     <!--  隐式样式（官方类型）：App 合并字典后 <DataGrid> 自动生效  -->
