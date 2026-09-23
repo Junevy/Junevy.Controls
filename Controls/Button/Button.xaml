@@ -101,6 +101,7 @@
             避免位图特效让按钮文字退出 ClearType。MinWidth/MinHeight 移到根 Grid。
             内容层用一层无刷 Border 复现「Padding + BorderThickness」的内缩，
             使拆分后的测量结果与拆分前完全一致（Border 即使无边框画也保留边框占位）。
+            阴影可由 ShowShadow=False（逐实例或样式 Setter）整体关掉。
         -->
         <Grid
             x:Name="RootHost"
@@ -203,6 +204,10 @@
             <Trigger Property="IsTextScaled" Value="True">
                 <Setter TargetName="NormalHost" Property="Visibility" Value="Collapsed" />
                 <Setter TargetName="ScaledHost" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <!--  逐实例/样式级关掉浮起阴影：与 ComboBox 等同排控件搭配时不再突兀  -->
+            <Trigger Property="ShowShadow" Value="False">
+                <Setter TargetName="ContentBorder" Property="Effect" Value="{x:Null}" />
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter TargetName="RootHost" Property="Opacity" Value="{StaticResource Button.Hover.Opacity}" />
