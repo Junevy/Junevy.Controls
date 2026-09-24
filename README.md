@@ -312,7 +312,7 @@ ThemeManager.ToggleTheme();
 | `DisplayMode` | 形状状态属性；当前只由 `ExpanderButton` 样式的触发器读取 |
 | `SwitchSize` | 开关整体高度，轨道宽度按 2:1 比例自动推导，默认 `20`，建议不小于 `12` |
 
-开关采用「轨道 + 滑块」结构：滑块直径 = `SwitchSize` − 4（扣除左右边框与内边距），与轨道内壁严丝合缝；胶囊模板圆角 = `SwitchSize` / 2，矩形模板使用 `Theme.SmallCornerRadius`，滑块圆角恒比轨道圆角小 2 DIP（内缩量），任意尺寸下内外圆角都保持视觉吻合。切换时滑块以缓动动画滑动到对侧。
+开关采用「轨道 + 滑块」结构，几何由控件统一推导（`TrackHeight` / `TrackWidth` / `TrackPadding` / `TrackCornerRadius` / `ThumbSize` / `ThumbCornerRadius` / `ThumbTravel` 均为只读派生属性，仅供模板绑定，外部不应设置）。推导时先把尺寸换算成**整数设备像素**再折回 DIP，滑块的四边内缩由同一个内缩值决定，因此在 100% / 125% / 150% 等任意缩放下上下左右严格相等，不会出现一边多 1 像素；代价是渲染高度落在整数设备像素上，与 `SwitchSize` 设定值最多相差半个设备像素（125% 下 ≤0.4 DIP）。窗口换到不同缩放的显示器后会在下一次测量时按新比例重新吸附。胶囊模板圆角 = 轨道高 / 2，矩形模板使用 `Theme.SmallCornerRadius`，滑块圆角恒比轨道圆角小一个内缩量，内外圆角视觉吻合。切换时滑块以缓动动画滑动到对侧。
 
 ```xml
 <jv:ToggleButton
@@ -326,7 +326,7 @@ ThemeManager.ToggleTheme();
 
 ### RadioButton
 
-`jv:RadioButton` 继承 WPF `RadioButton`，支持标准分组、命令和双向选中绑定。
+`jv:RadioButton` 继承 WPF `RadioButton`，支持标准分组、命令和双向选中绑定。选中标记是矢量圆点（`EllipseGeometry`，几何中心即元素中心），不受图标字体的 em 盒留白影响，因此在任意缩放下都严格居中于选择框。
 
 | 属性 | 效果 |
 | --- | --- |
@@ -344,9 +344,9 @@ ThemeManager.ToggleTheme();
 
 ### CheckBox
 
-`jv:CheckBox` 继承 WPF `CheckBox`，保留 `IsChecked`、三态和命令行为，使用内置图标字体绘制勾选标记。
+`jv:CheckBox` 继承 WPF `CheckBox`，保留 `IsChecked`、三态和命令行为，勾选标记为矢量对勾（圆头描边折线，几何包围盒等于标记元素盒），居中由布局保证，不再依赖图标字体度量。
 
-依赖：主题资源、焦点样式、`atc:Icon.FontFamily`。该附加属性只影响勾选符号字体。
+依赖：主题资源、焦点样式。默认样式仍保留 `atc:Icon.FontFamily` 的 Setter，但内置模板已不读取它——勾选标记改用矢量绘制后该附加属性不再影响外观；宿主自定义模板若要用图标字体需自行绑回。
 
 ```xml
 <jv:CheckBox Content="Enable inspection" IsChecked="{Binding InspectionEnabled, Mode=TwoWay}" />

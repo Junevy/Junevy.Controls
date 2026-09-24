@@ -23,16 +23,20 @@
                     BorderThickness="1.5"
                     CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
 
-                    <!--  勾选图标  -->
-                    <TextBlock
+                    <!--  勾选标记：矢量对勾，几何包围盒恰好等于元素盒（0,0 起算 + 显式宽高），居中时不会因笔画或坐标偏移而偏心  -->
+                    <Path
                         x:Name="CheckMark"
+                        Width="9"
+                        Height="6.5"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        FontFamily="{TemplateBinding atc:Icon.FontFamily}"
-                        FontSize="12"
-                        Foreground="{DynamicResource Theme.Brush.Text.OnAccent}"
+                        Data="M 0,3.5 L 3,6.5 L 9,0"
                         Opacity="0"
-                        Text="&#xe611;" />
+                        Stroke="{DynamicResource Theme.Brush.Text.OnAccent}"
+                        StrokeEndLineCap="Round"
+                        StrokeLineJoin="Round"
+                        StrokeStartLineCap="Round"
+                        StrokeThickness="1.5" />
                 </Border>
 
                 <!--  文本  -->
@@ -89,7 +93,7 @@
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
                 <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
-                <Setter TargetName="CheckMark" Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
+                <Setter TargetName="CheckMark" Property="Stroke" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
                 <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
             </Trigger>
 

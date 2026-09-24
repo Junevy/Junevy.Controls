@@ -53,18 +53,18 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <!--  轨道：宽 = 2 × SwitchSize，高 = SwitchSize，尺寸与圆角均由控件按 SwitchSize 推导  -->
+            <!--  轨道：宽高与内缩都由控件按 SwitchSize 吸附到整数设备像素后推导，保证滑块四周内缩严格相等  -->
             <Border
                 x:Name="ToggleHost"
                 Grid.Column="0"
                 Width="{TemplateBinding TrackWidth}"
-                Height="{TemplateBinding SwitchSize}"
-                Padding="1"
+                Height="{TemplateBinding TrackHeight}"
+                Padding="{TemplateBinding TrackPadding}"
                 Background="Transparent"
                 BorderBrush="{DynamicResource Theme.Brush.Border.Strong}"
                 BorderThickness="1"
                 CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
-                <!--  滑块：边长 = SwitchSize - 4，与边框、内边距严丝合缝；Checked 时由控件代码驱动滑动动画  -->
+                <!--  滑块：边长 = 轨道高 - 两侧内缩，与边框、内边距严丝合缝；Checked 时由控件代码驱动滑动动画  -->
                 <Border
                     x:Name="PART_Thumb"
                     Width="{TemplateBinding ThumbSize}"
@@ -135,19 +135,19 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <!--  轨道：宽 = 2 × SwitchSize，高 = SwitchSize，胶囊圆角 = SwitchSize / 2，由控件按 SwitchSize 推导  -->
+            <!--  轨道：宽高与内缩都由控件按 SwitchSize 吸附到整数设备像素后推导，胶囊圆角 = 轨道高 / 2  -->
             <Border
                 x:Name="ToggleHost"
                 Grid.Column="0"
                 Width="{TemplateBinding TrackWidth}"
-                Height="{TemplateBinding SwitchSize}"
-                Padding="1"
+                Height="{TemplateBinding TrackHeight}"
+                Padding="{TemplateBinding TrackPadding}"
                 Background="Transparent"
                 BorderBrush="{DynamicResource Theme.Brush.Border.Strong}"
                 BorderThickness="1"
                 CornerRadius="{TemplateBinding TrackCornerRadius}">
 
-                <!--  滑块：直径 = SwitchSize - 4，与边框、内边距严丝合缝；Checked 时由控件代码驱动滑动动画  -->
+                <!--  滑块：直径 = 轨道高 - 两侧内缩，与边框、内边距严丝合缝；Checked 时由控件代码驱动滑动动画  -->
                 <Border
                     x:Name="PART_Thumb"
                     Width="{TemplateBinding ThumbSize}"

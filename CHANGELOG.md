@@ -2,6 +2,28 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## 开关滑块与选中勾标的像素级居中
+
+### 本次更新（`jv:ToggleButton` 开关几何按 DPI 吸附整数设备像素；`jv:RadioButton` / `jv:CheckBox` 选中勾标改矢量绘制）— 2026-09-24
+
+- **动因**：用户实机反馈两处——① 开关的滑块上下边距不一样，下面比上面多出几个像素；② 单选框选中后的图像不在正中间。附图为 125% 缩放下的真机截图。
+- **根因 A（ToggleButton，不是 Padding 写错）**：旧几何全程按 DIP 直算（轨道高 = `SwitchSize`、`Padding="1"`、滑块 = `SwitchSize − 4`），而 WPF 把描边、内边距、元素偏移**各自独立**吸附到整数设备像素。125% 缩放下 1 DIP = 1.25 px，同一条内缩量在上下两条边上的取整方向可以不同，于是内缩一边 2 px、另一边 3 px；`SwitchSize` 为奇数 DIP 时轨道自身还落在半像素上，误差进一步放大。探针里旧几何的实测表现：S=20 上下 `2/3`、S=22 上下 `2/4`、S=24 上下 `3/2`、S=32 上下 `3/2`。
+- **根因 B（RadioButton / CheckBox）**：勾选标记是 iconfont 字形（单选 `E981`、复选 `E611`）用 `TextBlock` 居中摆放。`HorizontalAlignment=Center` 居中的是**em 盒**，而字形墨迹在 em 盒里的位置由字体设计决定（上下留白不对称），墨迹中心必然偏心；`E981` 在 125% 下实测绝对偏心 `+0.57,+0.36` 设备像素。这与控件模板的边距设置无关，改 Padding 治不好。
+- **改法 A（`Controls/Button/ToggleButton.xaml.cs`）**：`UpdateSwitchGeometry()` 先把尺寸换算成整数设备像素再折回 DIP——`trackPx = round(SwitchSize × scale)`、`trackWidthPx = round(SwitchSize × 2 × scale)`、单侧内缩 `insetPx = max(1, round(2 × scale))`、`thumbPx = trackPx − 2 × insetPx`，最后统一 `/ scale` 写回。上下与左右内缩由**同一个** `insetPx` 决定，因此严格相等，与取整方向无关。
+- **改法 A 的新增/变更派生属性**（全部 `RegisterReadOnly`，仅供模板绑定）：新增 `TrackHeight`（吸附后的轨道高，替代模板里直绑 `SwitchSize`）与 `TrackPadding`（`Thickness`，= `insetPx` 扣掉 1 DIP 描边后折回的 DIP 值）；`TrackWidth`、`TrackCornerRadius`、`ThumbSize`、`ThumbCornerRadius`、`ThumbTravel` 的取值改为由吸附后的像素推导。`TrackPadding` 必须是 `Thickness` 类型：`TemplateBinding` 不做类型转换，用 `double` 绑 `Padding` 会**静默失效**。模板 `SwitchToggleButton_Radius` / `SwitchToggleButton_Rect` 两处轨道的 `Height` 改绑 `TrackHeight`、`Padding="1"` 改绑 `TrackPadding`。
+- **改法 A 的代价（明确记录）**：渲染出的开关高度是整数设备像素，折回 DIP 后与 `SwitchSize` 设定值最多相差半个设备像素（125% 下 ≤0.4 DIP，如 S=14 渲染为 14.4 DIP）。这是「四边内缩严格相等」与「逻辑高度精确等于设定值」之间的取舍，本轮选前者。
+- **改法 A 的缩放变更响应**：重写 `MeasureOverride`，比对 `VisualTreeHelper.GetDpi(this).PixelsPerDip`，窗口拖到不同缩放的显示器或系统缩放被改动后按新比例重新吸附；旧实现只在 `SwitchSize` 变化时推导，缩放改变不会重算。
+- **改法 B**：勾选标记换成矢量 `Path`。单选（`Controls/Button/RadioButton.xaml` 的 Circular 与 Rectangular 两个模板同步替换）为 `8×8` 的 `EllipseGeometry`（`Center=4,4`，几何中心即元素盒中心）；复选（`Controls/Box/CheckBox.xaml`）为 `9×6.5` 折线 `M 0,3.5 L 3,6.5 L 9,0` + `StrokeThickness=1.5` 圆头描边，几何包围盒等于元素盒且两端圆头对称外伸，墨迹中心与元素盒中心重合。居中改由布局（`HorizontalAlignment`/`VerticalAlignment=Center` + 显式宽高）保证，不再依赖字体度量。Disabled 触发器的 Setter 目标由 `Foreground` 改为 `Fill`（单选）/ `Stroke`（复选）；RadioButton 因不再用图标字体而移除 `xmlns:atc` 声明。
+- **兼容性**：勾选标记不再受 `atc:Icon.FontFamily` 影响（CheckBox 默认样式仍保留该 Setter，但内置模板已不读取它；宿主自定义模板若要用图标字体需自行绑回）。尺寸、命中区域、状态触发器集合、颜色令牌、`SwitchSize` 语义均未改动。
+- **版本号**：`1.8.3`——`Junevy.Controls.csproj` 的 `Version` 现值即 `1.8.3`（上一节 Toolbox 直角随 `1.8.1` 写就，其后由维护者手动升到 `1.8.3`），本轮属该版本内的缺陷修复，未再改动 csproj；版本单一来源仍是 csproj，`AssemblyInfo.cs` 不含显式版本特性。
+- 文档：README 的 ToggleButton 小节改写几何推导说明并补 `TrackHeight` / `TrackPadding` 与「最多半个设备像素」的取舍；RadioButton 小节补矢量圆点一句；CheckBox 小节的「使用内置图标字体绘制勾选标记」改为矢量对勾，并注明 `atc:Icon.FontFamily` 已不参与。
+- **验证（探针为临时工程，不入库）**：
+  - `.workbuddy/tmp/CenterProbe/`：真机截屏（GDI `CopyFromScreen`，不用 `RenderTargetBitmap`，因为离屏渲染与上屏结果不一致）逐尺寸测「轨道墨迹盒 vs 滑块墨迹盒」四边内缩，断言 上==下、右==上、内缩 ≥1 px、滑块为正方形。`SwitchSize ∈ {14,16,18,20,22,24,26,32}` × 4 场景（`UseLayoutRounding` 开/关 × 样式自带 Margin 保留/归零）：**当前实现 0 项不合格**，125% 下一律「上2 下2 右2」。**变异反证**：运行时把几何退回旧算法（轨道高 = `SwitchSize`、`Padding=1`、滑块 = `SwitchSize − 4`）→ 12 项不合格，判据确实抓得住原缺陷。
+  - `.workbuddy/tmp/MarkProbe/`：**差分判据**——同屏并排摆「手工居中的理想矢量样本」与真控件，用同一套质心度量取差值 δ，把抗锯齿、圆角、描边造成的共模偏差抵消；基准取**布局预测的元素盒中心**（精确值）而非像素估计（后者在 0.5 px 噪声下不可信）。结果：Radio 圆形/方形与 CheckBox 共 8 个用例 δ = `0.00,0.00` ~ `0.00,+0.01` px（容差 0.25）；**人为偏心反证**——把理想样本平移 2 DIP 后 δ = `+1.99,+1.99`（圆点）、`+1.00,+1.00`（对勾），4/4 全部检出（阈值 0.6）；**老字形反证**——改动前的 `E981` 字形在同一判据下绝对偏心 `+0.57,+0.36` px 被判不合格，说明探针有判别力而非「一律放过」。不合格 0 项，结论：通过。
+  - Showcase 真机截图人工核对（125%）：深色下胶囊开关列像素剖面——轨道描边在 y=734 与 y=761，滑块实心 738..757 加两侧半覆盖边缘 737/758，上下各 2 px 严格对称；矩形开关同一轨道下滑块 736..759，上下各 1 px 对称；单选圆点与复选对勾在 12× 放大裁图里居中，禁用态勾标颜色正常。
+  - **踩坑记录**：真机截屏探针会被**物理鼠标停留位置**污染——悬停会把开关轨道填成强调蓝，使「滑块墨迹 = 蓝像素」这条判据把整条轨道当成滑块（CenterProbe 的 S=16 一度因此报 2 项不合格，且在 4 个场景里稳定复现，极易误判成真实缺陷）。把光标移到屏幕角落再复跑即归零。
+- 回归：`Junevy.Controls.csproj` Release 双目标框（net8.0-windows + net48）`-t:Rebuild` 0 错误、40 个既有可空性警告（数量与改动前一致）；Showcase 工程 0 错误 0 警告；`CenterProbe`、`MarkProbe` 复跑全部通过。
+
 ## Toolbox 容器改直角 `Theme.ToolboxCornerRadius`
 
 ### 本次更新（新增 `Theme.ToolboxCornerRadius`（值 0），Toolbox 容器不再带圆角）— 2026-09-23
