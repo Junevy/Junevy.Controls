@@ -13,8 +13,9 @@
 - **改法 A 的新增/变更派生属性**（全部 `RegisterReadOnly`，仅供模板绑定）：新增 `TrackHeight`（吸附后的轨道高，替代模板里直绑 `SwitchSize`）与 `TrackPadding`（`Thickness`，= `insetPx` 扣掉 1 DIP 描边后折回的 DIP 值）；`TrackWidth`、`TrackCornerRadius`、`ThumbSize`、`ThumbCornerRadius`、`ThumbTravel` 的取值改为由吸附后的像素推导。`TrackPadding` 必须是 `Thickness` 类型：`TemplateBinding` 不做类型转换，用 `double` 绑 `Padding` 会**静默失效**。模板 `SwitchToggleButton_Radius` / `SwitchToggleButton_Rect` 两处轨道的 `Height` 改绑 `TrackHeight`、`Padding="1"` 改绑 `TrackPadding`。
 - **改法 A 的代价（明确记录）**：渲染出的开关高度是整数设备像素，折回 DIP 后与 `SwitchSize` 设定值最多相差半个设备像素（125% 下 ≤0.4 DIP，如 S=14 渲染为 14.4 DIP）。这是「四边内缩严格相等」与「逻辑高度精确等于设定值」之间的取舍，本轮选前者。
 - **改法 A 的缩放变更响应**：重写 `MeasureOverride`，比对 `VisualTreeHelper.GetDpi(this).PixelsPerDip`，窗口拖到不同缩放的显示器或系统缩放被改动后按新比例重新吸附；旧实现只在 `SwitchSize` 变化时推导，缩放改变不会重算。
-- **改法 B**：勾选标记换成矢量 `Path`。单选（`Controls/Button/RadioButton.xaml` 的 Circular 与 Rectangular 两个模板同步替换）为 `8×8` 的 `EllipseGeometry`（`Center=4,4`，几何中心即元素盒中心）；复选（`Controls/Box/CheckBox.xaml`）为 `9×6.5` 折线 `M 0,3.5 L 3,6.5 L 9,0` + `StrokeThickness=1.5` 圆头描边，几何包围盒等于元素盒且两端圆头对称外伸，墨迹中心与元素盒中心重合。居中改由布局（`HorizontalAlignment`/`VerticalAlignment=Center` + 显式宽高）保证，不再依赖字体度量。Disabled 触发器的 Setter 目标由 `Foreground` 改为 `Fill`（单选）/ `Stroke`（复选）；RadioButton 因不再用图标字体而移除 `xmlns:atc` 声明。
-- **兼容性**：勾选标记不再受 `atc:Icon.FontFamily` 影响（CheckBox 默认样式仍保留该 Setter，但内置模板已不读取它；宿主自定义模板若要用图标字体需自行绑回）。尺寸、命中区域、状态触发器集合、颜色令牌、`SwitchSize` 语义均未改动。
+- **改法 B**：勾选标记换成矢量 `Path`。单选（`Controls/Button/RadioButton.xaml` 的 Circular 与 Rectangular 两个模板同步替换）为 `8×8` 的 `EllipseGeometry`（`Center=4,4`，几何中心即元素盒中心）；复选（`Controls/Box/CheckBox.xaml`）为 `9×6.5` 折线 `M 0,3.5 L 3,6.5 L 9,0` + `StrokeThickness=1.5` 圆头描边，几何包围盒等于元素盒且两端圆头对称外伸，墨迹中心与元素盒中心重合。居中改由布局（`HorizontalAlignment`/`VerticalAlignment=Center` + 显式宽高）保证，不再依赖字体度量。Disabled 触发器的 Setter 目标由 `Foreground` 改为 `Fill`（单选）/ `Stroke`（复选）。
+- **随之清掉的死引用**：两个字典里为图标字体勾选标记而存在、改矢量后不再被读取的引用一并删除——`RadioButton.xaml` 的 `xmlns:atc` 声明，`CheckBox.xaml` 的 `xmlns:atc`、`atc:Icon.FontFamily` Setter 与 `Resources/Font/IconFont.xaml` 合并项。删除是行为中性的：`atc:Icon.FontFamily` 的注册默认值本就是内置 `iconfont`，且 `Themes/Generic.xaml` 仍合并 `IconFont.xaml`，宿主自定义模板要沿用图标字体直接绑定即可，不必自己引字典。库内其余控件（`AppBar` / `MessageBar` / `ToggleButton` 的 Expander 箭头 / `TextBox` / `ComboBox` / `SideMenu` / `TabMenu` / `ContextMenu` / `ExpanderPanel` / `ProgressBarWindow` / `Label`）对 `IconFont` 的使用都还在，未受影响。
+- **兼容性**：勾选标记不再受 `atc:Icon.FontFamily` 影响。尺寸、命中区域、状态触发器集合、颜色令牌、`SwitchSize` 语义均未改动。
 - **版本号**：`1.8.3`——`Junevy.Controls.csproj` 的 `Version` 现值即 `1.8.3`（上一节 Toolbox 直角随 `1.8.1` 写就，其后由维护者手动升到 `1.8.3`），本轮属该版本内的缺陷修复，未再改动 csproj；版本单一来源仍是 csproj，`AssemblyInfo.cs` 不含显式版本特性。
 - 文档：README 的 ToggleButton 小节改写几何推导说明并补 `TrackHeight` / `TrackPadding` 与「最多半个设备像素」的取舍；RadioButton 小节补矢量圆点一句；CheckBox 小节的「使用内置图标字体绘制勾选标记」改为矢量对勾，并注明 `atc:Icon.FontFamily` 已不参与。
 - **验证（探针为临时工程，不入库）**：
@@ -22,7 +23,7 @@
   - `.workbuddy/tmp/MarkProbe/`：**差分判据**——同屏并排摆「手工居中的理想矢量样本」与真控件，用同一套质心度量取差值 δ，把抗锯齿、圆角、描边造成的共模偏差抵消；基准取**布局预测的元素盒中心**（精确值）而非像素估计（后者在 0.5 px 噪声下不可信）。结果：Radio 圆形/方形与 CheckBox 共 8 个用例 δ = `0.00,0.00` ~ `0.00,+0.01` px（容差 0.25）；**人为偏心反证**——把理想样本平移 2 DIP 后 δ = `+1.99,+1.99`（圆点）、`+1.00,+1.00`（对勾），4/4 全部检出（阈值 0.6）；**老字形反证**——改动前的 `E981` 字形在同一判据下绝对偏心 `+0.57,+0.36` px 被判不合格，说明探针有判别力而非「一律放过」。不合格 0 项，结论：通过。
   - Showcase 真机截图人工核对（125%）：深色下胶囊开关列像素剖面——轨道描边在 y=734 与 y=761，滑块实心 738..757 加两侧半覆盖边缘 737/758，上下各 2 px 严格对称；矩形开关同一轨道下滑块 736..759，上下各 1 px 对称；单选圆点与复选对勾在 12× 放大裁图里居中，禁用态勾标颜色正常。
   - **踩坑记录**：真机截屏探针会被**物理鼠标停留位置**污染——悬停会把开关轨道填成强调蓝，使「滑块墨迹 = 蓝像素」这条判据把整条轨道当成滑块（CenterProbe 的 S=16 一度因此报 2 项不合格，且在 4 个场景里稳定复现，极易误判成真实缺陷）。把光标移到屏幕角落再复跑即归零。
-- 回归：`Junevy.Controls.csproj` Release 双目标框（net8.0-windows + net48）`-t:Rebuild` 0 错误、40 个既有可空性警告（数量与改动前一致）；Showcase 工程 0 错误 0 警告；`CenterProbe`、`MarkProbe` 复跑全部通过。
+- 回归：`Junevy.Controls.csproj` Release 双目标框（net8.0-windows + net48）`-t:Rebuild` 0 错误、40 个既有可空性警告（数量与改动前一致）；Showcase 工程 0 错误 0 警告；`CenterProbe`、`MarkProbe` 复跑全部通过——上述 `IconFont` 死引用移除后两者再次复跑，仍为 0 项不合格（探针里「老字形」用例需要自行解析 `IconFont`，它走 `Themes/Generic.xaml` 的合并项或 pack URI 兜底，不依赖 CheckBox 字典）。
 
 ## Toolbox 容器改直角 `Theme.ToolboxCornerRadius`
 

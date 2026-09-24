@@ -346,7 +346,7 @@ ThemeManager.ToggleTheme();
 
 `jv:CheckBox` 继承 WPF `CheckBox`，保留 `IsChecked`、三态和命令行为，勾选标记为矢量对勾（圆头描边折线，几何包围盒等于标记元素盒），居中由布局保证，不再依赖图标字体度量。
 
-依赖：主题资源、焦点样式。默认样式仍保留 `atc:Icon.FontFamily` 的 Setter，但内置模板已不读取它——勾选标记改用矢量绘制后该附加属性不再影响外观；宿主自定义模板若要用图标字体需自行绑回。
+依赖：主题资源、焦点样式。勾选标记改用矢量绘制后，模板不再读取 `atc:Icon.FontFamily`，默认样式里相应的 Setter 与 `Resources/Font/IconFont.xaml` 合并引用已一并移除；宿主自定义模板若要用图标字体，`atc:Icon.FontFamily` 的默认值本身就是内置 `iconfont`，且 `Themes/Generic.xaml` 仍合并了 `IconFont.xaml`，直接绑定即可。
 
 ```xml
 <jv:CheckBox Content="Enable inspection" IsChecked="{Binding InspectionEnabled, Mode=TwoWay}" />
