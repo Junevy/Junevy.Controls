@@ -322,7 +322,7 @@
             <Trigger Property="IsFocused" Value="True">
                 <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
                 <Setter TargetName="Border" Property="BorderThickness" Value="1" />
-                <Setter TargetName="Border" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
+                <Setter TargetName="Border" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Focused}" />
             </Trigger>
 
 

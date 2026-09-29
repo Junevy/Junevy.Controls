@@ -84,10 +84,11 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
+                    <!--  侧栏与内容区之间只是分隔线，不是控件轮廓：走 Border.Subtle（1.3:1），比发丝线更退一层  -->
                     <Border
                         Grid.Column="0"
                         Background="{DynamicResource Theme.Brush.Surface.Base}"
-                        BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                        BorderBrush="{DynamicResource Theme.Brush.Border.Subtle}"
                         BorderThickness="0,0,1,0">
                         <jv:SideMenu
                             x:Name="NavMenu"

@@ -3,14 +3,18 @@
     <!--
         深色主题 — “Aperture · Umbra”（本影）
 
-        与浅色共用同一条 214° 灰阶线，只是从另一端读起：Slate.0 与 Chalk.1000
+        与浅色共用同一条低彩度灰阶线，只是从另一端读起：Slate.0 与 Chalk.1000
         是同一滴墨。因此深色不是另一套配色，而是同一套色卡的另一种曝光。
 
-        · 不累眼：底面 #121922 → 卡片 #1A222D，避开纯黑（纯黑会把边框逼成灰白）；
-          正文 L* 收在 89 而非 93+，消除暗底亮字的眩光边缘，对比仍达 13.4:1。
+        · 不累眼：底面 #16191C → 卡片 #1F2226，避开纯黑（纯黑会把边框逼成灰白）；
+          正文 L* 收在 89 而非 93+，消除暗底亮字的眩光边缘，卡片上仍有 12.1:1。
         · 层级靠表面台阶：本主题把高度差交给 ΔL* 递进的表面，
-          所以边框可以放心安静（相对表面 2.2:1）——暗色下过强的边框会连成一片网格。
+          所以边框可以放心安静——静止态 1.79:1 只剩一层轮廓，悬停 / 勾选框描边才给到 3.19:1；
+          暗色下过强的边框会连成一片网格。
+        · 中性线彩度同样封顶 C*≤7（旧值 16），深色不再整体泛蓝。
         · 语义分工：Cobalt 只做主操作；Coating（镀膜青）只做信息与焦点环。
+        · 警告用真黄 #E2C600：深色底给得起亮度，压在画布上 10.35:1、墨字压在上面 11.57:1，
+          不必像浅色那样在「够黄」与「可读」之间让步。
 
         命名约定：
         Palette.{Family}.{Step}        — 原语，唯一真值来源
@@ -30,40 +34,40 @@
         ============================================================
     -->
 
-    <!--  Chalk — 纸白到墨黑，全部落在 214° 色相线上。浅色主题自上而下取用。  -->
+    <!--  Chalk — 纸白到墨黑，仍落在 214° 那条线上，但彩度封顶 C*≤7（旧值 16）——灰就是灰，蓝交给 Cobalt。浅色主题自上而下取用。  -->
     <Color x:Key="Palette.Chalk.0">#FFFFFF</Color>
-    <Color x:Key="Palette.Chalk.25">#FAFCFE</Color>
-    <Color x:Key="Palette.Chalk.50">#EEF3F9</Color>
-    <Color x:Key="Palette.Chalk.75">#EAF1F7</Color>
-    <Color x:Key="Palette.Chalk.100">#DFE7EF</Color>
-    <Color x:Key="Palette.Chalk.150">#D5DFE9</Color>
-    <Color x:Key="Palette.Chalk.200">#C3D0DE</Color>
-    <Color x:Key="Palette.Chalk.300">#A7B8CB</Color>
-    <Color x:Key="Palette.Chalk.400">#8294AB</Color>
-    <Color x:Key="Palette.Chalk.500">#75899F</Color>
-    <Color x:Key="Palette.Chalk.550">#5C7089</Color>
-    <Color x:Key="Palette.Chalk.600">#56677B</Color>
-    <Color x:Key="Palette.Chalk.700">#3E5065</Color>
-    <Color x:Key="Palette.Chalk.800">#1C2937</Color>
-    <Color x:Key="Palette.Chalk.900">#111A24</Color>
+    <Color x:Key="Palette.Chalk.25">#FBFCFD</Color>
+    <Color x:Key="Palette.Chalk.50">#F1F3F5</Color>
+    <Color x:Key="Palette.Chalk.75">#EEF0F3</Color>
+    <Color x:Key="Palette.Chalk.100">#E3E6EA</Color>
+    <Color x:Key="Palette.Chalk.150">#DADEE2</Color>
+    <Color x:Key="Palette.Chalk.200">#CACFD5</Color>
+    <Color x:Key="Palette.Chalk.300">#B0B7BE</Color>
+    <Color x:Key="Palette.Chalk.400">#8C939C</Color>
+    <Color x:Key="Palette.Chalk.500">#808891</Color>
+    <Color x:Key="Palette.Chalk.550">#686F79</Color>
+    <Color x:Key="Palette.Chalk.600">#60666E</Color>
+    <Color x:Key="Palette.Chalk.700">#494F57</Color>
+    <Color x:Key="Palette.Chalk.800">#24282E</Color>
+    <Color x:Key="Palette.Chalk.900">#171A1E</Color>
     <Color x:Key="Palette.Chalk.1000">#070B10</Color>
 
-    <!--  Slate — 与 Chalk 同一条线的另一端读起：Slate.0 与 Chalk.1000 是同一滴墨。  -->
+    <!--  Slate — 与 Chalk 同一条线的另一端读起：Slate.0 与 Chalk.1000 是同一滴墨，同样低彩度。  -->
     <Color x:Key="Palette.Slate.0">#070B10</Color>
-    <Color x:Key="Palette.Slate.25">#0D1218</Color>
-    <Color x:Key="Palette.Slate.50">#121922</Color>
-    <Color x:Key="Palette.Slate.75">#1A222D</Color>
-    <Color x:Key="Palette.Slate.100">#212B38</Color>
-    <Color x:Key="Palette.Slate.125">#283340</Color>
-    <Color x:Key="Palette.Slate.150">#2E3A48</Color>
-    <Color x:Key="Palette.Slate.175">#3D4B5C</Color>
-    <Color x:Key="Palette.Slate.200">#4B5A6C</Color>
-    <Color x:Key="Palette.Slate.250">#5F7185</Color>
-    <Color x:Key="Palette.Slate.400">#8D9CB1</Color>
-    <Color x:Key="Palette.Slate.500">#A2B1C4</Color>
-    <Color x:Key="Palette.Slate.700">#C2CFDE</Color>
-    <Color x:Key="Palette.Slate.800">#D8E1EC</Color>
-    <Color x:Key="Palette.Slate.900">#EEF3F9</Color>
+    <Color x:Key="Palette.Slate.25">#111215</Color>
+    <Color x:Key="Palette.Slate.50">#16191C</Color>
+    <Color x:Key="Palette.Slate.75">#1F2226</Color>
+    <Color x:Key="Palette.Slate.100">#272B30</Color>
+    <Color x:Key="Palette.Slate.125">#2F3238</Color>
+    <Color x:Key="Palette.Slate.150">#35393F</Color>
+    <Color x:Key="Palette.Slate.175">#454A51</Color>
+    <Color x:Key="Palette.Slate.200">#545960</Color>
+    <Color x:Key="Palette.Slate.250">#697078</Color>
+    <Color x:Key="Palette.Slate.400">#969BA4</Color>
+    <Color x:Key="Palette.Slate.500">#AAB0B8</Color>
+    <Color x:Key="Palette.Slate.700">#C9CED4</Color>
+    <Color x:Key="Palette.Slate.800">#DDE0E5</Color>
+    <Color x:Key="Palette.Slate.900">#F1F3F5</Color>
     <Color x:Key="Palette.Slate.1000">#FFFFFF</Color>
 
     <!--  Cobalt — 主色 — 光学蓝。按钮、选中、进度、活动指示。  -->
@@ -81,52 +85,52 @@
     <Color x:Key="Palette.Cobalt.950">#16304D</Color>
 
     <!--  Coating — 次色 — 镜头镀膜的青。只承担「信息」与「焦点」，绝不当第二个主色。  -->
-    <Color x:Key="Palette.Coating.50">#ECF8FB</Color>
+    <Color x:Key="Palette.Coating.50">#E6F5F9</Color>
     <Color x:Key="Palette.Coating.100">#D3EFF5</Color>
     <Color x:Key="Palette.Coating.200">#A9E0EB</Color>
     <Color x:Key="Palette.Coating.300">#74CBDC</Color>
     <Color x:Key="Palette.Coating.400">#3FB4CB</Color>
     <Color x:Key="Palette.Coating.500">#1795B0</Color>
-    <Color x:Key="Palette.Coating.600">#0B7C91</Color>
+    <Color x:Key="Palette.Coating.600">#00768D</Color>
     <Color x:Key="Palette.Coating.700">#086475</Color>
     <Color x:Key="Palette.Coating.800">#07505E</Color>
     <Color x:Key="Palette.Coating.950">#0C3440</Color>
 
-    <!--  Green — 成功态。  -->
-    <Color x:Key="Palette.Green.100">#D8F3E3</Color>
-    <Color x:Key="Palette.Green.200">#A8E2C2</Color>
-    <Color x:Key="Palette.Green.300">#6FCF9B</Color>
-    <Color x:Key="Palette.Green.400">#45C48A</Color>
-    <Color x:Key="Palette.Green.500">#1F9D5B</Color>
-    <Color x:Key="Palette.Green.600">#157A46</Color>
-    <Color x:Key="Palette.Green.700">#0F6036</Color>
-    <Color x:Key="Palette.Green.950">#0E3526</Color>
+    <!--  Green — 成功态。深色侧用 400/300，浅色侧用 600/700，彩度按色域上限重解过去除褪色感。  -->
+    <Color x:Key="Palette.Green.100">#E7F8EB</Color>
+    <Color x:Key="Palette.Green.200">#C0E8C9</Color>
+    <Color x:Key="Palette.Green.300">#6DD38C</Color>
+    <Color x:Key="Palette.Green.400">#58C278</Color>
+    <Color x:Key="Palette.Green.500">#159A51</Color>
+    <Color x:Key="Palette.Green.600">#057E42</Color>
+    <Color x:Key="Palette.Green.700">#126A39</Color>
+    <Color x:Key="Palette.Green.950">#173823</Color>
 
-    <!--  Amber — 警告态。  -->
-    <Color x:Key="Palette.Amber.100">#FCF0D6</Color>
-    <Color x:Key="Palette.Amber.200">#F7DDA6</Color>
-    <Color x:Key="Palette.Amber.300">#EDC066</Color>
-    <Color x:Key="Palette.Amber.400">#DFA432</Color>
-    <Color x:Key="Palette.Amber.500">#C08412</Color>
-    <Color x:Key="Palette.Amber.600">#916308</Color>
-    <Color x:Key="Palette.Amber.700">#7A4A04</Color>
-    <Color x:Key="Palette.Amber.950">#3E2A08</Color>
+    <!--  Yellow — 警告态。色相角 97–102°——真黄。深色直接用 400/300，浅色受近白底限制只能取 600/700（见 check.js 的浅色 Warning 例外）。  -->
+    <Color x:Key="Palette.Yellow.100">#FFF6C4</Color>
+    <Color x:Key="Palette.Yellow.200">#FBE79B</Color>
+    <Color x:Key="Palette.Yellow.300">#EDD600</Color>
+    <Color x:Key="Palette.Yellow.400">#E2C600</Color>
+    <Color x:Key="Palette.Yellow.500">#C7AC00</Color>
+    <Color x:Key="Palette.Yellow.600">#A08700</Color>
+    <Color x:Key="Palette.Yellow.700">#947A00</Color>
+    <Color x:Key="Palette.Yellow.950">#3E3503</Color>
 
-    <!--  Red — 危险态。  -->
-    <Color x:Key="Palette.Red.100">#FCE2E2</Color>
-    <Color x:Key="Palette.Red.200">#F6B9B9</Color>
-    <Color x:Key="Palette.Red.300">#EE7B7B</Color>
-    <Color x:Key="Palette.Red.350">#F29C9C</Color>
-    <Color x:Key="Palette.Red.400">#E4646A</Color>
-    <Color x:Key="Palette.Red.500">#C33A3A</Color>
-    <Color x:Key="Palette.Red.600">#A82828</Color>
-    <Color x:Key="Palette.Red.700">#8A1F1F</Color>
-    <Color x:Key="Palette.Red.950">#4E1C1C</Color>
+    <!--  Red — 危险态。浅色基色由 L*38 的砖红抬到 L*45 的朱红。  -->
+    <Color x:Key="Palette.Red.100">#FFF0EE</Color>
+    <Color x:Key="Palette.Red.200">#FEC7C2</Color>
+    <Color x:Key="Palette.Red.300">#E77465</Color>
+    <Color x:Key="Palette.Red.350">#F88E81</Color>
+    <Color x:Key="Palette.Red.400">#EA685F</Color>
+    <Color x:Key="Palette.Red.500">#D74D44</Color>
+    <Color x:Key="Palette.Red.600">#BE3E2B</Color>
+    <Color x:Key="Palette.Red.700">#99352C</Color>
+    <Color x:Key="Palette.Red.950">#48201D</Color>
 
     <!--  投影、遮罩与禁用蒙层的载体色带 alpha，且两主题取值不同，故同属原语层  -->
     <Color x:Key="Palette.Effect.Shadow">#B3070B10</Color>
     <Color x:Key="Palette.Overlay.Backdrop">#B3070B10</Color>
-    <Color x:Key="Palette.State.DisabledVeil">#A00D1218</Color>
+    <Color x:Key="Palette.State.DisabledVeil">#A0111215</Color>
 
     <!--
         ============================================================
@@ -135,32 +139,33 @@
     -->
 
     <!--  背景  -->
-    <Color x:Key="Theme.Color.Background.App">#121922</Color>  <!--  = Palette.Slate.50  -->
-    <Color x:Key="Theme.Color.Background.Subtle">#212B38</Color>  <!--  = Palette.Slate.100  -->
-    <Color x:Key="Theme.Color.Background.Second">#0D1218</Color>  <!--  = Palette.Slate.25  -->
-    <Color x:Key="Theme.Color.Background.Third">#3D4B5C</Color>  <!--  = Palette.Slate.175  -->
+    <Color x:Key="Theme.Color.Background.App">#16191C</Color>  <!--  = Palette.Slate.50  -->
+    <Color x:Key="Theme.Color.Background.Subtle">#272B30</Color>  <!--  = Palette.Slate.100  -->
+    <Color x:Key="Theme.Color.Background.Second">#111215</Color>  <!--  = Palette.Slate.25  -->
+    <Color x:Key="Theme.Color.Background.Third">#454A51</Color>  <!--  = Palette.Slate.175  -->
 
     <!--  表面 — 由低到高的层级  -->
-    <Color x:Key="Theme.Color.Surface.Base">#1A222D</Color>  <!--  = Palette.Slate.75  -->
-    <Color x:Key="Theme.Color.Surface.Raised">#2E3A48</Color>  <!--  = Palette.Slate.150  -->
-    <Color x:Key="Theme.Color.Surface.Sunken">#0D1218</Color>  <!--  = Palette.Slate.25  -->
-    <Color x:Key="Theme.Color.Surface.Overlay">#2E3A48</Color>  <!--  = Palette.Slate.150  -->
-    <Color x:Key="Theme.Color.Surface.Hover">#212B38</Color>  <!--  = Palette.Slate.100  -->
-    <Color x:Key="Theme.Color.Surface.Pressed">#283340</Color>  <!--  = Palette.Slate.125  -->
+    <Color x:Key="Theme.Color.Surface.Base">#1F2226</Color>  <!--  = Palette.Slate.75  -->
+    <Color x:Key="Theme.Color.Surface.Raised">#35393F</Color>  <!--  = Palette.Slate.150  -->
+    <Color x:Key="Theme.Color.Surface.Sunken">#111215</Color>  <!--  = Palette.Slate.25  -->
+    <Color x:Key="Theme.Color.Surface.Overlay">#35393F</Color>  <!--  = Palette.Slate.150  -->
+    <Color x:Key="Theme.Color.Surface.Hover">#272B30</Color>  <!--  = Palette.Slate.100  -->
+    <Color x:Key="Theme.Color.Surface.Pressed">#2F3238</Color>  <!--  = Palette.Slate.125  -->
     <Color x:Key="Theme.Color.Surface.Selected">#16304D</Color>  <!--  = Palette.Cobalt.950  -->
+    <Color x:Key="Theme.Color.Surface.Focused">#272B30</Color>  <!--  = Palette.Slate.100  -->
 
     <!--  文字  -->
-    <Color x:Key="Theme.Color.Text.Primary">#D8E1EC</Color>  <!--  = Palette.Slate.800  -->
-    <Color x:Key="Theme.Color.Text.Secondary">#A2B1C4</Color>  <!--  = Palette.Slate.500  -->
-    <Color x:Key="Theme.Color.Text.Tertiary">#8D9CB1</Color>  <!--  = Palette.Slate.400  -->
-    <Color x:Key="Theme.Color.Text.Disabled">#3D4B5C</Color>  <!--  = Palette.Slate.175  -->
+    <Color x:Key="Theme.Color.Text.Primary">#DDE0E5</Color>  <!--  = Palette.Slate.800  -->
+    <Color x:Key="Theme.Color.Text.Secondary">#AAB0B8</Color>  <!--  = Palette.Slate.500  -->
+    <Color x:Key="Theme.Color.Text.Tertiary">#969BA4</Color>  <!--  = Palette.Slate.400  -->
+    <Color x:Key="Theme.Color.Text.Disabled">#454A51</Color>  <!--  = Palette.Slate.175  -->
     <Color x:Key="Theme.Color.Text.Inverse">#070B10</Color>  <!--  = Palette.Slate.0  -->
     <Color x:Key="Theme.Color.Text.OnAccent">#070B10</Color>  <!--  = Palette.Slate.0  -->
 
     <!--  边框  -->
-    <Color x:Key="Theme.Color.Border.Default">#4B5A6C</Color>  <!--  = Palette.Slate.200  -->
-    <Color x:Key="Theme.Color.Border.Subtle">#2E3A48</Color>  <!--  = Palette.Slate.150  -->
-    <Color x:Key="Theme.Color.Border.Strong">#5F7185</Color>  <!--  = Palette.Slate.250  -->
+    <Color x:Key="Theme.Color.Border.Default">#454A51</Color>  <!--  = Palette.Slate.175  -->
+    <Color x:Key="Theme.Color.Border.Subtle">#35393F</Color>  <!--  = Palette.Slate.150  -->
+    <Color x:Key="Theme.Color.Border.Strong">#697078</Color>  <!--  = Palette.Slate.250  -->
     <Color x:Key="Theme.Color.Border.Focus">#74CBDC</Color>  <!--  = Palette.Coating.300  -->
 
     <!--  主色 / 次色  -->
@@ -174,32 +179,32 @@
     <!--  状态 — 同时充当色块填充与前景文字，取值已按双重职责校准  -->
     <Color x:Key="Theme.Color.Status.Info">#74CBDC</Color>  <!--  = Palette.Coating.300  -->
     <Color x:Key="Theme.Color.Status.InfoSubtle">#0C3440</Color>  <!--  = Palette.Coating.950  -->
-    <Color x:Key="Theme.Color.Status.Success">#45C48A</Color>  <!--  = Palette.Green.400  -->
-    <Color x:Key="Theme.Color.Status.SuccessHover">#6FCF9B</Color>  <!--  = Palette.Green.300  -->
-    <Color x:Key="Theme.Color.Status.SuccessSubtle">#0E3526</Color>  <!--  = Palette.Green.950  -->
-    <Color x:Key="Theme.Color.Status.Warning">#DFA432</Color>  <!--  = Palette.Amber.400  -->
-    <Color x:Key="Theme.Color.Status.WarningHover">#EDC066</Color>  <!--  = Palette.Amber.300  -->
-    <Color x:Key="Theme.Color.Status.WarningSubtle">#3E2A08</Color>  <!--  = Palette.Amber.950  -->
-    <Color x:Key="Theme.Color.Status.Danger">#EE7B7B</Color>  <!--  = Palette.Red.300  -->
-    <Color x:Key="Theme.Color.Status.DangerHover">#F29C9C</Color>  <!--  = Palette.Red.350  -->
-    <Color x:Key="Theme.Color.Status.DangerSubtle">#4E1C1C</Color>  <!--  = Palette.Red.950  -->
+    <Color x:Key="Theme.Color.Status.Success">#58C278</Color>  <!--  = Palette.Green.400  -->
+    <Color x:Key="Theme.Color.Status.SuccessHover">#6DD38C</Color>  <!--  = Palette.Green.300  -->
+    <Color x:Key="Theme.Color.Status.SuccessSubtle">#173823</Color>  <!--  = Palette.Green.950  -->
+    <Color x:Key="Theme.Color.Status.Warning">#E2C600</Color>  <!--  = Palette.Yellow.400  -->
+    <Color x:Key="Theme.Color.Status.WarningHover">#EDD600</Color>  <!--  = Palette.Yellow.300  -->
+    <Color x:Key="Theme.Color.Status.WarningSubtle">#3E3503</Color>  <!--  = Palette.Yellow.950  -->
+    <Color x:Key="Theme.Color.Status.Danger">#E77465</Color>  <!--  = Palette.Red.300  -->
+    <Color x:Key="Theme.Color.Status.DangerHover">#F88E81</Color>  <!--  = Palette.Red.350  -->
+    <Color x:Key="Theme.Color.Status.DangerSubtle">#48201D</Color>  <!--  = Palette.Red.950  -->
 
     <!--  禁用态  -->
-    <Color x:Key="Theme.Color.State.DisabledSurface">#1A222D</Color>  <!--  = Palette.Slate.75  -->
-    <Color x:Key="Theme.Color.State.DisabledBorder">#3D4B5C</Color>  <!--  = Palette.Slate.175  -->
-    <Color x:Key="Theme.Color.State.DisabledForeground">#3D4B5C</Color>  <!--  = Palette.Slate.175  -->
+    <Color x:Key="Theme.Color.State.DisabledSurface">#1F2226</Color>  <!--  = Palette.Slate.75  -->
+    <Color x:Key="Theme.Color.State.DisabledBorder">#2F3238</Color>  <!--  = Palette.Slate.125  -->
+    <Color x:Key="Theme.Color.State.DisabledForeground">#454A51</Color>  <!--  = Palette.Slate.175  -->
 
     <!--  滚动条  -->
-    <Color x:Key="Theme.Color.ScrollBar.Thumb">#3D4B5C</Color>  <!--  = Palette.Slate.175  -->
-    <Color x:Key="Theme.Color.ScrollBar.ThumbHover">#5F7185</Color>  <!--  = Palette.Slate.250  -->
+    <Color x:Key="Theme.Color.ScrollBar.Thumb">#454A51</Color>  <!--  = Palette.Slate.175  -->
+    <Color x:Key="Theme.Color.ScrollBar.ThumbHover">#697078</Color>  <!--  = Palette.Slate.250  -->
 
     <!--  透明棋盘格底色  -->
-    <Color x:Key="Theme.Color.TransparentBackground.Base">#1A222D</Color>  <!--  = Palette.Slate.75  -->
-    <Color x:Key="Theme.Color.TransparentBackground.Alt">#0D1218</Color>  <!--  = Palette.Slate.25  -->
+    <Color x:Key="Theme.Color.TransparentBackground.Base">#1F2226</Color>  <!--  = Palette.Slate.75  -->
+    <Color x:Key="Theme.Color.TransparentBackground.Alt">#111215</Color>  <!--  = Palette.Slate.25  -->
     <Color x:Key="Theme.Color.Effect.Shadow">#B3070B10</Color>  <!--  = Palette.Effect.Shadow  -->
     <Color x:Key="Theme.Color.Overlay.Backdrop">#B3070B10</Color>  <!--  = Palette.Overlay.Backdrop  -->
-    <Color x:Key="Theme.Color.State.DisabledVeil">#A00D1218</Color>  <!--  = Palette.State.DisabledVeil  -->
-    <Color x:Key="Theme.Color.Status.Disable">#5F7185</Color>  <!--  = Palette.Slate.250  -->
+    <Color x:Key="Theme.Color.State.DisabledVeil">#A0111215</Color>  <!--  = Palette.State.DisabledVeil  -->
+    <Color x:Key="Theme.Color.Status.Disable">#697078</Color>  <!--  = Palette.Slate.250  -->
 
     <!--
         ============================================================
@@ -221,6 +226,7 @@
     <SolidColorBrush x:Key="Theme.Brush.Surface.Hover" Color="{StaticResource Palette.Slate.100}" />
     <SolidColorBrush x:Key="Theme.Brush.Surface.Pressed" Color="{StaticResource Palette.Slate.125}" />
     <SolidColorBrush x:Key="Theme.Brush.Surface.Selected" Color="{StaticResource Palette.Cobalt.950}" />
+    <SolidColorBrush x:Key="Theme.Brush.Surface.Focused" Color="{StaticResource Palette.Slate.100}" />
 
     <!--  文字  -->
     <SolidColorBrush x:Key="Theme.Brush.Text.Primary" Color="{StaticResource Palette.Slate.800}" />
@@ -231,7 +237,7 @@
     <SolidColorBrush x:Key="Theme.Brush.Text.OnAccent" Color="{StaticResource Palette.Slate.0}" />
 
     <!--  边框  -->
-    <SolidColorBrush x:Key="Theme.Brush.Border.Default" Color="{StaticResource Palette.Slate.200}" />
+    <SolidColorBrush x:Key="Theme.Brush.Border.Default" Color="{StaticResource Palette.Slate.175}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Subtle" Color="{StaticResource Palette.Slate.150}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Strong" Color="{StaticResource Palette.Slate.250}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Focus" Color="{StaticResource Palette.Coating.300}" />
@@ -250,16 +256,16 @@
     <SolidColorBrush x:Key="Theme.Brush.Status.Success" Color="{StaticResource Palette.Green.400}" />
     <SolidColorBrush x:Key="Theme.Brush.Status.SuccessHover" Color="{StaticResource Palette.Green.300}" />
     <SolidColorBrush x:Key="Theme.Brush.Status.SuccessSubtle" Color="{StaticResource Palette.Green.950}" />
-    <SolidColorBrush x:Key="Theme.Brush.Status.Warning" Color="{StaticResource Palette.Amber.400}" />
-    <SolidColorBrush x:Key="Theme.Brush.Status.WarningHover" Color="{StaticResource Palette.Amber.300}" />
-    <SolidColorBrush x:Key="Theme.Brush.Status.WarningSubtle" Color="{StaticResource Palette.Amber.950}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.Warning" Color="{StaticResource Palette.Yellow.400}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.WarningHover" Color="{StaticResource Palette.Yellow.300}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.WarningSubtle" Color="{StaticResource Palette.Yellow.950}" />
     <SolidColorBrush x:Key="Theme.Brush.Status.Danger" Color="{StaticResource Palette.Red.300}" />
     <SolidColorBrush x:Key="Theme.Brush.Status.DangerHover" Color="{StaticResource Palette.Red.350}" />
     <SolidColorBrush x:Key="Theme.Brush.Status.DangerSubtle" Color="{StaticResource Palette.Red.950}" />
 
     <!--  禁用态  -->
     <SolidColorBrush x:Key="Theme.Brush.State.DisabledSurface" Color="{StaticResource Palette.Slate.75}" />
-    <SolidColorBrush x:Key="Theme.Brush.State.DisabledBorder" Color="{StaticResource Palette.Slate.175}" />
+    <SolidColorBrush x:Key="Theme.Brush.State.DisabledBorder" Color="{StaticResource Palette.Slate.125}" />
     <SolidColorBrush x:Key="Theme.Brush.State.DisabledForeground" Color="{StaticResource Palette.Slate.175}" />
 
     <!--  滚动条  -->
