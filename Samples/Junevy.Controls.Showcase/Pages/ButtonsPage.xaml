@@ -3,22 +3,24 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Controls"
-    xmlns:jv="github.com.junevy">
+    xmlns:demo="clr-namespace:Junevy.Controls.Showcase.Controls"
+    xmlns:jv="github.com.junevy"
+    xmlns:sample="clr-namespace:Junevy.Controls.Showcase">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel MaxWidth="1080">
+        <StackPanel MaxWidth="1080" HorizontalAlignment="Center">
 
-            <TextBlock FontSize="20" FontWeight="Bold" Text="按钮控件" />
+            <TextBlock Style="{StaticResource DemoPageTitle}" Text="按钮控件" />
             <TextBlock
-                Margin="0,4,0,4"
-                FontSize="12"
-                Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
-                Text="jv:Button / jv:CardButton / jv:ToggleButton / jv:RadioButton，保留 WPF 标准行为（Command、IsChecked、分组）。" />
+                Style="{StaticResource DemoPageSubtitle}"
+                Text="jv:Button / jv:CardButton / jv:ToggleButton / jv:RadioButton，保留 WPF 标准行为（Command、IsChecked、分组）。每个演示区块下方附对应 XAML 源码，可一键复制。" />
 
-            <jv:GroupBox Header="jv:Button">
+            <demo:DemoSection
+                Title="jv:Button 基础用法"
+                Description="默认浮起阴影与降透明度状态反馈；atc:Icon.Icon 提供前置图标（没有图标时不保留前置空白）；无边框样式 NoBorderButtonStyle 为库公开资源；圆角经样式 Setter 设置 Border.CornerRadius 附加用法（逐实例 attribute 写法会被编译器拒绝）。"
+                XamlCode="{x:Static sample:ShowcaseSnippets.ButtonBasics}">
                 <StackPanel>
                     <StackPanel.Resources>
-                        <!--  jv:Button 默认 IsTextScaled=True 已是只缩小不放大，内容自适应场景无需再显式关闭  -->
                         <Style x:Key="CornerRadius16Button" BasedOn="{StaticResource {x:Type jv:Button}}" TargetType="{x:Type jv:Button}">
                             <Setter Property="Border.CornerRadius" Value="16" />
                         </Style>
@@ -36,51 +38,50 @@
                             Content="圆角 16（Border.CornerRadius）"
                             Style="{StaticResource CornerRadius16Button}" />
                     </WrapPanel>
-                    <TextBlock
-                        Margin="0,10,0,0"
-                        FontSize="12"
-                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
-                        Text="atc:Icon.Icon 提供前置图标（E611）；没有图标时不保留前置空白；圆角经样式 Setter 设置 Border.CornerRadius 附加用法（逐实例 attribute 写法会被标记编译器拒绝）。" />
-                    <WrapPanel Margin="0,12,0,0">
-                        <jv:Button
-                            Width="150"
-                            Height="56"
-                            Content="IsTextScaled=True：内容超出按钮时文字等比缩小"
-                            IsTextScaled="True" />
-                    </WrapPanel>
-                    <TextBlock
-                        Margin="0,10,0,0"
-                        FontSize="12"
-                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
-                        Text="jv:Button 默认 IsTextScaled=True，缩放只缩小不放大：空间充足时保持原始字号，按钮被挤压（显式尺寸或布局约束小于内容）时文字/图标等比缩小并保持居中；设为 False 恢复完全固定字号（挤压时不缩小）。" />
-
-                    <StackPanel Margin="0,16,0,0" Orientation="Horizontal">
-                        <jv:ComboBox
-                            Width="140"
-                            VerticalAlignment="Center"
-                            SelectedIndex="0">
-                            <jv:ComboBoxItem Content="Continuous" />
-                            <jv:ComboBoxItem Content="Trigger" />
-                        </jv:ComboBox>
-                        <jv:Button
-                            Margin="10,0,0,0"
-                            VerticalAlignment="Center"
-                            Content="默认浮起" />
-                        <jv:Button
-                            Margin="10,0,0,0"
-                            VerticalAlignment="Center"
-                            Content="ShowShadow=False"
-                            ShowShadow="False" />
-                    </StackPanel>
-                    <TextBlock
-                        Margin="0,10,0,0"
-                        FontSize="12"
-                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
-                        Text="常态浮起阴影可用 ShowShadow 关掉：与 ComboBox / TextBox 等没有浮起感的同级控件并排时逐个设 False，或用基于隐式样式的 Setter 批量关闭。只影响常态阴影，悬停/按压反馈与尺寸不变。" />
                 </StackPanel>
-            </jv:GroupBox>
+            </demo:DemoSection>
 
-            <jv:GroupBox Header="jv:CardButton（指标卡 / 快捷入口）" Margin="0,16,0,0">
+            <demo:DemoSection
+                Title="jv:Button —— IsTextScaled 内容自适应缩放"
+                Description="jv:Button 默认 IsTextScaled=True，缩放只缩小不放大：空间充足时保持原始字号，按钮被挤压（显式尺寸或布局约束小于内容）时文字/图标等比缩小并保持居中；设为 False 恢复完全固定字号（挤压时不缩小）。需要大字内容应直接设置 FontSize。"
+                XamlCode="{x:Static sample:ShowcaseSnippets.ButtonTextScaled}">
+                <WrapPanel>
+                    <jv:Button
+                        Width="150"
+                        Height="56"
+                        Content="IsTextScaled=True：内容超出按钮时文字等比缩小"
+                        IsTextScaled="True" />
+                </WrapPanel>
+            </demo:DemoSection>
+
+            <demo:DemoSection
+                Title="jv:Button —— ShowShadow 浮起阴影开关"
+                Description="常态阴影默认关闭（贴平，与 ComboBox / TextBox 等同级控件一致）；需要浮起感强调的按钮（主操作、独立 CTA）可对单个按钮设 True，或用基于隐式样式的 Setter 批量开启。只影响常态阴影，悬停/按压反馈与尺寸不变。"
+                XamlCode="{x:Static sample:ShowcaseSnippets.ButtonShadow}">
+                <StackPanel Orientation="Horizontal">
+                    <jv:ComboBox
+                        Width="140"
+                        VerticalAlignment="Center"
+                        SelectedIndex="0">
+                        <jv:ComboBoxItem Content="Continuous" />
+                        <jv:ComboBoxItem Content="Trigger" />
+                    </jv:ComboBox>
+                    <jv:Button
+                        Margin="10,0,0,0"
+                        VerticalAlignment="Center"
+                        Content="默认贴平" />
+                    <jv:Button
+                        Margin="10,0,0,0"
+                        VerticalAlignment="Center"
+                        Content="ShowShadow=True"
+                        ShowShadow="True" />
+                </StackPanel>
+            </demo:DemoSection>
+
+            <demo:DemoSection
+                Title="jv:CardButton（指标卡 / 快捷入口）"
+                Description="MainColor 决定卡片主题色与状态色，atc:Icon.Icon 提供右上角图标字体字符；可承载点击导航（保留 WPF Button 基类行为）。"
+                XamlCode="{x:Static sample:ShowcaseSnippets.CardButtonDemo}">
                 <WrapPanel>
                     <jv:CardButton
                         Title="在线相机"
@@ -101,46 +102,45 @@
                         atc:Icon.FontFamily="{DynamicResource IconFont}"
                         atc:Icon.Icon="&#xE60C;" />
                 </WrapPanel>
-            </jv:GroupBox>
+            </demo:DemoSection>
 
-            <jv:GroupBox Header="jv:ToggleButton（开关）" Margin="0,16,0,0">
-                <StackPanel>
-                    <WrapPanel>
-                        <jv:ToggleButton
-                            Content="自动曝光"
-                            IsChecked="True"
-                            SwitchSize="22"
-                            Template="{StaticResource SwitchToggleButton_Radius}" />
-                        <jv:ToggleButton
-                            Content="自动对焦"
-                            IsChecked="False"
-                            SwitchSize="22"
-                            Template="{StaticResource SwitchToggleButton_Radius}" />
-                        <jv:ToggleButton
-                            Content="矩形模板"
-                            IsChecked="True"
-                            SwitchSize="22"
-                            Template="{StaticResource SwitchToggleButton_Rect}" />
-                        <jv:ToggleButton
-                            Content="禁用开关"
-                            IsChecked="True"
-                            IsEnabled="False"
-                            SwitchSize="22"
-                            Template="{StaticResource SwitchToggleButton_Radius}" />
-                        <jv:ToggleButton
-                            IsChecked="False"
-                            SwitchSize="20"
-                            Template="{StaticResource SwitchToggleButton_Radius}" />
-                    </WrapPanel>
-                    <TextBlock
-                        Margin="0,10,0,0"
-                        FontSize="12"
-                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
-                        Text="开关需显式选择 SwitchToggleButton_Radius（胶囊）或 SwitchToggleButton_Rect（矩形）模板；SwitchSize 为整体高度，轨道宽度按 2:1 自动推导。" />
-                </StackPanel>
-            </jv:GroupBox>
+            <demo:DemoSection
+                Title="jv:ToggleButton（开关）"
+                Description="开关需显式选择 SwitchToggleButton_Radius（胶囊）或 SwitchToggleButton_Rect（矩形）模板；SwitchSize 为整体高度，轨道宽度按 2:1 自动推导，滑块与勾标按 DPI 吸附整数设备像素居中。"
+                XamlCode="{x:Static sample:ShowcaseSnippets.ToggleButtonDemo}">
+                <WrapPanel>
+                    <jv:ToggleButton
+                        Content="自动曝光"
+                        IsChecked="True"
+                        SwitchSize="22"
+                        Template="{StaticResource SwitchToggleButton_Radius}" />
+                    <jv:ToggleButton
+                        Content="自动对焦"
+                        IsChecked="False"
+                        SwitchSize="22"
+                        Template="{StaticResource SwitchToggleButton_Radius}" />
+                    <jv:ToggleButton
+                        Content="矩形模板"
+                        IsChecked="True"
+                        SwitchSize="22"
+                        Template="{StaticResource SwitchToggleButton_Rect}" />
+                    <jv:ToggleButton
+                        Content="禁用开关"
+                        IsChecked="True"
+                        IsEnabled="False"
+                        SwitchSize="22"
+                        Template="{StaticResource SwitchToggleButton_Radius}" />
+                    <jv:ToggleButton
+                        IsChecked="False"
+                        SwitchSize="20"
+                        Template="{StaticResource SwitchToggleButton_Radius}" />
+                </WrapPanel>
+            </demo:DemoSection>
 
-            <jv:GroupBox Header="jv:RadioButton（DisplayMode）" Margin="0,16,0,0">
+            <demo:DemoSection
+                Title="jv:RadioButton（DisplayMode）"
+                Description="GroupName 分组互斥，保留 WPF 单选标准行为；DisplayMode=Rectangular 将圆形标记切换为方形标记。"
+                XamlCode="{x:Static sample:ShowcaseSnippets.RadioButtonDemo}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -158,7 +158,7 @@
                         <jv:RadioButton Content="方形标记 C" DisplayMode="Rectangular" GroupName="ShowcaseShape" />
                     </StackPanel>
                 </Grid>
-            </jv:GroupBox>
+            </demo:DemoSection>
 
         </StackPanel>
     </ScrollViewer>

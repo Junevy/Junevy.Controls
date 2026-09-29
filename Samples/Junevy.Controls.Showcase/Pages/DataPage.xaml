@@ -3,19 +3,22 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Controls"
-    xmlns:jv="github.com.junevy">
+    xmlns:demo="clr-namespace:Junevy.Controls.Showcase.Controls"
+    xmlns:jv="github.com.junevy"
+    xmlns:sample="clr-namespace:Junevy.Controls.Showcase">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel MaxWidth="1080">
+        <StackPanel MaxWidth="1080" HorizontalAlignment="Center">
 
-            <TextBlock FontSize="20" FontWeight="Bold" Text="集合与数据" />
+            <TextBlock Style="{StaticResource DemoPageTitle}" Text="集合与数据" />
             <TextBlock
-                Margin="0,4,0,4"
-                FontSize="12"
-                Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                Style="{StaticResource DemoPageSubtitle}"
                 Text="jv:ListBox（竖向/横向滑动）/ jv:ListView（GridView）/ DataGrid。以下数据均为虚拟数据（SampleData）。" />
 
-            <jv:GroupBox Header="jv:ListBox（竖向）" Margin="0,2,0,0">
+            <demo:DemoSection
+                Title="jv:ListBox（竖向）"
+                Description="ItemTemplate 自定义条目布局；选中/悬停高亮与滚动条均为主题接管。"
+                XamlCode="{x:Static sample:ShowcaseSnippets.ListBoxVerticalDemo}">
                 <jv:ListBox
                     Height="180"
                     ItemsSource="{Binding Devices}">
@@ -44,9 +47,12 @@
                         </DataTemplate>
                     </jv:ListBox.ItemTemplate>
                 </jv:ListBox>
-            </jv:GroupBox>
+            </demo:DemoSection>
 
-            <jv:GroupBox Header="jv:ListBox（横向滑动，Orientation=Horizontal）" Margin="0,16,0,0">
+            <demo:DemoSection
+                Title="jv:ListBox（横向滑动，Orientation=Horizontal）"
+                Description="Orientation=Horizontal 后条目横向排列、横向滚动；条目用 Border 自绘缩略卡（图标 + 名称）。"
+                XamlCode="{x:Static sample:ShowcaseSnippets.ListBoxHorizontalDemo}">
                 <jv:ListBox
                     Height="110"
                     ItemsSource="{Binding Tiles}"
@@ -77,9 +83,12 @@
                         </DataTemplate>
                     </jv:ListBox.ItemTemplate>
                 </jv:ListBox>
-            </jv:GroupBox>
+            </demo:DemoSection>
 
-            <jv:GroupBox Header="jv:ListView（GridView 视图）" Margin="0,16,0,0">
+            <demo:DemoSection
+                Title="jv:ListView（GridView 视图）"
+                Description="标准 WPF GridView 用法，列头与行外观为库主题接管。"
+                XamlCode="{x:Static sample:ShowcaseSnippets.ListViewDemo}">
                 <jv:ListView
                     Height="180"
                     ItemsSource="{Binding Devices}">
@@ -100,9 +109,12 @@
                         </GridView>
                     </jv:ListView.View>
                 </jv:ListView>
-            </jv:GroupBox>
+            </demo:DemoSection>
 
-            <jv:GroupBox Header="DataGrid（虚拟数据 + 排序）" Margin="0,16,0,0">
+            <demo:DemoSection
+                Title="DataGrid（虚拟数据 + 排序）"
+                Description="标准列定义；表头排序、行悬停与选中均为主题接管。"
+                XamlCode="{x:Static sample:ShowcaseSnippets.DataGridDemo}">
                 <jv:DataGrid
                     Height="220"
                     AutoGenerateColumns="False"
@@ -114,9 +126,12 @@
                         <DataGridTextColumn Binding="{Binding Result}" Header="结果" />
                     </jv:DataGrid.Columns>
                 </jv:DataGrid>
-            </jv:GroupBox>
+            </demo:DemoSection>
 
-            <jv:GroupBox Header="DataGrid 空态提示（atc:DataGridAssist.EmptyText）" Margin="0,16,0,0">
+            <demo:DemoSection
+                Title="DataGrid 空态提示（atc:DataGridAssist.EmptyText）"
+                Description="附加属性 EmptyText：无数据时在表格中央显示空态文案，无需额外覆盖层。"
+                XamlCode="{x:Static sample:ShowcaseSnippets.DataGridEmptyTextDemo}">
                 <jv:DataGrid
                     Height="140"
                     AutoGenerateColumns="False"
@@ -128,7 +143,7 @@
                         <DataGridTextColumn Binding="{Binding Result}" Header="结果" />
                     </jv:DataGrid.Columns>
                 </jv:DataGrid>
-            </jv:GroupBox>
+            </demo:DemoSection>
 
         </StackPanel>
     </ScrollViewer>

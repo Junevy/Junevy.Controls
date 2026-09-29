@@ -21,7 +21,7 @@ namespace Junevy.Controls.Showcase.Pages
             {
                 Title = "相机",
                 Icon = "\uE66B",
-                Childrens =
+                Children =
                 {
                     new TreeMenuItem { Title = "实时预览", TargetType = typeof(Window) },
                     new TreeMenuItem { Title = "参数设置", TargetType = typeof(Window) },
@@ -29,7 +29,7 @@ namespace Junevy.Controls.Showcase.Pages
                     {
                         Title = "标定",
                         Icon = "\uE60F",
-                        Childrens = { new TreeMenuItem { Title = "九点标定" }, new TreeMenuItem { Title = "手眼标定" } }
+                        Children = { new TreeMenuItem { Title = "九点标定" }, new TreeMenuItem { Title = "手眼标定" } }
                     }
                 }
             });

@@ -4,13 +4,15 @@
     xmlns:attach="clr-namespace:Junevy.Controls.AttachedProperties"
     xmlns:bt="clr-namespace:Junevy.Controls.Controls.Button"
     xmlns:cvt="clr-namespace:Junevy.Controls.Converters"
-    xmlns:local="clr-namespace:Junevy.Controls.Controls.Menu"
-    xmlns:tb="clr-namespace:Junevy.Controls.Controls.Text">
+    xmlns:local="clr-namespace:Junevy.Controls.Controls.Menu">
 
+    <!--
+        NoBorderButtonTemplate / NoBorderTextBoxTemplate_WPF 以 StaticResource 引用，需保证 Button.xaml、
+        TextBox.xaml 先于本字典解析（本字典单独合并时亦可用）；IconFont 与 DefaultFocusStyle 经
+        DynamicResource / 附加属性默认值生效，由 Themes/Generic.xaml 统一提供，不再重复合并。
+    -->
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Junevy.Controls;component/Resources/Font/IconFont.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/Button.xaml" />
-        <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Text/TextBox.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
@@ -23,7 +25,6 @@
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="MinHeight" Value="20" />
-        <!--<Setter Property="MinWidth" Value="120" />-->
         <Setter Property="HorizontalAlignment" Value="Left" />
         <!--  Stretch使页签底边始终对齐页签行底部，与内容区上边框无缝衔接  -->
         <Setter Property="VerticalAlignment" Value="Stretch" />
@@ -178,7 +179,9 @@
                         </Grid.RowDefinitions>
 
                         <!--  内容：上移1px，使上边框线延伸到页签行底部，作为页签之间的分割线。
-                              声明在页签行之前，页签行绘制在其上层——选中页签无底边框即可盖住分割线，与内容区连为一体  -->
+                              声明在页签行之前，页签行绘制在其上层——选中页签无底边框即可盖住分割线，与内容区连为一体。
+                              PART_SelectedContentHost 为 TabControl 官方模板部件契约：
+                              选中内容经 TabControl 直接更新，容器增删时由 TabControl 释放内容呈现器引用  -->
                         <Border
                             Grid.Row="1"
                             Margin="0,-1,0,0"
@@ -187,11 +190,9 @@
                             BorderThickness="1,1,1,1"
                             CornerRadius="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ContentCornerRadius, Converter={StaticResource BottomCornerRadius}, FallbackValue=8}">
                             <ContentPresenter
+                                x:Name="PART_SelectedContentHost"
                                 Margin="{TemplateBinding Padding}"
-                                ContentSource="SelectedContent"
-                                ContentTemplate="{TemplateBinding SelectedContentTemplate}"
-                                ContentTemplateSelector="{TemplateBinding SelectedContentTemplateSelector}"
-                                ContentStringFormat="{TemplateBinding SelectedContentStringFormat}" />
+                                ContentSource="SelectedContent" />
                         </Border>
 
                         <!--  标签头（绘制在内容区上边框线之上）  -->

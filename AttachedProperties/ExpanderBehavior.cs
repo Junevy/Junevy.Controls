@@ -7,6 +7,11 @@ using System.Windows.Media;
 
 namespace Junevy.Controls.AttachedProperties
 {
+    /// <summary>
+    /// TreeViewItem 的双击/Enter 行为：非叶节点切换展开/收起，叶节点触发最近
+    /// <see cref="Junevy.Controls.Controls.Menu.TreeMenu"/> 的 <c>NavigateCommand</c>，
+    /// 命令参数为该容器的数据对象（对数据类型无要求）。
+    /// </summary>
     public static class ExpanderBehavior
     {
         public static readonly DependencyProperty EnableProperty =
@@ -68,16 +73,18 @@ namespace Junevy.Controls.AttachedProperties
 
         private static void ToggleOrActivate(TreeViewItem item)
         {
-            if (item.DataContext is not TreeMenuItem vm)
-                return;
-
-            if (vm.IsLeaf)
-            {
-                FindAncestor<TreeMenu>(item)?.NavigateCommand?.Execute(vm);
-            }
-            else
+            // 叶/枝由容器自身的 HasItems 判断，不依赖具体数据类型；
+            // 展开状态经默认容器样式与数据模型的 IsExpanded 双向绑定落回模型。
+            if (item.HasItems)
             {
                 item.IsExpanded = !item.IsExpanded;
+                return;
+            }
+
+            // 叶节点：激活，交给最近 TreeMenu 的 NavigateCommand，参数为该节点的数据对象。
+            if (FindAncestor<TreeMenu>(item)?.NavigateCommand is ICommand command)
+            {
+                command.Execute(item.DataContext);
             }
         }
 

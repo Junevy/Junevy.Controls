@@ -3,116 +3,116 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
     xmlns:bt="clr-namespace:Junevy.Controls.Controls.Button"
-    xmlns:cvt="clr-namespace:Junevy.Controls.Converters"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Menu">
 
+    <!--
+        TreeMenu：节点由 TreeMenuItem（POCO 数据模型）+ HierarchicalDataTemplate 驱动。
+        ExpanderButton 样式以 StaticResource 引用，因此保留对 ToggleButton.xaml 的合并；
+        DefaultFocusStyle.xaml 经 DynamicResource 使用，由 Themes/Generic.xaml 统一提供，不再重复合并。
+    -->
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/ToggleButton.xaml" />
-        <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+    <!--  Normal 模式条目模板：图标 + 标题。字体与前景色继承自 TreeMenu，图标字体取 atc:Icon.FontFamily。  -->
+    <HierarchicalDataTemplate x:Key="TreeMenuNormalItemTemplate" ItemsSource="{Binding Children}">
+        <Grid Background="Transparent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-    <Style TargetType="{x:Type local:TreeMenuItem}">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+            <ContentPresenter
+                x:Name="Icon"
+                Grid.Column="0"
+                Margin="5"
+                VerticalAlignment="Center"
+                Content="{Binding Icon}"
+                TextElement.FontFamily="{Binding (atc:Icon.FontFamily), RelativeSource={RelativeSource AncestorType=local:TreeMenu}}" />
 
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:TreeMenuItem}">
-                    <Border
-                        x:Name="Root"
-                        Background="{TemplateBinding Background}"
-                        CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
-                        <Grid>
-                        <Grid x:Name="NormalLayout">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
+            <TextBlock
+                x:Name="Title"
+                Grid.Column="1"
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="{Binding Title}"
+                TextTrimming="CharacterEllipsis" />
+        </Grid>
 
-                            <ContentControl
-                                x:Name="NormalIcon"
-                                Grid.Column="0"
-                                Margin="5"
-                                VerticalAlignment="Center"
-                                Content="{TemplateBinding Icon}"
-                                FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=(atc:Icon.FontFamily)}"
-                                FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=FontSize}"
-                                Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=Foreground}" />
+        <HierarchicalDataTemplate.Triggers>
+            <DataTrigger Binding="{Binding Icon}" Value="{x:Null}">
+                <Setter TargetName="Icon" Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Title}" Value="{x:Null}">
+                <Setter TargetName="Title" Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Title}" Value="">
+                <Setter TargetName="Title" Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </HierarchicalDataTemplate.Triggers>
+    </HierarchicalDataTemplate>
 
-                            <TextBlock
-                                x:Name="NormalTitle"
-                                Grid.Column="1"
-                                Margin="5"
-                                VerticalAlignment="Center"
-                                Background="Transparent"
-                                FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=FontSize}"
-                                Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=Foreground}"
-                                Text="{TemplateBinding Title}"
-                                TextTrimming="CharacterEllipsis" />
-                        </Grid>
+    <!--  Icon 模式条目模板：图标字号取 atc:Icon.IconSize，标题间距与旧版 IconLayout 一致。  -->
+    <HierarchicalDataTemplate x:Key="TreeMenuIconItemTemplate" ItemsSource="{Binding Children}">
+        <Grid Background="Transparent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                            <Grid x:Name="IconLayout" Visibility="Collapsed">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
+            <ContentPresenter
+                x:Name="Icon"
+                Grid.Column="0"
+                Margin="5"
+                VerticalAlignment="Center"
+                Content="{Binding Icon}"
+                TextElement.FontFamily="{Binding (atc:Icon.FontFamily), RelativeSource={RelativeSource AncestorType=local:TreeMenu}}"
+                TextElement.FontSize="{Binding (atc:Icon.IconSize), RelativeSource={RelativeSource AncestorType=local:TreeMenu}}" />
 
-                                <ContentControl
-                                    x:Name="IconModeIcon"
-                                    Grid.Column="0"
-                                    Margin="5,5,5,5"
-                                    VerticalAlignment="Center"
-                                    Content="{TemplateBinding Icon}"
-                                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=(atc:Icon.FontFamily)}"
-                                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=(atc:Icon.IconSize)}"
-                                    Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=Foreground}" />
+            <TextBlock
+                x:Name="Title"
+                Grid.Column="1"
+                Margin="10"
+                VerticalAlignment="Center"
+                Text="{Binding Title}"
+                TextTrimming="CharacterEllipsis" />
+        </Grid>
 
-                                <TextBlock
-                                    x:Name="IconModeTitle"
-                                    Grid.Column="1"
-                                    Margin="10"
-                                    VerticalAlignment="Center"
-                                    Background="Transparent"
-                                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=FontSize}"
-                                    Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=Foreground}"
-                                    Text="{TemplateBinding Title}"
-                                    TextTrimming="CharacterEllipsis" />
-                            </Grid>
-                        </Grid>
-                    </Border>
+        <HierarchicalDataTemplate.Triggers>
+            <DataTrigger Binding="{Binding Icon}" Value="{x:Null}">
+                <Setter TargetName="Icon" Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Title}" Value="{x:Null}">
+                <Setter TargetName="Title" Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Title}" Value="">
+                <Setter TargetName="Title" Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </HierarchicalDataTemplate.Triggers>
+    </HierarchicalDataTemplate>
 
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="Icon" Value="{x:Null}">
-                            <Setter TargetName="NormalIcon" Property="Visibility" Value="Collapsed" />
-                            <Setter TargetName="IconModeIcon" Property="Visibility" Value="Collapsed" />
-                        </Trigger>
-                        <Trigger Property="Title" Value="{x:Null}">
-                            <Setter TargetName="NormalTitle" Property="Visibility" Value="Collapsed" />
-                            <Setter TargetName="IconModeTitle" Property="Visibility" Value="Collapsed" />
-                        </Trigger>
-                        <Trigger Property="Title" Value="">
-                            <Setter TargetName="NormalTitle" Property="Visibility" Value="Collapsed" />
-                            <Setter TargetName="IconModeTitle" Property="Visibility" Value="Collapsed" />
-                        </Trigger>
-
-                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=local:TreeMenu}, Path=DisplayMode}" Value="{x:Static local:DisplayMode.Icon}">
-                            <Setter TargetName="NormalLayout" Property="Visibility" Value="Collapsed" />
-                            <Setter TargetName="IconLayout" Property="Visibility" Value="Visible" />
-                        </DataTrigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style x:Key="DefaultTreeMenuTemplate" TargetType="TreeViewItem">
+    <!--
+        容器样式（Normal / Icon 两模式共用一套模板，经 DataTrigger 切换）：
+        - IsExpanded / IsSelected 与 TreeMenuItem 同名属性双向绑定，状态落在数据模型上，容器回收后不丢失；
+        - ItemsPanel 换成 VirtualizingStackPanel，使嵌套层级与根级一样参与虚拟化（旧版只有第一层虚拟化）；
+        - ItemsPresenter 的 MaxWidth 绑定本级内容 Border 宽度，子级不会向上撑大 TreeMenu，超出部分被截断。
+    -->
+    <Style x:Key="TreeMenuItemContainerStyle" TargetType="TreeViewItem">
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="atc:ExpanderBehavior.Enable" Value="True" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
-        <Setter Property="ItemsSource" Value="{Binding Header.Childrens, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+        <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
+        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
 
         <Setter Property="Template">
             <Setter.Value>
@@ -120,8 +120,8 @@
                     <StackPanel>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition MaxWidth="20" />
-                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
 
                             <bt:ToggleButton
@@ -129,9 +129,20 @@
                                 Grid.Column="0"
                                 Width="16"
                                 Height="16"
+                                Margin="2,0"
+                                VerticalAlignment="Center"
                                 ClickMode="Press"
-                                IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                                 Style="{StaticResource ExpanderButton}" />
+
+                            <Border
+                                x:Name="Indicator"
+                                Grid.Column="0"
+                                Width="3"
+                                Margin="1,0"
+                                Background="{DynamicResource Theme.Brush.Accent.Primary}"
+                                CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
+                                Visibility="Collapsed" />
 
                             <Border
                                 x:Name="Root"
@@ -142,15 +153,8 @@
                             </Border>
                         </Grid>
 
-                        <!--
-                            嵌套（二级及更深层）菜单宽度钳制：
-                            MaxWidth 绑定到本表头 Border 宽度，使子级菜单的期望宽度不会向上撑大
-                            一级 TreeViewItem 与整个 TreeMenu，控件自动宽度仅由最长的一级菜单决定；
-                            ClipToBounds 保证超出部分被截断，不绘制到相邻控件上。
-                        -->
                         <ItemsPresenter
                             x:Name="ItemHost"
-                            Margin="0,0,0,0"
                             MaxWidth="{Binding ElementName=Root, Path=ActualWidth}"
                             ClipToBounds="True" />
                     </StackPanel>
@@ -169,79 +173,19 @@
                         <Trigger Property="HasItems" Value="False">
                             <Setter TargetName="ExpanderButton" Property="Visibility" Value="Hidden" />
                         </Trigger>
-                        <Trigger Property="IsExpanded" Value="False">
-                            <Setter TargetName="ItemHost" Property="Visibility" Value="Collapsed" />
-                        </Trigger>
-                        <Trigger Property="IsExpanded" Value="True">
-                            <Setter TargetName="ItemHost" Property="Visibility" Value="Visible" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style x:Key="IconTreeMenuTemplate" TargetType="TreeViewItem">
-        <Setter Property="Margin" Value="0" />
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="atc:ExpanderBehavior.Enable" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
-        <Setter Property="ItemsSource" Value="{Binding Header.Childrens, RelativeSource={RelativeSource Self}}" />
-
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="TreeViewItem">
-                    <StackPanel>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition MaxWidth="5" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-
-                            <Border
-                                x:Name="Indicator"
-                                Grid.Column="0"
-                                Background="{DynamicResource Theme.Brush.Accent.Primary}"
-                                CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
-                                Visibility="Collapsed" />
-
-                            <Border
-                                x:Name="Root"
-                                Grid.Column="1"
-                                Background="{TemplateBinding Background}"
-                                CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
-                                <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" />
-                            </Border>
-                        </Grid>
-
-                        <!--  同 DefaultTreeMenuTemplate：钳制子级宽度，避免展开后撑大控件。  -->
-                        <ItemsPresenter
-                            x:Name="ItemHost"
-                            Grid.Row="1"
-                            Margin="0,0,0,0"
-                            MaxWidth="{Binding ElementName=Root, Path=ActualWidth}"
-                            ClipToBounds="True" />
-                    </StackPanel>
-
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
-                        </Trigger>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Selected}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
-                        </Trigger>
-
-                        <Trigger Property="HasItems" Value="True">
+                        <!--  Icon 模式用左侧指示器替代展开箭头（指示器仅对有子项的节点显示）。  -->
+                        <DataTrigger Binding="{Binding DisplayMode, RelativeSource={RelativeSource AncestorType=local:TreeMenu}}" Value="Icon">
+                            <Setter TargetName="ExpanderButton" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding DisplayMode, RelativeSource={RelativeSource AncestorType=local:TreeMenu}}" Value="Icon" />
+                                <Condition Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="True" />
+                            </MultiDataTrigger.Conditions>
                             <Setter TargetName="Indicator" Property="Visibility" Value="Visible" />
-                        </Trigger>
+                        </MultiDataTrigger>
                         <Trigger Property="IsExpanded" Value="False">
                             <Setter TargetName="ItemHost" Property="Visibility" Value="Collapsed" />
-                        </Trigger>
-                        <Trigger Property="IsExpanded" Value="True">
-                            <Setter TargetName="ItemHost" Property="Visibility" Value="Visible" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -251,22 +195,21 @@
 
     <Style TargetType="{x:Type local:TreeMenu}">
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
-        <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
-        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
-        <!--<Setter Property="Width" Value="150" />-->
         <Setter Property="FontSize" Value="12" />
+        <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
+        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
-        <Setter Property="TextElement.FontSize" Value="12" />
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource TreeMenuItemContainerStyle}" />
+        <Setter Property="ItemTemplate" Value="{StaticResource TreeMenuNormalItemTemplate}" />
 
         <Setter Property="Template">
             <Setter.Value>
@@ -299,15 +242,9 @@
 
         <Style.Triggers>
             <Trigger Property="DisplayMode" Value="Icon">
-                <Setter Property="ItemContainerStyle" Value="{StaticResource IconTreeMenuTemplate}" />
-                <Setter Property="TextElement.FontSize" Value="14" />
-            </Trigger>
-
-            <Trigger Property="DisplayMode" Value="Normal">
-                <Setter Property="ItemContainerStyle" Value="{StaticResource DefaultTreeMenuTemplate}" />
+                <Setter Property="ItemTemplate" Value="{StaticResource TreeMenuIconItemTemplate}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
 </ResourceDictionary>
-

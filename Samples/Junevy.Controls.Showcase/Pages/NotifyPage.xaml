@@ -3,27 +3,23 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Controls"
-    xmlns:jv="github.com.junevy">
+    xmlns:demo="clr-namespace:Junevy.Controls.Showcase.Controls"
+    xmlns:jv="github.com.junevy"
+    xmlns:sample="clr-namespace:Junevy.Controls.Showcase">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel MaxWidth="1080">
-            <StackPanel.Resources>
-                <!--  内容自适应场景关闭等比缩放（jv:Button 默认 IsTextScaled=True 会占满可用空间）  -->
-                <Style BasedOn="{StaticResource {x:Type jv:Button}}" TargetType="{x:Type jv:Button}">
-                    <Setter Property="IsTextScaled" Value="False" />
-                </Style>
-            </StackPanel.Resources>
+        <StackPanel MaxWidth="1080" HorizontalAlignment="Center">
 
-            <TextBlock FontSize="20" FontWeight="Bold" Text="通知" />
+            <TextBlock Style="{StaticResource DemoPageTitle}" Text="通知" />
             <TextBlock
-                Margin="0,4,0,4"
-                FontSize="12"
-                Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                Style="{StaticResource DemoPageSubtitle}"
                 Text="jv:Badge / jv:MessageBar / MessageBarService（宿主已注册在主窗口底部，可通过本页按钮弹出通知）。" />
 
-            <jv:GroupBox Header="jv:Badge（角标）">
-                <StackPanel>
-                    <WrapPanel>
+            <demo:DemoSection
+                Title="jv:Badge（角标）"
+                Description="包裹任意内容；Count 角标 / IsDot 红点 / MaxCount 数值上限 / OffsetX/Y 偏移微调 / Corner 角位。注意：Badge 隐式样式将 Foreground 设为 Text.OnAccent（白色），包裹的内容若依赖继承前景色需显式设置；角标以自身中心对准内容角落，相邻控件的角标可能互相遮挡。"
+                XamlCode="{x:Static sample:ShowcaseSnippets.BadgeDemo}">
+                <WrapPanel>
                     <jv:Badge Count="5">
                         <jv:Button atc:Icon.FontFamily="{DynamicResource IconFont}" atc:Icon.Icon="&#xE932;" Content="消息" />
                     </jv:Badge>
@@ -68,15 +64,12 @@
                         </Border>
                     </jv:Badge>
                 </WrapPanel>
-                    <TextBlock
-                        Margin="0,10,0,0"
-                        FontSize="12"
-                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
-                        Text="注意：Badge 隐式样式将 Foreground 设为 Text.OnAccent（白色），包裹的内容若依赖继承前景色需显式设置；角标以自身中心对准内容角落，相邻控件的角标可能互相遮挡。" />
-                </StackPanel>
-            </jv:GroupBox>
+            </demo:DemoSection>
 
-            <jv:GroupBox Header="jv:MessageBar（布局内直接声明，IsShown 控制）" Margin="0,16,0,0">
+            <demo:DemoSection
+                Title="jv:MessageBar（布局内直接声明，IsShown 控制）"
+                Description="Timeout=0 表示禁用自动关闭；请通过 IsShown / Show() / Hide() 控制显隐，不要直接设置 Visibility/Opacity/RenderTransform。"
+                XamlCode="{x:Static sample:ShowcaseSnippets.MessageBarInlineDemo}">
                 <StackPanel>
                     <jv:MessageBar
                         x:Name="InlineBar"
@@ -89,15 +82,13 @@
                         <jv:Button Click="OnInlineShowClick" Content="Show()" />
                         <jv:Button Margin="12,0,0,0" Click="OnInlineHideClick" Content="Hide()" />
                     </StackPanel>
-                    <TextBlock
-                        Margin="0,10,0,0"
-                        FontSize="12"
-                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
-                        Text="Timeout=0 表示禁用自动关闭；请通过 IsShown / Show() / Hide() 控制显隐，不要直接设置 Visibility/Opacity/RenderTransform。" />
                 </StackPanel>
-            </jv:GroupBox>
+            </demo:DemoSection>
 
-            <jv:GroupBox Header="MessageBarService（应用级弹出，宿主在主窗口底部）" Margin="0,16,0,0">
+            <demo:DemoSection
+                Title="MessageBarService（应用级弹出，宿主在主窗口底部）"
+                Description="弹出宿主 jv:MessageBarPresenter 注册在主窗口底部（MessageBarService.SetPresenter），不占用页面布局；C# 调用：MessageBarService.Show(MessageBarAppearance.Success, &quot;标题&quot;, &quot;内容&quot;)，Danger 示例带 5 秒超时，Clear() 清空全部。"
+                XamlCode="{x:Static sample:ShowcaseSnippets.MessageBarServiceDemo}">
                 <WrapPanel>
                     <jv:Button Click="OnServiceInfoClick" Content="Informational" />
                     <jv:Button Margin="12,0,0,0" Click="OnServiceSuccessClick" Content="Success" />
@@ -105,7 +96,7 @@
                     <jv:Button Margin="12,0,0,0" Click="OnServiceDangerClick" Content="Danger（5 秒超时）" />
                     <jv:Button Margin="12,0,0,0" Click="OnServiceClearClick" Content="Clear()" />
                 </WrapPanel>
-            </jv:GroupBox>
+            </demo:DemoSection>
 
         </StackPanel>
     </ScrollViewer>

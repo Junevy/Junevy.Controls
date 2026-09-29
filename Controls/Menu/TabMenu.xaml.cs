@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,6 +10,11 @@ using System.Windows.Threading;
 
 namespace Junevy.Controls.Controls.Menu
 {
+    /// <summary>
+    /// 可关闭、可重命名的页签控件，继承 WPF <see cref="TabControl"/>。
+    /// 页签容器为 <see cref="TabMenuItem"/>；关闭经 <see cref="CloseTabCommand"/> 或 <see cref="CloseTab"/>,
+    /// 关闭前可经 <see cref="TabClosing"/> 拦截，关闭后派发 <see cref="TabClosed"/>。
+    /// </summary>
     public class TabMenu : TabControl
     {
         public static readonly RoutedCommand CloseTabCommand = new(nameof(CloseTabCommand), typeof(TabMenu));
@@ -48,6 +54,9 @@ namespace Junevy.Controls.Controls.Menu
         public static readonly DependencyProperty IsClosableProperty =
             DependencyProperty.Register(nameof(IsClosable), typeof(bool), typeof(TabMenu), new PropertyMetadata(true));
 
+        /// <summary>
+        /// 页签头圆角（模板只取其上两角与内容区衔接）。
+        /// </summary>
         public static readonly DependencyProperty HeaderCornerRadiusProperty =
             DependencyProperty.Register(
                 nameof(HeaderCornerRadius),
@@ -55,12 +64,22 @@ namespace Junevy.Controls.Controls.Menu
                 typeof(TabMenu),
                 new PropertyMetadata(new CornerRadius(4)));
 
+        /// <summary>
+        /// 内容区圆角（模板只取其下两角）。
+        /// </summary>
         public static readonly DependencyProperty ContentCornerRadiusProperty =
             DependencyProperty.Register(
                 nameof(ContentCornerRadius),
                 typeof(CornerRadius),
                 typeof(TabMenu),
                 new PropertyMetadata(new CornerRadius(8)));
+
+        /// <summary>
+        /// 关闭页签时是否释放内容元素的 <c>DataContext</c> 与 <c>Content</c>（仅当其实现 <see cref="IDisposable"/> 时调用 Dispose）。
+        /// 默认 false：生命周期由调用方自行管理，库不做隐藏的清理副作用。
+        /// </summary>
+        public static readonly DependencyProperty DisposeContentOnCloseProperty =
+            DependencyProperty.Register(nameof(DisposeContentOnClose), typeof(bool), typeof(TabMenu), new PropertyMetadata(false));
 
         public bool CanCloseLastTab
         {
@@ -72,6 +91,12 @@ namespace Junevy.Controls.Controls.Menu
         {
             get => (bool)GetValue(IsClosableProperty);
             set => SetValue(IsClosableProperty, value);
+        }
+
+        public bool DisposeContentOnClose
+        {
+            get => (bool)GetValue(DisposeContentOnCloseProperty);
+            set => SetValue(DisposeContentOnCloseProperty, value);
         }
 
         public CornerRadius HeaderCornerRadius
@@ -112,7 +137,7 @@ namespace Junevy.Controls.Controls.Menu
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"TabMenu.CanCloseTab error: {ex}");
+                Trace.TraceError($"TabMenu.CanCloseTab error: {ex}");
                 e.CanExecute = false;
             }
         }
@@ -138,7 +163,7 @@ namespace Junevy.Controls.Controls.Menu
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"TabMenu close command error: {ex}");
+                Trace.TraceError($"TabMenu close command error: {ex}");
             }
         }
 
@@ -176,7 +201,7 @@ namespace Junevy.Controls.Controls.Menu
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"TabMenu close error: {ex}");
+                Trace.TraceError($"TabMenu close error: {ex}");
             }
         }
 
@@ -212,14 +237,14 @@ namespace Junevy.Controls.Controls.Menu
 
                 if (ReferenceEquals(itemToRemove, tabItem))
                 {
-                    CleanupTabItem(tabItem);
+                    CleanupTabItem(tabItem, DisposeContentOnClose);
                 }
 
                 RaiseTabClosed(args);
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"TabMenu close error: {ex}");
+                Trace.TraceError($"TabMenu close error: {ex}");
             }
         }
 
@@ -243,7 +268,7 @@ namespace Junevy.Controls.Controls.Menu
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"TabClosing handler error: {ex}");
+                    Trace.TraceError($"TabClosing handler error: {ex}");
                 }
             }
         }
@@ -264,7 +289,7 @@ namespace Junevy.Controls.Controls.Menu
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"TabClosed handler error: {ex}");
+                    Trace.TraceError($"TabClosed handler error: {ex}");
                 }
             }
         }
@@ -357,13 +382,18 @@ namespace Junevy.Controls.Controls.Menu
             return result is not bool removed || removed;
         }
 
-        private static void CleanupTabItem(TabMenuItem tabItem)
+        /// <summary>
+        /// 释放已关闭页签持有的引用。<paramref name="disposeContent"/> 为 true 时才对实现
+        /// <see cref="IDisposable"/> 的 DataContext / Content 调用 Dispose——Dispose 是对消费者
+        /// 对象的破坏性副作用，默认（<see cref="DisposeContentOnClose"/> = false）不做，由调用方自行管理。
+        /// </summary>
+        private static void CleanupTabItem(TabMenuItem tabItem, bool disposeContent)
         {
             try
             {
                 if (tabItem.Content is FrameworkElement fe)
                 {
-                    if (fe.DataContext is IDisposable disposableDataContext)
+                    if (disposeContent && fe.DataContext is IDisposable disposableDataContext)
                     {
                         try
                         {
@@ -371,14 +401,14 @@ namespace Junevy.Controls.Controls.Menu
                         }
                         catch (Exception ex)
                         {
-                            System.Diagnostics.Debug.WriteLine($"TabMenu.Dispose error: {ex}");
+                            Trace.TraceError($"TabMenu.Dispose error: {ex}");
                         }
                     }
 
                     fe.DataContext = null;
                 }
 
-                if (tabItem.Content is IDisposable disposable)
+                if (disposeContent && tabItem.Content is IDisposable disposable)
                 {
                     try
                     {
@@ -386,7 +416,7 @@ namespace Junevy.Controls.Controls.Menu
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine($"TabMenu.Dispose error: {ex}");
+                        Trace.TraceError($"TabMenu.Dispose error: {ex}");
                     }
                 }
 
@@ -395,7 +425,7 @@ namespace Junevy.Controls.Controls.Menu
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"TabMenu.Cleanup error: {ex}");
+                Trace.TraceError($"TabMenu.Cleanup error: {ex}");
             }
         }
     }

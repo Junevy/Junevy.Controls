@@ -5,16 +5,21 @@ using System.Windows.Threading;
 
 namespace Junevy.Controls.Controls.Menu
 {
+    /// <summary>
+    /// TabMenu 的页签容器，继承 WPF <see cref="TabItem"/>。
+    /// 提供图标、关闭按钮（经 <see cref="TabMenu.CloseTabCommand"/> 关闭）与双击标题重命名（<see cref="CanRename"/>）。
+    /// </summary>
     [TemplatePart(Name = PART_EditHeaderTextBox, Type = typeof(TextBox))]
     [TemplatePart(Name = PART_CloseButton, Type = typeof(System.Windows.Controls.Button))]
+    [TemplatePart(Name = PART_HeaderPresenter, Type = typeof(ContentPresenter))]
     public class TabMenuItem : TabItem
     {
         private const string PART_EditHeaderTextBox = "PART_EditHeaderTextBox";
         private const string PART_CloseButton = "PART_CloseButton";
+        private const string PART_HeaderPresenter = "PART_HeaderPresenter";
+
         private TextBox? headerTextBox;
         private System.Windows.Controls.Button? closeButton;
-
-        public Guid Id { get; } = Guid.NewGuid();
 
         static TabMenuItem()
         {
@@ -141,7 +146,7 @@ namespace Junevy.Controls.Controls.Menu
         /// 若在编辑过程中被禁用，将立即退出编辑并保留当前文本。
         /// </summary>
         public static readonly DependencyProperty CanRenameProperty =
-            DependencyProperty.Register("CanRename", typeof(bool), typeof(TabMenuItem), new PropertyMetadata(false, OnCanRenameChanged));
+            DependencyProperty.Register("CanRename", typeof(bool), typeof(TabMenuItem), new PropertyMetadata(true, OnCanRenameChanged));
 
         public bool CanRename
         {
@@ -157,29 +162,14 @@ namespace Junevy.Controls.Controls.Menu
             }
         }
 
-        /// <summary>
-        /// MenuItem内元素的布局方向
-        /// </summary>
-        public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(TabMenuItem), new PropertyMetadata(Orientation.Horizontal));
-
-
+        /// <summary>页签图标；通常为图标字体字形字符串，字体族取所在 <c>TabMenu</c> 的 <c>atc:Icon.FontFamily</c>。</summary>
         public static readonly DependencyProperty IconProperty =
             DependencyProperty.Register("Icon", typeof(object), typeof(TabMenuItem));
-
-        public Orientation Orientation
-        {
-            get { return (Orientation)GetValue(OrientationProperty); }
-            set { SetValue(OrientationProperty, value); }
-        }
 
         public object Icon
         {
             get { return (object)GetValue(IconProperty); }
             set { SetValue(IconProperty, value); }
         }
-
-
     }
 }
-

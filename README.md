@@ -139,7 +139,7 @@ ThemeManager.ToggleTheme();
 
 ### ExpanderBehavior
 
-`atc:ExpanderBehavior.Enable` 用于 `TreeViewItem`。启用后，双击非叶节点会展开或折叠；双击叶节点会调用最近的 `TreeMenu.NavigateCommand`，命令参数是对应的 `TreeMenuItem`。
+`atc:ExpanderBehavior.Enable` 用于 `TreeViewItem`。启用后，双击非叶节点会展开或折叠；双击叶节点会调用最近的 `TreeMenu.NavigateCommand`，命令参数是该容器的数据对象（对数据类型无要求；`TreeMenu` 中即对应的 `TreeMenuItem`）。叶/枝由容器的 `HasItems` 判断，因此任意 POCO 数据均可工作。
 
 `TreeMenu` 的默认容器样式已经自动启用该行为，通常不需要手动设置。
 
@@ -246,7 +246,7 @@ ThemeManager.ToggleTheme();
 
 同一反馈方案已推广至其余可交互控件（公共资源键 `Control.Hover.Opacity` / `Control.Pressed.Opacity`，定义于 `Generic/Style/FeedbackOpacity.xaml`）：**背景可自定义的按钮/卡片类**（`CardButton`、`ToolBarItem`、`ToolboxItem`、`ToolItem`）与**内部图标小按钮**（`MessageBar` / `ProgressBarWindow` 关闭按钮、`ImageViewer` 工具栏按钮、`DialogWindow` 标题栏按钮、`ToggleButton` Expander 展开按钮、`DatePicker` 日历导航/头部/下拉按钮）悬停/按压均为降透明度，鲜艳背景不再被灰底覆盖；`MenuBar` / `ContextMenu` / `TabMenu` / `SideMenu` / `TreeMenu`、`ListBox` / `ListView` / `DataGrid`、`GroupBox` / `ExpanderPanel` 等中性表面上的列表/菜单项仍保留 `Surface.Hover` 灰底悬停高亮。
 
-`jv:Button` 常态带一层只向下散开的浮起阴影，按压或禁用时自动消失（贴回地面），与降透明度的状态反馈叠加使用。阴影取自新令牌 `Theme.ButtonShadow`（浅色 `BlurRadius=16 / ShadowDepth=5 / Opacity=0.18`，深色 `18 / 6 / 0.40`），与 `Theme.PopupShadow` 同族同强度，只按控件尺寸收紧模糊与偏移：实测按钮下方 1–9px 相对压暗 `8.47%`，MessageBar 弹层同距离为 `9.50%`；`5–9px / 1–5px` 衰减比 `0.58` 对弹层 `0.63`，即同一族形状而非另立一套观感。Effect 只挂在模板内**不含任何子元素**的背景层 `Border` 上，文字仍走 ClearType；官方 `Button`、`NoBorderButtonStyle` 与 `CardButton`（自带模板）都不带这层阴影。宿主 App 在 `Application.Resources` 写同名键即可整体调淡或关掉（应用自身条目的优先级高于 `ThemeManager` 追加的主题字典，因此这一份覆盖值会同时用于浅色与深色，需要分档时自行取两套参数）：
+`jv:Button` 可选一层只向下散开的浮起阴影（默认关闭，常态贴平，与 ComboBox / TextBox 等同级控件一致），设 `ShowShadow=True` 打开；按压或禁用时自动消失（贴回地面），与降透明度的状态反馈叠加使用。阴影取自新令牌 `Theme.ButtonShadow`（浅色 `BlurRadius=16 / ShadowDepth=5 / Opacity=0.18`，深色 `18 / 6 / 0.40`），与 `Theme.PopupShadow` 同族同强度，只按控件尺寸收紧模糊与偏移：实测按钮下方 1–9px 相对压暗 `8.47%`，MessageBar 弹层同距离为 `9.50%`；`5–9px / 1–5px` 衰减比 `0.58` 对弹层 `0.63`，即同一族形状而非另立一套观感。Effect 只挂在模板内**不含任何子元素**的背景层 `Border` 上，文字仍走 ClearType；官方 `Button`、`NoBorderButtonStyle` 与 `CardButton`（自带模板）都不带这层阴影。宿主 App 在 `Application.Resources` 写同名键即可整体调淡或关掉（应用自身条目的优先级高于 `ThemeManager` 追加的主题字典，因此这一份覆盖值会同时用于浅色与深色，需要分档时自行取两套参数）：
 
 ```xml
 <Application.Resources>
@@ -260,15 +260,15 @@ ThemeManager.ToggleTheme();
 </Application.Resources>
 ```
 
-独有依赖属性 `ShowShadow`（默认 `true`）：常态浮起阴影的开关。与 `ComboBox`、`TextBox` 等没有浮起感的同级控件并排时（表单行、工具条、对话框底栏），一半浮起一半贴平会显得突兀，可对单个按钮设 `false`，或用样式 Setter 批量/全局关闭。只影响常态阴影：按压与禁用本就不显示阴影，悬停/按压的降透明度反馈、尺寸与文字渲染均不受影响。
+独有依赖属性 `ShowShadow`（默认 `false`）：常态浮起阴影的开关。默认贴平，与 `ComboBox`、`TextBox` 等没有浮起感的同级控件并排时（表单行、工具条、对话框底栏）观感一致；需要浮起感强调的按钮（主操作、独立 CTA）可对单个按钮设 `true`，或用样式 Setter 批量/全局开启。只影响常态阴影：按压与禁用本就不显示阴影，悬停/按压的降透明度反馈、尺寸与文字渲染均不受影响。
 
 ```xml
-<!--  逐个关闭  -->
-<jv:Button Content="确定" ShowShadow="False" />
+<!--  逐个开启  -->
+<jv:Button Content="确定" ShowShadow="True" />
 
-<!--  整个 App 内所有 jv:Button 默认不带浮起阴影  -->
+<!--  整个 App 内所有 jv:Button 常态带浮起阴影  -->
 <Style TargetType="{x:Type jv:Button}" BasedOn="{StaticResource {x:Type jv:Button}}">
-    <Setter Property="ShowShadow" Value="False" />
+    <Setter Property="ShowShadow" Value="True" />
 </Style>
 ```
 
@@ -645,7 +645,7 @@ ThemeManager.ToggleTheme();
 </jv:Button>
 ```
 
-也可以在 `jv:ContextMenu` 内使用原生 `<MenuItem>`；默认样式会统一应用到子菜单。不要在上下文菜单中使用 `<jv:MenuItem>`，因为它是 `SideMenu`/`TreeMenu` 的导航数据控件，不是 WPF 菜单项。
+也可以在 `jv:ContextMenu` 内使用原生 `<MenuItem>`；默认样式会统一应用到子菜单。不要在上下文菜单中使用 `<jv:MenuItem>`，因为它是 `SideMenu` 的导航数据控件，不是 WPF 菜单项。
 
 `ItemsSource` 仍按 WPF 标准使用。绑定普通数据时通过 `ItemContainerStyle` 设置 `Header`、`Icon` 和 `Command`：
 
@@ -663,7 +663,7 @@ ThemeManager.ToggleTheme();
 
 ### MenuItem
 
-`jv:MenuItem` 是导航数据控件，继承 `ContentControl`，供 `SideMenu` 和 `TreeMenuItem` 使用。它与 WPF `MenuItem` 没有继承关系。
+`jv:MenuItem` 是导航数据控件，继承 `ContentControl`，供 `SideMenu` 使用（`TreeMenu` 自 `1.9.0` 起改用 `TreeMenuItem` 数据模型）。它与 WPF `MenuItem` 没有继承关系。
 
 | 属性 | 效果 |
 | --- | --- |
@@ -722,14 +722,16 @@ ThemeManager.ToggleTheme();
 
 ### TreeMenu 与 TreeMenuItem
 
-`jv:TreeMenu` 继承 WPF `TreeView`，`jv:TreeMenuItem` 继承导航 `jv:MenuItem` 并增加子节点集合。
+`jv:TreeMenu` 继承 WPF `TreeView`；`jv:TreeMenuItem` 是普通数据模型类（实现 `INotifyPropertyChanged`，不是控件），作为 `ItemsSource` 条目使用，由默认的 `HierarchicalDataTemplate` 渲染 `Title` 与 `Icon`，层级由 `Children` 提供。数据模型不继承 `DispatcherObject`，可在任意线程构建。
 
 | 属性 | 效果 |
 | --- | --- |
 | `TreeMenu.DisplayMode` | `Normal` 显示展开箭头；`Icon` 使用左侧层级指示器 |
-| `TreeMenu.NavigateCommand` | 激活叶节点时执行（双击或按 `Enter`），参数为叶节点 `TreeMenuItem` |
-| `TreeMenuItem.Childrens` | 子节点集合，构造时自动初始化 |
-| `TreeMenuItem.IsLeaf` | 根据 `Childrens` 是否为空计算的只读状态 |
+| `TreeMenu.NavigateCommand` | 激活叶节点时执行（双击或按 `Enter`），参数为叶节点的数据对象 |
+| `TreeMenuItem.Children` | 子节点集合，构造时自动初始化，直接 `Add` 即可更新视图 |
+| `TreeMenuItem.IsExpanded` | 展开/收起状态，与容器 `TreeViewItem.IsExpanded` 双向绑定，可直接赋值控制节点展开，虚拟化/容器回收后状态不丢失 |
+| `TreeMenuItem.IsSelected` | 选中状态，与容器 `TreeViewItem.IsSelected` 双向绑定，可直接赋值选中节点 |
+| `TreeMenuItem.IsLeaf` | 根据 `Children` 是否为空计算的只读状态 |
 | `atc:Icon.FontFamily` | 节点图标字体 |
 | `atc:Icon.IconSize` | `Icon` 模式的节点图标大小 |
 | `atc:ExpanderBehavior.Enable` | 默认容器样式已启用；控制双击/`Enter` 展开与激活导航 |
@@ -741,7 +743,7 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
     {
         Title = "Camera",
         Icon = "\uE66B",
-        Childrens =
+        Children =
         {
             new TreeMenuItem { Title = "Live View", TargetType = typeof(LiveView) },
             new TreeMenuItem { Title = "Settings", TargetType = typeof(CameraSettings) }
@@ -758,21 +760,23 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
     NavigateCommand="{Binding NavigateCommand}" />
 ```
 
-当前默认树模板和双击行为依赖 `TreeMenuItem`，因此树数据应使用该类型。
+默认模板按 `TreeMenuItem` 的约定渲染（`Title` / `Icon` / `Children`）。使用其他数据类型时，为 `TreeMenu` 提供自定义 `HierarchicalDataTemplate`（含 `ItemsSource` 绑定）即可；展开/激活行为按容器 `HasItems` 判断叶/枝，不依赖具体数据类型。容器样式经 `ItemContainerStyle` 应用后沿层级递归传递到所有层级的 `TreeViewItem`。
 
 交互约定：
 
 - 单击选中节点；双击文件夹节点切换展开/收起，双击叶节点触发 `NavigateCommand`。
 - 键盘方向键沿用 WPF `TreeView` 原生行为：`↑`/`↓` 移动选择，`→`/`←` 展开/收起；`Enter` 激活叶节点或切换文件夹展开。
 - 悬停、选中、禁用三种视觉状态使用主题色区分，并作用于整行；长列表自动显示垂直滚动条。
+- 根级与嵌套层级均使用 `VirtualizingStackPanel`（Recycling），整棵树参与虚拟化；`MaxWidth` 钳制使子级宽度不超过本级内容宽度，不会向上撑大控件。
 
 ### TabMenu 与 TabMenuItem
 
-`jv:TabMenu` 继承 WPF `TabControl`，`jv:TabMenuItem` 继承 WPF `TabItem`。它遵循标准的 `ItemsSource`、`ItemTemplate`、`ContentTemplate` 和容器生成规则；点击页签标题会切换对应内容。
+`jv:TabMenu` 继承 WPF `TabControl`，`jv:TabMenuItem` 继承 WPF `TabItem`。它遵循标准的 `ItemsSource`、`ItemTemplate`、`ContentTemplate` 和容器生成规则；点击页签标题会切换对应内容。页签条使用 `WrapPanel`（页签过多自动换行 + 横向滚动），因此**不支持 `TabStripPlacement` 的 Left/Bottom/Right 方向**（官方 `TabPanel` 能力未包含），页签条固定在顶部。
 
 | 属性/事件 | 效果 |
 | --- | --- |
 | `CanCloseLastTab` | 是否允许关闭最后一个页签，默认 `true` |
+| `DisposeContentOnClose` | 关闭页签时是否对实现 `IDisposable` 的内容元素 `DataContext` / `Content` 调用 Dispose，默认 `false`（生命周期由调用方管理；`Content` / `DataContext` 引用总是释放） |
 | `HeaderCornerRadius` | 页签头圆角 |
 | `ContentCornerRadius` | 内容区域圆角 |
 | `IsClosable` | 是否显示关闭按钮，默认 `true` |
@@ -1414,10 +1418,10 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `DialogWindow` | WPF `Window`、`WindowChrome`、`SystemCommands`、主题资源（含阴影/圆角令牌） | 无 |
 | `ContextMenu` | WPF `ContextMenu`、`MenuItem`、`Separator`、Popup/阴影资源 | 无 |
 | `ContextMenuItem` | WPF `MenuItem`、`JunevyContextMenuItemStyle` | 无 |
-| `MenuItem` | WPF `ContentControl`；作为 `SideMenu`/`TreeMenuItem` 的导航数据 | 无 |
+| `MenuItem` | WPF `ContentControl`；作为 `SideMenu` 的导航数据 | 无 |
 | `SideMenu` | WPF `ListBox`、`ListBoxItem`、导航数据模板 | `Icon.FontFamily`、`Icon.IconSize` |
-| `TreeMenu` | WPF `TreeView`、`TreeMenuItem`、`jv:ToggleButton` | `Icon.FontFamily`、`Icon.IconSize`、`ExpanderBehavior.Enable` |
-| `TreeMenuItem` | `jv:MenuItem`、`ObservableCollection<TreeMenuItem>` | 通过所在 `TreeMenu` 使用图标附加属性 |
+| `TreeMenu` | WPF `TreeView`、`TreeMenuItem`（数据模型）、`jv:ToggleButton` | `Icon.FontFamily`、`Icon.IconSize`、`ExpanderBehavior.Enable` |
+| `TreeMenuItem` | 普通数据模型（`INotifyPropertyChanged`）、`ObservableCollection<TreeMenuItem>`；经所在 `TreeMenu` 使用图标附加属性 | 无 |
 | `TabMenu` | WPF `TabControl`、`TabMenuItem`、`jv:TextBox`、`jv:Button` | `IsClosable`（控件自身属性）、`Icon.FontFamily` |
 | `TabMenuItem` | WPF `TabItem`、`DefaultTabMenuItemStyle`、`TabMenu.CloseTabCommand` | 继承所在 `TabMenu` 的相关附加属性 |
 | `ToolBar` | WPF `ItemsControl`、`ToolBarItem`、虚拟化面板 | 无；图标由项目自身属性提供 |
@@ -1436,6 +1440,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 
 - **主窗口**：无边框 + `WindowChrome` + `jv:AppBar`（默认模板 DefaultAppBar；一个程序仅一个 AppBar，此处展示默认状态，工具栏按钮演示 `ThemeManager` 主题切换与打开 `jv:SidePanel` 设置抽屉）、`jv:SideMenu` 分类导航、`MessageBarService` 通知宿主。
 - **分类页**：按钮 / 输入与选择（PlaceholderAssist、TitleAssist、ShowClear、DatePickerAssist、Slider 数值框）/ 集合与数据（虚拟数据：ListBox 竖向+横向、ListView GridView、DataGrid、EmptyText 空态）/ 文本与状态（Label 全模式、TextBlock、ToolTip）/ 通知（Badge、MessageBar、MessageBarService）/ 布局（GroupBox、ExpanderPanel、Border.CornerRadius）/ 菜单与导航（ContextMenu、TreeMenu、TabMenu、ToolBar、Toolbox）/ 窗口与图像（ImageViewer、DialogWindow）。
+- **演示区块（DemoSection）**：每个控件演示统一为「标题 + 用法说明 + 演示内容卡片 + XAML 源码块」结构（`Samples/Junevy.Controls.Showcase/Controls/DemoSection`），源码块带轻量语法高亮（`XamlHighlighter`，配色取主题令牌、随明暗主题切换）、「收起/展开代码」与「复制代码」按钮；片段文本集中在 `ShowcaseSnippets.cs`，与页面演示同步维护。
 - **注意**：`jv:Button` 默认 `IsTextScaled=True`，内容缩放**只缩小不放大**——空间充足时保持原始字号，仅按钮被挤压时文字/图标等比缩小并保持居中，内容自适应布局无需再显式关闭；展示页保留一个固定尺寸的等比缩小演示。
 
 ## 开发注意事项

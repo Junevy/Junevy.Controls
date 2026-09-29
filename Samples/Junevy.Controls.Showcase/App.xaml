@@ -7,6 +7,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Junevy.Controls;component/Themes/Generic.xaml" />
+                <ResourceDictionary Source="/Junevy.Controls.Showcase;component/Controls/DemoSection.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

@@ -112,7 +112,8 @@
                     <ContentControl
                         x:Name="PageHost"
                         Grid.Column="1"
-                        Focusable="False" />
+                        Focusable="False"
+                        Margin="32,24,32,32" />
 
                     <!--  SidePanel：不指定 Column 时自动跨满父 Grid，从右侧滑出  -->
                     <jv:SidePanel x:Name="SettingsPanel" Side="Right">

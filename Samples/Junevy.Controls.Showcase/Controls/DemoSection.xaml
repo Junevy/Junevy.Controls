@@ -1,0 +1,137 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:demo="clr-namespace:Junevy.Controls.Showcase.Controls"
+    xmlns:jv="github.com.junevy">
+
+    <!--
+        DemoSection 隐式样式：演示页统一区块（标题 + 描述 + 演示卡片 + XAML 源码块）。
+        配色全部取自库主题令牌，浅色/深色主题下自动切换。
+    -->
+    <Style TargetType="{x:Type demo:DemoSection}">
+        <Setter Property="Margin" Value="0,0,0,28" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type demo:DemoSection}">
+                    <StackPanel>
+                        <!--  标题行：左侧主题色竖条 + 控件名  -->
+                        <StackPanel
+                            x:Name="TitleRow"
+                            Margin="0,0,0,8"
+                            Orientation="Horizontal">
+                            <Border
+                                Width="4"
+                                Height="16"
+                                Background="{DynamicResource Theme.Brush.Accent.Primary}"
+                                CornerRadius="2"
+                                VerticalAlignment="Center" />
+                            <TextBlock
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Center"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Text="{TemplateBinding Title}" />
+                        </StackPanel>
+
+                        <!--  用法说明  -->
+                        <TextBlock
+                            x:Name="DescriptionText"
+                            Margin="12,0,0,12"
+                            FontSize="12"
+                            Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                            Text="{TemplateBinding Description}"
+                            TextWrapping="Wrap" />
+
+                        <!--  演示内容卡片  -->
+                        <Border
+                            Background="{DynamicResource Theme.Brush.Surface.Raised}"
+                            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                            BorderThickness="1"
+                            CornerRadius="{DynamicResource Theme.ControlCornerRadius}"
+                            Padding="16">
+                            <ContentPresenter />
+                        </Border>
+
+                        <!--  XAML 源码块：头部行常驻（含折叠/复制按钮），折叠只隐藏代码文本区  -->
+                        <Border
+                            x:Name="CodeBlock"
+                            Margin="0,12,0,0"
+                            Background="{DynamicResource Theme.Brush.Surface.Base}"
+                            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                            BorderThickness="1"
+                            CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
+                            <StackPanel>
+                                <Grid Margin="12,8,12,0">
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontSize="11"
+                                        FontWeight="Bold"
+                                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                                        Text="XAML" />
+                                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                        <jv:Button
+                                            x:Name="ToggleCodeButton"
+                                            Content="收起代码"
+                                            FontSize="12"
+                                            IsTextScaled="False"
+                                            Command="{Binding ToggleCodeCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+                                        <jv:Button
+                                            x:Name="CopyCodeButton"
+                                            Margin="8,0,0,0"
+                                            Content="复制代码"
+                                            FontSize="12"
+                                            IsTextScaled="False"
+                                            Command="{Binding CopyCodeCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <ScrollViewer
+                                    x:Name="PART_CodeScroll"
+                                    Margin="12,6,12,12"
+                                    HorizontalScrollBarVisibility="Auto"
+                                    VerticalScrollBarVisibility="Disabled">
+                                    <TextBlock
+                                        x:Name="PART_CodeText"
+                                        FontFamily="Consolas, Microsoft YaHei UI"
+                                        FontSize="12"
+                                        LineHeight="19"
+                                        TextWrapping="NoWrap"
+                                        xml:space="preserve" />
+                                </ScrollViewer>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsCodeExpanded" Value="False">
+                            <Setter TargetName="PART_CodeScroll" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="ToggleCodeButton" Property="Content" Value="展开代码" />
+                        </Trigger>
+                        <Trigger Property="Title" Value="">
+                            <Setter TargetName="TitleRow" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Description" Value="">
+                            <Setter TargetName="DescriptionText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  演示页标题与副标题（各页面统一使用）  -->
+    <Style x:Key="DemoPageTitle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Margin" Value="0,0,0,6" />
+    </Style>
+
+    <Style x:Key="DemoPageSubtitle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
+        <Setter Property="Margin" Value="0,0,0,20" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+</ResourceDictionary>

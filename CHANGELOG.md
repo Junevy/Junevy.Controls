@@ -2,6 +2,77 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## Button 浮起阴影默认关闭：`ShowShadow` 默认值 `true` → `false`
+
+### 本次更新（`jv:Button.ShowShadow` 默认值改为 `false`，常态贴平；需要浮起感的按钮显式开启）— 2026-09-29
+
+- **动因**：`1.8.1` 引入 `ShowShadow` 开关的初衷是解决「按钮与 `ComboBox` / `TextBox` 等无浮起感的同级控件并排时一半浮起一半贴平」的突兀感，但默认 `true` 意味着宿主必须逐处（或全局样式）手动关闭；把默认值翻转为 `false` 后，常态观感与同级控件天然一致，浮起阴影变为需要强调主操作 / 独立 CTA 时的**显式选择**。
+- **变更**：`Controls/Button/Button.xaml.cs` 的 `ShowShadowProperty` 注册元数据默认值 `true` → `false`，XML 文档注释同步；模板（`Button.xaml`）与触发器结构不变——`ShowShadow=False` 触发器清 `Effect` 的机制照旧，默认值翻转后所有未显式设置的按钮常态贴平，显式设 `True` 的实例触发器不命中、阴影照常显示。
+- **兼容性**：默认值变化属行为变更——依赖「默认浮起阴影」的宿主需显式设 `ShowShadow="True"`（逐实例或基于隐式样式的 Setter 批量开启）；显式设置过 `ShowShadow` 的宿主不受影响。开关只管常态的边界不变：按压/禁用本就不显示阴影，悬停/按压降透明度反馈、尺寸与文字 ClearType 均不受影响。
+- **Showcase**：`ButtonsPage` 的 ShowShadow 演示行与 `ShowcaseSnippets.ButtonShadow` 片段同步翻转——「默认贴平」+ `ShowShadow=True`（浮起）对照，说明与批量开启示例同步更新。
+- **版本号**：维持 `1.9.0`（默认值翻转属 `1.9.0` 未发布迭代内的行为变更，随本迭代一并发布）。
+- 文档：README「Button」小节的阴影描述与 `ShowShadow` 段落、示例代码同步（默认 `false`、逐个/批量开启写法）。
+- 验证（探针为临时工程，不入库）：`.workbuddy/tmp/ShowShadowDefaultProbe/` **13 项断言全部通过**——DP 元数据 `DefaultValue=False` 且实例默认 `ShowShadow=False`（P1/P2）；`DefaultStyleKey` 仍指向 `jv:Button` 类型，隐式样式可在主题字典解析并成功应用 `JvButtonTemplate`（P3/P3a/P3b/P3c）；默认实例背景层 `Effect=null`（P4）；显式设 `True` 即时恢复 `DropShadowEffect`、运行期切回 `False` 即时清空（P5/P6）；基于隐式样式的 Setter 批量开启同样生效（P7）；同族 `IsTextScaled` 默认值不受影响（P8）；模板触发器契约完整——`ShowShadow` / `IsMouseOver` / `IsPressed` / `IsEnabled` 触发器均在（P9a/P9b）。库工程与 Showcase 工程编译零错误、无涉及 Button 的警告。
+
+## TabMenu 评审修复：CanRename 默认值对齐文档 + 关闭清理改为显式开关 + 死代码清理
+
+### 本次更新（按代码评审结论修复 TabMenu/TabMenuItem 缺陷与无效代码；含 `CanRename` 默认值行为对齐与新增 `DisposeContentOnClose` 开关）— 2026-09-29
+
+- **动因**：对 `Controls/Menu/TabMenu*` 做内存泄漏 / 死代码 / WPF 规范评审。结论：无内存泄漏（事件订阅对称、无静态引用持有实例），但存在文档与实现矛盾、隐藏的 Dispose 副作用、模板契约缺件与多处死代码。
+- **缺陷修复**：
+  - **`TabMenuItem.CanRename` 默认值由 `false` 改为 `true`**（`TabMenuItem.cs`）：XML 文档注释与 README 均写「默认允许 / 默认 true」，实现却是 `false`，三处矛盾；Showcase 演示页未设置该属性，「双击标题重命名」提示实际不生效。对齐后演示行为与文档一致。
+  - **`CleanupTabItem` 的自动 Dispose 改为显式开关**：新增 `TabMenu.DisposeContentOnClose`（bool，默认 `false`）。原实现关闭页签时无条件对内容元素 `DataContext` / `Content` 调用 `Dispose()`——库替消费者销毁对象的隐藏副作用，且只对直接声明页签生效、`ItemsSource` 条目反而不清理。现默认不调用 Dispose（生命周期由调用方管理），需要旧行为时显式开启；`Content` / `DataContext` 引用释放保持不变。**该属性属新增公开 DP，默认值与旧行为不同，依赖自动 Dispose 的宿主需显式设 `true`。**
+  - **内容区补 `PART_SelectedContentHost` 模板部件名**（`TabMenu.xaml`）：对齐 `TabControl` 官方模板契约——选中内容经 `TabControl` 直接更新，容器增删时由其内建的「释放内容呈现器引用以防泄漏绑定」路径生效；同时删除 `ContentPresenter` 上与 `ContentSource="SelectedContent"` 重复的 `ContentTemplate/ContentTemplateSelector/ContentStringFormat` 三个 `TemplateBinding`（`ContentSource` 机制已自动接线）。
+  - **`[TemplatePart]` 补声明 `PART_HeaderPresenter`**（`ContentPresenter`）：`PART_` 命名此前未在特性中声明，不符合「PART_ 命名与 TemplatePart 声明一一对应」的官方要求。
+  - **异常记录由 `Debug.WriteLine` 改为 `Trace.TraceError`**（8 处）：`Debug.WriteLine` 在 Release 编译中被剔除，`TabClosing` 等处理器异常会无声消失；`Trace` 在 Release 中仍可经监听器观测。
+  - **补齐 `CanCloseLastTab` / `HeaderCornerRadius` / `ContentCornerRadius` / `DisposeContentOnClose` 的 XML 文档注释**，与库内「DP 必带文档」风格一致。
+- **无效代码清理**：删除 `TabMenuItem.Orientation`（全库零引用，复制残留）、`TabMenuItem.Id`（Guid，全库零引用）、`TabMenu.xaml` 未使用的 `xmlns:tb`、注释残留的 `MinWidth` Setter、冗余合并的 `IconFont.xaml` 与 `DefaultFocusStyle.xaml`（前者文件内从未按键引用、后者仅经 DynamicResource 引用，均由 `Themes/Generic.xaml` 统一提供；`Button.xaml`/`TextBox.xaml` 因 `NoBorderButtonTemplate` / `NoBorderTextBoxTemplate_WPF` 为 StaticResource 引用而保留）。
+- **兼容性**：`CanRename` 默认值变化影响依赖「默认不可重命名」的宿主（需显式设 `false`）；`DisposeContentOnClose` 默认 `false` 改变旧行为（原先关闭即 Dispose）。其余交互（关闭、拦截、选择转移、重命名快捷键）、模板结构、主题令牌均未变。`TabStripPlacement` 的 Left/Bottom/Right 方向限制（页签条为 `WrapPanel` 固定顶部）已在 README 明确声明，属设计取舍不在本轮修改。
+- **版本号**：维持 `1.9.0`（`CanRename` 默认值系对文档既定行为的修复，`DisposeContentOnClose` 为新增可选项；均为 `1.9.0` 未发布迭代内的变更）。
+- 文档：README「TabMenu 与 TabMenuItem」补 `DisposeContentOnClose` 行与 `TabStripPlacement` 方向限制说明。
+- 验证（探针为临时工程，不入库）：`.workbuddy/tmp/TabMenuProbe/`，详见下节验证结果。
+
+## Showcase 演示程序改造：统一演示区块 + XAML 源码对照
+
+### 本次更新（演示页改为 DemoSection 统一区块，每个控件旁附语法高亮的 XAML 源码，可复制/折叠；仅改 Samples，不改库）— 2026-09-29
+
+- **动因**：用户要求优化演示程序的显示效果与控件间隔，并在控件旁附 XAML 代码演示用法。原页面内容贴边（页面宿主无外边距）、组间距 16px 偏挤、用法说明散落在控件之间的 TextBlock 里；控件用法只能看源码文件学习。
+- **新增（均在 Samples 工程，不进入库包）**：
+  - `Samples/Junevy.Controls.Showcase/Controls/DemoSection.xaml(.cs)`：演示区块控件（`ContentControl` 派生），统一「标题（主题色竖条）+ 用法说明 + 演示内容卡片 + XAML 源码块」结构；源码块带「收起/展开代码」（`IsCodeExpanded`，默认展开）与「复制代码」（`Clipboard.SetText` + `MessageBarService` 反馈，剪贴板占用时降级为警告条）；隐式样式定义在字典内并合并进 `App.xaml`，配色全部取库主题令牌（DynamicResource），明暗主题自动切换。
+  - `Samples/Junevy.Controls.Showcase/Controls/XamlHighlighter.cs`：轻量 XAML 词法扫描器，把源码切成元素名/属性名/字符串值/标记扩展/注释/标点六类片段；`DemoSection` 将其渲染为带 `DynamicResource` 画刷的 `Run` 序列（`xml:space="preserve"` 保留缩进，横向可滚动）。
+  - `Samples/Junevy.Controls.Showcase/ShowcaseSnippets.cs`：33 组演示区块的 XAML 片段（C# 原始字符串字面量集中管理，经 `{x:Static}` 引用），内容与页面演示一致、做演示级精简。
+- **页面改造（8 个分类页全部重构为 DemoSection 结构）**：`MainWindow` 页面宿主加外边距（`Margin=32,24,32,32`）解决内容贴边，页面内容列居中（`MaxWidth=1080 + HorizontalAlignment=Center`）；页标题/副标题改用 `App.xaml` 中的 `DemoPageTitle` / `DemoPageSubtitle` 统一样式；区块间距 28px，原来散落的说明 TextBlock 上移为区块 Description；ButtonsPage 的 Button 组按演示点拆为基础用法 / IsTextScaled / ShowShadow 三个区块。
+- **当日修复（2026-09-29）**：
+  - 「收起代码」按钮原先位于代码块内部，折叠触发器把整块（含按钮自己）一起隐藏，导致收起后无法再展开。改为折叠只隐藏代码文本区（`PART_CodeScroll`），头部行（XAML 标签 + 折叠/复制按钮）常驻可见。
+  - 代码块的内层 `ScrollViewer`（纵向禁用、仅横向）会把滚轮事件吞掉，鼠标悬停在代码块上时外层页面无法滚动。`DemoSection` 在 `OnApplyTemplate` 给内层挂 `PreviewMouseWheel`：内层自身无法纵向消费滚轮时，构造新的 `MouseWheelEventArgs` 转发给外层可滚动的 `ScrollViewer` 并标记已处理，整页滚动保持连贯。
+- **兼容性**：库（Junevy.Controls.csproj）零改动，版本维持 1.9.0；页面 code-behind 与 `x:Name` 引用（TreeNav / InlineBar / Viewer 等）不变；`jv:GroupBox` 仍作为演示对象出现在 LayoutPage 内部。
+- 文档：README「示例程序（Showcase）」补 DemoSection / XamlHighlighter / ShowcaseSnippets 结构说明。
+- 验证（探针为临时工程，不入库）：`.workbuddy/tmp/ShowcaseDemoProbe/` **13 项断言全部通过**——ButtonsPage 含 6 个 DemoSection、代码块 Inlines 分类着色（多画刷）、默认展开、折叠后头部行常驻可见 + Command 绑定正确且执行即翻转（S1-S4）；其余 7 页区块数逐一核对（6/5/3/3/3/5/3）（S5-S11）；高亮扫描器对元素/属性/值/标记扩展/注释五类分类正确且词元拼接还原原文（S12）；代码块上的合成滚轮事件（PreviewMouseWheel 隧穿）转发后外层页面 `VerticalOffset` 下滚 >0、上滚归零（S13）。离屏渲染截图（RTB）：浅色与深色主题下标题/描述/卡片/代码块配色均正确随主题切换，代码高亮五色分明、缩进保留；图标字体在合并 Generic.xaml 的宿主中渲染正常。注：离屏环境无法模拟真实鼠标点击（原生 Button 对照同样无法触发 OnClick），折叠按钮的实点验证以真机为准。
+
+## TreeMenu 重构：POCO 数据模型 + HierarchicalDataTemplate
+
+### 本次更新（`TreeMenuItem` 由控件改为数据模型类，节点层级改由 `HierarchicalDataTemplate` 驱动，虚拟化覆盖所有层级；**含破坏性 API 变更**）— 2026-09-29
+
+- **动因**：代码评审发现旧设计把树节点做成 UIElement——`TreeMenuItem : jv:MenuItem : ContentControl` 直接充当数据并放入 `ItemsSource`。WPF 会把每个非 `TreeViewItem` 条目再包进一层自动生成的容器，导致每个节点产生「容器 `TreeViewItem` + 节点 `TreeMenuItem`」双控件开销；节点作为 `DispatcherObject` 只能在 UI 线程构建，无法承载普通 POCO/MVVM 数据；嵌套层级未虚拟化（`VirtualizingPanel` setter 只作用于根级，子级展开后所有后代容器全部实例化）；模板内十余处 `RelativeSource AncestorType=TreeMenu` 字体/前景色绑定绕过了 WPF 属性继承机制。
+- **破坏性变更（`1.9.0`）**：
+  - `TreeMenuItem` 由控件改为 POCO 数据模型类（实现 `INotifyPropertyChanged`），不再继承 `jv:MenuItem`，不再有 `Id`/`Orientation`/`Content` 等控件成员；
+  - `Childrens` 重命名为 `Children`（只读集合属性，构造时初始化，`Add` 即更新视图）；
+  - 新增 `IsExpanded` / `IsSelected`：与容器 `TreeViewItem.IsExpanded` / `IsSelected` 双向绑定，可直接在模型上控制展开与选中，虚拟化/容器回收后状态不丢失；
+  - `TreeMenu.DisplayMode` 默认值由 `Icon` 改为 `Normal`（`Icon` 模式无展开箭头，作为默认值可发现性差）；
+  - `ExpanderBehavior` 叶/枝判断改按容器 `HasItems`，不再要求 `DataContext` 必须是 `TreeMenuItem`；`NavigateCommand` 参数为叶节点的数据对象。
+- **改法**：
+  - `Controls/Menu/TreeMenuItem.cs` 重写为 POCO：`Title` / `Icon` / `TargetType` / `IsExpanded` / `IsSelected`（INPC）+ `Children`（只读 `ObservableCollection<TreeMenuItem>`）+ 只读 `IsLeaf`；
+  - `Controls/Menu/TreeMenu.xaml` 重写：两个键控 `HierarchicalDataTemplate`（`TreeMenuNormalItemTemplate` / `TreeMenuIconItemTemplate`）按 `DisplayMode` 经样式触发器切换 `ItemTemplate`；旧 `DefaultTreeMenuTemplate` / `IconTreeMenuTemplate` 两套大段重复的容器样式合并为单一 `TreeMenuItemContainerStyle`，模板内经 `DataTrigger` / `MultiDataTrigger` 切换展开箭头与左侧指示器；旧「容器样式 Setter 注入 `ItemsSource={Binding Header.Childrens}`」的层级机制由 `HierarchicalDataTemplate.ItemsSource={Binding Children}` 取代；容器 `ItemsPanel` 换为 `VirtualizingStackPanel`（Recycling），根级原有的虚拟化扩展到所有层级；移除模板里全部祖先字体/前景色绑定（改走属性继承，节点上可单独覆盖字号与颜色）；删除未使用的 `BoolToVisibilityConverter`、注释残留的 `Width=150`、StackPanel 内无效的 `Grid.Row` 等死代码；不再重复合并 `DefaultFocusStyle.xaml`（DynamicResource 经 `Themes/Generic.xaml` 统一解析），仅保留 `ToggleButton.xaml` 合并（`ExpanderButton` 为 StaticResource 引用，解析顺序依赖）；
+  - `AttachedProperties/ExpanderBehavior.cs`：`ToggleOrActivate` 按容器 `HasItems` 分流——非叶切换展开（经双向绑定落回模型），叶节点执行最近 `TreeMenu.NavigateCommand`（参数为容器 `DataContext`），不再检查具体数据类型；
+  - Showcase `MenusPage` 随 API 更新（`Children` 重命名、MenuItem 用途提示文案）。
+- **兼容性**：除上述列出的破坏性变更外，`TreeMenu` 的模板结构、交互约定（单击选中、双击/`Enter` 展开/激活）、主题令牌、`atc:Icon.*` 附加属性用法均未改动。使用 `ItemsSource + TreeMenuItem` 的既有数据构建代码只需把 `Childrens` 改为 `Children`；XAML 中直接声明 `<jv:TreeMenuItem>` 子元素的用法不再支持，请改用 `ItemsSource` 绑定数据模型；使用自定义数据类型时为 `TreeMenu` 提供含 `ItemsSource` 绑定的 `HierarchicalDataTemplate` 即可（容器样式经 `ItemContainerStyle` 应用后沿层级递归传递到所有层级的 `TreeViewItem`）。
+- **版本号**：`1.9.0`——`Junevy.Controls.csproj` 的 `Version` 由 `1.8.4` 升至 `1.9.0`（公开 API 破坏性变更升次版本号；版本单一来源仍是 csproj，`AssemblyInfo.cs` 不含显式版本特性）。
+- 文档：README「TreeMenu 与 TreeMenuItem」章节重写（POCO 用法、`IsExpanded` / `IsSelected`、自定义数据类型指引、嵌套虚拟化说明）；`ExpanderBehavior` 小节更新命令参数与叶/枝判定说明；`MenuItem` 小节与文末依赖表同步（`jv:MenuItem` 现仅服务于 `SideMenu`）。
+- 验证（探针为临时工程，不入库）：
+  - `.workbuddy/tmp/TreeMenuPocoProbe/`：**18 项断言全部通过**——根容器生成且 `DataContext` 即数据模型（P1）；默认模板渲染标题（P2）；根级与二级 ItemsHost 均为 `VirtualizingStackPanel`，嵌套容器拿到库容器样式（`ExpanderBehavior` 启用 + 模板部件存在，`ItemContainerStyle` 以 local 值沿层级递归传递）（P3/P3b/P3c）；模型 `IsExpanded` / `IsSelected` 双向绑定驱动容器与 `TreeView.SelectedItem`（P4/P5）；`Enter` 激活叶节点触发 `NavigateCommand(leaf)`、`Enter` 于分支切换展开并同步回模型（P6/P7）；Normal/Icon 模式切换展开箭头与指示器（P8）；模型 `Title` 变更即时更新 UI（P9）；`Icon=null` 时图标占位折叠（P10）；`TreeMenuItem` 可在后台线程构建（P11）；字符串图标内容渲染正常（P11b）；iconfont.ttf 可经 pack URI 加载（P11c）；**变异反证**——把 `ItemTemplate` 换成普通 `DataTemplate` 后子容器不再生成，证明层级确实由 `HierarchicalDataTemplate` 提供（P12）；任意 POCO（非 `TreeMenuItem`）经 `Enter` 展开分支/激活叶节点，证明行为不依赖具体数据类型（P13）。
+  - 布局截图（探针离屏渲染）：Normal 模式三级层级缩进、行高、选中高亮正常；Icon 模式展开箭头消失、指示器显示、内容列左移。图标字形在离屏渲染下显示为占位块，经断言排除库因素（P11b/P11c：内容管线与字体文件加载均正常），属离屏渲染与上屏不一致的已知差异；真实宿主按 `DynamicResource IconFont` 托管即可正常渲染。
+- 回归：`Junevy.Controls.csproj` Release 双目标框架（net8.0-windows + net48）构建 0 错误、警告 40 个与改动前一致；Showcase 工程 0 错误 0 警告。
+
 ## 开关滑块与选中勾标的像素级居中
 
 ### 本次更新（`jv:ToggleButton` 开关几何按 DPI 吸附整数设备像素；`jv:RadioButton` / `jv:CheckBox` 选中勾标改矢量绘制）— 2026-09-24
