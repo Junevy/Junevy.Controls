@@ -56,32 +56,115 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 
 `Themes/Generic.xaml` 会加载默认浅色主题、所有控件样式、滚动条、焦点样式和内置图标字体。主题相关颜色应使用 `DynamicResource`，这样运行时切换主题后现有控件可以同步刷新。
 
+### 三层令牌模型（Aperture）
+
+配色由 `Tools/palette/spec.js` 单一来源生成，改颜色请改 spec 再 `node Tools/palette/emit.js`，不要手写 XAML 里的色值。令牌分三层，**只有第三层可以对控件开放**：
+
+| 层 | 键前缀 | 谁可以用 |
+| --- | --- | --- |
+| 原语（palette ramp） | `Palette.Chalk.600`、`Palette.Cobalt.500` … | 只在 `AppColors.*.xaml` 内部被引用，控件与宿主都不要直接取 |
+| 兼容色值 | `Theme.Color.Text.Primary` … | 旧接口遗留的镜像层，与 `Palette.*` 同值；新代码用 `Theme.Brush.*` |
+| 角色画刷 | `Theme.Brush.Text.Primary` … | 控件模板与宿主应用**唯一**该绑的一层 |
+
+`Step` 数字不是权重，而是 CIE **L\***（感知亮度）：同一族里相邻 step 的色差在人类视觉上大致均匀，浅色族 `Chalk` 从 `0`（`#FFFFFF`）走到 `1000`（`#070B10`），深色族 `Slate` 方向相反。两套主题共用同一条蓝灰中性线（色相恒定在 210°–215°，饱和度很低），只是各自从线的两端往里读——切换主题时画面不会换一个色相说话。
+
+设计取向：
+
+- **浅色不刺眼**：最亮的表面（卡片 `Surface.Base`）封顶在 `#FAFCFE`（Y≈0.971）、画布 `#EEF3F9`（Y≈0.891），不再有整屏纯白；正文落在 14.4:1，而改版前是 18.3:1——仍远超 AA，但去掉了高对比带来的光晕感。
+- **深色不累眼**：正文 L\* 约 89 而非 93+（对深色画布 13.4:1，读数舒适但不发光）；层级（贴平 / 卡片 / 弹层）靠表面 L\* 台阶表达，因此边框被刻意压低（深色 `Border.Default` 对卡片仅 2.3:1，属装饰性重复线索，可辨识度由表面台阶承担），需要硬分隔时用 `Border.Strong`。浅色边框保持 3.0:1，满足 WCAG 1.4.11 非文本对比。
+- **两条蓝各司其职**：`Cobalt` 只做主操作（`Accent.Primary`）；`Coating`（镜片镀膜的青）只做信息与焦点环（`Status.Info` / `Border.Focus` / `Accent.Secondary`）。旧方案里 `Info` 与 `Accent` 是同一个蓝，读不出「这是状态还是这是按钮」。
+
+### 角色令牌全表
+
+| 角色令牌 | 浅色 | 深色 | 用途 |
+| --- | --- | --- | --- |
+| `Theme.Brush.Background.App` | `#EEF3F9` | `#121922` | 应用 / 页面画布 |
+| `Theme.Brush.Background.Subtle` | `#EAF1F7` | `#212B38` | 次级画布 |
+| `Theme.Brush.Background.Second` | `#DFE7EF` | `#0D1218` | 再深一档画布 |
+| `Theme.Brush.Background.Third` | `#D5DFE9` | `#3D4B5C` | 最深一档画布 |
+| `Theme.Brush.Surface.Base` | `#FAFCFE` | `#1A222D` | 卡片、面板基础表面 |
+| `Theme.Brush.Surface.Raised` | `#FFFFFF` | `#2E3A48` | 抬升表面（弹层、浮起卡片） |
+| `Theme.Brush.Surface.Sunken` | `#DFE7EF` | `#0D1218` | 内陷表面（输入区、代码块） |
+| `Theme.Brush.Surface.Overlay` | `#FFFFFF` | `#2E3A48` | 覆盖层（对话框、下拉） |
+| `Theme.Brush.Surface.Hover` | `#EAF1F7` | `#212B38` | 悬停 |
+| `Theme.Brush.Surface.Pressed` | `#DFE7EF` | `#283340` | 按下 |
+| `Theme.Brush.Surface.Selected` | `#DCEBFD` | `#16304D` | 选中 |
+| `Theme.Brush.Text.Primary` | `#1C2937` | `#D8E1EC` | 正文 |
+| `Theme.Brush.Text.Secondary` | `#3E5065` | `#A2B1C4` | 次级文字 |
+| `Theme.Brush.Text.Tertiary` | `#56677B` | `#8D9CB1` | 三级文字（说明、占位） |
+| `Theme.Brush.Text.Disabled` | `#A7B8CB` | `#3D4B5C` | 禁用文字 |
+| `Theme.Brush.Text.Inverse` | `#FFFFFF` | `#070B10` | 反色表面上的文字 |
+| `Theme.Brush.Text.OnAccent` | `#FFFFFF` | `#070B10` | 主色 / 状态色块上的文字 |
+| `Theme.Brush.Border.Default` | `#8294AB` | `#4B5A6C` | 控件边框（浅色 3.0:1 达非文本标准；深色见上文设计取向） |
+| `Theme.Brush.Border.Subtle` | `#D5DFE9` | `#2E3A48` | 分隔线（装饰性，刻意压得很淡） |
+| `Theme.Brush.Border.Strong` | `#5C7089` | `#5F7185` | 强调边框 |
+| `Theme.Brush.Border.Focus` | `#0B7C91` | `#74CBDC` | 焦点环 |
+| `Theme.Brush.Accent.Primary` | `#1F5FC4` | `#4E90E8` | 主操作 |
+| `Theme.Brush.Accent.PrimaryHover` | `#174CA4` | `#639BE9` | 主操作悬停 |
+| `Theme.Brush.Accent.PrimaryPressed` | `#123C82` | `#3E82D6` | 主操作按下 |
+| `Theme.Brush.Accent.PrimarySubtle` | `#EFF6FF` | `#16304D` | 主色淡底（标签、选中行） |
+| `Theme.Brush.Accent.Secondary` | `#0B7C91` | `#74CBDC` | 次强调 |
+| `Theme.Brush.Accent.SecondarySubtle` | `#ECF8FB` | `#0C3440` | 次强调淡底 |
+| `Theme.Brush.Status.Info` | `#0B7C91` | `#74CBDC` | 信息 |
+| `Theme.Brush.Status.InfoSubtle` | `#ECF8FB` | `#0C3440` | 信息淡底 |
+| `Theme.Brush.Status.Success` | `#157A46` | `#45C48A` | 成功 |
+| `Theme.Brush.Status.SuccessHover` | `#0F6036` | `#6FCF9B` | 成功悬停 |
+| `Theme.Brush.Status.SuccessSubtle` | `#D8F3E3` | `#0E3526` | 成功淡底 |
+| `Theme.Brush.Status.Warning` | `#916308` | `#DFA432` | 警告 |
+| `Theme.Brush.Status.WarningHover` | `#7A4A04` | `#EDC066` | 警告悬停 |
+| `Theme.Brush.Status.WarningSubtle` | `#FCF0D6` | `#3E2A08` | 警告淡底 |
+| `Theme.Brush.Status.Danger` | `#A82828` | `#EE7B7B` | 危险 |
+| `Theme.Brush.Status.DangerHover` | `#8A1F1F` | `#F29C9C` | 危险悬停 |
+| `Theme.Brush.Status.DangerSubtle` | `#FCE2E2` | `#4E1C1C` | 危险淡底 |
+| `Theme.Brush.State.DisabledSurface` | `#DFE7EF` | `#1A222D` | 禁用底 |
+| `Theme.Brush.State.DisabledBorder` | `#D5DFE9` | `#3D4B5C` | 禁用边框 |
+| `Theme.Brush.State.DisabledForeground` | `#A7B8CB` | `#3D4B5C` | 禁用前景 |
+| `Theme.Brush.State.DisabledVeil` | `#A0FFFFFF` | `#A00D1218` | 禁用蒙层（半透明，盖在日历 / 日期弹层上：浅色洗淡、深色压暗） |
+| `Theme.Brush.ScrollBar.Thumb` | `#A7B8CB` | `#3D4B5C` | 滚动条滑块 |
+| `Theme.Brush.ScrollBar.ThumbHover` | `#8294AB` | `#5F7185` | 滚动条滑块悬停 |
+| `Theme.Brush.TransparentBackground.Base` | `#FFFFFF` | `#1A222D` | 棋盘格浅格 |
+| `Theme.Brush.TransparentBackground.Alt` | `#D5DFE9` | `#0D1218` | 棋盘格深格 |
+| `Theme.Brush.Status.Disable` | `#A7B8CB` | `#5F7185` | 停用态前景（旧库仅浅色有，两主题已补齐） |
+| `Theme.Brush.Effect.Shadow` | `#26070B10` | `#B3070B10` | 投影载体色（ARGB） |
+| `Theme.Brush.Overlay.Backdrop` | `#99070B10` | `#B3070B10` | 遮罩 / 半透明背板 |
+
+以下三项容易被误用，特别注意：
+
+- **Text.OnAccent 在深色下是墨色不是白色**：深色强调色本身已经够亮，白字压上去只有 3.2:1（危险色上更低，2.7:1），换成近黑墨色后是 6.1:1 / 7.3:1。`Status.*` 色块上的文字同样走这个键，不要写死 `#FFFFFF`。
+- **Text.Inverse** 指「反色表面」上的文字（整体取反的选中条、徽标底等），浅色为白、深色为近黑。当前与 `Text.OnAccent` 同值，但语义不同，不要互换。
+- **Status.* 有双重职责**：既当色块底（配 `Text.OnAccent`），也当无边框模式（`Label.DisplayMode`、AppBar 徽标等）的前景。取值必须同时满足「字压得住底」和「底/字在纸上够分量」两端——`Tools/palette/check.js` 对此有硬断言，不满足时 `emit.js` 直接拒绝生成 XAML。
+
+### 官方 WPF 控件的继承范围
+
+把 `Generic.xaml` 合并进 `Application.Resources`（`Samples/Junevy.Controls.Showcase/App.xaml` 即此写法）后，库里的隐式样式会自动作用于这些**官方**控件，无需换成 `jv:` 版本：`Button`、`TextBox`、`ToolTip`、`ScrollBar`、`ListView`、`ListBox`、`DatePicker`、`DatePickerTextBox`、`DataGrid`、`ComboBox`、`CheckBox`、`Slider`，以及日历家族的 `Calendar` / `CalendarItem` / `CalendarDayButton` / `CalendarButton`。
+
+以下官方类型**不会**被重新着色（库里的同名隐式样式写在模板内部，只服务 `jv:` 控件自己的部件，不外溢）：`TextBlock`、`Label`、`RadioButton`、`ToggleButton`、`Menu`、`MenuItem`、`Separator`、`ListBoxItem`、`Border`、`GroupBox`、`ProgressBar`、`TabControl`、`TreeView`、`Expander`、`ContextMenu`、`Window`。用 `jv:` 对应控件，或自行绑 `Theme.Brush.*`：
+
+```xml
+<Window
+    Background="{DynamicResource Theme.Brush.Background.App}"
+    TextElement.Foreground="{DynamicResource Theme.Brush.Text.Primary}">
+```
+
+只引用程序集而不合并字典时，上述官方控件一个都不会继承（实测 0 个带隐式样式）；宿主窗口的 `Background` 与文字颜色不在库的管辖内，必须自己设，否则深色主题下仍是白底黑字。
+
+布局与效果令牌：
+
 | 资源键 | 用途 |
 | --- | --- |
-| `Theme.Brush.Background.App` | 应用或页面背景 |
-| `Theme.Brush.Surface.Base` | 控件、面板的基础表面 |
-| `Theme.Brush.Surface.Raised` | 抬高的表面 |
-| `Theme.Brush.Surface.Sunken` | 输入焦点等内陷表面 |
-| `Theme.Brush.Surface.Hover` | 鼠标悬停 |
-| `Theme.Brush.Surface.Pressed` | 按下状态 |
-| `Theme.Brush.Surface.Selected` | 选中状态 |
-| `Theme.Brush.Text.Primary` | 主要文字 |
-| `Theme.Brush.Text.Secondary` | 次要文字 |
-| `Theme.Brush.Border.Default` | 默认边框 |
-| `Theme.Brush.Border.Focus` | 焦点边框 |
-| `Theme.Brush.Accent.Primary` | 主强调色 |
-| `Theme.Brush.Status.Success` | 成功状态 |
-| `Theme.Brush.Status.Warning` | 警告状态 |
-| `Theme.Brush.Status.Danger` | 错误/危险状态 |
-| `TransparentBackground` | 透明图像背景的棋盘格（中档，8px 方格） |
-| `TransparentBackground.Small` / `TransparentBackground.Large` | 4px / 16px 方格的棋盘格 |
-| `TransparentBackground.Geometry` | 棋盘格单个 16×16 单元内的两块 8×8 方格（纯几何，无颜色） |
 | `Theme.ControlCornerRadius` | 默认控件圆角 |
 | `Theme.ToolboxCornerRadius` | `Toolbox` 容器专用圆角，默认 `0`（直角） |
 | `Theme.ControlPadding` | 默认控件内边距 |
 | `Theme.PopupShadow` | 阴影令牌（`DropShadowEffect`），用于弹层、悬浮卡片 |
 | `Theme.ButtonShadow` | `jv:Button` 专用的向下浮起阴影令牌（与 `Theme.PopupShadow` 同族，按控件尺寸收紧） |
 | `Theme.SideMenuItemShadow` | `SideMenu` 选中条目专用的极淡柔光令牌（只向下散开） |
+| `TransparentBackground` | 透明图像背景的棋盘格（中档，8px 方格） |
+| `TransparentBackground.Small` / `.Large` | 4px / 16px 方格的棋盘格 |
+| `TransparentBackground.Geometry` | 棋盘格单个 16×16 单元内的两块 8×8 方格（纯几何，无颜色） |
+
+阴影只换了载体色相（浅色 `#26070B10`、深色 `#B3070B10`，取代原来的 `#1A0D1520` 与纯黑 `#99000000`），`BlurRadius`、`ShadowDepth`、`Opacity` 三个参数逐条保持原样。WPF 的 `DropShadowEffect` 并不读取 `Color` 的 alpha 通道，浓淡只由 `Opacity` 决定，所以换色相不会改变阴影浓度——离屏实测六个令牌改版前后压暗量漂移均为 `0.00%`。
+
+改配色请先读 `Tools/palette/README.md`：`node Tools/palette/check.js` 跑 81 条对比度 / 亮度台阶断言，`node Tools/palette/emit.js` 重新生成两份 `AppColors.*.xaml` 并回读校验（镜像层漂移、悬空引用、资源计数都会被拦下）。
 
 运行时切换主题：
 
@@ -246,7 +329,7 @@ ThemeManager.ToggleTheme();
 
 同一反馈方案已推广至其余可交互控件（公共资源键 `Control.Hover.Opacity` / `Control.Pressed.Opacity`，定义于 `Generic/Style/FeedbackOpacity.xaml`）：**背景可自定义的按钮/卡片类**（`CardButton`、`ToolBarItem`、`ToolboxItem`、`ToolItem`）与**内部图标小按钮**（`MessageBar` / `ProgressBarWindow` 关闭按钮、`ImageViewer` 工具栏按钮、`DialogWindow` 标题栏按钮、`ToggleButton` Expander 展开按钮、`DatePicker` 日历导航/头部/下拉按钮）悬停/按压均为降透明度，鲜艳背景不再被灰底覆盖；`MenuBar` / `ContextMenu` / `TabMenu` / `SideMenu` / `TreeMenu`、`ListBox` / `ListView` / `DataGrid`、`GroupBox` / `ExpanderPanel` 等中性表面上的列表/菜单项仍保留 `Surface.Hover` 灰底悬停高亮。
 
-`jv:Button` 可选一层只向下散开的浮起阴影（默认关闭，常态贴平，与 ComboBox / TextBox 等同级控件一致），设 `ShowShadow=True` 打开；按压或禁用时自动消失（贴回地面），与降透明度的状态反馈叠加使用。阴影取自新令牌 `Theme.ButtonShadow`（浅色 `BlurRadius=16 / ShadowDepth=5 / Opacity=0.18`，深色 `18 / 6 / 0.40`），与 `Theme.PopupShadow` 同族同强度，只按控件尺寸收紧模糊与偏移：实测按钮下方 1–9px 相对压暗 `8.47%`，MessageBar 弹层同距离为 `9.50%`；`5–9px / 1–5px` 衰减比 `0.58` 对弹层 `0.63`，即同一族形状而非另立一套观感。Effect 只挂在模板内**不含任何子元素**的背景层 `Border` 上，文字仍走 ClearType；官方 `Button`、`NoBorderButtonStyle` 与 `CardButton`（自带模板）都不带这层阴影。宿主 App 在 `Application.Resources` 写同名键即可整体调淡或关掉（应用自身条目的优先级高于 `ThemeManager` 追加的主题字典，因此这一份覆盖值会同时用于浅色与深色，需要分档时自行取两套参数）：
+`jv:Button` 可选一层只向下散开的浮起阴影（默认关闭，常态贴平，与 ComboBox / TextBox 等同级控件一致），设 `ShowShadow=True` 打开；按压或禁用时自动消失（贴回地面），与降透明度的状态反馈叠加使用。阴影取自新令牌 `Theme.ButtonShadow`（浅色 `BlurRadius=16 / ShadowDepth=5 / Opacity=0.18`，深色 `18 / 6 / 0.40`；载体色 `#26070B10` / `#B3070B10`），与 `Theme.PopupShadow` 同族同强度，只按控件尺寸收紧模糊与偏移：实测按钮下方 1–9px 相对压暗 `8.47%`，MessageBar 弹层同距离为 `9.50%`；`5–9px / 1–5px` 衰减比 `0.58` 对弹层 `0.63`，即同一族形状而非另立一套观感。Effect 只挂在模板内**不含任何子元素**的背景层 `Border` 上，文字仍走 ClearType；官方 `Button`、`NoBorderButtonStyle` 与 `CardButton`（自带模板）都不带这层阴影。宿主 App 在 `Application.Resources` 写同名键即可整体调淡或关掉（应用自身条目的优先级高于 `ThemeManager` 追加的主题字典，因此这一份覆盖值会同时用于浅色与深色，需要分档时自行取两套参数）：
 
 ```xml
 <Application.Resources>

@@ -2,6 +2,33 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## 配色改版 Aperture：深色 / 浅色两套主题整体重做
+
+### 本次更新（`1.10.0`：`AppColors.Light.xaml` / `AppColors.Dark.xaml` 全部取值重做，新增 `Palette.*` 原语层、`State.DisabledVeil` 蒙层令牌与 `Tools/palette/` 生成脚本；既有资源键名一个不改）— 2026-09-29
+
+- **动因**：用户要求在 `design` 分支重做两套主题的配色，允许不迁就既有颜色接口，硬性目标只有三条——浅色不刺眼、深色不累眼、主色调仍为蓝。旧方案的实测问题：浅色正文对纯白底 `18.34:1`，整屏亮度顶到 `Y=1.0`，久读有光晕感；深色正文 `#ECECEE`（L\*93.4）压在纯中性 `#202023` 上，字在发光而画面没有色相身份；`Status.Info #2563EB` 与 `Accent.Primary #1E5EE6` 差不到 3 个 L\*，「这是一条状态还是一个主操作按钮」在界面上读不出来。
+- **新增（令牌分层，`Themes/AppColors.*.xaml`）**：`Palette.{Family}.{Step}` 原语阶梯（两主题各 82 条 = 79 条色阶 + 3 条带 alpha 的效果原语，逐行一致）→ `Theme.Color.*` 兼容镜像（49 条）→ `Theme.Brush.*` 角色画刷（49 条）。控件模板与宿主只应绑第三层。`Step` 取 CIE L\* 而非权重序号，故同一族内相邻档位的视觉间距大致相等。
+- **新增（`Theme.{Color,Brush}.State.DisabledVeil`）**：禁用蒙层令牌，浅色 `#A0FFFFFF`（纸白 63%）/ 深色 `#A00D1218`（`Slate.25` 63%）。`Controls/Box/DatePicker.xaml` 的 `CalendarItem` 模板部件 `PART_DisabledVisual` 原先把 `Fill` 写死为 `#A0FFFFFF`，是全套控件字典里唯一一处硬编码颜色——浅色下把禁用的日历洗成灰白是设计意图，深色下同一层白纱却把日历冲成奶白块（离屏实测同区域平均 L\* 由 26.1 升到 51.7，Δ +25.6；换成本令牌后为 17.8，Δ −8.3 即正常压暗）。两主题从此反着走：浅色洗淡、深色压暗。
+- **新增（`Tools/palette/`）**：`spec.js`（唯一的色值真值来源，含 `solveToLstar` / `solveInRamp` 按目标亮度反解，禁止手挑 hex）、`check.js`（81 条对比度与感知台阶断言）、`emit.js`（生成两份主题字典并回读自检）、`README.md`（改色的正确姿势）。两份 XAML 从此为生成产物，不再手改。
+- **变更（中性线）**：浅色 `Chalk` 自上而下、深色 `Slate` 自下而上，共用同一条 210°–215° 低饱和蓝灰线，`Chalk.1000` 与 `Slate.0` 同为 `#070B10`——两套主题是同一条线的两种读法。
+- **变更（浅色不刺眼）**：最亮表面封顶在 `#FAFCFE`（Y=0.971）而非纯白，画布 `#EEF3F9`（Y=0.891），正文 `#1C2937` 对卡片 `14.36:1`（AA 的三倍，去掉了 18:1 的过冲）。控件边框 `#8294AB` 保持 `3.01:1`，满足 WCAG 1.4.11 非文本对比。
+- **变更（深色不累眼）**：正文降到 L\*89.2（`#D8E1EC`）对画布 `13.39:1`，不再用 93+ 的高亮白；贴平 / 卡片 / 弹层的层级改由表面 L\* 台阶表达，因此 `Border.Default` 主动压到 `2.27:1`（边框退为装饰性重复线索，需要硬分隔时用 `Border.Strong`）。
+- **变更（两条蓝分工）**：`Cobalt` 只承担主操作（`Accent.Primary` 系），`Coating`（镜片镀膜青）只承担信息与焦点（`Status.Info` / `Border.Focus` / `Accent.Secondary`）。旧 `Info` 与 `Accent` 同色的歧义消除。
+- **变更（深色强调色块上的文字改为墨色）**：`Text.OnAccent` 深色由白改为 `#070B10`。深色 `Accent.Primary #4E90E8` 自身已够亮，白字压上去只有 `3.24:1`（危险色上更低到 `2.71:1`），换墨色后为 `6.09:1` / `7.29:1`。浅色侧不变，仍为白。
+- **变更（状态色双重职责收敛）**：`Status.*` 既当色块底（配 `Text.OnAccent`）又当无边框模式的前景，两端都要够分量——`emit.js` 在写盘前做硬守卫，不达标直接拒绝生成。据此把浅色 `Warning` 由 `#9B6A08` 压到 `#916308`（仅 3 个 L\*，仍是琥珀），深色 `DangerSubtle` 由 `#3E1414` 提到 `#4E1C1C`（原值与卡片只差 0.13 L\*，色板等于隐形），深色 `DangerHover` 改 `#F29C9C` 使三个状态的悬停方向一致朝「更亮」。
+- **变更（补齐 parity）**：`Background.Second` / `Background.Third` 原先只有浅色有色值、`Status.Disable` 原先只有浅色有画刷，现两主题四键齐全。
+- **兼容性**：既有资源键名零删除（与改版前逐条比对，`Theme.*` 只增不减，新增的是 `Background.Second` / `Background.Third` / `Status.Disable` 的缺失主题补齐，以及 `State.DisabledVeil` 一组），因此所有依赖 `Theme.*` 的控件字典与宿主引用照常解析，变的全是取值。两点需要注意：① 宿主若把强调色块上的文字写死 `#FFFFFF` 而不是绑 `Text.OnAccent`，深色下会掉到 3:1 以下；② 阴影只换了载体色相，`BlurRadius` / `ShadowDepth` / `Opacity` 逐条照抄——实测 WPF 的 `DropShadowEffect` 不读取 `Color` 的 alpha 通道（同 `Opacity` 下色 alpha 从 `#1A` 换到 `#FF`，离屏压暗量一位不变），所以这里不存在也不需要「按 alpha 反向补偿不透明度」，六个阴影令牌改版前后压暗量漂移 `0.00%`。
+- **版本号**：`1.9.0` → `1.10.0`（配色整体重做 + 新增角色令牌 + 蒙层行为变更，随本迭代发布）。
+- **Showcase**：`Controls/DemoSection.xaml` 的 `DemoPageTitle` 缺 `Foreground`，浅色下因继承而看不出问题、深色下所有页面标题渲染为黑字——补 `DynamicResource Theme.Brush.Text.Primary`（既有演示程序缺陷，非本次配色引入）。`Pages/NotifyPage.xaml` 的 Badge 说明文字「Foreground 设为 Text.OnAccent（白色）」改为「浅色为白、深色为墨色」。
+- 文档：README「主题」小节重写——补三层令牌模型与各层的可用者、`Step` 为 L\* 的说明、三条设计取向（含深色边框 `2.3:1` 的取舍理由）、49 行角色令牌全表（浅色 / 深色取值逐条列出）、`Text.OnAccent` / `Text.Inverse` / `Status.*` 三条易误用说明，并指向 `Tools/palette/`。新增「官方 WPF 控件的继承范围」小节：列出合并 `Generic.xaml` 后会自动换装的 16 个官方类型、明确不会被覆盖的类型（`TextBlock` / `Window` / `RadioButton` 等）与宿主要自己设 `Background` + `TextElement.Foreground` 的写法。
+- 验证（探针为临时工程，不入库）：
+  - `node Tools/palette/check.js` **81/81 通过**——两主题各覆盖正文 / 次级 / 三级 / 禁用文字对比度、边框与色板的 ΔL\* 台阶、状态色双重职责、悬停方向、焦点环、棋盘格两色可辨。
+  - `.workbuddy/tmp/ThemeShotProbe/` **248 项断言全部通过**：按 `App.xaml` 的方式合并 `Generic.xaml` + `DemoSection.xaml`，逐主题断言 48 组 `Theme.Color.*` 与 `Theme.Brush.*` 取色一致、20 个头部色值等于新规格、三个阴影令牌解析为 `DropShadowEffect`、`TransparentBackground` 解析为 `DrawingBrush`；再离屏渲染 8 张演示页 × 两主题 + 两张色板总览，共 18 张截图人工复核。
+  - `.workbuddy/tmp/ShadowDensityProbe/` **14/14 通过**：同一离屏画布上并排渲染新旧两套阴影参数，六个「主题 × 令牌」组合的下方 1–9px 相对压暗量漂移全部为 `0.00%`，并含一条专门证明 `DropShadowEffect` 忽略 `Color.A` 的断言（`A=#1A` / `#66` / `#FF` 同 `Opacity` 下压暗量恒等）。
+  - `.workbuddy/tmp/NativeStyleProbe/` **38/38 通过**：证明这套配色对官方 WPF 控件可用——未合并 `Generic.xaml` 时 25 个官方控件实例带隐式样式的数量为 `0`，合并后逐类型验证 16 个官方类型继承成功、8 个刻意不覆盖的类型（`RadioButton` / `ToggleButton` / `GroupBox` / `ProgressBar` / `TabControl` / `TreeView` / `Expander` / `Label`）保持系统外观；官方 `Button` 的 `Foreground` 随 `ThemeManager.ApplyTheme` 从 `#1C2937` 重解析为 `#D8E1EC`；49 组角色刷在两主题下全部可解析、无一为 null 或透明。蒙层一项含反向对照：绑定 `Theme.Brush.State.DisabledVeil` 后深色禁用日历的离屏平均 L\* 为 26.1 → 17.8（Δ −8.3，压暗），把 `Fill` 退回旧写死色 `#A0FFFFFF` 则复现 26.1 → 51.7（Δ +25.6，奶白块），证明该判据确有判别力；浅色侧仍为 74.8 → 77.2（洗淡，符合原设计意图）。
+  - 全库硬编码颜色扫描：`Controls/` `Generic/` `Themes/` `Samples/` 的 XAML 属性色（`Foreground` / `Background` / `BorderBrush` / `Fill` / `Stroke` / `OpacityMask` / `Color`）、行内 `<SolidColorBrush>` / `<GradientStop>` 与具名色全部为空命中——`1.10.0` 起控件字典里不再有任何写死的十六进制颜色（`Transparent` 除外）。
+  - 库工程与 Showcase 工程编译零错误。
+
 ## Button 浮起阴影默认关闭：`ShowShadow` 默认值 `true` → `false`
 
 ### 本次更新（`jv:Button.ShowShadow` 默认值改为 `false`，常态贴平；需要浮起感的按钮显式开启）— 2026-09-29

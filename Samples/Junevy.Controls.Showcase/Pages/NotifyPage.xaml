@@ -17,7 +17,7 @@
 
             <demo:DemoSection
                 Title="jv:Badge（角标）"
-                Description="包裹任意内容；Count 角标 / IsDot 红点 / MaxCount 数值上限 / OffsetX/Y 偏移微调 / Corner 角位。注意：Badge 隐式样式将 Foreground 设为 Text.OnAccent（白色），包裹的内容若依赖继承前景色需显式设置；角标以自身中心对准内容角落，相邻控件的角标可能互相遮挡。"
+                Description="包裹任意内容；Count 角标 / IsDot 红点 / MaxCount 数值上限 / OffsetX/Y 偏移微调 / Corner 角位。注意：Badge 隐式样式将 Foreground 设为 Text.OnAccent（浅色为白、深色为墨色），包裹的内容若依赖继承前景色需显式设置；角标以自身中心对准内容角落，相邻控件的角标可能互相遮挡。"
                 XamlCode="{x:Static sample:ShowcaseSnippets.BadgeDemo}">
                 <WrapPanel>
                     <jv:Badge Count="5">

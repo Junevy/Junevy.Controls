@@ -122,6 +122,7 @@
 
     <!--  演示页标题与副标题（各页面统一使用）  -->
     <Style x:Key="DemoPageTitle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
         <Setter Property="FontSize" Value="22" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Margin" Value="0,0,0,6" />

@@ -1,137 +1,288 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!--
-        Dark theme — "Optics Blue"
-        Anchored on #202023 — a deep cool-dark with a subtle blue undertone.
-        Every surface steps evenly from this root, creating a uniform, cohesive dark environment.
-        Text is soft off-white — readable without glare, even under prolonged use.
-        
-        Naming convention:
-        Theme.Color.{Category}.{Variant}  — raw Color values
-        Theme.Brush.{Category}.{Variant}   — SolidColorBrush, references its Color
-        Theme.{LayoutToken}                — CornerRadius, Thickness, DropShadowEffect
-        
-        Categories: Background | Surface | Text | Border | Accent | Status | State | Effect
+        深色主题 — “Aperture · Umbra”（本影）
+
+        与浅色共用同一条 214° 灰阶线，只是从另一端读起：Slate.0 与 Chalk.1000
+        是同一滴墨。因此深色不是另一套配色，而是同一套色卡的另一种曝光。
+
+        · 不累眼：底面 #121922 → 卡片 #1A222D，避开纯黑（纯黑会把边框逼成灰白）；
+          正文 L* 收在 89 而非 93+，消除暗底亮字的眩光边缘，对比仍达 13.4:1。
+        · 层级靠表面台阶：本主题把高度差交给 ΔL* 递进的表面，
+          所以边框可以放心安静（相对表面 2.2:1）——暗色下过强的边框会连成一片网格。
+        · 语义分工：Cobalt 只做主操作；Coating（镀膜青）只做信息与焦点环。
+
+        命名约定：
+        Palette.{Family}.{Step}        — 原语，唯一真值来源
+        Theme.Color.{Role}.{Variant}   — 角色色（兼容层，见下）
+        Theme.Brush.{Role}.{Variant}   — 角色画刷，控件模板只认这一层
+        Theme.{LayoutToken}            — CornerRadius / Thickness / DropShadowEffect
+
+        兼容层为何逐条写死十六进制：WPF 的 Color 资源不能引用另一个 Color，
+        只有 SolidColorBrush 能通过 Color="{StaticResource …}" 取 Color。
+        故 Theme.Color.* 只能是 Palette 的字面镜像（每行已注明出处），
+        由生成脚本保证两者同步；改色请改 Palette 后重新生成两个主题文件。
     -->
 
     <!--
         ============================================================
-        Background colors
+        原语层 Palette.{Family}.{Step} — 唯一真值来源
         ============================================================
     -->
-    <Color x:Key="Theme.Color.Background.App">#202023</Color>
-    <Color x:Key="Theme.Color.Background.Subtle">#252528</Color>
+
+    <!--  Chalk — 纸白到墨黑，全部落在 214° 色相线上。浅色主题自上而下取用。  -->
+    <Color x:Key="Palette.Chalk.0">#FFFFFF</Color>
+    <Color x:Key="Palette.Chalk.25">#FAFCFE</Color>
+    <Color x:Key="Palette.Chalk.50">#EEF3F9</Color>
+    <Color x:Key="Palette.Chalk.75">#EAF1F7</Color>
+    <Color x:Key="Palette.Chalk.100">#DFE7EF</Color>
+    <Color x:Key="Palette.Chalk.150">#D5DFE9</Color>
+    <Color x:Key="Palette.Chalk.200">#C3D0DE</Color>
+    <Color x:Key="Palette.Chalk.300">#A7B8CB</Color>
+    <Color x:Key="Palette.Chalk.400">#8294AB</Color>
+    <Color x:Key="Palette.Chalk.500">#75899F</Color>
+    <Color x:Key="Palette.Chalk.550">#5C7089</Color>
+    <Color x:Key="Palette.Chalk.600">#56677B</Color>
+    <Color x:Key="Palette.Chalk.700">#3E5065</Color>
+    <Color x:Key="Palette.Chalk.800">#1C2937</Color>
+    <Color x:Key="Palette.Chalk.900">#111A24</Color>
+    <Color x:Key="Palette.Chalk.1000">#070B10</Color>
+
+    <!--  Slate — 与 Chalk 同一条线的另一端读起：Slate.0 与 Chalk.1000 是同一滴墨。  -->
+    <Color x:Key="Palette.Slate.0">#070B10</Color>
+    <Color x:Key="Palette.Slate.25">#0D1218</Color>
+    <Color x:Key="Palette.Slate.50">#121922</Color>
+    <Color x:Key="Palette.Slate.75">#1A222D</Color>
+    <Color x:Key="Palette.Slate.100">#212B38</Color>
+    <Color x:Key="Palette.Slate.125">#283340</Color>
+    <Color x:Key="Palette.Slate.150">#2E3A48</Color>
+    <Color x:Key="Palette.Slate.175">#3D4B5C</Color>
+    <Color x:Key="Palette.Slate.200">#4B5A6C</Color>
+    <Color x:Key="Palette.Slate.250">#5F7185</Color>
+    <Color x:Key="Palette.Slate.400">#8D9CB1</Color>
+    <Color x:Key="Palette.Slate.500">#A2B1C4</Color>
+    <Color x:Key="Palette.Slate.700">#C2CFDE</Color>
+    <Color x:Key="Palette.Slate.800">#D8E1EC</Color>
+    <Color x:Key="Palette.Slate.900">#EEF3F9</Color>
+    <Color x:Key="Palette.Slate.1000">#FFFFFF</Color>
+
+    <!--  Cobalt — 主色 — 光学蓝。按钮、选中、进度、活动指示。  -->
+    <Color x:Key="Palette.Cobalt.50">#EFF6FF</Color>
+    <Color x:Key="Palette.Cobalt.100">#DCEBFD</Color>
+    <Color x:Key="Palette.Cobalt.200">#BFD8FA</Color>
+    <Color x:Key="Palette.Cobalt.300">#93BFF3</Color>
+    <Color x:Key="Palette.Cobalt.400">#639BE9</Color>
+    <Color x:Key="Palette.Cobalt.450">#4E90E8</Color>
+    <Color x:Key="Palette.Cobalt.500">#3E82D6</Color>
+    <Color x:Key="Palette.Cobalt.600">#1F5FC4</Color>
+    <Color x:Key="Palette.Cobalt.700">#174CA4</Color>
+    <Color x:Key="Palette.Cobalt.800">#123C82</Color>
+    <Color x:Key="Palette.Cobalt.900">#0D2A5C</Color>
+    <Color x:Key="Palette.Cobalt.950">#16304D</Color>
+
+    <!--  Coating — 次色 — 镜头镀膜的青。只承担「信息」与「焦点」，绝不当第二个主色。  -->
+    <Color x:Key="Palette.Coating.50">#ECF8FB</Color>
+    <Color x:Key="Palette.Coating.100">#D3EFF5</Color>
+    <Color x:Key="Palette.Coating.200">#A9E0EB</Color>
+    <Color x:Key="Palette.Coating.300">#74CBDC</Color>
+    <Color x:Key="Palette.Coating.400">#3FB4CB</Color>
+    <Color x:Key="Palette.Coating.500">#1795B0</Color>
+    <Color x:Key="Palette.Coating.600">#0B7C91</Color>
+    <Color x:Key="Palette.Coating.700">#086475</Color>
+    <Color x:Key="Palette.Coating.800">#07505E</Color>
+    <Color x:Key="Palette.Coating.950">#0C3440</Color>
+
+    <!--  Green — 成功态。  -->
+    <Color x:Key="Palette.Green.100">#D8F3E3</Color>
+    <Color x:Key="Palette.Green.200">#A8E2C2</Color>
+    <Color x:Key="Palette.Green.300">#6FCF9B</Color>
+    <Color x:Key="Palette.Green.400">#45C48A</Color>
+    <Color x:Key="Palette.Green.500">#1F9D5B</Color>
+    <Color x:Key="Palette.Green.600">#157A46</Color>
+    <Color x:Key="Palette.Green.700">#0F6036</Color>
+    <Color x:Key="Palette.Green.950">#0E3526</Color>
+
+    <!--  Amber — 警告态。  -->
+    <Color x:Key="Palette.Amber.100">#FCF0D6</Color>
+    <Color x:Key="Palette.Amber.200">#F7DDA6</Color>
+    <Color x:Key="Palette.Amber.300">#EDC066</Color>
+    <Color x:Key="Palette.Amber.400">#DFA432</Color>
+    <Color x:Key="Palette.Amber.500">#C08412</Color>
+    <Color x:Key="Palette.Amber.600">#916308</Color>
+    <Color x:Key="Palette.Amber.700">#7A4A04</Color>
+    <Color x:Key="Palette.Amber.950">#3E2A08</Color>
+
+    <!--  Red — 危险态。  -->
+    <Color x:Key="Palette.Red.100">#FCE2E2</Color>
+    <Color x:Key="Palette.Red.200">#F6B9B9</Color>
+    <Color x:Key="Palette.Red.300">#EE7B7B</Color>
+    <Color x:Key="Palette.Red.350">#F29C9C</Color>
+    <Color x:Key="Palette.Red.400">#E4646A</Color>
+    <Color x:Key="Palette.Red.500">#C33A3A</Color>
+    <Color x:Key="Palette.Red.600">#A82828</Color>
+    <Color x:Key="Palette.Red.700">#8A1F1F</Color>
+    <Color x:Key="Palette.Red.950">#4E1C1C</Color>
+
+    <!--  投影、遮罩与禁用蒙层的载体色带 alpha，且两主题取值不同，故同属原语层  -->
+    <Color x:Key="Palette.Effect.Shadow">#B3070B10</Color>
+    <Color x:Key="Palette.Overlay.Backdrop">#B3070B10</Color>
+    <Color x:Key="Palette.State.DisabledVeil">#A00D1218</Color>
 
     <!--
         ============================================================
-        Surface colors — even steps up from the #202023 root
+        角色色 Theme.Color.* — 兼容层，逐条镜像 Slate 原语
         ============================================================
     -->
-    <Color x:Key="Theme.Color.Surface.Base">#2B2B30</Color>
-    <Color x:Key="Theme.Color.Surface.Raised">#323238</Color>
-    <Color x:Key="Theme.Color.Surface.Sunken">#1A1A1D</Color>
-    <Color x:Key="Theme.Color.Surface.Overlay">#303036</Color>
-    <Color x:Key="Theme.Color.Surface.Hover">#33333A</Color>
-    <Color x:Key="Theme.Color.Surface.Pressed">#3D3D45</Color>
-    <Color x:Key="Theme.Color.Surface.Selected">#1E2E50</Color>
+
+    <!--  背景  -->
+    <Color x:Key="Theme.Color.Background.App">#121922</Color>  <!--  = Palette.Slate.50  -->
+    <Color x:Key="Theme.Color.Background.Subtle">#212B38</Color>  <!--  = Palette.Slate.100  -->
+    <Color x:Key="Theme.Color.Background.Second">#0D1218</Color>  <!--  = Palette.Slate.25  -->
+    <Color x:Key="Theme.Color.Background.Third">#3D4B5C</Color>  <!--  = Palette.Slate.175  -->
+
+    <!--  表面 — 由低到高的层级  -->
+    <Color x:Key="Theme.Color.Surface.Base">#1A222D</Color>  <!--  = Palette.Slate.75  -->
+    <Color x:Key="Theme.Color.Surface.Raised">#2E3A48</Color>  <!--  = Palette.Slate.150  -->
+    <Color x:Key="Theme.Color.Surface.Sunken">#0D1218</Color>  <!--  = Palette.Slate.25  -->
+    <Color x:Key="Theme.Color.Surface.Overlay">#2E3A48</Color>  <!--  = Palette.Slate.150  -->
+    <Color x:Key="Theme.Color.Surface.Hover">#212B38</Color>  <!--  = Palette.Slate.100  -->
+    <Color x:Key="Theme.Color.Surface.Pressed">#283340</Color>  <!--  = Palette.Slate.125  -->
+    <Color x:Key="Theme.Color.Surface.Selected">#16304D</Color>  <!--  = Palette.Cobalt.950  -->
+
+    <!--  文字  -->
+    <Color x:Key="Theme.Color.Text.Primary">#D8E1EC</Color>  <!--  = Palette.Slate.800  -->
+    <Color x:Key="Theme.Color.Text.Secondary">#A2B1C4</Color>  <!--  = Palette.Slate.500  -->
+    <Color x:Key="Theme.Color.Text.Tertiary">#8D9CB1</Color>  <!--  = Palette.Slate.400  -->
+    <Color x:Key="Theme.Color.Text.Disabled">#3D4B5C</Color>  <!--  = Palette.Slate.175  -->
+    <Color x:Key="Theme.Color.Text.Inverse">#070B10</Color>  <!--  = Palette.Slate.0  -->
+    <Color x:Key="Theme.Color.Text.OnAccent">#070B10</Color>  <!--  = Palette.Slate.0  -->
+
+    <!--  边框  -->
+    <Color x:Key="Theme.Color.Border.Default">#4B5A6C</Color>  <!--  = Palette.Slate.200  -->
+    <Color x:Key="Theme.Color.Border.Subtle">#2E3A48</Color>  <!--  = Palette.Slate.150  -->
+    <Color x:Key="Theme.Color.Border.Strong">#5F7185</Color>  <!--  = Palette.Slate.250  -->
+    <Color x:Key="Theme.Color.Border.Focus">#74CBDC</Color>  <!--  = Palette.Coating.300  -->
+
+    <!--  主色 / 次色  -->
+    <Color x:Key="Theme.Color.Accent.Primary">#4E90E8</Color>  <!--  = Palette.Cobalt.450  -->
+    <Color x:Key="Theme.Color.Accent.PrimaryHover">#639BE9</Color>  <!--  = Palette.Cobalt.400  -->
+    <Color x:Key="Theme.Color.Accent.PrimaryPressed">#3E82D6</Color>  <!--  = Palette.Cobalt.500  -->
+    <Color x:Key="Theme.Color.Accent.PrimarySubtle">#16304D</Color>  <!--  = Palette.Cobalt.950  -->
+    <Color x:Key="Theme.Color.Accent.Secondary">#74CBDC</Color>  <!--  = Palette.Coating.300  -->
+    <Color x:Key="Theme.Color.Accent.SecondarySubtle">#0C3440</Color>  <!--  = Palette.Coating.950  -->
+
+    <!--  状态 — 同时充当色块填充与前景文字，取值已按双重职责校准  -->
+    <Color x:Key="Theme.Color.Status.Info">#74CBDC</Color>  <!--  = Palette.Coating.300  -->
+    <Color x:Key="Theme.Color.Status.InfoSubtle">#0C3440</Color>  <!--  = Palette.Coating.950  -->
+    <Color x:Key="Theme.Color.Status.Success">#45C48A</Color>  <!--  = Palette.Green.400  -->
+    <Color x:Key="Theme.Color.Status.SuccessHover">#6FCF9B</Color>  <!--  = Palette.Green.300  -->
+    <Color x:Key="Theme.Color.Status.SuccessSubtle">#0E3526</Color>  <!--  = Palette.Green.950  -->
+    <Color x:Key="Theme.Color.Status.Warning">#DFA432</Color>  <!--  = Palette.Amber.400  -->
+    <Color x:Key="Theme.Color.Status.WarningHover">#EDC066</Color>  <!--  = Palette.Amber.300  -->
+    <Color x:Key="Theme.Color.Status.WarningSubtle">#3E2A08</Color>  <!--  = Palette.Amber.950  -->
+    <Color x:Key="Theme.Color.Status.Danger">#EE7B7B</Color>  <!--  = Palette.Red.300  -->
+    <Color x:Key="Theme.Color.Status.DangerHover">#F29C9C</Color>  <!--  = Palette.Red.350  -->
+    <Color x:Key="Theme.Color.Status.DangerSubtle">#4E1C1C</Color>  <!--  = Palette.Red.950  -->
+
+    <!--  禁用态  -->
+    <Color x:Key="Theme.Color.State.DisabledSurface">#1A222D</Color>  <!--  = Palette.Slate.75  -->
+    <Color x:Key="Theme.Color.State.DisabledBorder">#3D4B5C</Color>  <!--  = Palette.Slate.175  -->
+    <Color x:Key="Theme.Color.State.DisabledForeground">#3D4B5C</Color>  <!--  = Palette.Slate.175  -->
+
+    <!--  滚动条  -->
+    <Color x:Key="Theme.Color.ScrollBar.Thumb">#3D4B5C</Color>  <!--  = Palette.Slate.175  -->
+    <Color x:Key="Theme.Color.ScrollBar.ThumbHover">#5F7185</Color>  <!--  = Palette.Slate.250  -->
+
+    <!--  透明棋盘格底色  -->
+    <Color x:Key="Theme.Color.TransparentBackground.Base">#1A222D</Color>  <!--  = Palette.Slate.75  -->
+    <Color x:Key="Theme.Color.TransparentBackground.Alt">#0D1218</Color>  <!--  = Palette.Slate.25  -->
+    <Color x:Key="Theme.Color.Effect.Shadow">#B3070B10</Color>  <!--  = Palette.Effect.Shadow  -->
+    <Color x:Key="Theme.Color.Overlay.Backdrop">#B3070B10</Color>  <!--  = Palette.Overlay.Backdrop  -->
+    <Color x:Key="Theme.Color.State.DisabledVeil">#A00D1218</Color>  <!--  = Palette.State.DisabledVeil  -->
+    <Color x:Key="Theme.Color.Status.Disable">#5F7185</Color>  <!--  = Palette.Slate.250  -->
 
     <!--
         ============================================================
-        Text colors — soft off-white, never pure #FFFFFF
+        角色画刷 Theme.Brush.* — 控件模板只认这一层
         ============================================================
     -->
-    <Color x:Key="Theme.Color.Text.Primary">#ECECEE</Color>
-    <Color x:Key="Theme.Color.Text.Secondary">#9D9DA3</Color>
-    <Color x:Key="Theme.Color.Text.Tertiary">#73737A</Color>
-    <Color x:Key="Theme.Color.Text.Disabled">#55555C</Color>
-    <Color x:Key="Theme.Color.Text.Inverse">#202023</Color>
-    <Color x:Key="Theme.Color.Text.OnAccent">#FFFFFF</Color>
+
+    <!--  背景  -->
+    <SolidColorBrush x:Key="Theme.Brush.Background.App" Color="{StaticResource Palette.Slate.50}" />
+    <SolidColorBrush x:Key="Theme.Brush.Background.Subtle" Color="{StaticResource Palette.Slate.100}" />
+    <SolidColorBrush x:Key="Theme.Brush.Background.Second" Color="{StaticResource Palette.Slate.25}" />
+    <SolidColorBrush x:Key="Theme.Brush.Background.Third" Color="{StaticResource Palette.Slate.175}" />
+
+    <!--  表面 — 由低到高的层级  -->
+    <SolidColorBrush x:Key="Theme.Brush.Surface.Base" Color="{StaticResource Palette.Slate.75}" />
+    <SolidColorBrush x:Key="Theme.Brush.Surface.Raised" Color="{StaticResource Palette.Slate.150}" />
+    <SolidColorBrush x:Key="Theme.Brush.Surface.Sunken" Color="{StaticResource Palette.Slate.25}" />
+    <SolidColorBrush x:Key="Theme.Brush.Surface.Overlay" Color="{StaticResource Palette.Slate.150}" />
+    <SolidColorBrush x:Key="Theme.Brush.Surface.Hover" Color="{StaticResource Palette.Slate.100}" />
+    <SolidColorBrush x:Key="Theme.Brush.Surface.Pressed" Color="{StaticResource Palette.Slate.125}" />
+    <SolidColorBrush x:Key="Theme.Brush.Surface.Selected" Color="{StaticResource Palette.Cobalt.950}" />
+
+    <!--  文字  -->
+    <SolidColorBrush x:Key="Theme.Brush.Text.Primary" Color="{StaticResource Palette.Slate.800}" />
+    <SolidColorBrush x:Key="Theme.Brush.Text.Secondary" Color="{StaticResource Palette.Slate.500}" />
+    <SolidColorBrush x:Key="Theme.Brush.Text.Tertiary" Color="{StaticResource Palette.Slate.400}" />
+    <SolidColorBrush x:Key="Theme.Brush.Text.Disabled" Color="{StaticResource Palette.Slate.175}" />
+    <SolidColorBrush x:Key="Theme.Brush.Text.Inverse" Color="{StaticResource Palette.Slate.0}" />
+    <SolidColorBrush x:Key="Theme.Brush.Text.OnAccent" Color="{StaticResource Palette.Slate.0}" />
+
+    <!--  边框  -->
+    <SolidColorBrush x:Key="Theme.Brush.Border.Default" Color="{StaticResource Palette.Slate.200}" />
+    <SolidColorBrush x:Key="Theme.Brush.Border.Subtle" Color="{StaticResource Palette.Slate.150}" />
+    <SolidColorBrush x:Key="Theme.Brush.Border.Strong" Color="{StaticResource Palette.Slate.250}" />
+    <SolidColorBrush x:Key="Theme.Brush.Border.Focus" Color="{StaticResource Palette.Coating.300}" />
+
+    <!--  主色 / 次色  -->
+    <SolidColorBrush x:Key="Theme.Brush.Accent.Primary" Color="{StaticResource Palette.Cobalt.450}" />
+    <SolidColorBrush x:Key="Theme.Brush.Accent.PrimaryHover" Color="{StaticResource Palette.Cobalt.400}" />
+    <SolidColorBrush x:Key="Theme.Brush.Accent.PrimaryPressed" Color="{StaticResource Palette.Cobalt.500}" />
+    <SolidColorBrush x:Key="Theme.Brush.Accent.PrimarySubtle" Color="{StaticResource Palette.Cobalt.950}" />
+    <SolidColorBrush x:Key="Theme.Brush.Accent.Secondary" Color="{StaticResource Palette.Coating.300}" />
+    <SolidColorBrush x:Key="Theme.Brush.Accent.SecondarySubtle" Color="{StaticResource Palette.Coating.950}" />
+
+    <!--  状态 — 同时充当色块填充与前景文字，取值已按双重职责校准  -->
+    <SolidColorBrush x:Key="Theme.Brush.Status.Info" Color="{StaticResource Palette.Coating.300}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.InfoSubtle" Color="{StaticResource Palette.Coating.950}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.Success" Color="{StaticResource Palette.Green.400}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.SuccessHover" Color="{StaticResource Palette.Green.300}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.SuccessSubtle" Color="{StaticResource Palette.Green.950}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.Warning" Color="{StaticResource Palette.Amber.400}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.WarningHover" Color="{StaticResource Palette.Amber.300}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.WarningSubtle" Color="{StaticResource Palette.Amber.950}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.Danger" Color="{StaticResource Palette.Red.300}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.DangerHover" Color="{StaticResource Palette.Red.350}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.DangerSubtle" Color="{StaticResource Palette.Red.950}" />
+
+    <!--  禁用态  -->
+    <SolidColorBrush x:Key="Theme.Brush.State.DisabledSurface" Color="{StaticResource Palette.Slate.75}" />
+    <SolidColorBrush x:Key="Theme.Brush.State.DisabledBorder" Color="{StaticResource Palette.Slate.175}" />
+    <SolidColorBrush x:Key="Theme.Brush.State.DisabledForeground" Color="{StaticResource Palette.Slate.175}" />
+
+    <!--  滚动条  -->
+    <SolidColorBrush x:Key="Theme.Brush.ScrollBar.Thumb" Color="{StaticResource Palette.Slate.175}" />
+    <SolidColorBrush x:Key="Theme.Brush.ScrollBar.ThumbHover" Color="{StaticResource Palette.Slate.250}" />
+
+    <!--  透明棋盘格底色  -->
+    <SolidColorBrush x:Key="Theme.Brush.TransparentBackground.Base" Color="{StaticResource Palette.Slate.75}" />
+    <SolidColorBrush x:Key="Theme.Brush.TransparentBackground.Alt" Color="{StaticResource Palette.Slate.25}" />
+
+    <!--  投影 / 遮罩 / 禁用蒙层 / 禁用前景四把画刷。Status.Disable 在旧库里只有浅色有且写死中性灰，现两主题都补、并取回色相线上  -->
+    <SolidColorBrush x:Key="Theme.Brush.Effect.Shadow" Color="{StaticResource Palette.Effect.Shadow}" />
+    <SolidColorBrush x:Key="Theme.Brush.Overlay.Backdrop" Color="{StaticResource Palette.Overlay.Backdrop}" />
+    <SolidColorBrush x:Key="Theme.Brush.State.DisabledVeil" Color="{StaticResource Palette.State.DisabledVeil}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.Disable" Color="{StaticResource Palette.Slate.250}" />
 
     <!--
         ============================================================
-        Border colors
+        透明棋盘格 TransparentBackground（几何绘制，非位图）
+        一个 16x16 单元含两个 8x8 格，三把键只差 Viewport，故格子尺寸可缩放而图案不变形。
         ============================================================
     -->
-    <Color x:Key="Theme.Color.Border.Default">#38383E</Color>
-    <Color x:Key="Theme.Color.Border.Subtle">#2E2E33</Color>
-    <Color x:Key="Theme.Color.Border.Strong">#4C4C54</Color>
-    <Color x:Key="Theme.Color.Border.Focus">#5599FF</Color>
-
-    <!--
-        ============================================================
-        Accent colors — clean bright blue that stands out on #202023
-        ============================================================
-    -->
-    <Color x:Key="Theme.Color.Accent.Primary">#5599FF</Color>
-    <Color x:Key="Theme.Color.Accent.PrimaryHover">#7AB4FF</Color>
-    <Color x:Key="Theme.Color.Accent.PrimaryPressed">#3D7ACC</Color>
-    <Color x:Key="Theme.Color.Accent.PrimarySubtle">#1E3458</Color>
-    <Color x:Key="Theme.Color.Accent.Secondary">#8689FF</Color>
-    <Color x:Key="Theme.Color.Accent.SecondarySubtle">#292A54</Color>
-
-    <!--
-        ============================================================
-        Status colors
-        ============================================================
-    -->
-    <Color x:Key="Theme.Color.Status.Info">#5599FF</Color>
-    <Color x:Key="Theme.Color.Status.InfoSubtle">#1A3260</Color>
-    <Color x:Key="Theme.Color.Status.Success">#34D39A</Color>
-    <Color x:Key="Theme.Color.Status.SuccessHover">#22C083</Color>
-    <Color x:Key="Theme.Color.Status.SuccessSubtle">#123D32</Color>
-    <Color x:Key="Theme.Color.Status.Warning">#FFB020</Color>
-    <Color x:Key="Theme.Color.Status.WarningHover">#E5A609</Color>
-    <Color x:Key="Theme.Color.Status.WarningSubtle">#4A3518</Color>
-    <Color x:Key="Theme.Color.Status.Danger">#F87171</Color>
-    <Color x:Key="Theme.Color.Status.DangerHover">#F66565</Color>
-    <Color x:Key="Theme.Color.Status.DangerSubtle">#4A1F2C</Color>
-
-    <!--
-        ============================================================
-        State / disabled colors
-        ============================================================
-    -->
-    <Color x:Key="Theme.Color.State.DisabledSurface">#27272D</Color>
-    <Color x:Key="Theme.Color.State.DisabledBorder">#35353C</Color>
-    <Color x:Key="Theme.Color.State.DisabledForeground">#55555C</Color>
-
-    <!--
-        ============================================================
-        Effect & overlay colors
-        ============================================================
-    -->
-    <Color x:Key="Theme.Color.Effect.Shadow">#99000000</Color>
-    <Color x:Key="Theme.Color.Overlay.Backdrop">#99000000</Color>
-
-    <!--
-        ============================================================
-        ScrollBar colors
-        ============================================================
-    -->
-    <Color x:Key="Theme.Color.ScrollBar.Thumb">#45454D</Color>
-    <Color x:Key="Theme.Color.ScrollBar.ThumbHover">#5C5C66</Color>
-
-    <!--
-        ============================================================
-        Background brushes
-        ============================================================
-    -->
-    <SolidColorBrush x:Key="Theme.Brush.Background.App" Color="{StaticResource Theme.Color.Background.App}" />
-    <SolidColorBrush x:Key="Theme.Brush.Background.Subtle" Color="{StaticResource Theme.Color.Background.Subtle}" />
-
-    <!--
-        ============================================================
-        TransparentBackground (geometry-drawn transparency checkerboard)
-        One 16x16 unit holds two 8x8 cells; the three keys only differ
-        in Viewport, so cell size scales without distorting the pattern.
-        ============================================================
-    -->
-    <Color x:Key="Theme.Color.TransparentBackground.Base">#2B2B30</Color>
-    <Color x:Key="Theme.Color.TransparentBackground.Alt">#232327</Color>
-    <SolidColorBrush x:Key="Theme.Brush.TransparentBackground.Base" Color="{StaticResource Theme.Color.TransparentBackground.Base}" />
-    <SolidColorBrush x:Key="Theme.Brush.TransparentBackground.Alt" Color="{StaticResource Theme.Color.TransparentBackground.Alt}" />
-
-    <!--  The dark cells of a single 16x16 unit, reusable as plain geometry.  -->
+    <!--  单个 16x16 单元中的深色格，可当作普通几何复用。  -->
     <GeometryGroup x:Key="TransparentBackground.Geometry">
         <RectangleGeometry Rect="0,0,8,8" />
         <RectangleGeometry Rect="8,8,8,8" />
@@ -184,96 +335,9 @@
 
     <!--
         ============================================================
-        Surface brushes
-        ============================================================
-    -->
-    <SolidColorBrush x:Key="Theme.Brush.Surface.Base" Color="{StaticResource Theme.Color.Surface.Base}" />
-    <SolidColorBrush x:Key="Theme.Brush.Surface.Raised" Color="{StaticResource Theme.Color.Surface.Raised}" />
-    <SolidColorBrush x:Key="Theme.Brush.Surface.Sunken" Color="{StaticResource Theme.Color.Surface.Sunken}" />
-    <SolidColorBrush x:Key="Theme.Brush.Surface.Overlay" Color="{StaticResource Theme.Color.Surface.Overlay}" />
-    <SolidColorBrush x:Key="Theme.Brush.Surface.Hover" Color="{StaticResource Theme.Color.Surface.Hover}" />
-    <SolidColorBrush x:Key="Theme.Brush.Surface.Pressed" Color="{StaticResource Theme.Color.Surface.Pressed}" />
-    <SolidColorBrush x:Key="Theme.Brush.Surface.Selected" Color="{StaticResource Theme.Color.Surface.Selected}" />
-
-    <!--
-        ============================================================
-        Text brushes
-        ============================================================
-    -->
-    <SolidColorBrush x:Key="Theme.Brush.Text.Primary" Color="{StaticResource Theme.Color.Text.Primary}" />
-    <SolidColorBrush x:Key="Theme.Brush.Text.Secondary" Color="{StaticResource Theme.Color.Text.Secondary}" />
-    <SolidColorBrush x:Key="Theme.Brush.Text.Tertiary" Color="{StaticResource Theme.Color.Text.Tertiary}" />
-    <SolidColorBrush x:Key="Theme.Brush.Text.Disabled" Color="{StaticResource Theme.Color.Text.Disabled}" />
-    <SolidColorBrush x:Key="Theme.Brush.Text.Inverse" Color="{StaticResource Theme.Color.Text.Inverse}" />
-    <SolidColorBrush x:Key="Theme.Brush.Text.OnAccent" Color="{StaticResource Theme.Color.Text.OnAccent}" />
-
-    <!--
-        ============================================================
-        Border brushes
-        ============================================================
-    -->
-    <SolidColorBrush x:Key="Theme.Brush.Border.Default" Color="{StaticResource Theme.Color.Border.Default}" />
-    <SolidColorBrush x:Key="Theme.Brush.Border.Subtle" Color="{StaticResource Theme.Color.Border.Subtle}" />
-    <SolidColorBrush x:Key="Theme.Brush.Border.Strong" Color="{StaticResource Theme.Color.Border.Strong}" />
-    <SolidColorBrush x:Key="Theme.Brush.Border.Focus" Color="{StaticResource Theme.Color.Border.Focus}" />
-
-    <!--
-        ============================================================
-        Accent brushes
-        ============================================================
-    -->
-    <SolidColorBrush x:Key="Theme.Brush.Accent.Primary" Color="{StaticResource Theme.Color.Accent.Primary}" />
-    <SolidColorBrush x:Key="Theme.Brush.Accent.PrimaryHover" Color="{StaticResource Theme.Color.Accent.PrimaryHover}" />
-    <SolidColorBrush x:Key="Theme.Brush.Accent.PrimaryPressed" Color="{StaticResource Theme.Color.Accent.PrimaryPressed}" />
-    <SolidColorBrush x:Key="Theme.Brush.Accent.PrimarySubtle" Color="{StaticResource Theme.Color.Accent.PrimarySubtle}" />
-    <SolidColorBrush x:Key="Theme.Brush.Accent.Secondary" Color="{StaticResource Theme.Color.Accent.Secondary}" />
-    <SolidColorBrush x:Key="Theme.Brush.Accent.SecondarySubtle" Color="{StaticResource Theme.Color.Accent.SecondarySubtle}" />
-
-    <!--
-        ============================================================
-        Status brushes
-        ============================================================
-    -->
-    <SolidColorBrush x:Key="Theme.Brush.Status.Info" Color="{StaticResource Theme.Color.Status.Info}" />
-    <SolidColorBrush x:Key="Theme.Brush.Status.InfoSubtle" Color="{StaticResource Theme.Color.Status.InfoSubtle}" />
-    <SolidColorBrush x:Key="Theme.Brush.Status.Success" Color="{StaticResource Theme.Color.Status.Success}" />
-    <SolidColorBrush x:Key="Theme.Brush.Status.SuccessHover" Color="{StaticResource Theme.Color.Status.SuccessHover}" />
-    <SolidColorBrush x:Key="Theme.Brush.Status.SuccessSubtle" Color="{StaticResource Theme.Color.Status.SuccessSubtle}" />
-    <SolidColorBrush x:Key="Theme.Brush.Status.Warning" Color="{StaticResource Theme.Color.Status.Warning}" />
-    <SolidColorBrush x:Key="Theme.Brush.Status.WarningHover" Color="{StaticResource Theme.Color.Status.WarningHover}" />
-    <SolidColorBrush x:Key="Theme.Brush.Status.WarningSubtle" Color="{StaticResource Theme.Color.Status.WarningSubtle}" />
-    <SolidColorBrush x:Key="Theme.Brush.Status.Danger" Color="{StaticResource Theme.Color.Status.Danger}" />
-    <SolidColorBrush x:Key="Theme.Brush.Status.DangerHover" Color="{StaticResource Theme.Color.Status.DangerHover}" />
-    <SolidColorBrush x:Key="Theme.Brush.Status.DangerSubtle" Color="{StaticResource Theme.Color.Status.DangerSubtle}" />
-
-    <!--
-        ============================================================
-        State / disabled brushes
-        ============================================================
-    -->
-    <SolidColorBrush x:Key="Theme.Brush.State.DisabledSurface" Color="{StaticResource Theme.Color.State.DisabledSurface}" />
-    <SolidColorBrush x:Key="Theme.Brush.State.DisabledBorder" Color="{StaticResource Theme.Color.State.DisabledBorder}" />
-    <SolidColorBrush x:Key="Theme.Brush.State.DisabledForeground" Color="{StaticResource Theme.Color.State.DisabledForeground}" />
-
-    <!--
-        ============================================================
-        Effect & overlay brushes
-        ============================================================
-    -->
-    <SolidColorBrush x:Key="Theme.Brush.Effect.Shadow" Color="{StaticResource Theme.Color.Effect.Shadow}" />
-    <SolidColorBrush x:Key="Theme.Brush.Overlay.Backdrop" Color="{StaticResource Theme.Color.Overlay.Backdrop}" />
-
-    <!--
-        ============================================================
-        ScrollBar brushes
-        ============================================================
-    -->
-    <SolidColorBrush x:Key="Theme.Brush.ScrollBar.Thumb" Color="{StaticResource Theme.Color.ScrollBar.Thumb}" />
-    <SolidColorBrush x:Key="Theme.Brush.ScrollBar.ThumbHover" Color="{StaticResource Theme.Color.ScrollBar.ThumbHover}" />
-
-    <!--
-        ============================================================
-        Layout tokens
+        布局令牌 — 本次只换配色，几何与阴影参数（含 Opacity）逐条保持原样。
+        DropShadowEffect 不读取 Color 的 alpha，浓淡只由 Opacity 决定，
+        所以换掉深色载体（#99000000 → #B3070B10）不会改变最终浓度。
         ============================================================
     -->
     <CornerRadius x:Key="Theme.SmallCornerRadius">4</CornerRadius>
@@ -284,37 +348,28 @@
     <Thickness x:Key="Theme.ControlPadding">12,6</Thickness>
     <Thickness x:Key="Theme.ContentMargin">8,4</Thickness>
 
+    <!--  弹层专用：深色底面上可压暗的余量小，故同族参数下不透明度须高于浅色才看得出轮廓。  -->
     <DropShadowEffect
         x:Key="Theme.PopupShadow"
         BlurRadius="22"
         Direction="270"
         Opacity="0.40"
         ShadowDepth="8"
-        Color="{StaticResource Theme.Color.Effect.Shadow}" />
-
-    <!--
-        小控件（jv:Button）专用：与 Theme.PopupShadow 同族同强度，
-        只把模糊与偏移按控件尺寸收紧，避免大弹层的柔光在小按钮上糊成一团。
-    -->
+        Color="{StaticResource Palette.Effect.Shadow}" />
+    <!--  小控件（jv:Button）专用：与 Theme.PopupShadow 同族同强度，只把模糊与偏移按控件尺寸收紧，避免大弹层的柔光在小按钮上糊成一团。  -->
     <DropShadowEffect
         x:Key="Theme.ButtonShadow"
         BlurRadius="18"
         Direction="270"
         Opacity="0.40"
         ShadowDepth="6"
-        Color="{StaticResource Theme.Color.Effect.Shadow}" />
-
-    <!--
-        SideMenu 选中项专用：只向下散开的柔光，靠偏移把阴影从条目四周推到下方，
-        避免紧贴边缘形成一圈「描边感」；只作用于条目背景层。
-        深色主题阴影色本身更浓（#99000000），但深色底面上可见压暗余量小，故不透明度仍需高于浅色。
-    -->
+        Color="{StaticResource Palette.Effect.Shadow}" />
+    <!--  SideMenu 选中项专用：只向下散开的柔光，靠偏移把阴影从条目四周推到下方，避免紧贴边缘形成一圈「描边感」；只作用于条目背景层。  -->
     <DropShadowEffect
         x:Key="Theme.SideMenuItemShadow"
         BlurRadius="14"
         Direction="270"
         Opacity="0.20"
         ShadowDepth="5"
-        Color="{StaticResource Theme.Color.Effect.Shadow}" />
-
+        Color="{StaticResource Palette.Effect.Shadow}" />
 </ResourceDictionary>

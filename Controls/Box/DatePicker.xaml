@@ -193,11 +193,11 @@
                         </Grid.ColumnDefinitions>
                     </Grid>
 
-                    <!--  禁用蒙层（最后声明覆盖，官方契约部件名）  -->
+                    <!--  禁用蒙层（最后声明覆盖，官方契约部件名）：浅色洗淡、深色压暗，取值见 Theme.Brush.State.DisabledVeil  -->
                     <Rectangle
                         x:Name="PART_DisabledVisual"
                         Grid.Row="1"
-                        Fill="#A0FFFFFF"
+                        Fill="{DynamicResource Theme.Brush.State.DisabledVeil}"
                         RadiusX="4"
                         RadiusY="4"
                         Visibility="Collapsed" />
