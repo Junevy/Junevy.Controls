@@ -69,11 +69,25 @@ for (const mode of ['light', 'dark']) {
   A(mode, 'checkerboard cells differ', t['TransparentBackground.Alt'], t['TransparentBackground.Base'], 1.14);
   Alow(mode, 'disabled text reads inert', t['Text.Disabled'], t['Surface.Base'], 3.0);
   Alow(mode, 'divider stays decorative', t['Border.Subtle'], t['Surface.Base'], 1.7);
+  //  Shell 级区域分隔线（侧栏/内容等）：按画布计量——要「退一层」但不能消失。
+  Alow(mode, 'shell divider stays quiet on canvas', t['Border.Divider'], t['Background.App'], 1.35);
+  A(mode, 'shell divider still traceable on canvas', t['Border.Divider'], t['Background.App'], 1.05);
+  //  状态层纱色：以 sRGB 逐通道 alpha 混合到卡片底上后必须「可感知但不喧宾夺主」——
+  //  hover 温和一档、pressed 明显更深/更亮一档。这是「悬停不换底色、只叠纱」方案的物理下限。
+  const blend = (scrim, bg) => {
+    const a = parseInt(scrim.slice(1, 3), 16) / 255;
+    const f = rgb(scrim).map((v, i) => Math.round(a * v + (1 - a) * rgb(bg)[i]));
+    return '#' + f.map((v) => v.toString(16).padStart(2, '0')).join('').toUpperCase();
+  };
+  Dl(mode, 'hover scrim reads over surface', blend(Effect['State.HoverScrim'][mode], t['Surface.Base']), t['Surface.Base'], 2.5, 25);
+  Dl(mode, 'pressed scrim reads over surface', blend(Effect['State.PressedScrim'][mode], t['Surface.Base']), t['Surface.Base'], 5, 25);
   Dl(mode, 'surface vs app background', t['Surface.Base'], t['Background.App'], 2.5, 5);
   Dl(mode, 'hover step', t['Surface.Hover'], t['Surface.Base'], 2.5, 5.5);
   Dl(mode, 'pressed step', t['Surface.Pressed'], t['Surface.Hover'], 2, 5.5);
   Dl(mode, 'selected step', t['Surface.Selected'], t['Surface.Base'], 4, 9.5);
-  Dl(mode, 'overlay above surface', t['Surface.Overlay'], t['Surface.Base'], d ? 5 : 0.5, 12);
+  // 浅色卡片自 1.12.0 起为纯白（Chalk.0）：白之上不存在更亮的实色，弹层的「更高一层」
+  // 改由阴影 + 描边表达，不再用亮度差。深色弹层仍须比卡片亮至少 5 个 ΔL*。
+  Dl(mode, 'overlay above surface', t['Surface.Overlay'], t['Surface.Base'], d ? 5 : 0, 12);
   Dl(mode, 'sunken below surface', t['Surface.Sunken'], t['Surface.Base'], 2.5, 9);
   Dl(mode, 'focused input steps gently from base', t['Surface.Focused'], t['Surface.Base'], 3, 6);
   Dl(mode, 'accent vs hover', t['Accent.Primary'], t['Accent.PrimaryHover'], 3.5, 14);
@@ -104,7 +118,7 @@ if (problems.length) { console.log('PROBLEMS:'); problems.forEach(p => console.l
 
 console.log('\n--- the argument in numbers ---');
 console.log(`  light card ${Theme.light['Surface.Base']} (Y=${lum(Theme.light['Surface.Base']).toFixed(3)}), canvas ${Theme.light['Background.App']} (Y=${lum(Theme.light['Background.App']).toFixed(3)})`);
-console.log(`             body text ${ratio(Theme.light['Text.Primary'], Theme.light['Surface.Base']).toFixed(2)}:1  — was 18.34:1 on pure white`);
+console.log(`             body text ${ratio(Theme.light['Text.Primary'], Theme.light['Surface.Base']).toFixed(2)}:1 on the white card — 旧方案 18.34:1 过冲，1.10.0 灰白卡 14.4:1 被反馈「太灰」`);
 console.log(`  dark  canvas ${Theme.dark['Background.App']}, card ${Theme.dark['Surface.Base']}, body text ${Theme.dark['Text.Primary']} → ${ratio(Theme.dark['Text.Primary'], Theme.dark['Background.App']).toFixed(2)}:1`);
 console.log(`             was #ECECEE (L*${lstar('#ECECEE').toFixed(1)}) on neutral #202023; now L*${lstar(Theme.dark['Text.Primary']).toFixed(1)} on the low-chroma 214° line ${Theme.dark['Background.App']}`);
 console.log(`  old Info #2563EB vs old Accent #1E5EE6 → indistinguishable.`);

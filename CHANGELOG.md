@@ -2,6 +2,54 @@
 
 本文档记录 `Junevy.Controls` 控件库的历史变更与本次迭代内容。
 
+## 状态反馈重做：整体降透明度 → 状态层纱色（state layer）
+
+### 本次更新（`1.13.0`：新增 `Theme.Brush.State.HoverScrim` / `PressedScrim` 两枚纱色令牌，`Button`（3 模板）/ `CardButton` / `ToolBarItem` / `ToolItem` / `ToolboxItem` / `MessageBar` / `DatePicker`（3 模板）/ `ToggleButton` Expander / `ImageViewer` / `DialogWindow` / `ProgressBarWindow` 的悬停/按压反馈由「整体降透明度」改为「叠纱」；解决鲜艳按钮悬停发灰割裂与反馈过弱两个问题）— 2026-09-30
+
+- **动因**：用户反馈两点——① 悬停/按压仅降低整体不透明度（0.8/0.65），文字一起变淡、效果很不明显；② 鲜艳颜色的按钮若固定死悬停/按压底色（如换主题灰）会非常割裂（红按钮 hover 变灰底）。
+- **方案（状态层 / state layer）**：不换底色、不降透明度，而是在任意背景上叠一层**固定透明度的纱**——浅色是墨纱（悬停越明显越深）、深色是白纱（越悬停越亮），与配色体系「浅色悬停变深 / 深色悬停变亮」的方向约定一致。对鲜艳底色是保色相的加深/提亮（红按钮 hover = 深一点的红），对用户自定义背景同样成立；文字与图标全程实色（不再跟着变淡），反馈反而更清楚。这正是 Material/Flutter 等设计体系处理任意色按钮的标准做法，也是对旧方案「怕覆盖鲜艳底色才降透明度」这一妥协的根治。
+- **新增（`Tools/palette/spec.js` Effect 表，经 `check.js` 99/99 + `emit.js` 重新生成）**：`State.HoverScrim`（浅色 `#14070B10` / 深色 `#14FFFFFF`，各 8%）与 `State.PressedScrim`（`#26070B10` / `#26FFFFFF`，各 15%）。`check.js` 新增 4 条断言（两主题 × 悬停/按压）：纱色按 sRGB 混合到卡片底后 ΔL\* 必须落在可感知区间（悬停 ≥2.5、按压 ≥5，上限 25），防止将来调淡到不可见。
+- **变更（模板）**：
+  - `Button.xaml`：`ButtonTemplate` / `JvButtonTemplate` 在内容之上加 `StateLayer`（`IsHitTestVisible="False"`，悬停/按压切换纱色）；`NoBorderButtonTemplate`（幽灵按钮，含 `TextBox` 清空/命令按钮、窗口.chrome 按钮）改为纱色填充出圆角 hover 色块。`Button.Hover.Opacity` / `Button.Pressed.Opacity` 键删除，禁用态仍为 0.5 透明度 + 禁用表面。
+  - `CardButton.xaml`：内容网格外包一层无 Margin 网格，`StateLayer` 铺满整卡面（彩色指标卡悬停 = 同色相深一档）。
+  - `ToolBarItem` / `MessageBar` 关闭钮 / `DatePicker` 日历三按钮 / `ToggleButton` Expander / `ImageViewer` / `DialogWindow` / `ProgressBarWindow` / `ToolItem`：根 Border 由透明度触发改为纱色填充；`ToolboxItem` 外层触发器改设 `PART_TriggerButton.Background`（经内层模板 TemplateBinding 传到 `PART_HoverSurface`）。
+  - `Generic/Style/FeedbackOpacity.xaml` 标注为遗留（键保留防宿主断链，库内零消费）。
+- **兼容性**：新增 4 条主题资源（2 Color + 2 Brush），`Theme.*` 只增不减；宿主若覆盖过 `Control.Hover.Opacity` / `Button.Hover.Opacity` 等旧键，将不再生效（反馈已换机制），请改覆盖两个纱色令牌。禁用态反馈不变。
+- **版本号**：`1.12.0` → `1.13.0`（新增公开令牌 + 全库交互反馈行为变更，随本迭代发布）。
+- 文档：README「Button」小节反馈方案重写、令牌全表新增两行纱色。
+- 验证：`node Tools/palette/check.js` **99/99 通过**；库工程（net8.0-windows / net48）与 Showcase 编译零错误。Showcase 实机核对：白底按钮悬停纱面清晰、文字实色不发虚；`CardButton`（含 Danger 红 / Success 绿强调）重构后渲染正常；深色方向（白纱提亮）由令牌与断言保证。
+
+## 浅色主题去灰：白卡片阅读面 + Shell 级区域分隔线 `Border.Divider`
+
+### 本次更新（`1.12.0`：浅色 `Surface.Base` 由 `#FBFCFD` 提为纯白 `#FFFFFF`（用户反馈「整体太灰、不适合阅读」），新增 `Theme.Brush.Border.Divider` 角色并把 Showcase 侧栏分割线改为「同底色阶 + 退档分隔线」；深色取值不变）— 2026-09-30
+
+- **动因**：用户反馈浅色模式「总感觉太灰」——1.10.0 为压亮度把卡片封在 `#FBFCFD`（L\*98.9），整屏内容区因此蒙一层灰白；同时 Showcase 侧栏与内容区之间的分割线在明暗两主题下都「太明显」。
+- **变更（`Tools/palette/spec.js`，经 `check.js` 95/95 + `emit.js` 重新生成两份 `AppColors.*.xaml`）**：
+  - `Surface.Base` 浅色 `Chalk.25`（`#FBFCFD`）→ `Chalk.0`（`#FFFFFF`）：阅读面回归纸白，正文对比 14.4 → **14.81:1**；画布 `#F1F3F5` 不变，退为衬托（ΔL\* 4.3，仍在 2.5–5 守卫区间）。白卡之上不存在更亮的实色，浅色弹层与卡片同色、层级改由阴影 + 描边表达——`check.js` 的 `overlay above surface` 浅色下限由 0.5 放宽为 0（深色仍须 ≥5），这是继浅色 Warning 之后第二条显式设计放行项，均已在脚本注释中写明依据。
+  - 新增角色 `Border.Divider`（浅色 `Chalk.150` / 深色 `Slate.100`）：**Shell 级区域分隔线**，语义是「分区而非控件边界」（侧栏/内容、页签区），比控件边框全部再退一档，且按画布计量——对画布浅色 1.22:1 / 深色 1.24:1。`check.js` 新增两条守卫：不得越过 1.35（保持安静）、不得低于 1.05（仍可追迹）。角色总数 46 → 47，`emit.js` 的规格锁同步。
+  - 其余全部不动：中性线、文字、状态色、深色主题取值零变化；白卡让既有断言（悬停 ΔL\* 5.3、内陷 8.8、选中 7.5、发丝线 2.03:1、浅色警告 3.52:1）全部自然满足，无需再调档。
+- **变更（`Samples/Junevy.Controls.Showcase/MainWindow.xaml`）**：分割线「太明显」的根源是**双重边缘**——侧栏原先铺了 `Surface.Base` 底（与画布有色阶差）又叠 1px `Border.Subtle` 线（浅色 1.32:1、深色 1.52:1）。现侧栏不再另铺底色（与画布同层），线改走 `Border.Divider`：明暗两主题都只剩一条「若有若无」的发丝级分隔线。
+- **兼容性**：`Theme.*` 键只增不减（新增 `Border.Divider` 的 Color + Brush 共 4 条资源）；`Surface.Base` 浅色变纯白属取值变更，依赖旧灰白卡做「亮面」对比的宿主需自行复核观感。深色主题零变化。
+- **版本号**：`1.11.0` → `1.12.0`（新增公开角色令牌 + 主题取值变更，随本迭代发布）。
+- 文档：README「三层令牌模型」设计取向重写（白卡片阅读面、边框四级与 Divider 用法）、角色令牌全表更新 `Surface.Base` 取值并新增 `Border.Divider` 行、断言计数 91 → 95；`Tools/palette/README.md` 同步。
+- 验证：`node Tools/palette/check.js` **95/95 通过**（含新增的 Divider 上下限两条 × 两主题）；`node Tools/palette/emit.js` 守卫 + 回读自检通过（Palette 两主题逐行一致、镜像无漂移、资源计数 47+4）。库工程（net8.0-windows / net48）与 Showcase 编译零错误；Showcase 实机核对——浅色内容区为纯白卡片、正文发灰感消除，侧栏分割线在明暗两主题下均退为发丝级（深色由 1.52:1 降至 1.24:1），主题往返切换与 ListView / 选中态 / 状态色渲染正常。
+
+## TitleAssist 必填标识：`IsRequired` / `IsRequiredIcon` / `IsRequiredIconPlacement`
+
+### 本次更新（`1.11.0`：`atc:TitleAssist` 新增必填标识三附加属性——`IsRequired` 开关、`IsRequiredIcon` 自定义图标内容（默认主题 Danger 色小圆点）、`IsRequiredIconPlacement` 图标相对标题左/右位置；`TextBox` 与 `ComboBox` 模板同步支持）— 2026-09-30
+
+- **动因**：用户要求表单输入控件的标题支持「必填」视觉标记——`IsRequired` 为 `true` 时在标题右边（或左边，可设置）显示一个图标，默认小圆点，也可用星号等自定义内容（`IsRequiredIcon = xxx`）。
+- **新增（`AttachedProperties/TitleAssist.cs`）**：
+  - `IsRequired`（`bool`，默认 `false`）：为 `true` 且已设置 `Title` 时，在标题旁显示必填图标；无标题时不显示（图标随标题呈现器一起显示/隐藏）。
+  - `IsRequiredIcon`（`object`，默认 `null`）：必填图标内容。`null` 时显示默认图标（6×6 圆点，`Fill` 绑 `Theme.Brush.Status.Danger`，随主题切换）；设置后整体替换默认圆点——星号 `"*"`、iconfont 字形或任意 `object` 均可，字体族/字号/颜色继承标题的对应设置（`TitleFontFamily` 等）。
+  - `IsRequiredIconPlacement`（新枚举 `RequiredIconPlacement`，默认 `Right`）：图标相对标题文字的位置，`Right` 标题右侧 / `Left` 标题左侧；图标与标题间距固定 4 DIP，与既有标题间距规范一致。独立成枚举而非复用 `TitlePlacement`，避免 `Top`/`Bottom` 这类无意义取值。
+- **变更（`Controls/Text/TextBox.xaml` / `Controls/Box/ComboBox.xaml`）**：四个方位的标题呈现器由「直接呈现 `Title`」改为「水平面板 = 标题文字 + 左/右两个必填图标宿主（默认全部折叠）」；模板新增两条 `MultiTrigger`——`IsRequired=true` 时按 `IsRequiredIconPlacement` 只点亮对应一侧的四个宿主。宿主内部按 `IsRequiredIcon` 是否为空切换默认圆点与自定义图标：圆点经 `RequiredIconDotStyle` 的 `DataTrigger`（`IsRequiredIcon == {x:Null}` 时显示），自定义图标经 `NullToVisibility`（非空时显示）。`ComboBox.xaml` 为此补声明了本字典内缺失的 `NullToVisibility` 转换器资源（此前由 `Button.xaml` 合并提供，ComboBox 字典并未合并它）。`TitleLeft` 方位原先的 `TextBlock.TextAlignment="Right"` 改为内容面板 `HorizontalAlignment="Right"`——固定 `TitleWidth` 时标题组仍右对齐贴合输入框，图标始终紧贴标题文字而非漂到固定区域远端。
+- **兼容性**：纯增量。`Title` 的呈现路径仅从「呈现器 Content」移入「呈现器内的内容面板」，无标题时折叠行为、`TitleWidth` 表单对齐、四方位切换、PriorityBinding 字体回退均不变；未设置 `IsRequired` 的存量用法零影响。必填图标仅是视觉标记，库内不做任何校验逻辑。
+- **Showcase**：`InputsPage` 的 TitleAssist 演示区新增一行四个实时示例（默认圆点 / 自定义星号 / 图标在左 / Right 方位 + 图标在左）与一个带必填标识的固定宽度表单组；`ShowcaseSnippets.TextBoxTitleAssist` 片段同步补充。
+- **版本号**：`1.10.0` → `1.11.0`（新增公开附加属性与枚举，随本迭代发布）。
+- 文档：README「TitleAssist」小节属性表新增三行、示例新增必填标识两段；「TextBox」「ComboBox」小节的 TitleAssist 系列摘要补「含 `IsRequired` 必填标识」。
+- 验证：库工程（net8.0-windows / net48）与 Showcase 工程编译零错误（警告均为存量无关警告）；Showcase「输入与选择」页实机核对——默认圆点、星号、左置图标、Right 方位组合及固定宽度表单对齐下图标与标题的间距与对齐符合预期。
+
 ## 配色改版 Aperture：深色 / 浅色两套主题整体重做
 
 ### 本次更新（`1.10.0`：`AppColors.Light.xaml` / `AppColors.Dark.xaml` 全部取值重做，新增 `Palette.*` 原语层、`State.DisabledVeil` 蒙层令牌、`Surface.Focused` 焦点底令牌与 `Tools/palette/` 生成脚本；既有资源键名一个不改）— 2026-09-29

@@ -28,79 +28,90 @@
             CornerRadius="{TemplateBinding Border.CornerRadius}"
             Opacity="1"
             SnapsToDevicePixels="True">
-            <Grid Margin="{StaticResource Margin}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+            <!--  外层无 Margin 网格：内容网格保持内缩，状态层纱色铺满整卡面  -->
+            <Grid>
+                    <Grid Margin="{StaticResource Margin}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                <Grid Grid.Column="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="2*" />
-                    </Grid.RowDefinitions>
+                    <Grid Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="2*" />
+                        </Grid.RowDefinitions>
 
-                    <!--  details  -->
-                    <ContentControl
-                        Grid.Row="0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
-                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                        Content="{TemplateBinding Title}"
-                        FontFamily="{TemplateBinding FontFamily}"
-                        FontSize="{TemplateBinding FontSize}"
-                        Foreground="{TemplateBinding Foreground}" />
-
-                    <ContentControl
-                        Grid.Row="1"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
-                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                        Content="{TemplateBinding Content}"
-                        ContentStringFormat="{TemplateBinding ContentStringFormat}"
-                        ContentTemplate="{TemplateBinding ContentTemplate}"
-                        ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
-                        FontFamily="{TemplateBinding FontFamily}"
-                        FontSize="{TemplateBinding FontSize,
-                                                   Converter={StaticResource IncreaseFontSize}}"
-                        Foreground="{TemplateBinding MainColor}" />
-                </Grid>
-
-                <!--  icon  -->
-                <Grid Grid.Column="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="2*" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <Grid Grid.Row="0">
+                        <!--  details  -->
                         <ContentControl
-                            HorizontalAlignment="Right"
+                            Grid.Row="0"
+                            HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                             VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                            Content="{Binding RelativeSource={RelativeSource AncestorType=local:CardButton}, Path=(atc:Icon.Icon)}"
-                            FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:CardButton}, Path=(atc:Icon.FontFamily)}"
+                            Content="{TemplateBinding Title}"
+                            FontFamily="{TemplateBinding FontFamily}"
+                            FontSize="{TemplateBinding FontSize}"
+                            Foreground="{TemplateBinding Foreground}" />
+
+                        <ContentControl
+                            Grid.Row="1"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}"
+                            ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                            FontFamily="{TemplateBinding FontFamily}"
                             FontSize="{TemplateBinding FontSize,
                                                        Converter={StaticResource IncreaseFontSize}}"
-                            Foreground="{TemplateBinding MainColor}"
-                            Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:CardButton}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
+                            Foreground="{TemplateBinding MainColor}" />
                     </Grid>
 
-                </Grid>
+                    <!--  icon  -->
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="2*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0">
+                            <ContentControl
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Content="{Binding RelativeSource={RelativeSource AncestorType=local:CardButton}, Path=(atc:Icon.Icon)}"
+                                FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:CardButton}, Path=(atc:Icon.FontFamily)}"
+                                FontSize="{TemplateBinding FontSize,
+                                                           Converter={StaticResource IncreaseFontSize}}"
+                                Foreground="{TemplateBinding MainColor}"
+                                Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:CardButton}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
+                        </Grid>
+
+                    </Grid>
+                    </Grid>
+
+                <!--  状态层：悬停/按压的纱色铺满整卡面（IsHitTestVisible=False 不挡点击）  -->
+                <Border
+                    x:Name="StateLayer"
+                    Background="Transparent"
+                    CornerRadius="{TemplateBinding Border.CornerRadius}"
+                    IsHitTestVisible="False" />
             </Grid>
         </Border>
 
         <ControlTemplate.Triggers>
-            <!--  悬停/按压整体降透明度，不再覆盖固定底色（鲜艳背景悬停不再变色）  -->
+            <!--  状态层纱色：悬停/按压在任意底色（含 MainColor 彩色卡）上叠一层，
+                  色相不变、深浅一档，文字全程实色  -->
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Opacity" Value="{StaticResource Control.Hover.Opacity}" />
+                <Setter TargetName="StateLayer" Property="Background" Value="{DynamicResource Theme.Brush.State.HoverScrim}" />
             </Trigger>
 
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Opacity" Value="{StaticResource Control.Pressed.Opacity}" />
+                <Setter TargetName="StateLayer" Property="Background" Value="{DynamicResource Theme.Brush.State.PressedScrim}" />
             </Trigger>
 
             <Trigger Property="IsEnabled" Value="False">

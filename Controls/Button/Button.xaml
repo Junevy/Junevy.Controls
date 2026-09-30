@@ -14,11 +14,12 @@
     <cvt:IncreaseFontsizeConverter x:Key="IncreaseFontSize" />
 
     <!--
-        状态反馈透明度：悬停/按压不再替换固定底色（避免鲜艳背景色被主题色覆盖），
-        统一降低整体不透明度；模板触发器靠后者生效——按压覆盖悬停，禁用覆盖按压。
+        状态反馈（状态层 / state layer）：悬停/按压不再替换固定底色，也不再降低整体透明度
+        （整体变淡会让文字跟着模糊、鲜艳背景反馈微弱），而是在任意底色上叠一层固定透明度的
+        纱（Theme.Brush.State.HoverScrim / PressedScrim，浅色墨纱、深色白纱）——
+        红按钮悬停只是「同色相深一档」，用户自定义背景同样成立；文字图标全程保持实色。
+        模板触发器靠后者生效——按压覆盖悬停，禁用覆盖按压（禁用仍走透明度 + 禁用表面）。
     -->
-    <sys:Double x:Key="Button.Hover.Opacity">0.8</sys:Double>
-    <sys:Double x:Key="Button.Pressed.Opacity">0.65</sys:Double>
     <sys:Double x:Key="Button.Disabled.Opacity">0.5</sys:Double>
 
     <!--  官方 Button 模板：固定字号，无缩放宿主（官方类型没有 IsTextScaled 属性）  -->
@@ -69,15 +70,23 @@
                     TextElement.FontFamily="{TemplateBinding FontFamily}"
                     TextElement.FontSize="{TemplateBinding FontSize}"
                     TextElement.Foreground="{TemplateBinding Foreground}" />
+
+                <!--  状态层：悬停/按压的纱色叠在内容之上（IsHitTestVisible=False 不挡点击）  -->
+                <Border
+                    x:Name="StateLayer"
+                    Grid.ColumnSpan="2"
+                    Background="Transparent"
+                    CornerRadius="{TemplateBinding Border.CornerRadius}"
+                    IsHitTestVisible="False" />
             </Grid>
         </Border>
 
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Hover.Opacity}" />
+                <Setter TargetName="StateLayer" Property="Background" Value="{DynamicResource Theme.Brush.State.HoverScrim}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Pressed.Opacity}" />
+                <Setter TargetName="StateLayer" Property="Background" Value="{DynamicResource Theme.Brush.State.PressedScrim}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Disabled.Opacity}" />
@@ -198,6 +207,13 @@
                     </local:ShrinkBox>
                 </Grid>
             </Border>
+
+            <!--  状态层：悬停/按压的纱色覆盖背景与边框（不挡点击、文字保持实色）  -->
+            <Border
+                x:Name="StateLayer"
+                Background="Transparent"
+                CornerRadius="{TemplateBinding Border.CornerRadius}"
+                IsHitTestVisible="False" />
         </Grid>
 
         <ControlTemplate.Triggers>
@@ -210,10 +226,10 @@
                 <Setter TargetName="ContentBorder" Property="Effect" Value="{x:Null}" />
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="RootHost" Property="Opacity" Value="{StaticResource Button.Hover.Opacity}" />
+                <Setter TargetName="StateLayer" Property="Background" Value="{DynamicResource Theme.Brush.State.HoverScrim}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="RootHost" Property="Opacity" Value="{StaticResource Button.Pressed.Opacity}" />
+                <Setter TargetName="StateLayer" Property="Background" Value="{DynamicResource Theme.Brush.State.PressedScrim}" />
                 <!--  按压即「贴回地面」：阴影随浮起感一起消失  -->
                 <Setter TargetName="ContentBorder" Property="Effect" Value="{x:Null}" />
             </Trigger>
@@ -249,12 +265,13 @@
         </Border>
 
         <ControlTemplate.Triggers>
-            <!--  透明背景：悬停/按压的反馈为内容整体变淡  -->
+            <!--  透明背景（幽灵按钮）：悬停/按压以纱色填充出「色块」affordance，
+                  文字全程实色（不再整体变淡）；背景为透明，纱色直接落在按钮矩形上  -->
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Hover.Opacity}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.State.HoverScrim}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Pressed.Opacity}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.State.PressedScrim}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Disabled.Opacity}" />

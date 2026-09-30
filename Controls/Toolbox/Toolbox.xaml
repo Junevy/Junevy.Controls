@@ -130,7 +130,8 @@
                             <Setter TargetName="TriggerTitle" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="PART_TriggerButton" Property="Opacity" Value="{StaticResource Control.Hover.Opacity}" />
+                            <!--  状态层纱色:Background 经内层模板 TemplateBinding 传到 PART_HoverSurface  -->
+                            <Setter TargetName="PART_TriggerButton" Property="Background" Value="{DynamicResource Theme.Brush.State.HoverScrim}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
@@ -192,11 +193,11 @@
                             <Setter TargetName="ToolTitle" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <!--  悬停/按压整体降透明度，不覆盖底色（鲜艳背景悬停不再变色）  -->
-                            <Setter Property="Opacity" Value="{StaticResource Control.Hover.Opacity}" />
+                            <!--  状态层纱色:悬停/按压叠墨/白纱,文字实色、色相不变  -->
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.State.HoverScrim}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Opacity" Value="{StaticResource Control.Pressed.Opacity}" />
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.State.PressedScrim}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />

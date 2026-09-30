@@ -61,12 +61,12 @@
                     </Border>
 
                     <ControlTemplate.Triggers>
-                        <!--  悬停/按压整体降透明度，不覆盖底色（鲜艳背景悬停不再变色）  -->
+                        <!--  状态层纱色:悬停/按压在任意底色上叠一层墨/白纱,文字实色、色相不变  -->
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Opacity" Value="{StaticResource Control.Hover.Opacity}" />
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.State.HoverScrim}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Opacity" Value="{StaticResource Control.Pressed.Opacity}" />
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.State.PressedScrim}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />

@@ -131,6 +131,8 @@
     <Color x:Key="Palette.Effect.Shadow">#B3070B10</Color>
     <Color x:Key="Palette.Overlay.Backdrop">#B3070B10</Color>
     <Color x:Key="Palette.State.DisabledVeil">#A0111215</Color>
+    <Color x:Key="Palette.State.HoverScrim">#14FFFFFF</Color>
+    <Color x:Key="Palette.State.PressedScrim">#26FFFFFF</Color>
 
     <!--
         ============================================================
@@ -165,6 +167,7 @@
     <!--  边框  -->
     <Color x:Key="Theme.Color.Border.Default">#454A51</Color>  <!--  = Palette.Slate.175  -->
     <Color x:Key="Theme.Color.Border.Subtle">#35393F</Color>  <!--  = Palette.Slate.150  -->
+    <Color x:Key="Theme.Color.Border.Divider">#272B30</Color>  <!--  = Palette.Slate.100  -->
     <Color x:Key="Theme.Color.Border.Strong">#697078</Color>  <!--  = Palette.Slate.250  -->
     <Color x:Key="Theme.Color.Border.Focus">#74CBDC</Color>  <!--  = Palette.Coating.300  -->
 
@@ -204,6 +207,8 @@
     <Color x:Key="Theme.Color.Effect.Shadow">#B3070B10</Color>  <!--  = Palette.Effect.Shadow  -->
     <Color x:Key="Theme.Color.Overlay.Backdrop">#B3070B10</Color>  <!--  = Palette.Overlay.Backdrop  -->
     <Color x:Key="Theme.Color.State.DisabledVeil">#A0111215</Color>  <!--  = Palette.State.DisabledVeil  -->
+    <Color x:Key="Theme.Color.State.HoverScrim">#14FFFFFF</Color>  <!--  = Palette.State.HoverScrim  -->
+    <Color x:Key="Theme.Color.State.PressedScrim">#26FFFFFF</Color>  <!--  = Palette.State.PressedScrim  -->
     <Color x:Key="Theme.Color.Status.Disable">#697078</Color>  <!--  = Palette.Slate.250  -->
 
     <!--
@@ -239,6 +244,7 @@
     <!--  边框  -->
     <SolidColorBrush x:Key="Theme.Brush.Border.Default" Color="{StaticResource Palette.Slate.175}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Subtle" Color="{StaticResource Palette.Slate.150}" />
+    <SolidColorBrush x:Key="Theme.Brush.Border.Divider" Color="{StaticResource Palette.Slate.100}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Strong" Color="{StaticResource Palette.Slate.250}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Focus" Color="{StaticResource Palette.Coating.300}" />
 
@@ -280,6 +286,8 @@
     <SolidColorBrush x:Key="Theme.Brush.Effect.Shadow" Color="{StaticResource Palette.Effect.Shadow}" />
     <SolidColorBrush x:Key="Theme.Brush.Overlay.Backdrop" Color="{StaticResource Palette.Overlay.Backdrop}" />
     <SolidColorBrush x:Key="Theme.Brush.State.DisabledVeil" Color="{StaticResource Palette.State.DisabledVeil}" />
+    <SolidColorBrush x:Key="Theme.Brush.State.HoverScrim" Color="{StaticResource Palette.State.HoverScrim}" />
+    <SolidColorBrush x:Key="Theme.Brush.State.PressedScrim" Color="{StaticResource Palette.State.PressedScrim}" />
     <SolidColorBrush x:Key="Theme.Brush.Status.Disable" Color="{StaticResource Palette.Slate.250}" />
 
     <!--

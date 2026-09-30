@@ -6,11 +6,13 @@
         取景器与工业相机的世界：中性色仍排在同一条 214° 线上，但彩度封顶 C*≤7，
         灰就是灰——蓝不再染在纸面上，只由 Cobalt 这一个角色承担。
 
-        · 不刺眼：卡片底封在 #FBFCFD（Y≈0.97），不再拿纯白当大面积纸面；
-          正文对比停在 14.4:1 —— 越过 AAA 的 7:1，却退出了 18:1 的「焊工面罩」区间。
-        · 层级靠曝光差而不是靠黑线：画布 #F1F3F5 让位于卡片 #FBFCFD，
-          悬浮、按下、选中各自只推进一级 L*。静止边框是 1.97:1 的发丝线（若有若无），
-          只有悬停、勾选框描边这类「需要确认交互」的状态才提到 3:1 以上。
+        · 适合阅读：卡片是纯白（Chalk.0，正文对比 15.4:1）——1.10.0 的 #FBFCFD 灰白卡
+          被反馈「整体太灰」，阅读面应当是纸白，蓝灰留给画布做衬托（#F1F3F5，ΔL* 4.3）。
+          弹层不再比卡片亮，层级改由阴影 + 描边表达。
+        · 层级靠曝光差而不是靠黑线：画布 #F1F3F5 让位于纯白卡片，
+          悬浮、按下、选中各自只推进一级 L*。静止边框是 2.0:1 的发丝线（若有若无），
+          只有悬停、勾选框描边这类「需要确认交互」的状态才提到 3:1 以上；
+          侧栏/内容这类区域分界走更退一层的 Border.Divider（对画布 1.2:1）。
         · 语义分工：Cobalt 只做主操作；Coating（镀膜青）只做信息与焦点环。
           旧方案 Info #2563EB 与 Accent #1E5EE6 几乎同色，如今两者不再混淆。
         · 状态色去掉褪色感：警告由琥珀 #A85C07 抬成真黄 #A08700（Lab 色相角 64°→92°），
@@ -133,6 +135,8 @@
     <Color x:Key="Palette.Effect.Shadow">#26070B10</Color>
     <Color x:Key="Palette.Overlay.Backdrop">#99070B10</Color>
     <Color x:Key="Palette.State.DisabledVeil">#A0FFFFFF</Color>
+    <Color x:Key="Palette.State.HoverScrim">#14070B10</Color>
+    <Color x:Key="Palette.State.PressedScrim">#26070B10</Color>
 
     <!--
         ============================================================
@@ -147,7 +151,7 @@
     <Color x:Key="Theme.Color.Background.Third">#DADEE2</Color>  <!--  = Palette.Chalk.150  -->
 
     <!--  表面 — 由低到高的层级  -->
-    <Color x:Key="Theme.Color.Surface.Base">#FBFCFD</Color>  <!--  = Palette.Chalk.25  -->
+    <Color x:Key="Theme.Color.Surface.Base">#FFFFFF</Color>  <!--  = Palette.Chalk.0  -->
     <Color x:Key="Theme.Color.Surface.Raised">#FFFFFF</Color>  <!--  = Palette.Chalk.0  -->
     <Color x:Key="Theme.Color.Surface.Sunken">#E3E6EA</Color>  <!--  = Palette.Chalk.100  -->
     <Color x:Key="Theme.Color.Surface.Overlay">#FFFFFF</Color>  <!--  = Palette.Chalk.0  -->
@@ -167,6 +171,7 @@
     <!--  边框  -->
     <Color x:Key="Theme.Color.Border.Default">#B0B7BE</Color>  <!--  = Palette.Chalk.300  -->
     <Color x:Key="Theme.Color.Border.Subtle">#DADEE2</Color>  <!--  = Palette.Chalk.150  -->
+    <Color x:Key="Theme.Color.Border.Divider">#DADEE2</Color>  <!--  = Palette.Chalk.150  -->
     <Color x:Key="Theme.Color.Border.Strong">#686F79</Color>  <!--  = Palette.Chalk.550  -->
     <Color x:Key="Theme.Color.Border.Focus">#00768D</Color>  <!--  = Palette.Coating.600  -->
 
@@ -206,6 +211,8 @@
     <Color x:Key="Theme.Color.Effect.Shadow">#26070B10</Color>  <!--  = Palette.Effect.Shadow  -->
     <Color x:Key="Theme.Color.Overlay.Backdrop">#99070B10</Color>  <!--  = Palette.Overlay.Backdrop  -->
     <Color x:Key="Theme.Color.State.DisabledVeil">#A0FFFFFF</Color>  <!--  = Palette.State.DisabledVeil  -->
+    <Color x:Key="Theme.Color.State.HoverScrim">#14070B10</Color>  <!--  = Palette.State.HoverScrim  -->
+    <Color x:Key="Theme.Color.State.PressedScrim">#26070B10</Color>  <!--  = Palette.State.PressedScrim  -->
     <Color x:Key="Theme.Color.Status.Disable">#B0B7BE</Color>  <!--  = Palette.Chalk.300  -->
 
     <!--
@@ -221,7 +228,7 @@
     <SolidColorBrush x:Key="Theme.Brush.Background.Third" Color="{StaticResource Palette.Chalk.150}" />
 
     <!--  表面 — 由低到高的层级  -->
-    <SolidColorBrush x:Key="Theme.Brush.Surface.Base" Color="{StaticResource Palette.Chalk.25}" />
+    <SolidColorBrush x:Key="Theme.Brush.Surface.Base" Color="{StaticResource Palette.Chalk.0}" />
     <SolidColorBrush x:Key="Theme.Brush.Surface.Raised" Color="{StaticResource Palette.Chalk.0}" />
     <SolidColorBrush x:Key="Theme.Brush.Surface.Sunken" Color="{StaticResource Palette.Chalk.100}" />
     <SolidColorBrush x:Key="Theme.Brush.Surface.Overlay" Color="{StaticResource Palette.Chalk.0}" />
@@ -241,6 +248,7 @@
     <!--  边框  -->
     <SolidColorBrush x:Key="Theme.Brush.Border.Default" Color="{StaticResource Palette.Chalk.300}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Subtle" Color="{StaticResource Palette.Chalk.150}" />
+    <SolidColorBrush x:Key="Theme.Brush.Border.Divider" Color="{StaticResource Palette.Chalk.150}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Strong" Color="{StaticResource Palette.Chalk.550}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Focus" Color="{StaticResource Palette.Coating.600}" />
 
@@ -282,6 +290,8 @@
     <SolidColorBrush x:Key="Theme.Brush.Effect.Shadow" Color="{StaticResource Palette.Effect.Shadow}" />
     <SolidColorBrush x:Key="Theme.Brush.Overlay.Backdrop" Color="{StaticResource Palette.Overlay.Backdrop}" />
     <SolidColorBrush x:Key="Theme.Brush.State.DisabledVeil" Color="{StaticResource Palette.State.DisabledVeil}" />
+    <SolidColorBrush x:Key="Theme.Brush.State.HoverScrim" Color="{StaticResource Palette.State.HoverScrim}" />
+    <SolidColorBrush x:Key="Theme.Brush.State.PressedScrim" Color="{StaticResource Palette.State.PressedScrim}" />
     <SolidColorBrush x:Key="Theme.Brush.Status.Disable" Color="{StaticResource Palette.Chalk.300}" />
 
     <!--

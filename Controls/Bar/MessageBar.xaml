@@ -42,12 +42,12 @@
                             TextElement.Foreground="{TemplateBinding Foreground}" />
                     </Border>
                     <ControlTemplate.Triggers>
-                        <!--  悬停/按压整体降透明度，不覆盖底色（与 Button 反馈一致）  -->
+                        <!--  状态层纱色:与 Button 反馈一致(不降透明度,文字实色)  -->
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Opacity" Value="{StaticResource Control.Hover.Opacity}" />
+                            <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.State.HoverScrim}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Opacity" Value="{StaticResource Control.Pressed.Opacity}" />
+                            <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.State.PressedScrim}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.5" />

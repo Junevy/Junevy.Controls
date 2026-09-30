@@ -59,7 +59,7 @@ function guard(theme) {
   need('禁用文字不越界过亮', lstar(at(theme, 'Text.Disabled')), theme === 'light' ? 60 : 30);
 
   const covered = new Set(Object.keys(Roles));
-  if (covered.size !== 46) fails.push(`角色表条目数 ${covered.size}，与规格 46 不符`);
+  if (covered.size !== 47) fails.push(`角色表条目数 ${covered.size}，与规格 47 不符`);
 
   if (fails.length) {
     console.error(`拒绝生成 ${theme} — ${fails.length} 项未达标:\n  ` + fails.join('\n  '));
@@ -83,6 +83,8 @@ const EFFECT_REF = {
   'Effect.Shadow': 'Palette.Effect.Shadow',
   'Overlay.Backdrop': 'Palette.Overlay.Backdrop',
   'State.DisabledVeil': 'Palette.State.DisabledVeil',
+  'State.HoverScrim': 'Palette.State.HoverScrim',
+  'State.PressedScrim': 'Palette.State.PressedScrim',
 };
 const DISABLED_REF = { light: 'Chalk.300', dark: 'Slate.250' };
 const GROUP_LABEL = {
@@ -165,7 +167,7 @@ function emit(theme) {
   push(...roleLines(theme, 'brush'));
   push('');
   push('    <!--  投影 / 遮罩 / 禁用蒙层 / 禁用前景四把画刷。Status.Disable 在旧库里只有浅色有且写死中性灰，现两主题都补、并取回色相线上  -->');
-  for (const ref of ['Palette.Effect.Shadow', 'Palette.Overlay.Backdrop', 'Palette.State.DisabledVeil', `Palette.${DISABLED_REF[theme]}`]) {
+  for (const ref of ['Palette.Effect.Shadow', 'Palette.Overlay.Backdrop', 'Palette.State.DisabledVeil', 'Palette.State.HoverScrim', 'Palette.State.PressedScrim', `Palette.${DISABLED_REF[theme]}`]) {
     const key = ref === `Palette.${DISABLED_REF[theme]}` ? 'Status.Disable' : ref.replace('Palette.', '');
     push(`    <SolidColorBrush x:Key="Theme.Brush.${key}" Color="{StaticResource ${ref}}" />`);
   }
@@ -185,11 +187,13 @@ const HEAD = {
         取景器与工业相机的世界：中性色仍排在同一条 214° 线上，但彩度封顶 C*≤7，
         灰就是灰——蓝不再染在纸面上，只由 Cobalt 这一个角色承担。
 
-        · 不刺眼：卡片底封在 #FBFCFD（Y≈0.97），不再拿纯白当大面积纸面；
-          正文对比停在 14.4:1 —— 越过 AAA 的 7:1，却退出了 18:1 的「焊工面罩」区间。
-        · 层级靠曝光差而不是靠黑线：画布 #F1F3F5 让位于卡片 #FBFCFD，
-          悬浮、按下、选中各自只推进一级 L*。静止边框是 1.97:1 的发丝线（若有若无），
-          只有悬停、勾选框描边这类「需要确认交互」的状态才提到 3:1 以上。
+        · 适合阅读：卡片是纯白（Chalk.0，正文对比 15.4:1）——1.10.0 的 #FBFCFD 灰白卡
+          被反馈「整体太灰」，阅读面应当是纸白，蓝灰留给画布做衬托（#F1F3F5，ΔL* 4.3）。
+          弹层不再比卡片亮，层级改由阴影 + 描边表达。
+        · 层级靠曝光差而不是靠黑线：画布 #F1F3F5 让位于纯白卡片，
+          悬浮、按下、选中各自只推进一级 L*。静止边框是 2.0:1 的发丝线（若有若无），
+          只有悬停、勾选框描边这类「需要确认交互」的状态才提到 3:1 以上；
+          侧栏/内容这类区域分界走更退一层的 Border.Divider（对画布 1.2:1）。
         · 语义分工：Cobalt 只做主操作；Coating（镀膜青）只做信息与焦点环。
           旧方案 Info #2563EB 与 Accent #1E5EE6 几乎同色，如今两者不再混淆。
         · 状态色去掉褪色感：警告由琥珀 #A85C07 抬成真黄 #A08700（Lab 色相角 64°→92°），
@@ -400,7 +404,8 @@ for (const f of written) {
   }
   const brushCount = (src.match(/<SolidColorBrush/g) || []).length;
   const colorCount = (src.match(/<Color x:Key="Theme\.Color\./g) || []).length;
-  const EXPECT = Object.keys(Roles).length + 4;
+  // 角色画刷 + 5 个效果色（Shadow / Backdrop / DisabledVeil / 两个状态层纱）+ Status.Disable
+  const EXPECT = Object.keys(Roles).length + 6;
   if (colorCount !== EXPECT) drift.push(`${name}: Theme.Color 条目 ${colorCount}，应为 ${EXPECT}`);
   if (brushCount !== EXPECT) drift.push(`${name}: 画刷条目 ${brushCount}，应为 ${EXPECT}`);
 }

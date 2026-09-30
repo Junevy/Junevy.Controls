@@ -11,6 +11,11 @@ namespace Junevy.Controls.AttachedProperties
     /// <see cref="TitleFontFamily"/>；标题位置由 <see cref="TitlePlacement"/> 控制，
     /// 字体样式可通过配套附加属性自定义，未设置的样式项自动继承控件自身取值。
     /// 通过 <see cref="TitleWidth"/> 可为标题区域指定固定宽度，用于表单式布局中输入框整列对齐。
+    /// <para>
+    /// 必填标识：<see cref="IsRequired"/> 为 <see langword="true"/> 时在标题旁显示一个必填图标，
+    /// 图标位置由 <see cref="IsRequiredIconPlacement"/> 控制（标题左/右侧，默认右侧）；
+    /// 图标内容默认为主题 Danger 色小圆点，可通过 <see cref="IsRequiredIcon"/> 自定义
+    /// （如星号「*」或任意 object 内容），未设置时回退为默认小圆点。无标题时不显示必填标识。
     /// </para>
     /// </summary>
     public class TitleAssist
@@ -56,6 +61,24 @@ namespace Junevy.Controls.AttachedProperties
         /// </summary>
         public static readonly DependencyProperty TitleFontWeightProperty =
             DependencyProperty.RegisterAttached("TitleFontWeight", typeof(FontWeight), typeof(TitleAssist), new PropertyMetadata(FontWeights.Normal));
+
+        /// <summary>
+        /// 标识 <see cref="GetIsRequired"/>/<see cref="SetIsRequired"/> 的附加属性。
+        /// </summary>
+        public static readonly DependencyProperty IsRequiredProperty =
+            DependencyProperty.RegisterAttached("IsRequired", typeof(bool), typeof(TitleAssist), new PropertyMetadata(false));
+
+        /// <summary>
+        /// 标识 <see cref="GetIsRequiredIcon"/>/<see cref="SetIsRequiredIcon"/> 的附加属性。
+        /// </summary>
+        public static readonly DependencyProperty IsRequiredIconProperty =
+            DependencyProperty.RegisterAttached("IsRequiredIcon", typeof(object), typeof(TitleAssist), new PropertyMetadata(null));
+
+        /// <summary>
+        /// 标识 <see cref="GetIsRequiredIconPlacement"/>/<see cref="SetIsRequiredIconPlacement"/> 的附加属性。
+        /// </summary>
+        public static readonly DependencyProperty IsRequiredIconPlacementProperty =
+            DependencyProperty.RegisterAttached("IsRequiredIconPlacement", typeof(RequiredIconPlacement), typeof(TitleAssist), new PropertyMetadata(RequiredIconPlacement.Right));
 
         /// <summary>
         /// 读取指定控件的标题内容；为 <see langword="null"/> 时不显示标题。
@@ -168,6 +191,56 @@ namespace Junevy.Controls.AttachedProperties
         public static void SetTitleFontWeight(DependencyObject obj, FontWeight value)
         {
             obj.SetValue(TitleFontWeightProperty, value);
+        }
+
+        /// <summary>
+        /// 读取是否显示必填标识，默认 <see langword="false"/>；
+        /// 为 <see langword="true"/> 且已设置 <see cref="Title"/> 时，在标题旁显示必填图标。
+        /// </summary>
+        public static bool GetIsRequired(DependencyObject obj)
+        {
+            return (bool)obj.GetValue(IsRequiredProperty);
+        }
+
+        /// <summary>
+        /// 在指定控件上设置是否显示必填标识；图标内容与位置见 <see cref="IsRequiredIcon"/> / <see cref="IsRequiredIconPlacement"/>。
+        /// </summary>
+        public static void SetIsRequired(DependencyObject obj, bool value)
+        {
+            obj.SetValue(IsRequiredProperty, value);
+        }
+
+        /// <summary>
+        /// 读取必填图标内容；为 <see langword="null"/> 时使用默认的主题 Danger 色小圆点，
+        /// 设置后替换默认圆点（如星号「*」、iconfont 字形或任意 object）。
+        /// </summary>
+        public static object GetIsRequiredIcon(DependencyObject obj)
+        {
+            return obj.GetValue(IsRequiredIconProperty);
+        }
+
+        /// <summary>
+        /// 在指定控件上设置必填图标内容（覆盖默认小圆点）。
+        /// </summary>
+        public static void SetIsRequiredIcon(DependencyObject obj, object value)
+        {
+            obj.SetValue(IsRequiredIconProperty, value);
+        }
+
+        /// <summary>
+        /// 读取必填图标相对标题的位置，默认 <see cref="RequiredIconPlacement.Right"/>。
+        /// </summary>
+        public static RequiredIconPlacement GetIsRequiredIconPlacement(DependencyObject obj)
+        {
+            return (RequiredIconPlacement)obj.GetValue(IsRequiredIconPlacementProperty);
+        }
+
+        /// <summary>
+        /// 在指定控件上设置必填图标相对标题的位置（标题左侧或右侧）。
+        /// </summary>
+        public static void SetIsRequiredIconPlacement(DependencyObject obj, RequiredIconPlacement value)
+        {
+            obj.SetValue(IsRequiredIconPlacementProperty, value);
         }
     }
 }

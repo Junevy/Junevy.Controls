@@ -4,7 +4,9 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <!--
-        悬停/按压统一透明度反馈资源（控件库通用）。
+        [遗留] 1.13.0 起控件库模板的悬停/按压反馈已全部迁移到状态层纱色
+        （Theme.Brush.State.HoverScrim / PressedScrim），本文件不再被库内模板消费，
+        仅保留键避免直接引用这两个键的宿主工程断链；新代码请勿使用。
         背景暴露给用户的按钮/卡片类控件（CardButton、ToolBarItem、ToolboxItem、ToolItem 等）
         悬停/按压不再覆盖固定底色，而是整体降低透明度，避免鲜艳背景（如红色）被灰底覆盖；
         中性表面上的列表/菜单项（MenuBar、ContextMenu、ListBox、TreeMenu 等）仍使用

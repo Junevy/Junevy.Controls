@@ -71,7 +71,7 @@
 
             <demo:DemoSection
                 Title="jv:TextBox —— TitleAssist（输入框外侧标题）"
-                Description="标题内容为 object（可直接设 iconfont 字形）；TitlePlacement 四方位、间距固定 4 DIP；字体族/字号未设置时继承控件自身值，颜色未设置时取主题次级文本色。TitleWidth 为标题区域固定宽度（默认 NaN 自适应）：表单式布局中统一设置后，不同长度的标题保持一致的标题—输入框间距，输入框整列对齐（左方位标题自动右对齐贴合输入框）。"
+                Description="标题内容为 object（可直接设 iconfont 字形）；TitlePlacement 四方位、间距固定 4 DIP；字体族/字号未设置时继承控件自身值，颜色未设置时取主题次级文本色。TitleWidth 为标题区域固定宽度（默认 NaN 自适应）：表单式布局中统一设置后，不同长度的标题保持一致的标题—输入框间距，输入框整列对齐（左方位标题自动右对齐贴合输入框）。IsRequired 为 true 时标题旁显示必填图标：默认主题 Danger 色小圆点，IsRequiredIcon 可自定义内容（如星号「*」），IsRequiredIconPlacement 控制图标在标题左侧或右侧（默认右侧）；未设置 Title 时不显示必填标识。"
                 XamlCode="{x:Static sample:ShowcaseSnippets.TextBoxTitleAssist}">
                 <StackPanel>
                     <WrapPanel>
@@ -99,10 +99,34 @@
                             atc:TitleAssist.TitleForeground="OrangeRed"
                             atc:PlaceholderAssist.Placeholder="iconfont 标题 ComboBox" />
                     </WrapPanel>
+                    <WrapPanel Margin="0,12,0,0">
+                        <jv:TextBox
+                            Width="220"
+                            atc:TitleAssist.IsRequired="True"
+                            atc:TitleAssist.Title="服务器地址（默认圆点）" />
+                        <jv:ComboBox
+                            Width="220"
+                            atc:TitleAssist.IsRequired="True"
+                            atc:TitleAssist.IsRequiredIcon="*"
+                            atc:TitleAssist.Title="采集模式（自定义星号）" />
+                        <jv:TextBox
+                            Width="220"
+                            atc:TitleAssist.IsRequired="True"
+                            atc:TitleAssist.IsRequiredIconPlacement="Left"
+                            atc:TitleAssist.Title="设备名称（图标在左）" />
+                        <jv:TextBox
+                            Width="220"
+                            atc:TitleAssist.IsRequired="True"
+                            atc:TitleAssist.IsRequiredIcon="*"
+                            atc:TitleAssist.IsRequiredIconPlacement="Left"
+                            atc:TitleAssist.TitlePlacement="Right"
+                            atc:TitleAssist.Title="备注（Right 方位）" />
+                    </WrapPanel>
                     <StackPanel Margin="0,12,0,0">
                         <jv:TextBox
                             Width="260"
                             HorizontalAlignment="Left"
+                            atc:TitleAssist.IsRequired="True"
                             atc:TitleAssist.Title="用户名"
                             atc:TitleAssist.TitlePlacement="Left"
                             atc:TitleAssist.TitleWidth="110" />
@@ -110,6 +134,8 @@
                             Width="260"
                             Margin="0,8,0,0"
                             HorizontalAlignment="Left"
+                            atc:TitleAssist.IsRequired="True"
+                            atc:TitleAssist.IsRequiredIcon="*"
                             atc:TitleAssist.Title="电子邮箱地址"
                             atc:TitleAssist.TitlePlacement="Left"
                             atc:TitleAssist.TitleWidth="110" />

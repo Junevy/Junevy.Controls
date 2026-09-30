@@ -128,6 +128,15 @@ namespace Junevy.Controls.Showcase
                          atc:TitleAssist.TitleFontFamily="{DynamicResource IconFont}"
                          atc:TitleAssist.TitleFontSize="14" />
 
+            <!-- 必填标识：IsRequired=true 时标题旁显示图标，默认主题 Danger 色小圆点 -->
+            <jv:TextBox Width="220" atc:TitleAssist.Title="服务器地址" atc:TitleAssist.IsRequired="True" />
+
+            <!-- 自定义必填图标（如星号）与位置（标题左侧） -->
+            <jv:ComboBox Width="220" atc:TitleAssist.Title="采集模式" atc:TitleAssist.IsRequired="True"
+                         atc:TitleAssist.IsRequiredIcon="*" />
+            <jv:TextBox Width="220" atc:TitleAssist.Title="设备名称" atc:TitleAssist.IsRequired="True"
+                        atc:TitleAssist.IsRequiredIconPlacement="Left" />
+
             <!-- TitleWidth 固定标题区域宽度：表单式布局中不同长度的标题保持一致间距，整列对齐 -->
             <jv:TextBox Width="260" HorizontalAlignment="Left"
                         atc:TitleAssist.Title="用户名" atc:TitleAssist.TitlePlacement="Left" atc:TitleAssist.TitleWidth="110" />

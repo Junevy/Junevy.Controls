@@ -70,12 +70,12 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 
 设计取向：
 
-- **浅色不刺眼**：最亮的表面（卡片 `Surface.Base`）封顶在 `#FBFCFD`（Y≈0.972）、画布 `#F1F3F5`（Y≈0.894），不再有整屏纯白；正文落在 14.4:1，而改版前是 18.3:1——仍远超 AA，但去掉了高对比带来的光晕感。
+- **浅色适合阅读**：阅读面（卡片 `Surface.Base`）是纯白 `#FFFFFF`——1.10.0 曾把卡片封在 `#FBFCFD`、被反馈「整体太灰」，现改为白卡片 + 画布 `#F1F3F5`（Y≈0.894）衬托的经典阅读结构，正文对比 14.8:1；弹层不再比卡片亮，层级改由阴影与描边表达。
 - **深色不累眼**：正文 L\* 约 89 而非 93+（对深色画布 13.3:1、对卡片 12.1:1，读数舒适但不发光）；层级（贴平 / 卡片 / 弹层）靠表面 L\* 台阶表达，因此边框被刻意压低。
-- **边框分三级，静止态「若有若无」**：`Border.Default` 是发丝线（浅色 1.97:1、深色 1.79:1），只勾一层控件轮廓；`Border.Subtle` 更淡（浅色 1.32:1、深色 1.38:1）做纯装饰分隔线——面板与内容区之间那种「不是控件边界」的线用它，Showcase 侧栏分割线即如此。需要被清楚看见的状态才升到 3:1 以上——悬停与勾选框 / 开关描边用 `Border.Strong`（浅色 4.94:1、深色 3.19:1），焦点环用 `Border.Focus`。WCAG 1.4.11 的 3:1 由「可交互态」满足，静止发丝线不承诺。
+- **边框分四级，静止态「若有若无」**：`Border.Default` 是发丝线（浅色 2.03:1、深色 1.79:1），只勾一层控件轮廓；`Border.Subtle` 更淡（浅色 1.35:1、深色 1.38:1）做纯装饰分隔线；`Border.Divider` 是 **Shell 级区域分隔线**——侧栏 / 内容区这种「分区而非控件」的界线，按画布计量（浅色 1.22:1、深色 1.24:1），且区域之间不另铺表面底色，避免色阶差 + 线的双重边缘（Showcase 侧栏分割线即此用法）。需要被清楚看见的状态才升到 3:1 以上——悬停与勾选框 / 开关描边用 `Border.Strong`（浅色 5.07:1、深色 3.19:1），焦点环用 `Border.Focus`。WCAG 1.4.11 的 3:1 由「可交互态」满足，静止发丝线不承诺。
 - **两条蓝各司其职**：`Cobalt` 只做主操作（`Accent.Primary`）；`Coating`（镜片镀膜的青）只做信息与焦点环（`Status.Info` / `Border.Focus` / `Accent.Secondary`）。旧方案里 `Info` 与 `Accent` 是同一个蓝，读不出「这是状态还是这是按钮」。
 - **状态色不带复古感**：`Danger` 由砖红 `#A82828`（L\* 37.8）抬亮为朱红 `#BE3E2B`（L\* 45），`Success` 由橄榄 `#157A46` 改为 `#057E42`；`Warning` 独立成 `Palette.Yellow` 一族（Lab 色相角 97–102°，实测浅色 92° / 深色 94°），深色 `#E2C600` 压得住近黑墨字 11.57:1、拆出来当无边框前景对画布也有 10.35:1。抬亮之后仍同时满足「色块压得住文字」与「拆出来当无边框前景读得动」两端（见下文双重职责）。
-- **浅色警告是唯一放行项**：真黄做不到 AA——黄色方向上想守住 4.5:1 就得压到 L\*≤52，而那个亮度的 sRGB 黄已经是橄榄／土褐（上一轮的琥珀 `#A85C07`，色相角 64°，即被否掉的「棕色感」）。所以浅色 `Warning` 停在 `#A08700`（L\* 56.9，对卡片 3.43:1、色块上白字 3.52:1），只达 AA-Large。这条例外在 `check.js` 与 `emit.js` 里各写成一条显式的浅色下限（3.3 / 3.2 / 3.4），深色仍走 4.5 的标准线，不是漏网。
+- **浅色警告是唯一放行项**：真黄做不到 AA——黄色方向上想守住 4.5:1 就得压到 L\*≤52，而那个亮度的 sRGB 黄已经是橄榄／土褐（上一轮的琥珀 `#A85C07`，色相角 64°，即被否掉的「棕色感」）。所以浅色 `Warning` 停在 `#A08700`（L\* 56.9，对卡片 3.52:1、色块上白字 3.52:1），只达 AA-Large。这条例外在 `check.js` 与 `emit.js` 里各写成一条显式的浅色下限（3.3 / 3.2 / 3.4），深色仍走 4.5 的标准线，不是漏网。
 
 ### 角色令牌全表
 
@@ -85,11 +85,11 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `Theme.Brush.Background.Subtle` | `#EEF0F3` | `#272B30` | 次级画布 |
 | `Theme.Brush.Background.Second` | `#E3E6EA` | `#111215` | 再深一档画布 |
 | `Theme.Brush.Background.Third` | `#DADEE2` | `#454A51` | 最深一档画布 |
-| `Theme.Brush.Surface.Base` | `#FBFCFD` | `#1F2226` | 卡片、面板基础表面 |
+| `Theme.Brush.Surface.Base` | `#FFFFFF` | `#1F2226` | 卡片、面板基础表面（浅色为纯白阅读面） |
 | `Theme.Brush.Surface.Raised` | `#FFFFFF` | `#35393F` | 抬升表面（弹层、浮起卡片） |
 | `Theme.Brush.Surface.Sunken` | `#E3E6EA` | `#111215` | 内陷表面（只读输入区、代码块、进度槽） |
 | `Theme.Brush.Surface.Focused` | `#EEF0F3` | `#272B30` | 输入框获得焦点时的底色（只比卡片挪半步，不用 `Sunken`） |
-| `Theme.Brush.Surface.Overlay` | `#FFFFFF` | `#35393F` | 覆盖层（对话框、下拉） |
+| `Theme.Brush.Surface.Overlay` | `#FFFFFF` | `#35393F` | 覆盖层（对话框、下拉；浅色与卡片同白，靠阴影 + 描边分层） |
 | `Theme.Brush.Surface.Hover` | `#EEF0F3` | `#272B30` | 悬停 |
 | `Theme.Brush.Surface.Pressed` | `#E3E6EA` | `#2F3238` | 按下 |
 | `Theme.Brush.Surface.Selected` | `#DCEBFD` | `#16304D` | 选中 |
@@ -99,8 +99,9 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `Theme.Brush.Text.Disabled` | `#B0B7BE` | `#454A51` | 禁用文字 |
 | `Theme.Brush.Text.Inverse` | `#FFFFFF` | `#070B10` | 反色表面上的文字 |
 | `Theme.Brush.Text.OnAccent` | `#FFFFFF` | `#070B10` | 主色 / 状态色块上的文字 |
-| `Theme.Brush.Border.Default` | `#B0B7BE` | `#454A51` | 控件静止边框：发丝线（浅色 1.97:1 / 深色 1.79:1），只要勾出轮廓 |
+| `Theme.Brush.Border.Default` | `#B0B7BE` | `#454A51` | 控件静止边框：发丝线（浅色 2.03:1 / 深色 1.79:1），只要勾出轮廓 |
 | `Theme.Brush.Border.Subtle` | `#DADEE2` | `#35393F` | 分隔线（装饰性，刻意压得很淡） |
+| `Theme.Brush.Border.Divider` | `#DADEE2` | `#272B30` | Shell 级区域分隔线（侧栏 / 内容区等分区界线，对画布 1.22:1 / 1.24:1） |
 | `Theme.Brush.Border.Strong` | `#686F79` | `#697078` | 强调边框：悬停描边、勾选框 / 开关描边（≥3:1，满足非文本对比） |
 | `Theme.Brush.Border.Focus` | `#00768D` | `#74CBDC` | 焦点环 |
 | `Theme.Brush.Accent.Primary` | `#1F5FC4` | `#4E90E8` | 主操作 |
@@ -124,6 +125,8 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `Theme.Brush.State.DisabledBorder` | `#DADEE2` | `#2F3238` | 禁用边框 |
 | `Theme.Brush.State.DisabledForeground` | `#B0B7BE` | `#454A51` | 禁用前景 |
 | `Theme.Brush.State.DisabledVeil` | `#A0FFFFFF` | `#A0111215` | 禁用蒙层（半透明，盖在日历 / 日期弹层上：浅色洗淡、深色压暗） |
+| `Theme.Brush.State.HoverScrim` | `#14070B10` | `#14FFFFFF` | 状态层纱色：悬停反馈（8% 墨 / 8% 白，叠在任意底色上，色相不变） |
+| `Theme.Brush.State.PressedScrim` | `#26070B10` | `#26FFFFFF` | 状态层纱色：按压反馈（15% 墨 / 15% 白） |
 | `Theme.Brush.ScrollBar.Thumb` | `#B0B7BE` | `#454A51` | 滚动条滑块 |
 | `Theme.Brush.ScrollBar.ThumbHover` | `#8C939C` | `#697078` | 滚动条滑块悬停 |
 | `Theme.Brush.TransparentBackground.Base` | `#FFFFFF` | `#1F2226` | 棋盘格浅格 |
@@ -169,7 +172,7 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 
 阴影只换了载体色相（浅色 `#26070B10`、深色 `#B3070B10`，取代原来的 `#1A0D1520` 与纯黑 `#99000000`），`BlurRadius`、`ShadowDepth`、`Opacity` 三个参数逐条保持原样。WPF 的 `DropShadowEffect` 并不读取 `Color` 的 alpha 通道，浓淡只由 `Opacity` 决定，所以换色相不会改变阴影浓度——离屏实测六个令牌改版前后压暗量漂移均为 `0.00%`。
 
-改配色请先读 `Tools/palette/README.md`：`node Tools/palette/check.js` 跑 91 条对比度 / 亮度台阶断言，`node Tools/palette/emit.js` 重新生成两份 `AppColors.*.xaml` 并回读校验（镜像层漂移、悬空引用、资源计数都会被拦下）。
+改配色请先读 `Tools/palette/README.md`：`node Tools/palette/check.js` 跑 95 条对比度 / 亮度台阶断言，`node Tools/palette/emit.js` 重新生成两份 `AppColors.*.xaml` 并回读校验（镜像层漂移、悬空引用、资源计数都会被拦下）。
 
 运行时切换主题：
 
@@ -237,13 +240,16 @@ ThemeManager.ToggleTheme();
 
 | 附加属性 | 默认值 | 实际效果 |
 | --- | --- | --- |
-| `atc:TitleAssist.Title` | `null` | 标题内容；为 `null` 时不显示标题，也不占用布局空间 |
+| `atc:TitleAssist.Title` | `null` | 标题内容；为 `null` 时不显示标题，也不占用布局空间（必填标识同样不显示） |
 | `atc:TitleAssist.TitlePlacement` | `Top` | 标题位置：`Top` / `Bottom` / `Left` / `Right`，标题与输入框间距固定 4 DIP |
 | `atc:TitleAssist.TitleWidth` | `NaN` | 标题区域固定宽度（DIP），四个方位统一生效；`NaN` 时自适应标题内容。表单式布局中统一设置后，不同长度的标题保持一致的标题—输入框间距，输入框整列对齐（`Left` 方位标题自动右对齐贴合输入框） |
 | `atc:TitleAssist.TitleFontFamily` | `null` | 标题字体族；为 `null` 时继承控件自身字体。标题为 iconfont 字形时需设置为 iconfont |
 | `atc:TitleAssist.TitleFontSize` | `NaN` | 标题字号；`NaN` 时继承控件自身字号 |
 | `atc:TitleAssist.TitleForeground` | `null` | 标题颜色；为 `null` 时由默认样式提供主题次级文本色 |
 | `atc:TitleAssist.TitleFontWeight` | `Normal` | 标题字重 |
+| `atc:TitleAssist.IsRequired` | `false` | 必填标识开关；`true` 且已设置 `Title` 时在标题旁显示必填图标（与标题一起显示/隐藏） |
+| `atc:TitleAssist.IsRequiredIcon` | `null` | 必填图标内容；为 `null` 时显示默认的主题 Danger 色小圆点，设置后替换默认圆点（如星号 `*`、iconfont 字形或任意 `object`，字体样式继承标题设置） |
+| `atc:TitleAssist.IsRequiredIconPlacement` | `Right` | 必填图标相对标题文字的位置：`Right`（标题右侧）/ `Left`（标题左侧），图标与标题间距固定 4 DIP |
 
 标题同时支持 `jv:TextBox` / `jv:ComboBox` 与原生 `<TextBox>` / `<ComboBox>` 借用默认外观的场景（附加属性经模板绑定生效）。
 
@@ -274,6 +280,20 @@ ThemeManager.ToggleTheme();
     atc:TitleAssist.Title="电子邮箱地址"
     atc:TitleAssist.TitlePlacement="Left"
     atc:TitleAssist.TitleWidth="110" />
+
+<!-- 必填标识：默认在标题右侧显示主题 Danger 色小圆点 -->
+<jv:TextBox
+    Width="220"
+    atc:TitleAssist.Title="服务器地址"
+    atc:TitleAssist.IsRequired="True" />
+
+<!-- 自定义必填图标（星号），并放到标题左侧 -->
+<jv:ComboBox
+    Width="220"
+    atc:TitleAssist.Title="采集模式"
+    atc:TitleAssist.IsRequired="True"
+    atc:TitleAssist.IsRequiredIcon="*"
+    atc:TitleAssist.IsRequiredIconPlacement="Left" />
 ```
 
 ### PlaceholderAssist
@@ -330,9 +350,9 @@ ThemeManager.ToggleTheme();
 </StackPanel>
 ```
 
-悬停/按压不替换固定底色，而是降低整体不透明度：悬停 `0.8`、按压 `0.65`、禁用 `0.5`（定义于 `Button.xaml` 资源 `Button.Hover.Opacity` / `Button.Pressed.Opacity` / `Button.Disabled.Opacity`）。鲜艳背景色（如红色）悬停时只变淡、不变色；`NoBorderButtonStyle` 透明背景下的反馈为内容整体变淡。
+悬停/按压采用**状态层（state layer）**反馈：不替换固定底色、也不降低整体透明度，而是在任意背景上叠一层固定透明度的纱——`Theme.Brush.State.HoverScrim`（浅色 8% 墨 `#14070B10` / 深色 8% 白 `#14FFFFFF`）与 `Theme.Brush.State.PressedScrim`（两主题各 15%：`#26070B10` / `#26FFFFFF`）。文字与图标全程保持实色，反馈比旧版整体变淡明显得多；鲜艳背景（如红色按钮）悬停/按压时只是「同色相加深一档」（深色主题反向提亮），不会跳到灰色系产生割裂，用户自定义背景同样成立。禁用态仍为整体 0.5 透明度 + 禁用表面。`NoBorderButtonStyle` 透明背景（幽灵按钮）的悬停/按压为纱色填充出圆角色块。
 
-同一反馈方案已推广至其余可交互控件（公共资源键 `Control.Hover.Opacity` / `Control.Pressed.Opacity`，定义于 `Generic/Style/FeedbackOpacity.xaml`）：**背景可自定义的按钮/卡片类**（`CardButton`、`ToolBarItem`、`ToolboxItem`、`ToolItem`）与**内部图标小按钮**（`MessageBar` / `ProgressBarWindow` 关闭按钮、`ImageViewer` 工具栏按钮、`DialogWindow` 标题栏按钮、`ToggleButton` Expander 展开按钮、`DatePicker` 日历导航/头部/下拉按钮）悬停/按压均为降透明度，鲜艳背景不再被灰底覆盖；`MenuBar` / `ContextMenu` / `TabMenu` / `SideMenu` / `TreeMenu`、`ListBox` / `ListView` / `DataGrid`、`GroupBox` / `ExpanderPanel` 等中性表面上的列表/菜单项仍保留 `Surface.Hover` 灰底悬停高亮。
+同一反馈方案已推广至其余可交互控件：**背景可自定义的按钮/卡片类**（`CardButton`、`ToolBarItem`、`ToolboxItem`、`ToolItem`）与**内部图标小按钮**（`MessageBar` / `ProgressBarWindow` 关闭按钮、`ImageViewer` 工具栏按钮、`DialogWindow` 标题栏按钮、`ToggleButton` Expander 展开按钮、`DatePicker` 日历导航/头部/下拉按钮）悬停/按压均为状态层纱色；`MenuBar` / `ContextMenu` / `TabMenu` / `SideMenu` / `TreeMenu`、`ListBox` / `ListView` / `DataGrid`、`GroupBox` / `ExpanderPanel` 等中性表面上的列表/菜单项仍保留 `Surface.Hover` 灰底悬停高亮。两个纱色为 `DynamicResource` 主题令牌（`Themes/AppColors.*.xaml` 生成，守卫脚本断言其对卡片的 ΔL\* 落在可感知区间），宿主可整体覆盖。
 
 `jv:Button` 可选一层只向下散开的浮起阴影（默认关闭，常态贴平，与 ComboBox / TextBox 等同级控件一致），设 `ShowShadow=True` 打开；按压或禁用时自动消失（贴回地面），与降透明度的状态反馈叠加使用。阴影取自新令牌 `Theme.ButtonShadow`（浅色 `BlurRadius=16 / ShadowDepth=5 / Opacity=0.18`，深色 `18 / 6 / 0.40`；载体色 `#26070B10` / `#B3070B10`），与 `Theme.PopupShadow` 同族同强度，只按控件尺寸收紧模糊与偏移：实测按钮下方 1–9px 相对压暗 `8.47%`，MessageBar 弹层同距离为 `9.50%`；`5–9px / 1–5px` 衰减比 `0.58` 对弹层 `0.63`，即同一族形状而非另立一套观感。Effect 只挂在模板内**不含任何子元素**的背景层 `Border` 上，文字仍走 ClearType；官方 `Button`、`NoBorderButtonStyle` 与 `CardButton`（自带模板）都不带这层阴影。宿主 App 在 `Application.Resources` 写同名键即可整体调淡或关掉（应用自身条目的优先级高于 `ThemeManager` 追加的主题字典，因此这一份覆盖值会同时用于浅色与深色，需要分档时自行取两套参数）：
 
@@ -348,7 +368,7 @@ ThemeManager.ToggleTheme();
 </Application.Resources>
 ```
 
-独有依赖属性 `ShowShadow`（默认 `false`）：常态浮起阴影的开关。默认贴平，与 `ComboBox`、`TextBox` 等没有浮起感的同级控件并排时（表单行、工具条、对话框底栏）观感一致；需要浮起感强调的按钮（主操作、独立 CTA）可对单个按钮设 `true`，或用样式 Setter 批量/全局开启。只影响常态阴影：按压与禁用本就不显示阴影，悬停/按压的降透明度反馈、尺寸与文字渲染均不受影响。
+独有依赖属性 `ShowShadow`（默认 `false`）：常态浮起阴影的开关。默认贴平，与 `ComboBox`、`TextBox` 等没有浮起感的同级控件并排时（表单行、工具条、对话框底栏）观感一致；需要浮起感强调的按钮（主操作、独立 CTA）可对单个按钮设 `true`，或用样式 Setter 批量/全局开启。只影响常态阴影：按压与禁用本就不显示阴影，状态层纱色的悬停/按压反馈、尺寸与文字渲染均不受影响。
 
 ```xml
 <!--  逐个开启  -->
@@ -454,7 +474,7 @@ ThemeManager.ToggleTheme();
 | `CommandButtonCommand`（依赖属性） | 命令按钮点击时执行的命令（ICommand），可绑定 ViewModel 命令；按钮可用性随命令 `CanExecute` 自动启停 |
 | `CommandButtonCommandParameter`（依赖属性） | 传递给 `CommandButtonCommand` 的命令参数 |
 | `CommandButtonContent`（依赖属性） | 命令按钮内容（文本或 iconfont 字形），字体族跟随 `atc:Icon.FontFamily`，字号/颜色继承控件自身取值；为 `null` 时显示空白占位，建议显式设置 |
-| `atc:TitleAssist.Title` 系列（含 `TitleWidth` 固定宽度） | 在输入框外侧显示用途标题，位置可选 `Top`/`Bottom`/`Left`/`Right`，支持 iconfont 与自定义字体样式，详见 [TitleAssist](#titleassist) |
+| `atc:TitleAssist.Title` 系列（含 `TitleWidth` 固定宽度、`IsRequired` 必填标识） | 在输入框外侧显示用途标题，位置可选 `Top`/`Bottom`/`Left`/`Right`，支持 iconfont 与自定义字体样式，详见 [TitleAssist](#titleassist) |
 
 ```xml
 <jv:TextBox
@@ -1489,8 +1509,8 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ToggleButton` | WPF `ToggleButton`、圆形/矩形模板 | `Border.CornerRadius` |
 | `RadioButton` | WPF `RadioButton`、`ShapeMode`、焦点资源 | `Icon.FontFamily` 用于选中符号 |
 | `CheckBox` | WPF `CheckBox`、焦点资源 | `Icon.FontFamily`、`Border.CornerRadius` |
-| `TextBox` | WPF `TextBox`、`jv:Button` 清空按钮、`jv:Button` 命令按钮 | `Icon.Icon`、`Icon.FontFamily`、`ShowClear`（依赖属性）、`ShowCommandButton`/`CommandButtonCommand`/`CommandButtonCommandParameter`/`CommandButtonContent`（依赖属性）、`PlaceholderAssist.Placeholder`、`TitleAssist.Title` 系列、`Border.CornerRadius` |
-| `ComboBox` | WPF `ComboBox`、`ComboBoxItem`、`jv:ToggleButton` | `PlaceholderAssist.Placeholder`、`TitleAssist.Title` 系列、`Border.CornerRadius` |
+| `TextBox` | WPF `TextBox`、`jv:Button` 清空按钮、`jv:Button` 命令按钮 | `Icon.Icon`、`Icon.FontFamily`、`ShowClear`（依赖属性）、`ShowCommandButton`/`CommandButtonCommand`/`CommandButtonCommandParameter`/`CommandButtonContent`（依赖属性）、`PlaceholderAssist.Placeholder`、`TitleAssist.Title` 系列（含 `IsRequired` 必填标识）、`Border.CornerRadius` |
+| `ComboBox` | WPF `ComboBox`、`ComboBoxItem`、`jv:ToggleButton` | `PlaceholderAssist.Placeholder`、`TitleAssist.Title` 系列（含 `IsRequired` 必填标识）、`Border.CornerRadius` |
 | `ComboBoxItem` | WPF `ComboBoxItem`、`DefaultComboBoxItemStyle` | 无 |
 | `ListBox` | WPF `ListBox`、`ListBoxItem`、虚拟化和滚动资源 | 无 |
 | `ListView` | WPF `ListView`、`GridView`、虚拟化和转换器 | `Border.CornerRadius` |

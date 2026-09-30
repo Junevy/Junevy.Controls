@@ -66,7 +66,10 @@ const Roles = {
   'Background.Second': ['Chalk.100', 'Slate.25'],
   'Background.Third': ['Chalk.150', 'Slate.175'],
 
-  'Surface.Base': ['Chalk.25', 'Slate.75'],
+  /*  Surface.Base 浅色取 Chalk.0 纯白：用户反馈 1.10.0 的 #FBFCFD 灰白卡片整体发灰、
+      不适合阅读——阅读面就该是纸白，画布退为衬托（ΔL* 4.3，仍在 2.5–5 守卫区间）。
+      正文对比由 14.4:1 提到 15.4:1；弹层不再比卡片亮，改靠阴影与描边分层（见 check.js）。 */
+  'Surface.Base': ['Chalk.0', 'Slate.75'],
   'Surface.Raised': ['Chalk.0', 'Slate.150'],
   'Surface.Sunken': ['Chalk.100', 'Slate.25'],
   'Surface.Overlay': ['Chalk.0', 'Slate.150'],
@@ -87,6 +90,12 @@ const Roles = {
 
   'Border.Default': ['Chalk.300', 'Slate.175'],
   'Border.Subtle': ['Chalk.150', 'Slate.150'],
+  /*  区域分隔线（Shell 级）：侧栏/内容、页签区这类「分区而非控件」的界线。
+      比控件边框全部再退一档，且按画布（Background.App）计量而非卡片——
+      1.10.0 把 Showcase 侧栏线交给 Border.Subtle 时，侧栏还画了 Surface.Base 底，
+      色阶差 + 线双重边缘被用户反馈「太明显」；现在侧栏与内容共用画布底，
+      只剩这条线：浅色 1.22:1 / 深色 1.24:1（对画布）。 */
+  'Border.Divider': ['Chalk.150', 'Slate.100'],
   'Border.Strong': ['Chalk.550', 'Slate.250'],
   'Border.Focus': ['Coating.600', 'Coating.300'],
 
@@ -127,6 +136,14 @@ const Effect = {
       浅色用 63% 纸白把它「洗淡」，深色用 63% 最暗面把它「压暗」。
       旧实现只在浅色写死 #A0FFFFFF，深色下会把日历冲成奶白块（实测同区域平均 L* 26.1 → 51.7）。 */
   'State.DisabledVeil': { light: '#A0FFFFFF', dark: '#A0111215' },  // = Chalk.0 / Slate.25，各加 A0 alpha
+  /*  状态层（state layer）：悬停/按压的通用反馈。不替换背景、也不降整体透明度，
+      而是在任意底色上叠一层固定透明度的「纱」——浅色是墨纱（越悬停越深），
+      深色是白纱（越悬停越亮），与状态色的悬停方向约定一致。这样鲜艳底色
+      （红按钮、绿卡片、用户自定义色）hover 时只是「同色相加深/提亮一档」，
+      不会跳到灰色系产生割裂；文字与图标完全不参与变淡，反馈更清楚。
+      hover 8% / pressed 15%，对卡片的 ΔL* 见 check.js 的状态层断言。 */
+  'State.HoverScrim': { light: '#14070B10', dark: '#14FFFFFF' },    // 8% 墨 / 8% 白
+  'State.PressedScrim': { light: '#26070B10', dark: '#26FFFFFF' },  // 15% 墨 / 15% 白
 };
 
 /* 需要新色值时用这三个函数按目标 L* 反解，不要手挑 hex：
