@@ -16,7 +16,7 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="Padding" Value="{DynamicResource Theme.ContentMargin}" />
         <Setter Property="Margin" Value="1" />
         <Setter Property="MinHeight" Value="32" />
@@ -90,7 +90,7 @@
 
     <Style x:Key="DefaultListBoxStyle" TargetType="ListBox">
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Border.CornerRadius" Value="{DynamicResource Theme.ControlCornerRadius}" />

@@ -21,7 +21,7 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="Padding" Value="9,4" />
@@ -104,7 +104,7 @@
                 TargetType="{x:Type Separator}" />
         </Style.Resources>
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />

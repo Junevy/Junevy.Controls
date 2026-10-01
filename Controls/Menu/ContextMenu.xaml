@@ -28,7 +28,7 @@
             <SolidColorBrush x:Key="{x:Static SystemColors.MenuHighlightBrushKey}"
                              Color="{DynamicResource Theme.Color.Surface.Hover}" />
         </Style.Resources>
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
@@ -119,12 +119,12 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsHighlighted" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
-                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                            <Setter Property="Background" Value="{Binding ItemHoverBackground, RelativeSource={RelativeSource AncestorType=local:ContextMenu}}" />
+                            <Setter TargetName="Root" Property="Background" Value="{Binding ItemHoverBackground, RelativeSource={RelativeSource AncestorType=local:ContextMenu}}" />
                         </Trigger>
                         <Trigger Property="IsSubmenuOpen" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
-                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                            <Setter Property="Background" Value="{Binding ItemHoverBackground, RelativeSource={RelativeSource AncestorType=local:ContextMenu}}" />
+                            <Setter TargetName="Root" Property="Background" Value="{Binding ItemHoverBackground, RelativeSource={RelativeSource AncestorType=local:ContextMenu}}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Pressed}" />
@@ -169,7 +169,8 @@
             <Style TargetType="{x:Type Separator}"
                    BasedOn="{StaticResource JunevyContextMenuSeparatorStyle}" />
         </Style.Resources>
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
+        <Setter Property="ItemHoverBackground" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="1" />

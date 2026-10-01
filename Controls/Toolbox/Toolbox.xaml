@@ -12,7 +12,7 @@
 
     <Style x:Key="DefaultToolboxStyle" TargetType="{x:Type local:Toolbox}">
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="4" />
@@ -41,6 +41,7 @@
     <Style TargetType="{x:Type local:Toolbox}" BasedOn="{StaticResource DefaultToolboxStyle}" />
 
     <Style x:Key="DefaultToolboxItemStyle" TargetType="{x:Type local:ToolboxItem}">
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="Width" Value="48" />
         <Setter Property="Height" Value="48" />
         <Setter Property="Margin" Value="2" />
@@ -153,6 +154,7 @@
     <Style TargetType="{x:Type local:ToolboxItem}" BasedOn="{StaticResource DefaultToolboxItemStyle}" />
 
     <Style x:Key="DefaultToolItemStyle" TargetType="{x:Type local:ToolItem}">
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="Height" Value="68" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />

@@ -121,11 +121,11 @@ function roleLines(theme, kind) {
 const SHADOWS = {
   light: {
     color: '#26070B10',
-    items: [['Theme.PopupShadow', 18, 6, 0.18], ['Theme.ButtonShadow', 16, 5, 0.18], ['Theme.SideMenuItemShadow', 12, 5, 0.05]],
+    items: [['Theme.PopupShadow', 18, 6, 0.18], ['Theme.ButtonShadow', 16, 5, 0.18]],
   },
   dark: {
     color: '#B3070B10',
-    items: [['Theme.PopupShadow', 22, 8, 0.4], ['Theme.ButtonShadow', 18, 6, 0.4], ['Theme.SideMenuItemShadow', 14, 5, 0.2]],
+    items: [['Theme.PopupShadow', 22, 8, 0.4], ['Theme.ButtonShadow', 18, 6, 0.4]],
   },
 };
 
@@ -339,7 +339,6 @@ function shadowBlock(theme, head) {
   const notes = {
     'Theme.PopupShadow': '弹层专用：深色底面上可压暗的余量小，故同族参数下不透明度须高于浅色才看得出轮廓。',
     'Theme.ButtonShadow': '小控件（jv:Button）专用：与 Theme.PopupShadow 同族同强度，只把模糊与偏移按控件尺寸收紧，避免大弹层的柔光在小按钮上糊成一团。',
-    'Theme.SideMenuItemShadow': 'SideMenu 选中项专用：只向下散开的柔光，靠偏移把阴影从条目四周推到下方，避免紧贴边缘形成一圈「描边感」；只作用于条目背景层。',
   };
   const body = cfg.items.map(([key, blur, depth, op]) => `
     <!--  ${notes[key]}  -->

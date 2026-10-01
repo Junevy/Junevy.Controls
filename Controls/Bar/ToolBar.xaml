@@ -85,9 +85,9 @@
         <!--<Setter Property="MinHeight" Value="42" />-->
         <Setter Property="Margin" Value="0" />
         <Setter Property="Padding" Value="2" />
-        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Subtle}" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />

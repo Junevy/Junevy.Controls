@@ -66,13 +66,13 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | 兼容色值 | `Theme.Color.Text.Primary` … | 旧接口遗留的镜像层，与 `Palette.*` 同值；新代码用 `Theme.Brush.*` |
 | 角色画刷 | `Theme.Brush.Text.Primary` … | 控件模板与宿主应用**唯一**该绑的一层 |
 
-`Step` 数字不是权重，而是 CIE **L\***（感知亮度）：同一族里相邻 step 的色差在人类视觉上大致均匀，浅色族 `Chalk` 从 `0`（`#FFFFFF`）走到 `1000`（`#070B10`），深色族 `Slate` 方向相反。两套主题共用同一条中性线（色相仍恒定在 210°–215°，但彩度封顶 C\*≤7，实测峰值 6.5），只是各自从线的两端往里读——切换主题时画面不会换一个色相说话。**灰就是灰**：蓝只由 `Cobalt` / `Coating` 两个色族承担，纸面与墨面本身不再泛蓝。
+`Step` 数字不是权重，而是 CIE **L\***（感知亮度）：同一族里相邻 step 的色差在人类视觉上大致均匀，浅色族 `Chalk` 从 `0`（`#FFFFFF`）走到 `800`（`#24282E`），深色族 `Slate` 方向相反。两套主题共用同一条中性线（色相仍恒定在 210°–215°，但彩度封顶 C\*≤7，实测峰值 6.5），只是各自从线的两端往里读——切换主题时画面不会换一个色相说话。**灰就是灰**：蓝只由 `Cobalt` / `Coating` 两个色族承担，纸面与墨面本身不再泛蓝。
 
 设计取向：
 
-- **浅色适合阅读**：阅读面（卡片 `Surface.Base`）是纯白 `#FFFFFF`——1.10.0 曾把卡片封在 `#FBFCFD`、被反馈「整体太灰」，现改为白卡片 + 画布 `#F1F3F5`（Y≈0.894）衬托的经典阅读结构，正文对比 14.8:1；弹层不再比卡片亮，层级改由阴影与描边表达。
+- **浅色适合阅读**：阅读面（卡片 `Surface.Base`）是纯白 `#FFFFFF`——1.10.0 曾把卡片封在 `#FBFCFD`、被反馈「整体太灰」，现改为白卡片 + 画布 `#F1F3F5`（Y≈0.894）衬托的经典阅读结构，正文对比 14.8:1；弹层不再比卡片亮，层级改由阴影与描边表达。**侧栏用次级背景**（`Background.Subtle` `#EBEDEF`，比主画布深 ΔL* 2.1）：「次级在左、主背景在右」的区域层级，参考主流工具类应用的侧栏观感；悬停色随次级背景深化从 Chalk.75 迁到 Chalk.50。
 - **深色不累眼**：正文 L\* 约 89 而非 93+（对深色画布 13.3:1、对卡片 12.1:1，读数舒适但不发光）；层级（贴平 / 卡片 / 弹层）靠表面 L\* 台阶表达，因此边框被刻意压低。
-- **边框分四级，静止态「若有若无」**：`Border.Default` 是发丝线（浅色 2.03:1、深色 1.79:1），只勾一层控件轮廓；`Border.Subtle` 更淡（浅色 1.35:1、深色 1.38:1）做纯装饰分隔线；`Border.Divider` 是 **Shell 级区域分隔线**——侧栏 / 内容区这种「分区而非控件」的界线，按画布计量（浅色 1.22:1、深色 1.24:1），且区域之间不另铺表面底色，避免色阶差 + 线的双重边缘（Showcase 侧栏分割线即此用法）。需要被清楚看见的状态才升到 3:1 以上——悬停与勾选框 / 开关描边用 `Border.Strong`（浅色 5.07:1、深色 3.19:1），焦点环用 `Border.Focus`。WCAG 1.4.11 的 3:1 由「可交互态」满足，静止发丝线不承诺。
+- **边框分四级，静止态「若有若无」**：`Border.Default` 是发丝线（浅色 2.03:1、深色 1.79:1），只勾一层控件轮廓；`Border.Subtle` 更淡（浅色 1.35:1、深色 1.38:1）做纯装饰分隔线；`Border.Divider` 是 **Shell 级区域分隔线**——侧栏 / 内容区这种「分区而非控件」的界线（浅色对画布 1.22:1、深色 1.37:1，对次级侧栏底 1.15:1 / 1.11:1）；侧栏铺次级背景后，分隔线对两侧仍保持可辨。需要被清楚看见的状态才升到 3:1 以上——悬停与勾选框 / 开关描边用 `Border.Strong`（浅色 5.07:1、深色 3.19:1），焦点环用 `Border.Focus`。WCAG 1.4.11 的 3:1 由「可交互态」满足，静止发丝线不承诺。
 - **两条蓝各司其职**：`Cobalt` 只做主操作（`Accent.Primary`）；`Coating`（镜片镀膜的青）只做信息与焦点环（`Status.Info` / `Border.Focus` / `Accent.Secondary`）。旧方案里 `Info` 与 `Accent` 是同一个蓝，读不出「这是状态还是这是按钮」。
 - **状态色不带复古感**：`Danger` 由砖红 `#A82828`（L\* 37.8）抬亮为朱红 `#BE3E2B`（L\* 45），`Success` 由橄榄 `#157A46` 改为 `#057E42`；`Warning` 独立成 `Palette.Yellow` 一族（Lab 色相角 97–102°，实测浅色 92° / 深色 94°），深色 `#E2C600` 压得住近黑墨字 11.57:1、拆出来当无边框前景对画布也有 10.35:1。抬亮之后仍同时满足「色块压得住文字」与「拆出来当无边框前景读得动」两端（见下文双重职责）。
 - **浅色警告是唯一放行项**：真黄做不到 AA——黄色方向上想守住 4.5:1 就得压到 L\*≤52，而那个亮度的 sRGB 黄已经是橄榄／土褐（上一轮的琥珀 `#A85C07`，色相角 64°，即被否掉的「棕色感」）。所以浅色 `Warning` 停在 `#A08700`（L\* 56.9，对卡片 3.52:1、色块上白字 3.52:1），只达 AA-Large。这条例外在 `check.js` 与 `emit.js` 里各写成一条显式的浅色下限（3.3 / 3.2 / 3.4），深色仍走 4.5 的标准线，不是漏网。
@@ -82,15 +82,15 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | 角色令牌 | 浅色 | 深色 | 用途 |
 | --- | --- | --- | --- |
 | `Theme.Brush.Background.App` | `#F1F3F5` | `#16191C` | 应用 / 页面画布 |
-| `Theme.Brush.Background.Subtle` | `#EEF0F3` | `#272B30` | 次级画布 |
+| `Theme.Brush.Background.Subtle` | `#EBEDEF` | `#272B30` | 次级背景：侧栏这类「次要区域」的底色（比主画布深 ΔL* 2.1，主背景在其右侧读起来更白） |
 | `Theme.Brush.Background.Second` | `#E3E6EA` | `#111215` | 再深一档画布 |
 | `Theme.Brush.Background.Third` | `#DADEE2` | `#454A51` | 最深一档画布 |
 | `Theme.Brush.Surface.Base` | `#FFFFFF` | `#1F2226` | 卡片、面板基础表面（浅色为纯白阅读面） |
 | `Theme.Brush.Surface.Raised` | `#FFFFFF` | `#35393F` | 抬升表面（弹层、浮起卡片） |
 | `Theme.Brush.Surface.Sunken` | `#E3E6EA` | `#111215` | 内陷表面（只读输入区、代码块、进度槽） |
-| `Theme.Brush.Surface.Focused` | `#EEF0F3` | `#272B30` | 输入框获得焦点时的底色（只比卡片挪半步，不用 `Sunken`） |
+| `Theme.Brush.Surface.Focused` | `#FFFFFF` | `#272B30` | 输入框获得焦点时的底色：浅色与纯白卡片同白（焦点态由 accent 边框表达，不比静止态更灰），深色仍抬亮一档 |
 | `Theme.Brush.Surface.Overlay` | `#FFFFFF` | `#35393F` | 覆盖层（对话框、下拉；浅色与卡片同白，靠阴影 + 描边分层） |
-| `Theme.Brush.Surface.Hover` | `#EEF0F3` | `#272B30` | 悬停 |
+| `Theme.Brush.Surface.Hover` | `#F1F3F5` | `#272B30` | 悬停（随次级背景深化迁至 Chalk.50，白卡上 ΔL* 4.25 守在悬停区间内） |
 | `Theme.Brush.Surface.Pressed` | `#E3E6EA` | `#2F3238` | 按下 |
 | `Theme.Brush.Surface.Selected` | `#DCEBFD` | `#16304D` | 选中 |
 | `Theme.Brush.Text.Primary` | `#24282E` | `#DDE0E5` | 正文 |
@@ -101,7 +101,7 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `Theme.Brush.Text.OnAccent` | `#FFFFFF` | `#070B10` | 主色 / 状态色块上的文字 |
 | `Theme.Brush.Border.Default` | `#B0B7BE` | `#454A51` | 控件静止边框：发丝线（浅色 2.03:1 / 深色 1.79:1），只要勾出轮廓 |
 | `Theme.Brush.Border.Subtle` | `#DADEE2` | `#35393F` | 分隔线（装饰性，刻意压得很淡） |
-| `Theme.Brush.Border.Divider` | `#DADEE2` | `#272B30` | Shell 级区域分隔线（侧栏 / 内容区等分区界线，对画布 1.22:1 / 1.24:1） |
+| `Theme.Brush.Border.Divider` | `#DADEE2` | `#2F3238` | Shell 级区域分隔线（侧栏 / 内容区等分区界线；侧栏铺次级背景后，对两侧 1.1–1.2:1） |
 | `Theme.Brush.Border.Strong` | `#686F79` | `#697078` | 强调边框：悬停描边、勾选框 / 开关描边（≥3:1，满足非文本对比） |
 | `Theme.Brush.Border.Focus` | `#00768D` | `#74CBDC` | 焦点环 |
 | `Theme.Brush.Accent.Primary` | `#1F5FC4` | `#4E90E8` | 主操作 |
@@ -165,7 +165,6 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `Theme.ControlPadding` | 默认控件内边距 |
 | `Theme.PopupShadow` | 阴影令牌（`DropShadowEffect`），用于弹层、悬浮卡片 |
 | `Theme.ButtonShadow` | `jv:Button` 专用的向下浮起阴影令牌（与 `Theme.PopupShadow` 同族，按控件尺寸收紧） |
-| `Theme.SideMenuItemShadow` | `SideMenu` 选中条目专用的极淡柔光令牌（只向下散开） |
 | `TransparentBackground` | 透明图像背景的棋盘格（中档，8px 方格） |
 | `TransparentBackground.Small` / `.Large` | 4px / 16px 方格的棋盘格 |
 | `TransparentBackground.Geometry` | 棋盘格单个 16×16 单元内的两块 8×8 方格（纯几何，无颜色） |
@@ -802,6 +801,8 @@ ThemeManager.ToggleTheme();
 | `ItemHeight` | 固定项目高度；默认 `NaN`，使用内容自然高度 |
 | `atc:Icon.FontFamily` | 所有菜单项图标字体 |
 | `atc:Icon.IconSize` | 所有菜单项图标尺寸 |
+| `ItemHoverBackground` | 菜单项悬停背景画刷；默认 `Surface.Base`（悬停项「浮起」变亮） |
+| `SelectedItemBackground` | 选中项背景画刷；默认 `Surface.Sunken`（中性灰、无阴影）——浅色下与 `Background.Second` 同值，侧栏底色为 `Background.Second` 时选中填充不可见，可自定义 |
 
 ```xml
 <jv:SideMenu
@@ -815,20 +816,21 @@ ThemeManager.ToggleTheme();
 
 `NavigationItems` 可以是包含 `Title` 和 `Icon` 属性的普通 ViewModel 集合，也可以是 `jv:MenuItem` 集合。
 
-被选中的条目会套用 `Theme.SideMenuItemShadow`（由 `ItemContainerStyle` 的 `IsSelected` 触发器驱动）：只给选中那条加一层**只向下散开**的极淡柔光，未选中条目保持原样。阴影靠 `ShadowDepth` 从边缘推到下方、靠大 `BlurRadius` 做出渐变，因此不会紧贴胶囊四周形成一圈「描边感」；挂在条目模板的背景层 `Border` 上，文字与其同级，不会因位图特效而丢失 ClearType。实测浅色下方 1-9px 相对压暗 2.15%（同图 `MessageBar` 的 `Theme.PopupShadow` 为 9.48%，即约 1/4 强度），上边缘压暗为 0。
+选中与悬停的底色由两个画刷属性控制（默认经样式取状态层纱色，随主题与底色自适应深浅）：
 
-要整体调淡或关掉，在应用资源里覆盖同名键即可（`ThemeManager` 的主题字典走 `MergedDictionaries`，应用自身直接定义的同名键优先级更高）：
+| 属性 | 默认 | 效果 |
+| --- | --- | --- |
+| `ItemHoverBackground` | `Surface.Base` | 悬停项「浮起」变亮 |
+| `SelectedItemBackground` | `Surface.Sunken` | 选中项压暗（中性灰，无阴影、无强调蓝） |
+
+需要自定义（如恢复强调蓝、品牌色或透明）时，直接在实例上设置画刷即可：
 
 ```xml
-<Application.Resources>
-    <ResourceDictionary>
-        <!-- 完全去掉选中项阴影 -->
-        <DropShadowEffect x:Key="Theme.SideMenuItemShadow" Opacity="0" />
-    </ResourceDictionary>
-</Application.Resources>
+<jv:SideMenu ... SelectedItemBackground="{DynamicResource Theme.Brush.Surface.Selected}" />
 ```
 
-### TreeMenu 与 TreeMenuItem
+选中项**不再套用阴影**（1.14.0 起移除；如需阴影可在 `ItemContainerStyle` 的 `IsSelected` 触发器中自行添加 `Effect`）。
+Item
 
 `jv:TreeMenu` 继承 WPF `TreeView`；`jv:TreeMenuItem` 是普通数据模型类（实现 `INotifyPropertyChanged`，不是控件），作为 `ItemsSource` 条目使用，由默认的 `HierarchicalDataTemplate` 渲染 `Title` 与 `Icon`，层级由 `Children` 提供。数据模型不继承 `DispatcherObject`，可在任意线程构建。
 
@@ -1099,10 +1101,13 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 
 `jv:AppBar` 继承 WPF `ContentControl`，提供应用图标、标题以及最小化、最大化/还原、关闭按钮。系统按钮通过 WPF `SystemCommands` 操作所在窗口。库内提供两套模板，`ToolBar` 与 `Menu` 二选一：
 
-| 模板资源键 | 布局 | 使用的内容属性 |
+布局经 `Mode` 枚举（`AppBarMode`）切换，隐式样式按值换模板（也可继续经 `Template="{StaticResource ...}"` 显式指定同名模板键）：
+
+| `Mode` | 布局 | 使用的内容属性 |
 | --- | --- | --- |
-| `DefaultAppBar`（默认） | 图标 + 标题 / 分隔线 / 工具栏，右侧系统按钮 | `ToolBar` |
-| `MenuBarAppBar` | 单行：图标 + 应用名 + 菜单栏 + 弹性空白 + 系统按钮 | `Menu` |
+| `Default`（默认） | 图标 + 标题 / 分隔线 / 工具栏，右侧系统按钮 | `ToolBar` |
+| `MenuBar` | 单行：图标 + 应用名 + 菜单栏 + 弹性空白 + 系统按钮 | `Menu` |
+| `Expandable` | 抽屉开关（最左）+ 整条居中标题 + 系统按钮（最右） | `Drawer` |
 
 | 属性/附加属性 | 效果 |
 | --- | --- |
@@ -1113,6 +1118,11 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 | `atc:Icon.FontFamily` | 应用图标和标题栏系统按钮字体 |
 | `atc:Icon.IconSize` | 左侧应用图标区域大小 |
 | `Foreground` | 标题和应用图标颜色；图片本身不受影响 |
+| `Mode` | 布局模式（见上表），默认 `Default` |
+| `Drawer` | 抽屉内容（任意 `object`，尺寸由内容决定），仅 `Expandable` 呈现；为 `null` 时抽屉开关自动隐藏 |
+| `IsDrawerOpen` | 抽屉是否展开（可双向绑定驱动）；点抽屉外部收起时自动写回 `false` |
+| `AutoCloseOnDrawerClick` | 点击抽屉内容中未被处理的左键（列表项、菜单项）时自动收起抽屉；按钮等已处理点击的控件不触发 |
+| `DrawerToggleIcon` | 抽屉开关按钮的 iconfont 字形（默认菜单字形） |
 
 ```xml
 <jv:AppBar
@@ -1218,7 +1228,61 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 - 同一窗口内多个 `AppBar`、切换模板都只会注册一组绑定。
 - 若希望完全自行接管，直接在窗口上注册四个绑定即可（官方 WindowChrome 示例写法）。
 
+`Mode=Expandable` 的抽屉经 `Popup` 从标题栏下缘向下悬浮（标题栏是布局元素，无法把展开区推进宿主的行里，故不复用 `ExpanderPanel` / `SidePanel`）：点抽屉外部收起，再次点击开关同样收起（`StaysOpen=False` 收起时会放行落点鼠标消息、使开关再收到一次 Click，控件内置 250ms 时间窗守卫把这次余波忽略掉，不会重复展开）。标题跨三列真居中——左右两侧宽度不等时依然居中。拖动仍交由宿主 `WindowChrome` caption 区，建议 `CaptionHeight="{Binding ActualHeight, ElementName=AppBar 实例名}"` 与栏高保持同步。
+
 依赖：所在 `Window`、WPF `SystemCommands`（按钮命令绑定由 `AppBar` 自动补齐）、内置图标字体、`Button` 样式；`DefaultAppBar` 另依赖 `ToolBar`，`MenuBarAppBar` 另依赖 WPF `Menu`/`MenuItem`、`Separator` 与 `ContextMenu` 系列样式。自定义无边框窗口时仍需由应用配置 `WindowChrome`、`WindowStyle` 和拖动区域。
+
+### InfoBar
+
+`jv:InfoBar` 用户信息条：左侧头像（`AvatarSource` 图片，圆形裁切；未设置时显示 `UserName` 首字符的圆形字标），`Text` 布局（默认）在头像右侧显示名称与可选的设置按钮，`AvatarOnly` 布局仅显示头像、悬停经 ToolTip 显示名称。两种布局点击都会弹出**与控件等宽**的菜单：菜单项可在 XAML 中直接编写（作为控件的 `Items`），也可经 `ItemsSource` 绑定一个列表（项外观用 `ItemTemplate` 定制）；菜单经 `Popup` 悬浮，默认向上展开（适合侧栏 / 标题栏底部，`MenuPlacement` 可换），点菜单外部或再次点击收起；`AutoCloseOnMenuClick="True"`（默认）时点击菜单内的按钮项自动收起。菜单在**鼠标抬起**时弹出（按下阶段开 Popup 会与点击手势冲突）。设置按钮点击冒泡 `SettingsClick` 路由事件；`AvatarOnly` 布局指定宽度时头像居中显示。**数据项容器**：经 `ItemsSource` 绑定的字符串 / 模型项自动包装为整行 `Button`（全宽左对齐、悬停纱色，可用 `ItemContainerStyle` 覆盖），点击冒泡 `ButtonBase.Click`（同时触发自动收起，宿主可在 InfoBar 上经 `OriginalSource.DataContext` 区分菜单项）；XAML 中直接编写的元素（`jv:Button`、分隔线等）按原样使用、不再包装。
+
+| 属性 | 默认值 | 效果 |
+| --- | --- | --- |
+| `UserName` | `null` | 用户名称；Text 布局显示、AvatarOnly 布局进 ToolTip，并决定字标首字符（属性不叫 `Name`——与 `FrameworkElement.Name` 冲突，XAML 里会被当成元素名） |
+| `AvatarSource` | `null` | 头像图片（圆形裁切）；为 `null` 时显示首字符字标 |
+| `DisplayMode` | `Text` | `Text`（头像 + 名称 + 设置按钮）/ `AvatarOnly`（仅头像） |
+| `ShowSettingsButton` | `true` | 是否显示设置按钮（Text 布局），点击冒泡 `SettingsClick` |
+| `IsMenuOpen` | `false` | 菜单是否展开（可双向绑定驱动）；点菜单外部收起时自动写回 `false` |
+| `MenuPlacement` | `Top` | 菜单弹出方位（`PlacementMode`） |
+| `AutoCloseOnMenuClick` | `true` | 点击菜单内的按钮项（Click 冒泡到菜单宿主）时自动收起菜单 |
+| `Items` / `ItemsSource` / `ItemTemplate` | — | 继承自 `ItemsControl`：菜单项 XAML 编写或列表绑定 |
+| `MenuContent` | `null` | 弹层改为任意面板内容（`ListBox`、`UserControl`、复杂布局均可），设置后替代菜单项列表；内容与 InfoBar 共享 `DataContext` |
+| `MenuWidth` | `NaN` | 弹层宽度；`NaN` 时与控件等宽，设置后覆盖等宽约束 |
+| `MenuMaxHeight` | `NaN` | 弹层最大高度；列表项较多时建议设置，避免超出屏幕 |
+
+```xml
+<jv:InfoBar
+    Width="280"
+    UserName="xuhill07"
+    AutoCloseOnMenuClick="True"
+    SettingsClick="OnInfoBarSettingsClick">
+    <jv:Button Content="&#xE60F; 应用设置" HorizontalContentAlignment="Left"
+               Style="{StaticResource NoBorderButtonStyle}" />
+    <jv:Button Content="&#xE639; 退出登录" HorizontalContentAlignment="Left"
+               Style="{StaticResource NoBorderButtonStyle}" />
+</jv:InfoBar>
+
+<!-- 绑定列表 + 图片头像 + 仅头像布局 -->
+<jv:InfoBar
+    Width="280"
+    DisplayMode="AvatarOnly"
+    UserName="xuhill07"
+    AvatarSource="pack://application:,,,/Junevy.Controls;component/Resources/Pictures/Author.png"
+    ItemsSource="{Binding MenuItems}"
+    ItemTemplate="{StaticResource InfoBarMenuItemTemplate}" />
+
+<!-- 面板模式:MenuContent 放任意内容(复杂布局 / UserControl 皆可) -->
+<jv:InfoBar Width="280" UserName="操作面板" MenuWidth="360" MenuMaxHeight="240">
+    <jv:InfoBar.MenuContent>
+        <StackPanel>
+            <TextBlock Margin="8,8,8,4" FontWeight="Bold" Text="快捷操作" />
+            <ListBox BorderThickness="0" ItemsSource="{Binding Tasks}" />
+        </StackPanel>
+    </jv:InfoBar.MenuContent>
+</jv:InfoBar>
+```
+
+面板内容与 InfoBar 共享 `DataContext`，内部按钮点击冒泡 `ButtonBase.Click`（`AutoCloseOnMenuClick=true` 时自动收起菜单）。`AppBar Mode="Expandable"` 的抽屉（`Drawer` 属性）本就接受任意面板内容，两者一致。
 
 ## 布局控件
 

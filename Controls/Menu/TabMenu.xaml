@@ -31,7 +31,7 @@
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="TextElement.FontSize" Value="12" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
@@ -128,12 +128,14 @@
                         <!--  触发器后声明者优先：IsSelected需覆盖IsMouseOver，
                               避免悬停选中页签时背景偏离内容区背景色  -->
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                            <Setter TargetName="border" Property="Background" Value="{Binding ItemHoverBackground, RelativeSource={RelativeSource AncestorType=local:TabMenu}}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
                             <!--  背景与内容区一致、去掉底边框，使选中页签与内容区视觉一体  -->
-                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.Background.App}" />
+                            <Setter TargetName="border" Property="Background" Value="{Binding SelectedItemBackground, RelativeSource={RelativeSource AncestorType=local:TabMenu}}" />
                             <Setter TargetName="border" Property="BorderThickness" Value="1,1,1,0" />
+                            <!--  选中页签文字升为一级  -->
+                            <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
                         </Trigger>
                         <Trigger Property="IsEditing" Value="True">
                             <Setter TargetName="PART_HeaderPresenter" Property="Visibility" Value="Collapsed" />
@@ -151,8 +153,10 @@
 
     <!--  2. TabControl 的完整样式  -->
     <Style TargetType="{x:Type local:TabMenu}">
+        <Setter Property="ItemHoverBackground" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+        <Setter Property="SelectedItemBackground" Value="{DynamicResource Theme.Brush.Background.App}" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Background.App}" />
         <Setter Property="HeaderCornerRadius" Value="{DynamicResource Theme.SmallCornerRadius}" />
         <Setter Property="ContentCornerRadius" Value="{DynamicResource Theme.LargeCornerRadius}" />

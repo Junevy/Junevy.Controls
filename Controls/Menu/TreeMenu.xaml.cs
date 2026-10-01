@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Junevy.Controls.Controls.Menu
 {
@@ -40,6 +41,24 @@ namespace Junevy.Controls.Controls.Menu
         }
         public static readonly DependencyProperty DisplayModeProperty =
             DependencyProperty.Register("DisplayMode", typeof(DisplayMode), typeof(TreeMenu), new PropertyMetadata(DisplayMode.Normal));
+
+        /// <summary>节点悬停背景画刷(默认 Surface.Hover;可自定义,模板触发器经 AncestorType 绑定)。</summary>
+        public Brush ItemHoverBackground
+        {
+            get { return (Brush)GetValue(ItemHoverBackgroundProperty); }
+            set { SetValue(ItemHoverBackgroundProperty, value); }
+        }
+        public static readonly DependencyProperty ItemHoverBackgroundProperty =
+            DependencyProperty.Register("ItemHoverBackground", typeof(Brush), typeof(TreeMenu), new PropertyMetadata(null));
+
+        /// <summary>选中节点背景画刷(默认 Surface.Sunken 中性灰;可自定义)。</summary>
+        public Brush SelectedItemBackground
+        {
+            get { return (Brush)GetValue(SelectedItemBackgroundProperty); }
+            set { SetValue(SelectedItemBackgroundProperty, value); }
+        }
+        public static readonly DependencyProperty SelectedItemBackgroundProperty =
+            DependencyProperty.Register("SelectedItemBackground", typeof(Brush), typeof(TreeMenu), new PropertyMetadata(null));
 
 
 

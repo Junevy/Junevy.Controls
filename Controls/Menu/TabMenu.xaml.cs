@@ -54,6 +54,24 @@ namespace Junevy.Controls.Controls.Menu
         public static readonly DependencyProperty IsClosableProperty =
             DependencyProperty.Register(nameof(IsClosable), typeof(bool), typeof(TabMenu), new PropertyMetadata(true));
 
+        /// <summary>页签悬停背景画刷(默认 Surface.Hover;可自定义,模板触发器经 AncestorType 绑定)。</summary>
+        public Brush ItemHoverBackground
+        {
+            get { return (Brush)GetValue(ItemHoverBackgroundProperty); }
+            set { SetValue(ItemHoverBackgroundProperty, value); }
+        }
+        public static readonly DependencyProperty ItemHoverBackgroundProperty =
+            DependencyProperty.Register("ItemHoverBackground", typeof(Brush), typeof(TabMenu), new PropertyMetadata(null));
+
+        /// <summary>选中页签背景画刷(默认 Background.App——选中页签与内容区视觉一体;可自定义)。</summary>
+        public Brush SelectedItemBackground
+        {
+            get { return (Brush)GetValue(SelectedItemBackgroundProperty); }
+            set { SetValue(SelectedItemBackgroundProperty, value); }
+        }
+        public static readonly DependencyProperty SelectedItemBackgroundProperty =
+            DependencyProperty.Register("SelectedItemBackground", typeof(Brush), typeof(TabMenu), new PropertyMetadata(null));
+
         /// <summary>
         /// 页签头圆角（模板只取其上两角与内容区衔接）。
         /// </summary>

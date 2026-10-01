@@ -339,7 +339,7 @@
                         IsHitTestVisible="False"
                         TextElement.FontFamily="{TemplateBinding atc:Icon.FontFamily}"
                         TextElement.FontSize="{TemplateBinding FontSize}"
-                        TextElement.Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        TextElement.Foreground="{DynamicResource Theme.Brush.Text.Tertiary}"
                         Visibility="Collapsed" />
 
                     <!--  清空按钮：显式 TextBlock 承载字形——图标字体默认行高的 ascent/descent 不对称，
@@ -527,7 +527,7 @@
         <Setter Property="MinHeight" Value="30" />
         <Setter Property="atc:Icon.FontFamily" Value="{StaticResource IconFont}" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Border.CornerRadius" Value="{DynamicResource Theme.ControlCornerRadius}" />

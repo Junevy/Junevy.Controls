@@ -19,7 +19,7 @@
         <Setter Property="Width" Value="40" />
         <Setter Property="Height" Value="32" />
         <Setter Property="Margin" Value="0" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
     </Style>
@@ -28,7 +28,7 @@
         x:Key="CloseCaptionButtonStyle"
         BasedOn="{StaticResource CaptionButtonStyle}"
         TargetType="{x:Type bt:Button}">
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type bt:Button}">
@@ -112,7 +112,7 @@
                 <!--  seperator  -->
                 <Border
                     Grid.Row="1"
-                    BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                    BorderBrush="{DynamicResource Theme.Brush.Border.Subtle}"
                     BorderThickness="1" />
 
                 <!--  tools bar  -->
@@ -215,12 +215,11 @@
             Background="{TemplateBinding Background}">
 
             <Grid.Resources>
-                <!--  Scoped to this template: the library never injects a global
-                      implicit Menu style.
+                <!--
+                    Scoped to this template: the library never injects a global
+                    implicit Menu style.
                 -->
-                <Style
-                    BasedOn="{StaticResource JunevyMenuBarStyle}"
-                    TargetType="{x:Type Menu}" />
+                <Style BasedOn="{StaticResource JunevyMenuBarStyle}" TargetType="{x:Type Menu}" />
             </Grid.Resources>
 
             <Grid.ColumnDefinitions>
@@ -325,10 +324,150 @@
         </Grid>
     </ControlTemplate>
 
+    <!--
+        可展开标题栏（Mode=Expandable）：抽屉开关（最左） + 居中标题 + 系统按钮（最右）。
+        标题跨三列真居中（不是"剩余空间居中"——左右两侧宽度不等时依然居中）；
+        拖动交由宿主 WindowChrome caption 区，标题层不做命中豁免，
+        因此在标题上按下即可拖动；抽屉开关与系统按钮所在的区域
+        WindowChrome.IsHitTestVisibleInChrome=True，点击不被 caption 吞掉。
+        抽屉为 Popup：从标题栏下缘向下展开悬浮于宿主内容之上（AppBar 是布局元素，
+        无法把展开区塞进宿主的行里，ExpanderPanel / SidePanel 均不适合在此复用），
+        点外部收起由 StaysOpen=False 的鼠标捕获保证；开关上的「收起后放行 Click」
+        由 AppBar 代码侧的时间窗守卫去抖，不会重复展开。
+    -->
+    <ControlTemplate x:Key="ExpandableAppBar" TargetType="{x:Type local:AppBar}">
+        <Grid Background="{TemplateBinding Background}">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <!--  标题：跨全部三列水平居中  -->
+            <ContentPresenter
+                Grid.ColumnSpan="3"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                ContentSource="Content"
+                RecognizesAccessKey="True"
+                TextElement.FontSize="{TemplateBinding FontSize}"
+                TextElement.Foreground="{TemplateBinding Foreground}" />
+
+            <!--  抽屉开关（最左侧）：无 Drawer 内容时隐藏  -->
+            <bt:Button
+                x:Name="PART_DrawerToggle"
+                Grid.Column="0"
+                Width="40"
+                Height="32"
+                Margin="2,0,0,0"
+                VerticalAlignment="Center"
+                Content="{TemplateBinding DrawerToggleIcon}"
+                FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
+                FontSize="18"
+                Style="{StaticResource NoBorderButtonStyle}"
+                ToolTip="Menu"
+                Visibility="{TemplateBinding Drawer,
+                                             Converter={StaticResource NullToVisibility}}"
+                WindowChrome.IsHitTestVisibleInChrome="True" />
+
+            <!--  系统按钮（最右侧）：与 DefaultAppBar 相同的 SystemCommands 三件套  -->
+            <Grid Grid.Column="2" WindowChrome.IsHitTestVisibleInChrome="True">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <bt:Button
+                    Grid.Column="0"
+                    Command="{x:Static SystemCommands.MinimizeWindowCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    Content="&#xe60e;"
+                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
+                    FontSize="18"
+                    Style="{StaticResource CaptionButtonStyle}"
+                    ToolTip="Minimize"
+                    WindowChrome.IsHitTestVisibleInChrome="True" />
+                <bt:Button
+                    Grid.Column="1"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
+                    FontSize="18"
+                    WindowChrome.IsHitTestVisibleInChrome="True">
+                    <bt:Button.Style>
+                        <Style BasedOn="{StaticResource CaptionButtonStyle}" TargetType="{x:Type bt:Button}">
+                            <Setter Property="Content" Value="&#xe691;" />
+                            <Setter Property="Command" Value="{x:Static SystemCommands.MaximizeWindowCommand}" />
+                            <Setter Property="ToolTip" Value="Maximize" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                                    <Setter Property="Content" Value="&#xe772;" />
+                                    <Setter Property="Command" Value="{x:Static SystemCommands.RestoreWindowCommand}" />
+                                    <Setter Property="ToolTip" Value="Restore" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </bt:Button.Style>
+                </bt:Button>
+                <bt:Button
+                    Grid.Column="2"
+                    Command="{x:Static SystemCommands.CloseWindowCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    Content="&#xe639;"
+                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
+                    FontSize="18"
+                    Style="{StaticResource CloseCaptionButtonStyle}"
+                    ToolTip="Close"
+                    WindowChrome.IsHitTestVisibleInChrome="True" />
+            </Grid>
+
+            <!--
+                抽屉：标题栏下方向下展开的浮层，尺寸由内容决定；
+                IsOpen 双向绑定 IsDrawerOpen——StaysOpen=False 点外部自动关闭时同步写回
+            -->
+            <Popup
+                x:Name="PART_Popup"
+                AllowsTransparency="True"
+                Focusable="False"
+                IsOpen="{Binding IsDrawerOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                Placement="Bottom"
+                PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                PopupAnimation="Slide"
+                StaysOpen="False">
+                <Border
+                    x:Name="PART_DrawerHost"
+                    MinWidth="180"
+                    Margin="0,2,10,10"
+                    Background="{DynamicResource Theme.Brush.Surface.Base}"
+                    BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                    BorderThickness="1"
+                    CornerRadius="{DynamicResource Theme.ControlCornerRadius}"
+                    Effect="{DynamicResource Theme.PopupShadow}">
+                    <ContentPresenter
+                        Margin="6"
+                        Content="{TemplateBinding Drawer}"
+                        TextElement.Foreground="{DynamicResource Theme.Brush.Text.Secondary}" />
+                </Border>
+            </Popup>
+        </Grid>
+    </ControlTemplate>
+
     <Style TargetType="{x:Type local:AppBar}">
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template" Value="{StaticResource DefaultAppBar}" />
         <Setter Property="atc:Icon.FontFamily" Value="{StaticResource IconFont}" />
+        <Style.Triggers>
+            <Trigger Property="Mode" Value="MenuBar">
+                <Setter Property="Template" Value="{StaticResource MenuBarAppBar}" />
+            </Trigger>
+            <Trigger Property="Mode" Value="Expandable">
+                <Setter Property="Template" Value="{StaticResource ExpandableAppBar}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>

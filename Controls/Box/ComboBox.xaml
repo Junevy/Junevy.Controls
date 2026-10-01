@@ -47,7 +47,7 @@
 
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
+                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
             </Trigger>
             <Trigger Property="IsSelected" Value="True">
                 <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource Theme.Brush.Accent.PrimarySubtle}" />
@@ -68,8 +68,8 @@
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Margin" Value="0,0,0,2" />
         <Setter Property="MinHeight" Value="30" />
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
-        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Background.App}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template" Value="{StaticResource DefaultComboBoxItemTemplate}" />
     </Style>
@@ -378,7 +378,7 @@
                         IsHitTestVisible="False"
                         TextElement.FontFamily="{TemplateBinding atc:Icon.FontFamily}"
                         TextElement.FontSize="{TemplateBinding FontSize}"
-                        TextElement.Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        TextElement.Foreground="{DynamicResource Theme.Brush.Text.Tertiary}"
                         Visibility="Collapsed" />
 
 
@@ -535,7 +535,7 @@
         <Setter Property="MinWidth" Value="50" />
         <Setter Property="Padding" Value="{DynamicResource Theme.ControlPadding}" />
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="1" />

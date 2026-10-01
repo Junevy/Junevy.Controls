@@ -14,7 +14,7 @@
     <!--  列标题样式：Sunken 表头、底部分隔线、悬停高亮与排序方向指示箭头  -->
     <Style x:Key="DefaultDataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="0,0,0,1" />
         <Setter Property="Padding" Value="12,8" />
@@ -119,7 +119,7 @@
     -->
     <Style x:Key="DefaultDataGridCellStyle" TargetType="DataGridCell">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Subtle}" />
         <Setter Property="BorderThickness" Value="0,0,0,1" />
         <Setter Property="Padding" Value="12,8" />
@@ -328,7 +328,7 @@
         <Setter Property="CellStyle" Value="{StaticResource DefaultDataGridCellStyle}" />
         <Setter Property="RowStyle" Value="{StaticResource DefaultDataGridRowStyle}" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="GridLinesVisibility" Value="None" />

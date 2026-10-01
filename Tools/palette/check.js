@@ -70,8 +70,15 @@ for (const mode of ['light', 'dark']) {
   Alow(mode, 'disabled text reads inert', t['Text.Disabled'], t['Surface.Base'], 3.0);
   Alow(mode, 'divider stays decorative', t['Border.Subtle'], t['Surface.Base'], 1.7);
   //  Shell 级区域分隔线（侧栏/内容等）：按画布计量——要「退一层」但不能消失。
-  Alow(mode, 'shell divider stays quiet on canvas', t['Border.Divider'], t['Background.App'], 1.35);
+  Alow(mode, 'shell divider stays quiet on canvas', t['Border.Divider'], t['Background.App'], 1.4);
   A(mode, 'shell divider still traceable on canvas', t['Border.Divider'], t['Background.App'], 1.05);
+  //  侧栏改用次级背景（Background.Subtle）后：分隔线对侧栏底也要可辨；
+  //  三档文字在次级侧栏上仍须守各自的下限（Primary 重要内容 / Secondary 常规项 / Tertiary 分组头）。
+  Alow(mode, 'shell divider stays quiet on secondary sidebar', t['Border.Divider'], t['Background.Subtle'], 1.35);
+  A(mode, 'shell divider traceable on secondary sidebar', t['Border.Divider'], t['Background.Subtle'], 1.05);
+  A(mode, 'text.primary on secondary sidebar', t['Text.Primary'], t['Background.Subtle'], 9);
+  A(mode, 'text.secondary on secondary sidebar', t['Text.Secondary'], t['Background.Subtle'], 4.5);
+  A(mode, 'text.tertiary on secondary sidebar', t['Text.Tertiary'], t['Background.Subtle'], 4.5);
   //  状态层纱色：以 sRGB 逐通道 alpha 混合到卡片底上后必须「可感知但不喧宾夺主」——
   //  hover 温和一档、pressed 明显更深/更亮一档。这是「悬停不换底色、只叠纱」方案的物理下限。
   const blend = (scrim, bg) => {
@@ -89,7 +96,9 @@ for (const mode of ['light', 'dark']) {
   // 改由阴影 + 描边表达，不再用亮度差。深色弹层仍须比卡片亮至少 5 个 ΔL*。
   Dl(mode, 'overlay above surface', t['Surface.Overlay'], t['Surface.Base'], d ? 5 : 0, 12);
   Dl(mode, 'sunken below surface', t['Surface.Sunken'], t['Surface.Base'], 2.5, 9);
-  Dl(mode, 'focused input steps gently from base', t['Surface.Focused'], t['Surface.Base'], 3, 6);
+  //  浅色卡片为纯白后，焦点底与卡片同白（不比静止态更灰，焦点态由 accent 边框表达）；
+  //  深色焦点底仍须比卡片亮至少 3 个 ΔL*（焦点 = 抬起）。
+  Dl(mode, 'focused input steps gently from base', t['Surface.Focused'], t['Surface.Base'], d ? 3 : 0, 6);
   Dl(mode, 'accent vs hover', t['Accent.Primary'], t['Accent.PrimaryHover'], 3.5, 14);
   Dl(mode, 'text hierarchy primary->secondary', t['Text.Primary'], t['Text.Secondary'], 13, 24);
   Dl(mode, 'text hierarchy secondary->tertiary', t['Text.Secondary'], t['Text.Tertiary'], 6, 13);

@@ -282,7 +282,7 @@
     <Style x:Key="DefaultButtonStyle" TargetType="Button">
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="MinHeight" Value="10" />
         <Setter Property="MinWidth" Value="10" />
         <Setter Property="HorizontalAlignment" Value="Left" />

@@ -100,7 +100,7 @@
 
 
     <Style x:Key="DefaultCheckBoxStyle" TargetType="CheckBox">
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
@@ -108,7 +108,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template" Value="{StaticResource DefaultCheckBoxTemplate}" />
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
     </Style>
 
     <!--  隐式样式（官方类型）：App 合并字典后 <CheckBox> 自动生效  -->

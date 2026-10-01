@@ -109,7 +109,11 @@
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <!--  菜单项文字默认次级（常规导航项),选中项由触发器升为一级——对应
+              「标题=一级 / 常规项=次级 / 分组头=三级」的三档文字层级  -->
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
+        <Setter Property="ItemHoverBackground" Value="{DynamicResource Theme.Brush.Surface.Base}" />
+        <Setter Property="SelectedItemBackground" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="1" />
@@ -178,12 +182,14 @@
 
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                                        <Setter TargetName="Root" Property="Background" Value="{Binding ItemHoverBackground, RelativeSource={RelativeSource AncestorType=local:SideMenu}}" />
                                     </Trigger>
 
+                                    <!--  选中背景经 ItemHoverBackground/SelectedItemBackground 可自定义;
+                                          不再有选中阴影(Effect 已移除)  -->
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Selected}" />
-                                        <Setter TargetName="Root" Property="Effect" Value="{DynamicResource Theme.SideMenuItemShadow}" />
+                                        <Setter TargetName="Root" Property="Background" Value="{Binding SelectedItemBackground, RelativeSource={RelativeSource AncestorType=local:SideMenu}}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
                                     </Trigger>
 
                                     <Trigger Property="IsEnabled" Value="False">
