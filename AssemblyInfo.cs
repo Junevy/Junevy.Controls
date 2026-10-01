@@ -5,6 +5,7 @@ using System.Windows.Markup;
 [assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.Bar")]
 [assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.Button")]
 [assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.Text")]
+[assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.CodeEditor")]
 [assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.Box")]
 [assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.DataGrid")]
 [assembly: XmlnsDefinition("github.com.junevy", "Junevy.Controls.Controls.Image")]

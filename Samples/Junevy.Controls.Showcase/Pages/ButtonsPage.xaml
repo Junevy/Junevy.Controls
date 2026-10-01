@@ -85,7 +85,7 @@
 
                 <demo:DemoSection
                     Title="jv:CardButton（指标卡 / 快捷入口）"
-                    Description="MainColor 决定卡片主题色与状态色，atc:Icon.Icon 提供右上角图标字体字符；可承载点击导航（保留 WPF Button 基类行为）。"
+                    Description="MainColor 决定卡片主题色与状态色，atc:Icon.Icon 提供右下角图标字体字符；可承载点击导航（保留 WPF Button 基类行为）。"
                     XamlCode="{x:Static sample:ShowcaseSnippets.CardButtonDemo}">
                     <WrapPanel>
                         <jv:CardButton

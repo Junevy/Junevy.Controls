@@ -6,11 +6,11 @@
 		<LangVersion>14</LangVersion>
 		<UseWPF>true</UseWPF>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<DefaultItemExcludes>$(DefaultItemExcludes);Tests\**\*;Samples\**\*;Tools\DebugProbe\**\*</DefaultItemExcludes>
+		<DefaultItemExcludes>$(DefaultItemExcludes);Tests\**\*;Samples\**\*;Tools\DebugProbe\**\*;Companion\**\*</DefaultItemExcludes>
 
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>Junevy.Controls</PackageId>
-		<Version>1.14.0</Version>
+		<Version>2.1.1</Version>
 		<Authors>Junevy</Authors>
 		<Company>Junevy</Company>
 		<Description>Junevy WPF Controls</Description>
@@ -65,6 +65,11 @@
 		<Page Update="Themes\Generic.xaml">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Page>
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
 	</ItemGroup>
 
 </Project>

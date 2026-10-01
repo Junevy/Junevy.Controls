@@ -100,6 +100,10 @@
     <Style x:Key="TreeMenuItemContainerStyle" TargetType="TreeViewItem">
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="Transparent" />
+        <!--  条目前景跟随宿主 TreeMenu.Foreground（默认样式给宿主的是随主题的 Text.Secondary，宿主在
+              实例上覆盖时条目同步跟随）。系统 TreeViewItem 默认样式钉死恒黑 ControlTextBrush 且优先级
+              高于属性继承，必须显式设值才能盖过它；经 AncestorType 绑定宿主与模板触发器同一模式。  -->
+        <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=local:TreeMenu}}" />
         <Setter Property="atc:ExpanderBehavior.Enable" Value="True" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
@@ -149,7 +153,10 @@
                                 Grid.Column="1"
                                 Background="{TemplateBinding Background}"
                                 CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
-                                <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" />
+                                <ContentPresenter
+                                    ContentSource="Header"
+                                    RecognizesAccessKey="True"
+                                    TextElement.Foreground="{TemplateBinding Foreground}" />
                             </Border>
                         </Grid>
 
@@ -167,6 +174,7 @@
                             <Setter TargetName="Root" Property="Background" Value="{Binding SelectedItemBackground, RelativeSource={RelativeSource AncestorType=local:TreeMenu}}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
                             <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
                         </Trigger>
 

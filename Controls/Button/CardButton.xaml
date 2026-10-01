@@ -21,30 +21,26 @@
             x:Name="ContentBorder"
             MinWidth="{TemplateBinding MinWidth}"
             MinHeight="{TemplateBinding MinHeight}"
-            Padding="{TemplateBinding Padding}"
             Background="{TemplateBinding Background}"
             BorderBrush="{TemplateBinding BorderBrush}"
             BorderThickness="{TemplateBinding BorderThickness}"
             CornerRadius="{TemplateBinding Border.CornerRadius}"
-            Opacity="1"
             SnapsToDevicePixels="True">
-            <!--  外层无 Margin 网格：内容网格保持内缩，状态层纱色铺满整卡面  -->
             <Grid>
+                <!--  内容层：Padding 只内缩内容本身，不约束状态层  -->
+                <Border Padding="{TemplateBinding Padding}">
                     <Grid Margin="{StaticResource Margin}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Grid Grid.Column="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="2*" />
                         </Grid.RowDefinitions>
 
-                        <!--  details  -->
+                        <!--  title  -->
                         <ContentControl
-                            Grid.Row="0"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -54,6 +50,7 @@
                             FontSize="{TemplateBinding FontSize}"
                             Foreground="{TemplateBinding Foreground}" />
 
+                        <!--  content  -->
                         <ContentControl
                             Grid.Row="1"
                             HorizontalAlignment="Left"
@@ -68,33 +65,25 @@
                             FontSize="{TemplateBinding FontSize,
                                                        Converter={StaticResource IncreaseFontSize}}"
                             Foreground="{TemplateBinding MainColor}" />
+
+                        <!--  icon：右下角，与数值同行右对齐  -->
+                        <ContentControl
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{Binding RelativeSource={RelativeSource AncestorType=local:CardButton}, Path=(atc:Icon.Icon)}"
+                            FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:CardButton}, Path=(atc:Icon.FontFamily)}"
+                            FontSize="{TemplateBinding FontSize,
+                                                       Converter={StaticResource IncreaseFontSize}}"
+                            Foreground="{TemplateBinding MainColor}"
+                            Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:CardButton}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
                     </Grid>
+                </Border>
 
-                    <!--  icon  -->
-                    <Grid Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="2*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <Grid Grid.Row="0">
-                            <ContentControl
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Center"
-                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                Content="{Binding RelativeSource={RelativeSource AncestorType=local:CardButton}, Path=(atc:Icon.Icon)}"
-                                FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:CardButton}, Path=(atc:Icon.FontFamily)}"
-                                FontSize="{TemplateBinding FontSize,
-                                                           Converter={StaticResource IncreaseFontSize}}"
-                                Foreground="{TemplateBinding MainColor}"
-                                Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:CardButton}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
-                        </Grid>
-
-                    </Grid>
-                    </Grid>
-
-                <!--  状态层：悬停/按压的纱色铺满整卡面（IsHitTestVisible=False 不挡点击）  -->
+                <!--  状态层：悬停/按压的纱色铺满整卡面（含 Padding 区域），IsHitTestVisible=False 不挡点击  -->
                 <Border
                     x:Name="StateLayer"
                     Background="Transparent"

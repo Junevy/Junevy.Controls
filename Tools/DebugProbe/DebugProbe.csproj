@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
+		<RootNamespace>DebugProbe</RootNamespace>
+		<Description>无窗口冒烟探针：离屏实例化控件、断言行为、渲染主题截图（主工程已通过 DefaultItemExcludes 排除本目录）</Description>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Junevy.Controls.csproj" />
+		<ProjectReference Include="..\..\Companion\Junevy.Controls.CodeCompletion\Junevy.Controls.CodeCompletion.csproj" />
+	</ItemGroup>
+
+</Project>

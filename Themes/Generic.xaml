@@ -31,6 +31,7 @@
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Box/ToolTip.xaml" />
 
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Text/Label.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/CodeEditor/CodeEditor.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/CardButton.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/DataGrid/DataGrid.xaml" />
 

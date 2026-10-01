@@ -72,7 +72,9 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
+        <!--  Item 前景跟随宿主 ListView.Foreground（默认样式给宿主的是随主题的 Text.Secondary，
+              宿主在实例上覆盖时条目同步跟随，撤销覆盖用 ClearValue）。  -->
+        <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}" />
         <Setter Property="Padding" Value="{DynamicResource Theme.ContentMargin}" />
         <Setter Property="Margin" Value="1" />
         <Setter Property="MinHeight" Value="32" />
@@ -255,7 +257,9 @@
 
     <Style x:Key="DefaultListViewStyle" TargetType="ListView">
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
-        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+        <!--  控件默认前景对齐「常规控件文字 = 次级」约定（与 ListBox 一致，原为 Text.Primary）：
+              Item 前景经 AncestorType 绑定宿主，此值即条目默认文字色（选中项仍由触发器升为一级）。  -->
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Border.CornerRadius" Value="{DynamicResource Theme.ControlCornerRadius}" />

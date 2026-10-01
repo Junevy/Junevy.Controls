@@ -8,7 +8,7 @@ Junevy.Controls 是一个面向 WPF 桌面应用的自定义控件库，提供�
 | --- | --- |
 | 目标框架 | `.NET 8 WPF (net8.0-windows)`、`.NET Framework 4.8 WPF (net48)` |
 | 平台 | Windows / WPF |
-| NuGet 依赖 | 控件库本身没有第三方包依赖 |
+| NuGet 依赖 | [`AvalonEdit`](https://www.nuget.org/packages/AvalonEdit)（`jv:CodeEditor` 专用，MIT，**零传递依赖**，net48/net8.0-windows 均覆盖）；其余无第三方包。可选伴生包 [`Junevy.Controls.CodeCompletion`](https://www.nuget.org/packages/Junevy.Controls.CodeCompletion)（CodeEditor 系统类 IntelliSense，按需引入 Roslyn 依赖链） |
 | WPF 程序集 | `PresentationFramework`、`PresentationCore`、`WindowsBase`；`net48` 还引用 `System.Xaml` |
 | 主题入口 | `/Junevy.Controls;component/Themes/Generic.xaml` |
 | 统一 XAML 命名空间 | `github.com.junevy` |
@@ -396,7 +396,7 @@ ThemeManager.ToggleTheme();
 | `Title` | 卡片左上方标题，类型为 `object` |
 | `Content` | 卡片主要内容或数值 |
 | `MainColor` | 主要内容和图标颜色 |
-| `atc:Icon.Icon` | 卡片右侧图标 |
+| `atc:Icon.Icon` | 卡片右下角图标 |
 | `atc:Icon.FontFamily` | 图标字体 |
 
 ```xml
@@ -594,7 +594,7 @@ ThemeManager.ToggleTheme();
 
 ### ListBox
 
-`jv:ListBox` 继承 WPF `ListBox`，提供统一的悬停、选中、焦点和禁用状态，并默认启用 UI 虚拟化和回收模式。项目既可按默认的竖向列表排列，也可通过 `Orientation` 切换为横向带状列表并沿水平方向滑动。选中项以主色强调（背景 `Surface.Selected`、描边 `Accent.Primary`），点击获得键盘焦点后描边仍保持主色；青色焦点环只出现在未选中的聚焦项上。
+`jv:ListBox` 继承 WPF `ListBox`，提供统一的悬停、选中、焦点和禁用状态，并默认启用 UI 虚拟化和回收模式。项目既可按默认的竖向列表排列，也可通过 `Orientation` 切换为横向带状列表并沿水平方向滑动。选中项以主色强调（背景 `Surface.Selected`、描边 `Accent.Primary`），点击获得键盘焦点后描边仍保持主色；青色焦点环只出现在未选中的聚焦项上。条目文字前景跟随控件 `Foreground`（默认为随主题切换的 `Text.Secondary`，选中项由触发器升为 `Text.Primary`、禁用态为 `State.DisabledForeground`）；在实例上设置 `Foreground` 会传导到所有条目，撤销覆盖用 `ClearValue(ForegroundProperty)`。
 
 | 属性 | 默认值 | 效果 |
 | --- | --- | --- |
@@ -636,7 +636,7 @@ ThemeManager.ToggleTheme();
 
 ### ListView
 
-`jv:ListView` 继承 WPF `ListView`，同时支持普通列表和标准 `GridView`。控件保留 WPF 的 `View` 管线，可以正常使用 `GridViewColumn.DisplayMemberBinding`、单元格模板和自定义 `ItemTemplate`。普通列表同样支持横向带状排列与水平滑动。选中项以主色强调（背景 `Surface.Selected`、描边 `Accent.Primary`），点击获得键盘焦点后描边仍保持主色；青色焦点环只出现在未选中的聚焦项上。
+`jv:ListView` 继承 WPF `ListView`，同时支持普通列表和标准 `GridView`。控件保留 WPF 的 `View` 管线，可以正常使用 `GridViewColumn.DisplayMemberBinding`、单元格模板和自定义 `ItemTemplate`。普通列表同样支持横向带状排列与水平滑动。选中项以主色强调（背景 `Surface.Selected`、描边 `Accent.Primary`），点击获得键盘焦点后描边仍保持主色；青色焦点环只出现在未选中的聚焦项上。条目文字前景跟随控件 `Foreground`（默认为随主题切换的 `Text.Secondary`，`GridView` 列单元格经行呈现器同样跟随；选中项由触发器升为 `Text.Primary`、禁用态为 `State.DisabledForeground`）；在实例上设置 `Foreground` 会传导到所有条目，撤销覆盖用 `ClearValue(ForegroundProperty)`。
 
 | 属性 | 默认值 | 效果 |
 | --- | --- | --- |
@@ -728,6 +728,49 @@ ThemeManager.ToggleTheme();
 ```
 
 依赖：标准 `Content`/`ContentTemplate` 管线和 `Text`、`TextAlignment`、`TextWrapping` 依赖属性，无专用附加属性。标题文本超宽时以省略号截断（`TextTrimming`），可通过对齐/内边距属性覆盖模板默认值。
+
+### CodeEditor
+
+`jv:CodeEditor` 是完全封装 AvalonEdit 的代码编辑器控件：公共 API 只暴露 Junevy 类型，高级场景（折叠管理、自定义背景渲染、补全窗等）经 `InnerEditor` 逃生口取内部 `TextEditor` 实例。语法高亮按 `SyntaxLanguage` 加载 AvalonEdit 内置规则的**私有副本**（不改动全局共享定义），命名颜色统一映射到 `Theme.Brush.*` 主题画刷——关键字 = 主色（Cobalt）、类型词/属性名/选择器 = 次色（Coating）、字符串/字符 = 成功绿、数字 = 危险红、注释 = 三级灰、预处理指令 = 次级灰，深浅主题切换即时生效。外观口径与 `TextBox` 一致（发丝线边框、控件圆角/内边距令牌、聚焦 accent 边框、只读底色下沉、禁用蒙层）；等宽字体默认 `Consolas, Courier New`，可按实例覆盖。
+
+```xml
+<jv:CodeEditor Height="320" SyntaxLanguage="CSharp" ShowLineNumbers="True" />
+```
+
+| 依赖属性 | 说明 | 默认值 |
+| --- | --- | --- |
+| `Text` | 编辑器文本，双向绑定（`PropertyChanged` 节奏）；外部设置时整体替换文档（光标回起点、撤销栈清空，与 AvalonEdit 语义一致） | `""` |
+| `SyntaxLanguage` | 语法高亮语言（`CodeLanguage` 枚举）：`None`/`CSharp`/`VisualBasic`/`Cpp`/`Java`/`JavaScript`/`Html`/`Css`/`Xml`/`Json`/`Sql`/`Python`/`Markdown`/`PowerShell`，运行时切换即时生效 | `None` |
+| `ShowLineNumbers` | 是否显示行号（行号与分隔点线跟随 `Theme.Brush.Text.Tertiary`） | `True` |
+| `IsReadOnly` | 只读态：内容不可编辑，底色下沉为 `Surface.Sunken` | `False` |
+| `WordWrap` | 自动换行（换行时隐藏水平滚动条） | `False` |
+| `CompletionProvider` | 补全提供者（`ICodeCompletionProvider`）：非空时启用补全——输入标识符字符/点号或 Ctrl+Space 弹出主题化补全弹窗；null 时关闭 | `null` |
+| `InnerEditor`（只读属性） | 逃生口：内部 AvalonEdit `TextEditor` 实例，模板应用前为 `null` | — |
+
+注意：属性名为 `SyntaxLanguage` 而非 `Language`——后者是 `FrameworkElement.Language`（xml:lang）的既有语义，刻意避开遮蔽。
+
+#### 代码补全
+
+核心库的补全是**挂载点设计**：`CodeEditor` 本身不带任何补全引擎，只提供 `ICodeCompletionProvider` 抽象（输入全文+光标 → 返回 `CodeCompletionItem` 列表）与主题化弹窗管线。宿主自行实现该接口即可接入任意引擎（关键词表、私有符号表、LSP 等），不挂载则零行为、零依赖：
+
+```csharp
+editor.CompletionProvider = new MyKeywordProvider(); // 任意 ICodeCompletionProvider 实现
+```
+
+**系统类 IntelliSense 用伴生包**（按需安装，会引入 Roslyn 依赖链——全链 34 包 / 约 40 MB 运行时程序集，不装则核心库保持仅 AvalonEdit 一个依赖）：
+
+```bash
+dotnet add package Junevy.Controls.CodeCompletion
+```
+
+```csharp
+var provider = new Junevy.Controls.CodeCompletion.RoslynCodeCompletionProvider();
+// 可选：追加宿主自有程序集/第三方库引用（须在首次补全前）
+// provider.AdditionalReferences.Add(MetadataReference.CreateFromFile(@"...\MyLib.dll"));
+editor.CompletionProvider = provider;
+```
+
+`RoslynCodeCompletionProvider` 引用 .NET 运行时目录中的基础类库（System.Console、System.Collections 等开箱即用，零额外包）；补全弹窗外观与主题画刷联动，深浅主题切换即时生效。已知限制：单文件发布形态不支持（MEF 需要按文件发现 Roslyn 程序集）；大文档逐键全量解析，超大文件建议配合只读或按需启用。
 
 ## 菜单与导航控件
 
@@ -877,6 +920,7 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
 - 单击选中节点；双击文件夹节点切换展开/收起，双击叶节点触发 `NavigateCommand`。
 - 键盘方向键沿用 WPF `TreeView` 原生行为：`↑`/`↓` 移动选择，`→`/`←` 展开/收起；`Enter` 激活叶节点或切换文件夹展开。
 - 悬停、选中、禁用三种视觉状态使用主题色区分，并作用于整行；长列表自动显示垂直滚动条。
+- 条目文字与图标的前景色跟随 `TreeMenu.Foreground`（默认为随主题切换的 `Text.Secondary`，禁用态使用 `State.DisabledForeground`）。系统 `TreeViewItem` 默认样式会把前景钉在恒黑的 `ControlTextBrush` 上（优先级高于属性继承），因此默认容器样式显式绑定宿主前景：在 `TreeMenu` 实例上设置 `Foreground` 会同步传导到所有层级的条目，撤销覆盖（`ClearValue`）后恢复主题色。
 - 根级与嵌套层级均使用 `VirtualizingStackPanel`（Recycling），整棵树参与虚拟化；`MaxWidth` 钳制使子级宽度不超过本级内容宽度，不会向上撑大控件。
 
 ### TabMenu 与 TabMenuItem

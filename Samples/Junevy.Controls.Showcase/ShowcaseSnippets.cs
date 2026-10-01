@@ -303,6 +303,14 @@ namespace Junevy.Controls.Showcase
             <jv:CheckBox Content="复选框 ToolTip" ToolTip="任意 FrameworkElement 的 ToolTip 属性" />
             """;
 
+        public const string CodeEditorDemo = """
+            <!-- 完全封装 AvalonEdit：公共 API 只暴露 Junevy 类型，高级场景经 InnerEditor 取内部实例。
+                 SyntaxLanguage 运行时可切换：CSharp/VisualBasic/Cpp/Java/JavaScript/Html/Css/
+                 Xml/Json/Sql/Python/Markdown/PowerShell；高亮取 AvalonEdit 内置规则私有副本，
+                 着色统一映射 Theme.Brush.*，点击右上角按钮切换主题即可验证。 -->
+            <jv:CodeEditor Height="320" SyntaxLanguage="CSharp" ShowLineNumbers="True" />
+            """;
+
         // ---------------- 通知（NotifyPage） ----------------
 
         public const string BadgeDemo = """

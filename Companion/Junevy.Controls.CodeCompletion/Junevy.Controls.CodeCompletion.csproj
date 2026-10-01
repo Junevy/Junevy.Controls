@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0-windows;net48</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<LangVersion>14</LangVersion>
+		<UseWPF>true</UseWPF>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>Junevy.Controls.CodeCompletion</PackageId>
+		<Version>2.1.1</Version>
+		<Authors>Junevy</Authors>
+		<Company>Junevy</Company>
+		<Description>Junevy.Controls CodeEditor 的 Roslyn 代码补全伴生包（系统类 IntelliSense）。按需引用：会引入 Microsoft.CodeAnalysis.CSharp.Features 依赖链（约 40 MB 运行时程序集）。</Description>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+		<Reference Include="System.Xaml" />
+		<Reference Include="WindowsBase" />
+		<Reference Include="PresentationCore" />
+		<Reference Include="PresentationFramework" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Junevy.Controls.csproj" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="5.9.0" />
+	</ItemGroup>
+
+</Project>

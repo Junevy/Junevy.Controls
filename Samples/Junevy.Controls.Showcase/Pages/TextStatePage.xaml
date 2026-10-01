@@ -98,6 +98,16 @@
                             ToolTip="任意 FrameworkElement 的 ToolTip 属性" />
                     </WrapPanel>
                 </demo:DemoSection>
+                <demo:DemoSection
+                    Title="jv:CodeEditor（代码编辑器）"
+                    Description="内部封装 AvalonEdit：SyntaxLanguage 运行时可切换，语法着色统一映射主题画刷（点右上角按钮切主题即可验证）；本页已挂关键词补全（输入如 ret / name 触发，Ctrl+Space 强制弹出），完整系统类 IntelliSense 见伴生包 Junevy.Controls.CodeCompletion。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.CodeEditorDemo}">
+                    <jv:CodeEditor
+                        x:Name="CodeEditorInstance"
+                        Height="320"
+                        SyntaxLanguage="CSharp"
+                        ShowLineNumbers="True" />
+                </demo:DemoSection>
 
             </StackPanel>
         </ScrollViewer>
