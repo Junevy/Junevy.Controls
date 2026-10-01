@@ -66,42 +66,42 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | 兼容色值 | `Theme.Color.Text.Primary` … | 旧接口遗留的镜像层，与 `Palette.*` 同值；新代码用 `Theme.Brush.*` |
 | 角色画刷 | `Theme.Brush.Text.Primary` … | 控件模板与宿主应用**唯一**该绑的一层 |
 
-`Step` 数字不是权重，而是 CIE **L\***（感知亮度）：同一族里相邻 step 的色差在人类视觉上大致均匀，浅色族 `Chalk` 从 `0`（`#FFFFFF`）走到 `800`（`#24282E`），深色族 `Slate` 方向相反。两套主题共用同一条中性线（色相仍恒定在 210°–215°，但彩度封顶 C\*≤7，实测峰值 6.5），只是各自从线的两端往里读——切换主题时画面不会换一个色相说话。**灰就是灰**：蓝只由 `Cobalt` / `Coating` 两个色族承担，纸面与墨面本身不再泛蓝。
+`Step` 数字不是权重，而是 CIE **L\***（感知亮度）：同一族里相邻 step 的色差在人类视觉上大致均匀，浅色族 `Chalk` 从 `0`（`#FFFFFF`）走到 `800`（`#24282E`），深色族 `Slate` 方向相反（1.14.0 手调后深色各阶按用途排布：`Slate.30` 承接深色画布，`Slate.50` 是悬停/按下/凹陷的统一台阶，不追求全族单调）。两套主题共用同一条中性线（色相仍恒定在 210°–215°，但彩度封顶 C\*≤7，实测峰值 6.5），只是各自从线的两端往里读——切换主题时画面不会换一个色相说话。**灰就是灰**：蓝只由 `Cobalt` / `Coating` 两个色族承担，纸面与墨面本身不再泛蓝。
 
 设计取向：
 
-- **浅色适合阅读**：阅读面（卡片 `Surface.Base`）是纯白 `#FFFFFF`——1.10.0 曾把卡片封在 `#FBFCFD`、被反馈「整体太灰」，现改为白卡片 + 画布 `#F1F3F5`（Y≈0.894）衬托的经典阅读结构，正文对比 14.8:1；弹层不再比卡片亮，层级改由阴影与描边表达。**侧栏用次级背景**（`Background.Subtle` `#EBEDEF`，比主画布深 ΔL* 2.1）：「次级在左、主背景在右」的区域层级，参考主流工具类应用的侧栏观感；悬停色随次级背景深化从 Chalk.75 迁到 Chalk.50。
-- **深色不累眼**：正文 L\* 约 89 而非 93+（对深色画布 13.3:1、对卡片 12.1:1，读数舒适但不发光）；层级（贴平 / 卡片 / 弹层）靠表面 L\* 台阶表达，因此边框被刻意压低。
-- **边框分四级，静止态「若有若无」**：`Border.Default` 是发丝线（浅色 2.03:1、深色 1.79:1），只勾一层控件轮廓；`Border.Subtle` 更淡（浅色 1.35:1、深色 1.38:1）做纯装饰分隔线；`Border.Divider` 是 **Shell 级区域分隔线**——侧栏 / 内容区这种「分区而非控件」的界线（浅色对画布 1.22:1、深色 1.37:1，对次级侧栏底 1.15:1 / 1.11:1）；侧栏铺次级背景后，分隔线对两侧仍保持可辨。需要被清楚看见的状态才升到 3:1 以上——悬停与勾选框 / 开关描边用 `Border.Strong`（浅色 5.07:1、深色 3.19:1），焦点环用 `Border.Focus`。WCAG 1.4.11 的 3:1 由「可交互态」满足，静止发丝线不承诺。
+- **浅色适合阅读**：阅读面（卡片 `Surface.Base`）是纯白 `#FFFFFF`——1.10.0 曾把卡片封在 `#FBFCFD`、被反馈「整体太灰」，现改为白卡片，正文对比 14.8:1；1.14.0 手调后画布（`Background.App`）同为纯白，「白卡浮于灰画布」的亮度衬托不再存在，层级全交给阴影与描边表达。**侧栏用次级背景**（`Background.Subtle` `#EBEDEF`，比画布深 ΔL\* 2.1）：「次级在左、主背景在右」的区域层级，参考主流工具类应用的侧栏观感；悬停色为 Chalk.50（`#F6F6F6`，比白卡深约 3 个 ΔL\*）。
+- **深色不累眼**：正文 L\* 约 89 而非 93+（对深色画布 `#232323` 与卡片 `#1F2226` 均约 11.9:1，读数舒适但不发光）；1.14.0 手调后中性线整体去蓝改纯灰，悬停/按下/凹陷统一落在 `Slate.50`（`#2F2F2F`，比卡片亮约 6 个 ΔL\*），边框被刻意压低。
+- **边框分四级，静止态「若有若无」**：`Border.Default` 是发丝线（浅色 2.03:1、深色 1.79:1），只勾一层控件轮廓；`Border.Subtle` 更淡（浅色 1.35:1、深色 1.15:1）做纯装饰分隔线；`Border.Divider` 是 **Shell 级区域分隔线**——侧栏 / 内容区这种「分区而非控件」的界线（浅色对画布 1.35:1、深色 1.13:1，对次级侧栏底 1.15:1 / 1.04:1）；侧栏铺次级背景后，分隔线对两侧仍保持可辨。需要被清楚看见的状态才升到 3:1 以上——悬停与勾选框 / 开关描边用 `Border.Strong`（浅色 5.07:1、深色 3.19:1），焦点环用 `Border.Focus`。WCAG 1.4.11 的 3:1 由「可交互态」满足，静止发丝线不承诺。
 - **两条蓝各司其职**：`Cobalt` 只做主操作（`Accent.Primary`）；`Coating`（镜片镀膜的青）只做信息与焦点环（`Status.Info` / `Border.Focus` / `Accent.Secondary`）。旧方案里 `Info` 与 `Accent` 是同一个蓝，读不出「这是状态还是这是按钮」。
-- **状态色不带复古感**：`Danger` 由砖红 `#A82828`（L\* 37.8）抬亮为朱红 `#BE3E2B`（L\* 45），`Success` 由橄榄 `#157A46` 改为 `#057E42`；`Warning` 独立成 `Palette.Yellow` 一族（Lab 色相角 97–102°，实测浅色 92° / 深色 94°），深色 `#E2C600` 压得住近黑墨字 11.57:1、拆出来当无边框前景对画布也有 10.35:1。抬亮之后仍同时满足「色块压得住文字」与「拆出来当无边框前景读得动」两端（见下文双重职责）。
-- **浅色警告是唯一放行项**：真黄做不到 AA——黄色方向上想守住 4.5:1 就得压到 L\*≤52，而那个亮度的 sRGB 黄已经是橄榄／土褐（上一轮的琥珀 `#A85C07`，色相角 64°，即被否掉的「棕色感」）。所以浅色 `Warning` 停在 `#A08700`（L\* 56.9，对卡片 3.52:1、色块上白字 3.52:1），只达 AA-Large。这条例外在 `check.js` 与 `emit.js` 里各写成一条显式的浅色下限（3.3 / 3.2 / 3.4），深色仍走 4.5 的标准线，不是漏网。
+- **状态色不带复古感**：`Danger` 由砖红 `#A82828`（L\* 37.8）抬亮为朱红 `#BE3E2B`（L\* 45），`Success` 由橄榄 `#157A46` 改为 `#057E42`；`Warning` 独立成 `Palette.Yellow` 一族（Lab 色相角 97–102°），深色 `#E2C600` 压得住深灰墨字约 9.2:1、拆出来当无边框前景对画布也是 9.2:1。
+- **浅色警告随真黄放宽（1.14.0 手调）**：1.13.0 时代浅色 `Warning` 停在琥珀 `#A08700`（AA-Large，3.5:1）；手调后两主题统一为真黄 `#E2C600`，白卡上对比度只有约 1.7:1——对比度不再是这一档的目标，`check.js` / `emit.js` 的浅色下限已按实测值锚定（若要恢复 AA-Large，把 spec.js 的 `Status.Warning` 改回 `Yellow.600` 并同步守卫）。因此浅色警告色块上**不要**放白字或深灰小字，优先「淡底 + 深色前景」（`Status.WarningSubtle` + `Text.Primary`）。
 
 ### 角色令牌全表
 
 | 角色令牌 | 浅色 | 深色 | 用途 |
 | --- | --- | --- | --- |
-| `Theme.Brush.Background.App` | `#F1F3F5` | `#16191C` | 应用 / 页面画布 |
-| `Theme.Brush.Background.Subtle` | `#EBEDEF` | `#272B30` | 次级背景：侧栏这类「次要区域」的底色（比主画布深 ΔL* 2.1，主背景在其右侧读起来更白） |
-| `Theme.Brush.Background.Second` | `#E3E6EA` | `#111215` | 再深一档画布 |
+| `Theme.Brush.Background.App` | `#FFFFFF` | `#232323` | 应用 / 页面画布（1.14.0 手调：浅色与卡片同白、深色由带蓝的 `#16191C` 提亮为纯灰，层级全交给描边与阴影） |
+| `Theme.Brush.Background.Subtle` | `#EBEDEF` | `#2F2F2F` | 次级背景：侧栏这类「次要区域」的底色（浅色比画布深 ΔL* 2.1，深色比画布亮约 ΔL* 6，保持「侧栏 / 内容」两区域可辨） |
+| `Theme.Brush.Background.Second` | `#F6F6F6` | `#1D1D1D` | 再深一档画布 |
 | `Theme.Brush.Background.Third` | `#DADEE2` | `#454A51` | 最深一档画布 |
 | `Theme.Brush.Surface.Base` | `#FFFFFF` | `#1F2226` | 卡片、面板基础表面（浅色为纯白阅读面） |
-| `Theme.Brush.Surface.Raised` | `#FFFFFF` | `#35393F` | 抬升表面（弹层、浮起卡片） |
-| `Theme.Brush.Surface.Sunken` | `#E3E6EA` | `#111215` | 内陷表面（只读输入区、代码块、进度槽） |
-| `Theme.Brush.Surface.Focused` | `#FFFFFF` | `#272B30` | 输入框获得焦点时的底色：浅色与纯白卡片同白（焦点态由 accent 边框表达，不比静止态更灰），深色仍抬亮一档 |
-| `Theme.Brush.Surface.Overlay` | `#FFFFFF` | `#35393F` | 覆盖层（对话框、下拉；浅色与卡片同白，靠阴影 + 描边分层） |
-| `Theme.Brush.Surface.Hover` | `#F1F3F5` | `#272B30` | 悬停（随次级背景深化迁至 Chalk.50，白卡上 ΔL* 4.25 守在悬停区间内） |
-| `Theme.Brush.Surface.Pressed` | `#E3E6EA` | `#2F3238` | 按下 |
+| `Theme.Brush.Surface.Raised` | `#FFFFFF` | `#2C2C2C` | 抬升表面（弹层、浮起卡片） |
+| `Theme.Brush.Surface.Sunken` | `#E9EAEA` | `#2F2F2F` | 内陷表面（只读输入区、代码块、进度槽） |
+| `Theme.Brush.Surface.Focused` | `#FFFFFF` | `#232323` | 输入框获得焦点时的底色：两主题都与卡片同阶（焦点态由 accent 边框表达，不比静止态更灰） |
+| `Theme.Brush.Surface.Overlay` | `#FFFFFF` | `#2F2F2F` | 覆盖层（对话框、下拉；浅色与卡片同白靠阴影分层，深色比卡片亮一档） |
+| `Theme.Brush.Surface.Hover` | `#F6F6F6` | `#2F2F2F` | 悬停（浅色比白卡深约 ΔL* 3，深色比卡片亮约 ΔL* 6） |
+| `Theme.Brush.Surface.Pressed` | `#E9EAEA` | `#2F2F2F` | 按下（深色与悬停同阶） |
 | `Theme.Brush.Surface.Selected` | `#DCEBFD` | `#16304D` | 选中 |
 | `Theme.Brush.Text.Primary` | `#24282E` | `#DDE0E5` | 正文 |
 | `Theme.Brush.Text.Secondary` | `#494F57` | `#AAB0B8` | 次级文字 |
 | `Theme.Brush.Text.Tertiary` | `#60666E` | `#969BA4` | 三级文字（说明、占位） |
 | `Theme.Brush.Text.Disabled` | `#B0B7BE` | `#454A51` | 禁用文字 |
-| `Theme.Brush.Text.Inverse` | `#FFFFFF` | `#070B10` | 反色表面上的文字 |
-| `Theme.Brush.Text.OnAccent` | `#FFFFFF` | `#070B10` | 主色 / 状态色块上的文字 |
+| `Theme.Brush.Text.Inverse` | `#FFFFFF` | `#232323` | 反色表面上的文字 |
+| `Theme.Brush.Text.OnAccent` | `#FFFFFF` | `#232323` | 主色 / 状态色块上的文字 |
 | `Theme.Brush.Border.Default` | `#B0B7BE` | `#454A51` | 控件静止边框：发丝线（浅色 2.03:1 / 深色 1.79:1），只要勾出轮廓 |
-| `Theme.Brush.Border.Subtle` | `#DADEE2` | `#35393F` | 分隔线（装饰性，刻意压得很淡） |
-| `Theme.Brush.Border.Divider` | `#DADEE2` | `#2F3238` | Shell 级区域分隔线（侧栏 / 内容区等分区界线；侧栏铺次级背景后，对两侧 1.1–1.2:1） |
+| `Theme.Brush.Border.Subtle` | `#DADEE2` | `#2C2C2C` | 分隔线（装饰性，刻意压得很淡） |
+| `Theme.Brush.Border.Divider` | `#DADEE2` | `#2C2C2C` | Shell 级区域分隔线（侧栏 / 内容区等分区界线；侧栏铺次级背景后，对两侧 1.15:1 / 1.04:1） |
 | `Theme.Brush.Border.Strong` | `#686F79` | `#697078` | 强调边框：悬停描边、勾选框 / 开关描边（≥3:1，满足非文本对比） |
 | `Theme.Brush.Border.Focus` | `#00768D` | `#74CBDC` | 焦点环 |
 | `Theme.Brush.Accent.Primary` | `#1F5FC4` | `#4E90E8` | 主操作 |
@@ -115,14 +115,14 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `Theme.Brush.Status.Success` | `#057E42` | `#58C278` | 成功 |
 | `Theme.Brush.Status.SuccessHover` | `#126A39` | `#6DD38C` | 成功悬停 |
 | `Theme.Brush.Status.SuccessSubtle` | `#E7F8EB` | `#173823` | 成功淡底 |
-| `Theme.Brush.Status.Warning` | `#A08700` | `#E2C600` | 警告 |
-| `Theme.Brush.Status.WarningHover` | `#947A00` | `#EDD600` | 警告悬停 |
+| `Theme.Brush.Status.Warning` | `#E2C600` | `#E2C600` | 警告（1.14.0 手调：两主题统一真黄） |
+| `Theme.Brush.Status.WarningHover` | `#EDD600` | `#EDD600` | 警告悬停 |
 | `Theme.Brush.Status.WarningSubtle` | `#FFF6C4` | `#3E3503` | 警告淡底 |
 | `Theme.Brush.Status.Danger` | `#BE3E2B` | `#E77465` | 危险 |
 | `Theme.Brush.Status.DangerHover` | `#99352C` | `#F88E81` | 危险悬停 |
 | `Theme.Brush.Status.DangerSubtle` | `#FFF0EE` | `#48201D` | 危险淡底 |
-| `Theme.Brush.State.DisabledSurface` | `#E3E6EA` | `#1F2226` | 禁用底 |
-| `Theme.Brush.State.DisabledBorder` | `#DADEE2` | `#2F3238` | 禁用边框 |
+| `Theme.Brush.State.DisabledSurface` | `#E9EAEA` | `#1F2226` | 禁用底 |
+| `Theme.Brush.State.DisabledBorder` | `#DADEE2` | `#2C2C2C` | 禁用边框 |
 | `Theme.Brush.State.DisabledForeground` | `#B0B7BE` | `#454A51` | 禁用前景 |
 | `Theme.Brush.State.DisabledVeil` | `#A0FFFFFF` | `#A0111215` | 禁用蒙层（半透明，盖在日历 / 日期弹层上：浅色洗淡、深色压暗） |
 | `Theme.Brush.State.HoverScrim` | `#14070B10` | `#14FFFFFF` | 状态层纱色：悬停反馈（8% 墨 / 8% 白，叠在任意底色上，色相不变） |
@@ -130,16 +130,16 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `Theme.Brush.ScrollBar.Thumb` | `#B0B7BE` | `#454A51` | 滚动条滑块 |
 | `Theme.Brush.ScrollBar.ThumbHover` | `#8C939C` | `#697078` | 滚动条滑块悬停 |
 | `Theme.Brush.TransparentBackground.Base` | `#FFFFFF` | `#1F2226` | 棋盘格浅格 |
-| `Theme.Brush.TransparentBackground.Alt` | `#DADEE2` | `#111215` | 棋盘格深格 |
+| `Theme.Brush.TransparentBackground.Alt` | `#DADEE2` | `#1D1D1D` | 棋盘格深格 |
 | `Theme.Brush.Status.Disable` | `#B0B7BE` | `#697078` | 停用态前景（旧库仅浅色有，两主题已补齐） |
 | `Theme.Brush.Effect.Shadow` | `#26070B10` | `#B3070B10` | 投影载体色（ARGB） |
 | `Theme.Brush.Overlay.Backdrop` | `#99070B10` | `#B3070B10` | 遮罩 / 半透明背板 |
 
 以下四项容易被误用，特别注意：
 
-- **Text.OnAccent 在深色下是墨色不是白色**：深色强调色本身已经够亮，白字压上去只有 3.24:1（危险色上 2.96:1，警告 / 成功 / 信息色上更低，1.71–2.23:1），换成近黑墨色后是 6.09:1 / 6.66:1（状态色块 6.66–11.57:1）。`Status.*` 色块上的文字同样走这个键，不要写死 `#FFFFFF`。
-- **Text.Inverse** 指「反色表面」上的文字（整体取反的选中条、徽标底等），浅色为白、深色为近黑。当前与 `Text.OnAccent` 同值，但语义不同，不要互换。
-- **Status.* 有双重职责**：既当色块底（配 `Text.OnAccent`），也当无边框模式（`Label.DisplayMode`、AppBar 徽标等）的前景。取值必须同时满足「字压得住底」和「底/字在纸上够分量」两端——`Tools/palette/check.js` 对此有硬断言，不满足时 `emit.js` 直接拒绝生成 XAML。唯一的例外是浅色 `Status.Warning`（真黄守不住 4.5:1，停在 AA-Large 档），所以浅色警告徽章优先用「淡底 + 深色前景」（`Status.WarningSubtle` + `Status.Warning`），不要拿 `#A08700` 当色块塞小号白字。
+- **Text.OnAccent 在深色下是墨色不是白色**：深色强调色本身已经够亮，白字压上去只有 3.24:1（危险色上更低），换成深灰墨色 `#232323`（1.14.0 手调值）后对主色 4.85:1、危险色块 5.30:1、信息 / 成功 / 警告色块 7.0–9.2:1。`Status.*` 色块上的文字同样走这个键，不要写死 `#FFFFFF`。
+- **Text.Inverse** 指「反色表面」上的文字（整体取反的选中条、徽标底等），浅色为白、深色为深灰墨色。当前与 `Text.OnAccent` 同值，但语义不同，不要互换。
+- **Status.* 有双重职责**：既当色块底（配 `Text.OnAccent`），也当无边框模式（`Label.DisplayMode`、AppBar 徽标等）的前景。取值必须同时满足「字压得住底」和「底/字在纸上够分量」两端——`Tools/palette/check.js` 对此有硬断言，不满足时 `emit.js` 直接拒绝生成 XAML。1.14.0 手调后浅色 `Status.Warning` 与深色同为真黄 `#E2C600`（白卡上约 1.7:1，守卫已按实测锚定），所以浅色警告徽章 / 无边框前景**不要**配白字或小号深灰字，优先「淡底 + 深色前景」（`Status.WarningSubtle` + `Text.Primary`）；其余状态照守 4.5:1。
 - **Surface.Sunken ≠ Surface.Focused**：`Sunken` 是静态内陷（只读输入框、代码块、进度槽、DataGrid 底色），台阶很大（对卡片 ΔL\* 7.7 / 7.9）；输入框**获得焦点**时的底色走 `Surface.Focused`，只比卡片挪半步（ΔL\* 4.2 / 4.3）。写模板时按语义选，不要因为「都是浅一点的底」而互换。
 
 ### 官方 WPF 控件的继承范围
@@ -594,7 +594,7 @@ ThemeManager.ToggleTheme();
 
 ### ListBox
 
-`jv:ListBox` 继承 WPF `ListBox`，提供统一的悬停、选中、焦点和禁用状态，并默认启用 UI 虚拟化和回收模式。项目既可按默认的竖向列表排列，也可通过 `Orientation` 切换为横向带状列表并沿水平方向滑动。
+`jv:ListBox` 继承 WPF `ListBox`，提供统一的悬停、选中、焦点和禁用状态，并默认启用 UI 虚拟化和回收模式。项目既可按默认的竖向列表排列，也可通过 `Orientation` 切换为横向带状列表并沿水平方向滑动。选中项以主色强调（背景 `Surface.Selected`、描边 `Accent.Primary`），点击获得键盘焦点后描边仍保持主色；青色焦点环只出现在未选中的聚焦项上。
 
 | 属性 | 默认值 | 效果 |
 | --- | --- | --- |
@@ -636,7 +636,7 @@ ThemeManager.ToggleTheme();
 
 ### ListView
 
-`jv:ListView` 继承 WPF `ListView`，同时支持普通列表和标准 `GridView`。控件保留 WPF 的 `View` 管线，可以正常使用 `GridViewColumn.DisplayMemberBinding`、单元格模板和自定义 `ItemTemplate`。普通列表同样支持横向带状排列与水平滑动。
+`jv:ListView` 继承 WPF `ListView`，同时支持普通列表和标准 `GridView`。控件保留 WPF 的 `View` 管线，可以正常使用 `GridViewColumn.DisplayMemberBinding`、单元格模板和自定义 `ItemTemplate`。普通列表同样支持横向带状排列与水平滑动。选中项以主色强调（背景 `Surface.Selected`、描边 `Accent.Primary`），点击获得键盘焦点后描边仍保持主色；青色焦点环只出现在未选中的聚焦项上。
 
 | 属性 | 默认值 | 效果 |
 | --- | --- | --- |

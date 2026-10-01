@@ -22,20 +22,24 @@ function guard(theme) {
   for (const s of ['Info', 'Success', 'Warning', 'Danger']) {
     const fill = at(theme, `Status.${s}`);
     const subtle = at(theme, `Status.${s}Subtle`);
-    // 浅色 Warning 是唯一的例外：真黄（色相角 97°+）在近白卡片上做不到 4.5:1，
-    // 用户选定「抬黄优先」，故这一档放行到 AA 大字号（3.4 / 3.3 / 3.2）。深色不受影响。
-    const warnFloor = s === 'Warning' && theme === 'light' ? { chip: 3.4, text: 3.3, onSubtle: 3.2 } : { chip: 4.5, text: 4.5, onSubtle: 4.5 };
+    // 浅色 Warning 例外（1.14.0 第二次手调）：浅色警告同样抬成真黄（Yellow.400/300），
+    // 白卡上对比度只有 ~1.7:1，用户选定「两主题一致的黄优先」，守卫按实测值锚定，
+    // 悬停方向也随真黄改为「提亮」。若要恢复 AA 大字号，改回 Yellow.600/700 并同步本表。
+    const warnFloor = s === 'Warning' && theme === 'light'
+      ? { chip: 1.6, hoverChip: 1.4, text: 1.6, onSubtle: 1.5, surface: 1.5, brighter: true }
+      : { chip: 4.5, hoverChip: 3.0, text: 4.5, onSubtle: 4.5, surface: 3.0, brighter: false };
     need(`${s} 色块上的 OnAccent 文字`, ratio(onAccent, fill), warnFloor.chip);
     const hoverKey = `Status.${s}Hover`;
     if (Roles[hoverKey]) {
       const hover = at(theme, hoverKey);
-      need(`${s}Hover 色块上的 OnAccent 文字`, ratio(onAccent, hover), 3.0);
-      // 悬停必须朝「更抢眼」的方向走：浅色变深、深色变亮，且三个状态一致。
+      need(`${s}Hover 色块上的 OnAccent 文字`, ratio(onAccent, hover), warnFloor.hoverChip);
+      // 悬停必须朝「更抢眼」的方向走：浅色变深、深色变亮（浅色真黄例外为提亮），且三个状态一致。
       const step = lstar(hover) - lstar(fill);
-      need(`${s} 悬停方向（应${theme === 'light' ? '变深' : '变亮'}）`, theme === 'light' ? -step : step, 2.0);
+      const wantBrighter = theme === 'dark' || warnFloor.brighter;
+      need(`${s} 悬停方向（应${wantBrighter ? '变亮' : '变深'}）`, wantBrighter ? step : -step, 2.0);
     }
     need(`${s} 作为无边框前景文字`, ratio(fill, surface), warnFloor.text);
-    need(`${s} 色块相对表面的可辨度`, ratio(fill, surface), 3.0);
+    need(`${s} 色块相对表面的可辨度`, ratio(fill, surface), warnFloor.surface);
     need(`${s} 文字压在其 Subtle 底上`, ratio(fill, subtle), warnFloor.onSubtle);
     need(`${s}Subtle 与表面的台阶`, Math.abs(lstar(subtle) - lstar(surface)), 2.0);
   }
@@ -72,11 +76,11 @@ function guard(theme) {
 const RAMP_ORDER = ['Chalk', 'Slate', 'Cobalt', 'Coating', 'Green', 'Yellow', 'Red'];
 const RAMP_NOTE = {
   Chalk: '纸白到墨黑，仍落在 214° 那条线上，但彩度封顶 C*≤7（旧值 16）——灰就是灰，蓝交给 Cobalt。浅色主题自上而下取用。',
-  Slate: '与 Chalk 同一条线的另一端读起：Slate.0 与 Chalk.1000 是同一滴墨，同样低彩度。',
+  Slate: '与 Chalk 同一条线的另一端读起：Slate.0 与 Chalk.1000 是同一滴墨，同样低彩度。1.14.0 手调后深色各阶为纯灰（阶序按用途排布，Slate.30 承接深色画布）。',
   Cobalt: '主色 — 光学蓝。按钮、选中、进度、活动指示。',
   Coating: '次色 — 镜头镀膜的青。只承担「信息」与「焦点」，绝不当第二个主色。',
   Green: '成功态。深色侧用 400/300，浅色侧用 600/700，彩度按色域上限重解过去除褪色感。',
-  Yellow: '警告态。色相角 97–102°——真黄。深色直接用 400/300，浅色受近白底限制只能取 600/700（见 check.js 的浅色 Warning 例外）。',
+  Yellow: '警告态。色相角 97–102°——真黄。1.14.0 手调后两主题统一用 400/300（浅色对比度守卫已相应锚定，见 check.js）。',
   Red: '危险态。浅色基色由 L*38 的砖红抬到 L*45 的朱红。',
 };
 const EFFECT_REF = {
@@ -187,19 +191,20 @@ const HEAD = {
         取景器与工业相机的世界：中性色仍排在同一条 214° 线上，但彩度封顶 C*≤7，
         灰就是灰——蓝不再染在纸面上，只由 Cobalt 这一个角色承担。
 
-        · 适合阅读：卡片是纯白（Chalk.0，正文对比 15.4:1）——1.10.0 的 #FBFCFD 灰白卡
-          被反馈「整体太灰」，阅读面应当是纸白，蓝灰留给画布做衬托（#F1F3F5，ΔL* 4.3）。
-          弹层不再比卡片亮，层级改由阴影 + 描边表达。
-        · 层级靠曝光差而不是靠黑线：画布 #F1F3F5 让位于纯白卡片，
-          悬浮、按下、选中各自只推进一级 L*。静止边框是 2.0:1 的发丝线（若有若无），
+        · 适合阅读：卡片是纯白（Chalk.0，正文对比 14.8:1）——1.10.0 的 #FBFCFD 灰白卡
+          被反馈「整体太灰」，阅读面应当是纸白。1.14.0 手调后画布同为纯白
+          （Background.App = Chalk.0），「白卡浮于灰画布」的亮度衬托不再存在，
+          层级全交给描边与阴影；弹层不再比卡片亮，改由阴影 + 描边表达。
+        · 层级靠曝光差而不是靠黑线：悬浮、按下各自只推进一级 L*
+          （Chalk.50 #F6F6F6 / Chalk.100 #E9EAEA）。静止边框是 2.1:1 的发丝线（若有若无），
           只有悬停、勾选框描边这类「需要确认交互」的状态才提到 3:1 以上；
-          侧栏/内容这类区域分界走更退一层的 Border.Divider（对画布 1.2:1）。
+          侧栏/内容这类区域分界走更退一层的 Border.Divider（对画布 1.37:1）。
         · 语义分工：Cobalt 只做主操作；Coating（镀膜青）只做信息与焦点环。
           旧方案 Info #2563EB 与 Accent #1E5EE6 几乎同色，如今两者不再混淆。
-        · 状态色去掉褪色感：警告由琥珀 #A85C07 抬成真黄 #A08700（Lab 色相角 64°→92°），
-          砖红 #A82828（L*38）→ 朱红 #BE3E2B（L*45），橄榄绿 #157A46 → #057E42。
-          唯一的让步在警告：真黄要压到 4.5:1 就得回到 L*≤52，那已经是棕色，故浅色警告
-          停在 3.4:1（AA 大字号），check.js 与 emit.js 对这一档单独放行，其余状态照守 4.5:1。
+        · 状态色去掉褪色感：警告经两轮手调，1.14.0 起两主题同为真黄 #E2C600
+          （Lab 色相角 97°+）；砖红 #A82828（L*38）→ 朱红 #BE3E2B（L*45），橄榄绿 #157A46 → #057E42。
+          代价在浅色警告的对比度：白卡上约 1.7:1，check.js 与 emit.js 已按此值锚定，
+          其余状态照守 4.5:1。
 
         命名约定：
         Palette.{Family}.{Step}        — 原语，唯一真值来源
@@ -220,15 +225,16 @@ const HEAD = {
         与浅色共用同一条低彩度灰阶线，只是从另一端读起：Slate.0 与 Chalk.1000
         是同一滴墨。因此深色不是另一套配色，而是同一套色卡的另一种曝光。
 
-        · 不累眼：底面 #16191C → 卡片 #1F2226，避开纯黑（纯黑会把边框逼成灰白）；
-          正文 L* 收在 89 而非 93+，消除暗底亮字的眩光边缘，卡片上仍有 12.1:1。
-        · 层级靠表面台阶：本主题把高度差交给 ΔL* 递进的表面，
-          所以边框可以放心安静——静止态 1.79:1 只剩一层轮廓，悬停 / 勾选框描边才给到 3.19:1；
-          暗色下过强的边框会连成一片网格。
+        · 不累眼：底面 #232323 → 卡片 #1F2226（1.14.0 手调：中性线整体去蓝改纯灰阶，
+          画布由带蓝的 #16191C 提亮为 #232323，与卡片几乎同阶，避开纯黑）；
+          正文 L* 收在 89 而非 93+，消除暗底亮字的眩光边缘，卡片上仍有 11.9:1。
+        · 层级靠表面台阶：悬停/按下/凹陷在 1.14.0 手调后统一落在 Slate.50（#2F2F2F），
+          比卡片亮约 6 个 ΔL*；边框可以放心安静——静止态 1.79:1 只剩一层轮廓，
+          悬停 / 勾选框描边才给到 3.19:1；暗色下过强的边框会连成一片网格。
         · 中性线彩度同样封顶 C*≤7（旧值 16），深色不再整体泛蓝。
         · 语义分工：Cobalt 只做主操作；Coating（镀膜青）只做信息与焦点环。
         · 警告用真黄 #E2C600：深色底给得起亮度，压在画布上 10.35:1、墨字压在上面 11.57:1，
-          不必像浅色那样在「够黄」与「可读」之间让步。
+          不必像浅色那样在「够黄」与「可读」之间让步（1.14.0 起浅色同样用真黄）。
 
         命名约定：
         Palette.{Family}.{Step}        — 原语，唯一真值来源

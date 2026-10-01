@@ -146,9 +146,14 @@
                             <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource Theme.Brush.Accent.PrimarySubtle}" />
                             <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.PrimaryHover}" />
                         </MultiTrigger>
-                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                        <!--  焦点环只给未选中项：选中项描边固定用主色，避免键盘焦点后主色被焦点青覆盖  -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsKeyboardFocusWithin" Value="True" />
+                                <Condition Property="IsSelected" Value="False" />
+                            </MultiTrigger.Conditions>
                             <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Focus}" />
-                        </Trigger>
+                        </MultiTrigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
                             <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />

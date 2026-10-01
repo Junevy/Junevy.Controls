@@ -28,12 +28,20 @@ const chroma = (h) => {
 // 规格只有一份：Pal / Roles / Effect 来自 spec.js，校验器与生成器共用同一张表
 const Pal = {
   Chalk: {
-    0: '#FFFFFF', 50: '#F1F3F5', 75: '#EBEDEF', 100: '#E3E6EA', 150: '#DADEE2', 300: '#B0B7BE', 400: '#8C939C', 550: '#686F79',
+    0: '#FFFFFF', 50: '#F6F6F6', 75: '#EBEDEF', 100: '#E9EAEA', 150: '#DADEE2', 300: '#B0B7BE', 400: '#8C939C', 550: '#686F79',
     600: '#60666E', 700: '#494F57', 800: '#24282E',
   },
+  /*  1.14.0 手调（浅色减淡 / 深色纯灰化）后的台阶，均以「实际消费方」的取值为准：
+      · Chalk.50/100 只被浅色消费（悬停/按下），按浅色手调值 #F6F6F6 / #E9EAEA；
+        深色文件里的同名阶是无人引用的常量，随共享色卡对齐。
+      · Slate.25–150 只被深色消费（侧栏/悬停/按下/边框），按深色手调值纯灰化：
+        #1D1D1D / #2F2F2F / #232323 / #2C2C2C / #2C2C2C；浅色文件里的同名阶无人引用。
+      · Slate.0 两主题都要（浅色反色墨 / 深色画布）但手调后取值分叉——浅色保 #070B10，
+        深色画布提亮为 #232323，故新增只被深色消费的 Slate.30 承接深色画布与
+        Text.Inverse / Text.OnAccent（深色主色按钮文字随之 #232323，见 Roles）。 */
   Slate: {
-    0: '#070B10', 25: '#111215', 50: '#16191C', 75: '#1F2226', 100: '#272B30', 125: '#2F3238',
-    150: '#35393F', 175: '#454A51', 250: '#697078', 400: '#969BA4',
+    0: '#070B10', 25: '#1D1D1D', 30: '#232323', 50: '#2F2F2F', 75: '#1F2226', 100: '#232323', 125: '#2C2C2C',
+    150: '#2C2C2C', 175: '#454A51', 250: '#697078', 400: '#969BA4',
     500: '#AAB0B8', 800: '#DDE0E5',
   },
   Cobalt: {
@@ -59,25 +67,29 @@ const Pal = {
    Every key keeps the name the control templates already bind to, so the 32
    dictionaries re-skin from values alone.  [lightPrimitive, darkPrimitive]      */
 const Roles = {
-  'Background.App': ['Chalk.50', 'Slate.50'],
-  /*  Background.Subtle:次级背景——侧栏这类「次要区域」的底色(Showcase 左侧菜单栏用),
-      比主画布深一档(ΔL* 2.1),使主背景在其右侧读起来更白;此前为 Chalk.75 原值,
-      与画布仅差 ΔL* 1.0、肉眼不可辨,故按侧栏用途重解。 */
-  'Background.Subtle': ['Chalk.75', 'Slate.100'],
-  'Background.Second': ['Chalk.100', 'Slate.25'],
+  /*  1.14.0 手调：浅色画布提为纯白（与卡片同白，层级全交给描边与阴影）；
+      深色画布提亮为纯灰 #232323（Slate.30，替代带蓝的 #16191C），画布不再近黑。 */
+  'Background.App': ['Chalk.0', 'Slate.30'],
+  /*  Background.Subtle:次级背景——侧栏这类「次要区域」的底色(Showcase 左侧菜单栏用)。
+      浅色 Chalk.75；深色随画布纯灰化取 Slate.50（#2F2F2F）。 */
+  'Background.Subtle': ['Chalk.75', 'Slate.50'],
+  /*  1.14.0 手调：浅色再深一档画布随 Chalk.50 减淡为 #F6F6F6。 */
+  'Background.Second': ['Chalk.50', 'Slate.25'],
   'Background.Third': ['Chalk.150', 'Slate.175'],
 
   /*  Surface.Base 浅色取 Chalk.0 纯白：用户反馈 1.10.0 的 #FBFCFD 灰白卡片整体发灰、
       不适合阅读——阅读面就该是纸白，画布退为衬托（ΔL* 4.3，仍在 2.5–5 守卫区间）。
-      正文对比由 14.4:1 提到 15.4:1；弹层不再比卡片亮，改靠阴影与描边分层（见 check.js）。 */
+      正文对比由 14.4:1 提到 15.4:1；弹层不再比卡片亮，改靠阴影与描边分层（见 check.js）。
+      1.14.0 手调后画布同为纯白，衬托差改由描边与阴影表达。 */
   'Surface.Base': ['Chalk.0', 'Slate.75'],
   'Surface.Raised': ['Chalk.0', 'Slate.150'],
-  'Surface.Sunken': ['Chalk.100', 'Slate.25'],
-  'Surface.Overlay': ['Chalk.0', 'Slate.150'],
-  /*  Hover 随 Chalk.75 深化迁到 Chalk.50:白卡上悬停 ΔL* 4.25(守卫 2.5-5.5),
-      数值与画布相同属巧合——悬停发生在卡片表面,画布在其下层级。 */
-  'Surface.Hover': ['Chalk.50', 'Slate.100'],
-  'Surface.Pressed': ['Chalk.100', 'Slate.125'],
+  /*  深色表面台阶 1.14.0 手调：Hover / Pressed / Sunken / Overlay 统一落到 Slate.50
+      （#2F2F2F）——悬停、按下、凹陷、弹层共用「比卡片亮一档」的同一个灰，
+      卡片仍是 Slate.75（#1F2226）。浅色随 Chalk.50/100 减淡。 */
+  'Surface.Sunken': ['Chalk.100', 'Slate.50'],
+  'Surface.Overlay': ['Chalk.0', 'Slate.50'],
+  'Surface.Hover': ['Chalk.50', 'Slate.50'],
+  'Surface.Pressed': ['Chalk.100', 'Slate.50'],
   'Surface.Selected': ['Cobalt.100', 'Cobalt.950'],
   /*  获得焦点的输入框底色：1.10.0 时卡片是 #FBFCFD，焦点底走 Chalk.75「比卡片挪半步」；
       1.12.0 卡片提为纯白后，挪半步反而比静止态更灰——用户反馈「点击编辑时内部太灰」。
@@ -89,8 +101,10 @@ const Roles = {
   'Text.Secondary': ['Chalk.700', 'Slate.500'],
   'Text.Tertiary': ['Chalk.600', 'Slate.400'],
   'Text.Disabled': ['Chalk.300', 'Slate.175'],
-  'Text.Inverse': ['Chalk.0', 'Slate.0'],
-  'Text.OnAccent': ['Chalk.0', 'Slate.0'],
+  /*  深色 Inverse / OnAccent 随画布手调落到 Slate.30（#232323）：主色按钮上的文字
+      由近黑 #070B10 改为深灰 #232323（对 Cobalt.450 仍守 4.5:1）。 */
+  'Text.Inverse': ['Chalk.0', 'Slate.30'],
+  'Text.OnAccent': ['Chalk.0', 'Slate.30'],
 
   'Border.Default': ['Chalk.300', 'Slate.175'],
   'Border.Subtle': ['Chalk.150', 'Slate.150'],
@@ -115,8 +129,12 @@ const Roles = {
   'Status.Success': ['Green.600', 'Green.400'],
   'Status.SuccessHover': ['Green.700', 'Green.300'],
   'Status.SuccessSubtle': ['Green.100', 'Green.950'],
-  'Status.Warning': ['Yellow.600', 'Yellow.400'],
-  'Status.WarningHover': ['Yellow.700', 'Yellow.300'],
+  /*  1.14.0 手调：浅色警告同样抬成真黄（Yellow.400 #E2C600 / Hover Yellow.300 #EDD600，
+      与深色一致），不再用琥珀 Yellow.600/700——代价是白卡上的对比度降到约 1.7:1，
+      check.js / emit.js 的浅色 Warning 守卫已按此值锚定；若要恢复 AA 大字号
+      （3.3:1），把这两行改回 ['Yellow.600', 'Yellow.400'] / ['Yellow.700', 'Yellow.300']。 */
+  'Status.Warning': ['Yellow.400', 'Yellow.400'],
+  'Status.WarningHover': ['Yellow.300', 'Yellow.300'],
   'Status.WarningSubtle': ['Yellow.100', 'Yellow.950'],
   'Status.Danger': ['Red.600', 'Red.300'],
   'Status.DangerHover': ['Red.700', 'Red.350'],
