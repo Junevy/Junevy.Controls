@@ -6,71 +6,78 @@
     xmlns:jv="github.com.junevy"
     xmlns:sample="clr-namespace:Junevy.Controls.Showcase">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel MaxWidth="1080" HorizontalAlignment="Center">
+    <Border
+        Padding="10"
+        Background="{DynamicResource Theme.Brush.Background.App}"
+        BorderBrush="{DynamicResource Theme.Brush.Border.Subtle}"
+        BorderThickness="1"
+        CornerRadius="15,0,0,15">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel MaxWidth="1080" HorizontalAlignment="Center">
 
-            <TextBlock Style="{StaticResource DemoPageTitle}" Text="窗口与图像" />
-            <TextBlock
-                Style="{StaticResource DemoPageSubtitle}"
-                Text="jv:ImageViewer（缩放/平移/右键保存）/ jv:DialogWindow（无边框圆角对话框宿主）。" />
+                <TextBlock Style="{StaticResource DemoPageTitle}" Text="窗口与图像" />
+                <TextBlock
+                    Style="{StaticResource DemoPageSubtitle}"
+                    Text="jv:ImageViewer（缩放/平移/右键保存）/ jv:DialogWindow（无边框圆角对话框宿主）。" />
 
-            <demo:DemoSection
-                Title="jv:ImageViewer"
-                Description="滚轮缩放 0.05x-64x，左键拖动平移，右键菜单保存；默认棋盘背景即 TransparentBackground 资源；代码控制：Viewer.FitToWindow() / Viewer.ActualSize()。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.ImageViewerDemo}">
-                <StackPanel>
-                    <jv:ImageViewer
-                        x:Name="Viewer"
-                        Height="380"
-                        Source="pack://application:,,,/Junevy.Controls;component/Resources/Pictures/camera.png" />
-                    <StackPanel Margin="0,12,0,0" Orientation="Horizontal">
-                        <jv:Button Click="OnFitToWindowClick" Content="FitToWindow()" />
-                        <jv:Button Margin="12,0,0,0" Click="OnActualSizeClick" Content="ActualSize()" />
+                <demo:DemoSection
+                    Title="jv:ImageViewer"
+                    Description="滚轮缩放 0.05x-64x，左键拖动平移，右键菜单保存；默认棋盘背景即 TransparentBackground 资源；代码控制：Viewer.FitToWindow() / Viewer.ActualSize()。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.ImageViewerDemo}">
+                    <StackPanel>
+                        <jv:ImageViewer
+                            x:Name="Viewer"
+                            Height="380"
+                            Source="pack://application:,,,/Junevy.Controls;component/Resources/Pictures/camera.png" />
+                        <StackPanel Margin="0,12,0,0" Orientation="Horizontal">
+                            <jv:Button Click="OnFitToWindowClick" Content="FitToWindow()" />
+                            <jv:Button Margin="12,0,0,0" Click="OnActualSizeClick" Content="ActualSize()" />
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-            </demo:DemoSection>
+                </demo:DemoSection>
 
-            <demo:DemoSection
-                Title="TransparentBackground（透明背景棋盘格）"
-                Description="左起三格为 Small（4px 方格）/ 默认（8px）/ Large（16px）；最右侧是纯几何资源 TransparentBackground.Geometry（单个 16×16 单元内的两块 8×8 方格），用 Path 自绘上色。引用时必须用 DynamicResource，切换标题栏主题后配色随之改变；方格不随控件尺寸拉伸。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.TransparentBackgroundDemo}">
-                <UniformGrid Columns="4" Rows="1">
-                    <Border
-                        Margin="0,0,8,0"
-                        Background="{DynamicResource TransparentBackground.Small}"
-                        BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                        BorderThickness="1"
-                        Height="96" />
-                    <Border
-                        Margin="0,0,8,0"
-                        Background="{DynamicResource TransparentBackground}"
-                        BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                        BorderThickness="1"
-                        Height="96" />
-                    <Border
-                        Margin="0,0,8,0"
-                        Background="{DynamicResource TransparentBackground.Large}"
-                        BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                        BorderThickness="1"
-                        Height="96" />
-                    <Path
-                        Data="{DynamicResource TransparentBackground.Geometry}"
-                        Fill="{DynamicResource Theme.Brush.Accent.Primary}"
-                        Stretch="Uniform"
-                        Height="96" />
-                </UniformGrid>
-            </demo:DemoSection>
+                <demo:DemoSection
+                    Title="TransparentBackground（透明背景棋盘格）"
+                    Description="左起三格为 Small（4px 方格）/ 默认（8px）/ Large（16px）；最右侧是纯几何资源 TransparentBackground.Geometry（单个 16×16 单元内的两块 8×8 方格），用 Path 自绘上色。引用时必须用 DynamicResource，切换标题栏主题后配色随之改变；方格不随控件尺寸拉伸。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.TransparentBackgroundDemo}">
+                    <UniformGrid Columns="4" Rows="1">
+                        <Border
+                            Margin="0,0,8,0"
+                            Background="{DynamicResource TransparentBackground.Small}"
+                            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                            BorderThickness="1"
+                            Height="96" />
+                        <Border
+                            Margin="0,0,8,0"
+                            Background="{DynamicResource TransparentBackground}"
+                            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                            BorderThickness="1"
+                            Height="96" />
+                        <Border
+                            Margin="0,0,8,0"
+                            Background="{DynamicResource TransparentBackground.Large}"
+                            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                            BorderThickness="1"
+                            Height="96" />
+                        <Path
+                            Data="{DynamicResource TransparentBackground.Geometry}"
+                            Fill="{DynamicResource Theme.Brush.Accent.Primary}"
+                            Stretch="Uniform"
+                            Height="96" />
+                    </UniformGrid>
+                </demo:DemoSection>
 
-            <demo:DemoSection
-                Title="jv:DialogWindow（代码实例化弹出）"
-                Description="未启用 SizeToContent 覆盖时窗口尺寸完全跟随内容；标题栏可拖动、边缘可缩放、Esc 可关闭；内容按窗口圆角裁剪。经代码实例化：new DialogWindow { Title = ..., Content = ... } 后 ShowDialog()。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.DialogWindowDemo}">
-                <jv:Button
-                    HorizontalAlignment="Left"
-                    Click="OnOpenDialogClick"
-                    Content="打开对话框（无边框、圆角、主题化标题栏）" />
-            </demo:DemoSection>
+                <demo:DemoSection
+                    Title="jv:DialogWindow（代码实例化弹出）"
+                    Description="未启用 SizeToContent 覆盖时窗口尺寸完全跟随内容；标题栏可拖动、边缘可缩放、Esc 可关闭；内容按窗口圆角裁剪。经代码实例化：new DialogWindow { Title = ..., Content = ... } 后 ShowDialog()。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.DialogWindowDemo}">
+                    <jv:Button
+                        HorizontalAlignment="Left"
+                        Click="OnOpenDialogClick"
+                        Content="打开对话框（无边框、圆角、主题化标题栏）" />
+                </demo:DemoSection>
 
-        </StackPanel>
-    </ScrollViewer>
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
 </UserControl>

@@ -7,144 +7,151 @@
     xmlns:jv="github.com.junevy"
     xmlns:sample="clr-namespace:Junevy.Controls.Showcase">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel MaxWidth="1080" HorizontalAlignment="Center">
+    <Border
+        Padding="10"
+        Background="{DynamicResource Theme.Brush.Background.App}"
+        BorderBrush="{DynamicResource Theme.Brush.Border.Subtle}"
+        BorderThickness="1"
+        CornerRadius="15,0,0,15">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel MaxWidth="1080" HorizontalAlignment="Center">
 
-            <TextBlock Style="{StaticResource DemoPageTitle}" Text="集合与数据" />
-            <TextBlock
-                Style="{StaticResource DemoPageSubtitle}"
-                Text="jv:ListBox（竖向/横向滑动）/ jv:ListView（GridView）/ DataGrid。以下数据均为虚拟数据（SampleData）。" />
+                <TextBlock Style="{StaticResource DemoPageTitle}" Text="集合与数据" />
+                <TextBlock
+                    Style="{StaticResource DemoPageSubtitle}"
+                    Text="jv:ListBox（竖向/横向滑动）/ jv:ListView（GridView）/ DataGrid。以下数据均为虚拟数据（SampleData）。" />
 
-            <demo:DemoSection
-                Title="jv:ListBox（竖向）"
-                Description="ItemTemplate 自定义条目布局；选中/悬停高亮与滚动条均为主题接管。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.ListBoxVerticalDemo}">
-                <jv:ListBox
-                    Height="180"
-                    ItemsSource="{Binding Devices}">
-                    <jv:ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Margin="8,4">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock
-                                    Grid.Column="0"
-                                    FontWeight="Bold"
-                                    Text="{Binding Name}" />
-                                <TextBlock
-                                    Grid.Column="1"
-                                    Margin="12,0,0,0"
-                                    Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
-                                    Text="{Binding IP}" />
-                                <TextBlock
-                                    Grid.Column="2"
-                                    Foreground="{DynamicResource Theme.Brush.Accent.Primary}"
-                                    Text="{Binding Status}" />
-                            </Grid>
-                        </DataTemplate>
-                    </jv:ListBox.ItemTemplate>
-                </jv:ListBox>
-            </demo:DemoSection>
-
-            <demo:DemoSection
-                Title="jv:ListBox（横向滑动，Orientation=Horizontal）"
-                Description="Orientation=Horizontal 后条目横向排列、横向滚动；条目用 Border 自绘缩略卡（图标 + 名称）。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.ListBoxHorizontalDemo}">
-                <jv:ListBox
-                    Height="110"
-                    ItemsSource="{Binding Tiles}"
-                    Orientation="Horizontal">
-                    <jv:ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Border
-                                Width="120"
-                                Margin="4"
-                                Background="{DynamicResource Theme.Brush.Surface.Raised}"
-                                BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                                BorderThickness="1"
-                                CornerRadius="8">
-                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <demo:DemoSection
+                    Title="jv:ListBox（竖向）"
+                    Description="ItemTemplate 自定义条目布局；选中/悬停高亮与滚动条均为主题接管。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.ListBoxVerticalDemo}">
+                    <jv:ListBox
+                        Height="180"
+                        ItemsSource="{Binding Devices}">
+                        <jv:ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="8,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
                                     <TextBlock
-                                        HorizontalAlignment="Center"
-                                        FontFamily="{DynamicResource IconFont}"
-                                        FontSize="22"
-                                        Foreground="{DynamicResource Theme.Brush.Accent.Primary}"
-                                        Text="&#xE60C;" />
-                                    <TextBlock
-                                        HorizontalAlignment="Center"
-                                        FontSize="11"
-                                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                                        Grid.Column="0"
+                                        FontWeight="Bold"
                                         Text="{Binding Name}" />
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </jv:ListBox.ItemTemplate>
-                </jv:ListBox>
-            </demo:DemoSection>
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="12,0,0,0"
+                                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                                        Text="{Binding IP}" />
+                                    <TextBlock
+                                        Grid.Column="2"
+                                        Foreground="{DynamicResource Theme.Brush.Accent.Primary}"
+                                        Text="{Binding Status}" />
+                                </Grid>
+                            </DataTemplate>
+                        </jv:ListBox.ItemTemplate>
+                    </jv:ListBox>
+                </demo:DemoSection>
 
-            <demo:DemoSection
-                Title="jv:ListView（GridView 视图）"
-                Description="标准 WPF GridView 用法，列头与行外观为库主题接管。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.ListViewDemo}">
-                <jv:ListView
-                    Height="180"
-                    ItemsSource="{Binding Devices}">
-                    <jv:ListView.View>
-                        <GridView>
-                            <GridViewColumn
-                                Width="160"
-                                DisplayMemberBinding="{Binding Name}"
-                                Header="设备" />
-                            <GridViewColumn
-                                Width="100"
-                                DisplayMemberBinding="{Binding Status}"
-                                Header="状态" />
-                            <GridViewColumn
-                                Width="180"
-                                DisplayMemberBinding="{Binding IP}"
-                                Header="IP 地址" />
-                        </GridView>
-                    </jv:ListView.View>
-                </jv:ListView>
-            </demo:DemoSection>
+                <demo:DemoSection
+                    Title="jv:ListBox（横向滑动，Orientation=Horizontal）"
+                    Description="Orientation=Horizontal 后条目横向排列、横向滚动；条目用 Border 自绘缩略卡（图标 + 名称）。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.ListBoxHorizontalDemo}">
+                    <jv:ListBox
+                        Height="110"
+                        ItemsSource="{Binding Tiles}"
+                        Orientation="Horizontal">
+                        <jv:ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border
+                                    Width="120"
+                                    Margin="4"
+                                    Background="{DynamicResource Theme.Brush.Surface.Raised}"
+                                    BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                                    BorderThickness="1"
+                                    CornerRadius="8">
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            FontFamily="{DynamicResource IconFont}"
+                                            FontSize="22"
+                                            Foreground="{DynamicResource Theme.Brush.Accent.Primary}"
+                                            Text="&#xE60C;" />
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            FontSize="11"
+                                            Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                                            Text="{Binding Name}" />
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </jv:ListBox.ItemTemplate>
+                    </jv:ListBox>
+                </demo:DemoSection>
 
-            <demo:DemoSection
-                Title="DataGrid（虚拟数据 + 排序）"
-                Description="标准列定义；表头排序、行悬停与选中均为主题接管。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.DataGridDemo}">
-                <jv:DataGrid
-                    Height="220"
-                    AutoGenerateColumns="False"
-                    IsReadOnly="True"
-                    ItemsSource="{Binding Results}">
-                    <jv:DataGrid.Columns>
-                        <DataGridTextColumn Binding="{Binding Time}" Header="时间" />
-                        <DataGridTextColumn Binding="{Binding Device}" Header="设备" />
-                        <DataGridTextColumn Binding="{Binding Result}" Header="结果" />
-                    </jv:DataGrid.Columns>
-                </jv:DataGrid>
-            </demo:DemoSection>
+                <demo:DemoSection
+                    Title="jv:ListView（GridView 视图）"
+                    Description="标准 WPF GridView 用法，列头与行外观为库主题接管。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.ListViewDemo}">
+                    <jv:ListView
+                        Height="180"
+                        ItemsSource="{Binding Devices}">
+                        <jv:ListView.View>
+                            <GridView>
+                                <GridViewColumn
+                                    Width="160"
+                                    DisplayMemberBinding="{Binding Name}"
+                                    Header="设备" />
+                                <GridViewColumn
+                                    Width="100"
+                                    DisplayMemberBinding="{Binding Status}"
+                                    Header="状态" />
+                                <GridViewColumn
+                                    Width="180"
+                                    DisplayMemberBinding="{Binding IP}"
+                                    Header="IP 地址" />
+                            </GridView>
+                        </jv:ListView.View>
+                    </jv:ListView>
+                </demo:DemoSection>
 
-            <demo:DemoSection
-                Title="DataGrid 空态提示（atc:DataGridAssist.EmptyText）"
-                Description="附加属性 EmptyText：无数据时在表格中央显示空态文案，无需额外覆盖层。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.DataGridEmptyTextDemo}">
-                <jv:DataGrid
-                    Height="140"
-                    AutoGenerateColumns="False"
-                    IsReadOnly="True"
-                    atc:DataGridAssist.EmptyText="暂无检测结果（空态演示）">
-                    <jv:DataGrid.Columns>
-                        <DataGridTextColumn Binding="{Binding Time}" Header="时间" />
-                        <DataGridTextColumn Binding="{Binding Device}" Header="设备" />
-                        <DataGridTextColumn Binding="{Binding Result}" Header="结果" />
-                    </jv:DataGrid.Columns>
-                </jv:DataGrid>
-            </demo:DemoSection>
+                <demo:DemoSection
+                    Title="DataGrid（虚拟数据 + 排序）"
+                    Description="标准列定义；表头排序、行悬停与选中均为主题接管。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.DataGridDemo}">
+                    <jv:DataGrid
+                        Height="220"
+                        AutoGenerateColumns="False"
+                        IsReadOnly="True"
+                        ItemsSource="{Binding Results}">
+                        <jv:DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Time}" Header="时间" />
+                            <DataGridTextColumn Binding="{Binding Device}" Header="设备" />
+                            <DataGridTextColumn Binding="{Binding Result}" Header="结果" />
+                        </jv:DataGrid.Columns>
+                    </jv:DataGrid>
+                </demo:DemoSection>
 
-        </StackPanel>
-    </ScrollViewer>
+                <demo:DemoSection
+                    Title="DataGrid 空态提示（atc:DataGridAssist.EmptyText）"
+                    Description="附加属性 EmptyText：无数据时在表格中央显示空态文案，无需额外覆盖层。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.DataGridEmptyTextDemo}">
+                    <jv:DataGrid
+                        Height="140"
+                        AutoGenerateColumns="False"
+                        IsReadOnly="True"
+                        atc:DataGridAssist.EmptyText="暂无检测结果（空态演示）">
+                        <jv:DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Time}" Header="时间" />
+                            <DataGridTextColumn Binding="{Binding Device}" Header="设备" />
+                            <DataGridTextColumn Binding="{Binding Result}" Header="结果" />
+                        </jv:DataGrid.Columns>
+                    </jv:DataGrid>
+                </demo:DemoSection>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
 </UserControl>

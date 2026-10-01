@@ -10,25 +10,25 @@
     Height="800"
     MinWidth="1024"
     MinHeight="640"
-    WindowStartupLocation="CenterScreen"
-    WindowStyle="None"
-    ResizeMode="CanResize"
-    UseLayoutRounding="True"
     Background="Transparent"
     FontSize="13"
-    Foreground="{DynamicResource Theme.Brush.Text.Primary}">
+    Foreground="{DynamicResource Theme.Brush.Text.Primary}"
+    ResizeMode="CanResize"
+    UseLayoutRounding="True"
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="None">
 
     <shell:WindowChrome.WindowChrome>
         <shell:WindowChrome
             CaptionHeight="56"
             CornerRadius="0"
-            GlassFrameThickness="0"
+            GlassFrameThickness="10"
             ResizeBorderThickness="6"
             UseAeroCaptionButtons="False" />
     </shell:WindowChrome.WindowChrome>
 
     <!--  最大化时窗口边界会比工作区大出一圈，用 Margin 内缩补偿，避免标题栏被裁切。  -->
-    <Border>
+    <Border Background="{DynamicResource Theme.Brush.Background.App}">
         <Border.Style>
             <Style TargetType="{x:Type Border}">
                 <Setter Property="Margin" Value="0" />
@@ -39,7 +39,7 @@
                 </Style.Triggers>
             </Style>
         </Border.Style>
-        <Border Background="{DynamicResource Theme.Brush.Background.App}">
+        <Border Background="{DynamicResource Theme.Brush.Background.Second}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -53,6 +53,7 @@
                     atc:Icon.FontFamily="{DynamicResource IconFont}"
                     atc:Icon.Icon="&#xE66B;"
                     atc:Icon.IconSize="26"
+                    Background="Transparent"
                     Content="Junevy.Controls Showcase"
                     FontSize="14"
                     Foreground="{DynamicResource Theme.Brush.Text.Secondary}">
@@ -84,38 +85,34 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <!--  侧栏与内容区只是分区、不是控件边界：不另铺表面底色（与画布同层，
-                          避免色阶差 + 线的双重边缘），分隔线走 Border.Divider——比控件边框
-                          再退一档的区域分隔线（对画布约 1.2:1，明暗两主题一致地「若有若无」）  -->
-                    <Border
+                    <jv:SideMenu
+                        x:Name="NavMenu"
                         Grid.Column="0"
-                        BorderBrush="{DynamicResource Theme.Brush.Border.Divider}"
-                        BorderThickness="0,0,1,0">
-                        <jv:SideMenu
-                            x:Name="NavMenu"
-                            Width="200"
-                            Margin="0,8"
-                            DisplayMode="Horizontal"
-                            ItemHeight="44"
-                            SelectionChanged="OnNavSelectionChanged"
-                            atc:Icon.FontFamily="{DynamicResource IconFont}"
-                            atc:Icon.IconSize="18">
-                            <jv:MenuItem Title="按钮控件" Icon="&#xE981;" />
-                            <jv:MenuItem Title="输入与选择" Icon="&#xE60C;" />
-                            <jv:MenuItem Title="集合与数据" Icon="&#xE66B;" />
-                            <jv:MenuItem Title="文本与状态" Icon="&#xE651;" />
-                            <jv:MenuItem Title="通知" Icon="&#xE932;" />
-                            <jv:MenuItem Title="布局控件" Icon="&#xE650;" />
-                            <jv:MenuItem Title="菜单与导航" Icon="&#xE65D;" />
-                            <jv:MenuItem Title="窗口与图像" Icon="&#xE611;" />
-                        </jv:SideMenu>
-                    </Border>
+                        Width="140"
+                        Margin="0"
+                        Padding="10,0"
+                        atc:Icon.FontFamily="{DynamicResource IconFont}"
+                        atc:Icon.IconSize="18"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        DisplayMode="Horizontal"
+                        ItemHeight="44"
+                        SelectionChanged="OnNavSelectionChanged">
+                        <jv:MenuItem Title="按钮控件" Icon="&#xE981;" />
+                        <jv:MenuItem Title="输入与选择" Icon="&#xE60C;" />
+                        <jv:MenuItem Title="集合与数据" Icon="&#xE66B;" />
+                        <jv:MenuItem Title="文本与状态" Icon="&#xE651;" />
+                        <jv:MenuItem Title="通知" Icon="&#xE932;" />
+                        <jv:MenuItem Title="布局控件" Icon="&#xE650;" />
+                        <jv:MenuItem Title="菜单与导航" Icon="&#xE65D;" />
+                        <jv:MenuItem Title="窗口与图像" Icon="&#xE611;" />
+                    </jv:SideMenu>
+                    <!--</Border>-->
 
                     <ContentControl
                         x:Name="PageHost"
                         Grid.Column="1"
-                        Focusable="False"
-                        Margin="32,24,32,32" />
+                        Focusable="False" />
 
                     <!--  SidePanel：不指定 Column 时自动跨满父 Grid，从右侧滑出  -->
                     <jv:SidePanel x:Name="SettingsPanel" Side="Right">
@@ -143,8 +140,8 @@
                                 Maximum="100"
                                 TickFrequency="10"
                                 TickPlacement="BottomRight"
-                                Value="40"
-                                ValueFormatString="F0" />
+                                ValueFormatString="F0"
+                                Value="40" />
                             <StackPanel Orientation="Horizontal">
                                 <jv:ToggleButton Content="开机自启" IsChecked="True" />
                                 <jv:Button

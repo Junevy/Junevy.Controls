@@ -7,97 +7,104 @@
     xmlns:jv="github.com.junevy"
     xmlns:sample="clr-namespace:Junevy.Controls.Showcase">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel MaxWidth="1080" HorizontalAlignment="Center">
+    <Border
+        Padding="10"
+        Background="{DynamicResource Theme.Brush.Background.App}"
+        BorderBrush="{DynamicResource Theme.Brush.Border.Subtle}"
+        BorderThickness="1"
+        CornerRadius="15,0,0,15">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel MaxWidth="1080" HorizontalAlignment="Center">
 
-            <TextBlock Style="{StaticResource DemoPageTitle}" Text="通知" />
-            <TextBlock
-                Style="{StaticResource DemoPageSubtitle}"
-                Text="jv:Badge / jv:MessageBar / MessageBarService（宿主已注册在主窗口底部，可通过本页按钮弹出通知）。" />
+                <TextBlock Style="{StaticResource DemoPageTitle}" Text="通知" />
+                <TextBlock
+                    Style="{StaticResource DemoPageSubtitle}"
+                    Text="jv:Badge / jv:MessageBar / MessageBarService（宿主已注册在主窗口底部，可通过本页按钮弹出通知）。" />
 
-            <demo:DemoSection
-                Title="jv:Badge（角标）"
-                Description="包裹任意内容；Count 角标 / IsDot 红点 / MaxCount 数值上限 / OffsetX/Y 偏移微调 / Corner 角位。注意：Badge 隐式样式将 Foreground 设为 Text.OnAccent（浅色为白、深色为墨色），包裹的内容若依赖继承前景色需显式设置；角标以自身中心对准内容角落，相邻控件的角标可能互相遮挡。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.BadgeDemo}">
-                <WrapPanel>
-                    <jv:Badge Count="5">
-                        <jv:Button atc:Icon.FontFamily="{DynamicResource IconFont}" atc:Icon.Icon="&#xE932;" Content="消息" />
-                    </jv:Badge>
-                    <jv:Badge
-                        Margin="16,0,0,0"
-                        Count="1"
-                        IsDot="True">
-                        <jv:Button Content="更新" />
-                    </jv:Badge>
-                    <jv:Badge Margin="16,0,0,0" Count="99" MaxCount="9">
-                        <jv:Button Content="MaxCount=9" />
-                    </jv:Badge>
-                    <jv:Badge Count="3" OffsetX="-4" OffsetY="4">
-                        <jv:Button Content="偏移微调" />
-                    </jv:Badge>
-                    <jv:Badge Margin="16,0,0,0" Count="6" Corner="TopLeft">
-                        <Border
-                            Padding="10"
-                            Background="{DynamicResource Theme.Brush.Surface.Raised}"
-                            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                            BorderThickness="1"
-                            CornerRadius="6">
-                            <TextBlock
-                                FontFamily="{DynamicResource IconFont}"
-                                FontSize="18"
-                                Foreground="{DynamicResource Theme.Brush.Text.Primary}"
-                                Text="&#xE66B;" />
-                        </Border>
-                    </jv:Badge>
-                    <jv:Badge Margin="16,0,0,0" Count="8" Corner="BottomRight">
-                        <Border
-                            Padding="10"
-                            Background="{DynamicResource Theme.Brush.Surface.Raised}"
-                            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                            BorderThickness="1"
-                            CornerRadius="6">
-                            <TextBlock
-                                FontFamily="{DynamicResource IconFont}"
-                                FontSize="18"
-                                Foreground="{DynamicResource Theme.Brush.Text.Primary}"
-                                Text="&#xE60C;" />
-                        </Border>
-                    </jv:Badge>
-                </WrapPanel>
-            </demo:DemoSection>
+                <demo:DemoSection
+                    Title="jv:Badge（角标）"
+                    Description="包裹任意内容；Count 角标 / IsDot 红点 / MaxCount 数值上限 / OffsetX/Y 偏移微调 / Corner 角位。注意：Badge 隐式样式将 Foreground 设为 Text.OnAccent（浅色为白、深色为墨色），包裹的内容若依赖继承前景色需显式设置；角标以自身中心对准内容角落，相邻控件的角标可能互相遮挡。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.BadgeDemo}">
+                    <WrapPanel>
+                        <jv:Badge Count="5">
+                            <jv:Button atc:Icon.FontFamily="{DynamicResource IconFont}" atc:Icon.Icon="&#xE932;" Content="消息" />
+                        </jv:Badge>
+                        <jv:Badge
+                            Margin="16,0,0,0"
+                            Count="1"
+                            IsDot="True">
+                            <jv:Button Content="更新" />
+                        </jv:Badge>
+                        <jv:Badge Margin="16,0,0,0" Count="99" MaxCount="9">
+                            <jv:Button Content="MaxCount=9" />
+                        </jv:Badge>
+                        <jv:Badge Count="3" OffsetX="-4" OffsetY="4">
+                            <jv:Button Content="偏移微调" />
+                        </jv:Badge>
+                        <jv:Badge Margin="16,0,0,0" Count="6" Corner="TopLeft">
+                            <Border
+                                Padding="10"
+                                Background="{DynamicResource Theme.Brush.Surface.Raised}"
+                                BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                                BorderThickness="1"
+                                CornerRadius="6">
+                                <TextBlock
+                                    FontFamily="{DynamicResource IconFont}"
+                                    FontSize="18"
+                                    Foreground="{DynamicResource Theme.Brush.Text.Primary}"
+                                    Text="&#xE66B;" />
+                            </Border>
+                        </jv:Badge>
+                        <jv:Badge Margin="16,0,0,0" Count="8" Corner="BottomRight">
+                            <Border
+                                Padding="10"
+                                Background="{DynamicResource Theme.Brush.Surface.Raised}"
+                                BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                                BorderThickness="1"
+                                CornerRadius="6">
+                                <TextBlock
+                                    FontFamily="{DynamicResource IconFont}"
+                                    FontSize="18"
+                                    Foreground="{DynamicResource Theme.Brush.Text.Primary}"
+                                    Text="&#xE60C;" />
+                            </Border>
+                        </jv:Badge>
+                    </WrapPanel>
+                </demo:DemoSection>
 
-            <demo:DemoSection
-                Title="jv:MessageBar（布局内直接声明，IsShown 控制）"
-                Description="Timeout=0 表示禁用自动关闭；请通过 IsShown / Show() / Hide() 控制显隐，不要直接设置 Visibility/Opacity/RenderTransform。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.MessageBarInlineDemo}">
-                <StackPanel>
-                    <jv:MessageBar
-                        x:Name="InlineBar"
-                        Appearance="Warning"
-                        IsShown="True"
-                        Message="场景亮度低于目标值，请检查光源。"
-                        Timeout="0"
-                        Title="低曝光" />
-                    <StackPanel Margin="0,12,0,0" Orientation="Horizontal">
-                        <jv:Button Click="OnInlineShowClick" Content="Show()" />
-                        <jv:Button Margin="12,0,0,0" Click="OnInlineHideClick" Content="Hide()" />
+                <demo:DemoSection
+                    Title="jv:MessageBar（布局内直接声明，IsShown 控制）"
+                    Description="Timeout=0 表示禁用自动关闭；请通过 IsShown / Show() / Hide() 控制显隐，不要直接设置 Visibility/Opacity/RenderTransform。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.MessageBarInlineDemo}">
+                    <StackPanel>
+                        <jv:MessageBar
+                            x:Name="InlineBar"
+                            Appearance="Warning"
+                            IsShown="True"
+                            Message="场景亮度低于目标值，请检查光源。"
+                            Timeout="0"
+                            Title="低曝光" />
+                        <StackPanel Margin="0,12,0,0" Orientation="Horizontal">
+                            <jv:Button Click="OnInlineShowClick" Content="Show()" />
+                            <jv:Button Margin="12,0,0,0" Click="OnInlineHideClick" Content="Hide()" />
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-            </demo:DemoSection>
+                </demo:DemoSection>
 
-            <demo:DemoSection
-                Title="MessageBarService（应用级弹出，宿主在主窗口底部）"
-                Description="弹出宿主 jv:MessageBarPresenter 注册在主窗口底部（MessageBarService.SetPresenter），不占用页面布局；C# 调用：MessageBarService.Show(MessageBarAppearance.Success, &quot;标题&quot;, &quot;内容&quot;)，Danger 示例带 5 秒超时，Clear() 清空全部。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.MessageBarServiceDemo}">
-                <WrapPanel>
-                    <jv:Button Click="OnServiceInfoClick" Content="Informational" />
-                    <jv:Button Margin="12,0,0,0" Click="OnServiceSuccessClick" Content="Success" />
-                    <jv:Button Margin="12,0,0,0" Click="OnServiceWarningClick" Content="Warning" />
-                    <jv:Button Margin="12,0,0,0" Click="OnServiceDangerClick" Content="Danger（5 秒超时）" />
-                    <jv:Button Margin="12,0,0,0" Click="OnServiceClearClick" Content="Clear()" />
-                </WrapPanel>
-            </demo:DemoSection>
+                <demo:DemoSection
+                    Title="MessageBarService（应用级弹出，宿主在主窗口底部）"
+                    Description="弹出宿主 jv:MessageBarPresenter 注册在主窗口底部（MessageBarService.SetPresenter），不占用页面布局；C# 调用：MessageBarService.Show(MessageBarAppearance.Success, &quot;标题&quot;, &quot;内容&quot;)，Danger 示例带 5 秒超时，Clear() 清空全部。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.MessageBarServiceDemo}">
+                    <WrapPanel>
+                        <jv:Button Click="OnServiceInfoClick" Content="Informational" />
+                        <jv:Button Margin="12,0,0,0" Click="OnServiceSuccessClick" Content="Success" />
+                        <jv:Button Margin="12,0,0,0" Click="OnServiceWarningClick" Content="Warning" />
+                        <jv:Button Margin="12,0,0,0" Click="OnServiceDangerClick" Content="Danger（5 秒超时）" />
+                        <jv:Button Margin="12,0,0,0" Click="OnServiceClearClick" Content="Clear()" />
+                    </WrapPanel>
+                </demo:DemoSection>
 
-        </StackPanel>
-    </ScrollViewer>
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
 </UserControl>

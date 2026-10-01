@@ -13,6 +13,10 @@ namespace Junevy.Controls.Showcase.Pages
         /// <summary>TreeMenu 虚拟导航树。</summary>
         public ObservableCollection<TreeMenuItem> NavTree { get; } = [];
 
+        /// <summary>InfoBar 菜单列表(经 ItemsSource 绑定的演示数据)。</summary>
+        public System.Collections.Generic.IEnumerable<string> InfoBarMenuItems { get; } =
+            new[] { "应用设置", "个人资料", "切换语言", "退出登录" };
+
         public MenusPage()
         {
             InitializeComponent();
@@ -39,6 +43,19 @@ namespace Junevy.Controls.Showcase.Pages
             TreeNav.ItemsSource = NavTree;
             TreeNav.NavigateCommand = new RelayCommand(() =>
                 MessageBarService.Show("TreeMenu", "叶节点已激活（NavigateCommand）"));
+        }
+
+        private void OnInfoBarSettingsClick(object sender, RoutedEventArgs e)
+        {
+            MessageBarService.Show("InfoBar", "已点击设置按钮（SettingsClick 路由事件）");
+        }
+
+        private void OnInfoBarMenuItemClick(object sender, RoutedEventArgs e)
+        {
+            if (e.OriginalSource is FrameworkElement container && container.DataContext is string item)
+            {
+                MessageBarService.Show("InfoBar", $"已点击菜单项：{item}");
+            }
         }
 
         private void OnTabClosing(object sender, TabCloseEventArgs e)

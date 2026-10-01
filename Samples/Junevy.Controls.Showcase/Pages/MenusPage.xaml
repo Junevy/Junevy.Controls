@@ -5,122 +5,223 @@
     xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Controls"
     xmlns:demo="clr-namespace:Junevy.Controls.Showcase.Controls"
     xmlns:jv="github.com.junevy"
+    x:Name="PageRoot"
     xmlns:sample="clr-namespace:Junevy.Controls.Showcase">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel MaxWidth="1080" HorizontalAlignment="Center">
-
-            <TextBlock Style="{StaticResource DemoPageTitle}" Text="菜单与导航" />
+    <UserControl.Resources>
+        <!--  InfoBar ItemsSource 列表项的呈现模板  -->
+        <DataTemplate x:Key="InfoBarMenuItemTemplate">
             <TextBlock
-                Style="{StaticResource DemoPageSubtitle}"
-                Text="jv:ContextMenu / jv:TreeMenu（TreeMenuItem 数据模型 + ExpanderBehavior）/ jv:TabMenu / jv:ToolBar / jv:Toolbox。jv:SideMenu 已作为本程序左侧导航使用。" />
+                Margin="8,7"
+                FontSize="13"
+                Text="{Binding}" />
+        </DataTemplate>
+    </UserControl.Resources>
 
-            <demo:DemoSection
-                Title="jv:ContextMenu（右键按钮打开）"
-                Description="附加到任意元素的 ContextMenu；菜单项请使用原生 MenuItem 或 jv:ContextMenuItem（jv:MenuItem 是 SideMenu 的导航数据控件，不是 WPF 菜单项）；Separator 分组、IsCheckable 复选、InputGestureText 快捷键提示、Icon 图标字体字符均支持。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.ContextMenuDemo}">
-                <StackPanel>
-                    <jv:Button Content="右键打开上下文菜单" HorizontalAlignment="Left">
-                        <jv:Button.ContextMenu>
-                            <jv:ContextMenu>
-                                <jv:ContextMenuItem
-                                    Command="{Binding PanelToggleCommand, Source={x:Static sample:SampleData.Instance}}"
-                                    Header="打开"
-                                    Icon="&#xE60F;"
-                                    InputGestureText="Ctrl+O" />
-                                <jv:ContextMenuItem Header="保存" Icon="&#xE611;" InputGestureText="Ctrl+S" />
-                                <Separator />
-                                <jv:ContextMenuItem Header="自动滚动" IsCheckable="True" IsChecked="True" />
-                                <jv:ContextMenuItem Header="导出">
-                                    <jv:ContextMenuItem Header="导出为 PNG" />
-                                    <jv:ContextMenuItem Header="导出为 JPEG" />
-                                </jv:ContextMenuItem>
-                            </jv:ContextMenu>
-                        </jv:Button.ContextMenu>
-                    </jv:Button>
-                </StackPanel>
-            </demo:DemoSection>
+    <Border
+        Padding="10"
+        Background="{DynamicResource Theme.Brush.Background.App}"
+        BorderBrush="{DynamicResource Theme.Brush.Border.Subtle}"
+        BorderThickness="1"
+        CornerRadius="15,0,0,15">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel MaxWidth="1080" HorizontalAlignment="Center">
 
-            <demo:DemoSection
-                Title="jv:TreeMenu（树形导航）"
-                Description="jv:TreeMenuItem 为 POCO 数据模型（Title/Icon/Children），由默认 HierarchicalDataTemplate 渲染；默认容器样式已启用 atc:ExpanderBehavior.Enable：双击/Enter 展开或折叠文件夹，激活叶节点时执行 NavigateCommand（本页以 MessageBarService 反馈）。根级与嵌套层级均参与虚拟化。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.TreeMenuDemo}">
-                <jv:TreeMenu
-                    x:Name="TreeNav"
-                    Height="200"
-                    DisplayMode="Normal"
-                    atc:Icon.FontFamily="{DynamicResource IconFont}"
-                    atc:Icon.IconSize="16" />
-            </demo:DemoSection>
+                <TextBlock Style="{StaticResource DemoPageTitle}" Text="菜单与导航" />
+                <TextBlock
+                    Style="{StaticResource DemoPageSubtitle}"
+                    Text="jv:ContextMenu / jv:TreeMenu（TreeMenuItem 数据模型 + ExpanderBehavior）/ jv:TabMenu / jv:ToolBar / jv:Toolbox。jv:SideMenu 已作为本程序左侧导航使用。" />
 
-            <demo:DemoSection
-                Title="jv:TabMenu（可关闭页签 + TabClosing 拦截）"
-                Description="IsClosable 控制是否显示关闭按钮（默认 True）；双击文字标题可重命名（CanRename）；CanCloseLastTab=False 保护最后一个页签；TabClosing 事件可取消关闭。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.TabMenuDemo}">
-                <jv:TabMenu
-                    Height="220"
-                    CanCloseLastTab="False"
-                    TabClosing="OnTabClosing">
-                    <jv:TabMenuItem Header="相机 1" Icon="&#xE66B;">
-                        <TextBlock Margin="16" Text="相机 1 的内容区域（虚拟数据演示页签内容）。" />
-                    </jv:TabMenuItem>
-                    <jv:TabMenuItem Header="日志">
-                        <TextBlock Margin="16" Text="日志页签内容。" />
-                    </jv:TabMenuItem>
-                    <jv:TabMenuItem Header="保护页">
-                        <TextBlock Margin="16" Text="尝试关闭此页签：TabClosing 事件会取消并弹出提示。" />
-                    </jv:TabMenuItem>
-                </jv:TabMenu>
-            </demo:DemoSection>
+                <demo:DemoSection
+                    Title="jv:ContextMenu（右键按钮打开）"
+                    Description="附加到任意元素的 ContextMenu；菜单项请使用原生 MenuItem 或 jv:ContextMenuItem（jv:MenuItem 是 SideMenu 的导航数据控件，不是 WPF 菜单项）；Separator 分组、IsCheckable 复选、InputGestureText 快捷键提示、Icon 图标字体字符均支持。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.ContextMenuDemo}">
+                    <StackPanel>
+                        <jv:Button Content="右键打开上下文菜单" HorizontalAlignment="Left">
+                            <jv:Button.ContextMenu>
+                                <jv:ContextMenu>
+                                    <jv:ContextMenuItem
+                                        Command="{Binding PanelToggleCommand, Source={x:Static sample:SampleData.Instance}}"
+                                        Header="打开"
+                                        Icon="&#xE60F;"
+                                        InputGestureText="Ctrl+O" />
+                                    <jv:ContextMenuItem Header="保存" Icon="&#xE611;" InputGestureText="Ctrl+S" />
+                                    <Separator />
+                                    <jv:ContextMenuItem Header="自动滚动" IsCheckable="True" IsChecked="True" />
+                                    <jv:ContextMenuItem Header="导出">
+                                        <jv:ContextMenuItem Header="导出为 PNG" />
+                                        <jv:ContextMenuItem Header="导出为 JPEG" />
+                                    </jv:ContextMenuItem>
+                                </jv:ContextMenu>
+                            </jv:Button.ContextMenu>
+                        </jv:Button>
+                    </StackPanel>
+                </demo:DemoSection>
 
-            <demo:DemoSection
-                Title="jv:ToolBar（横向 / 纵向）"
-                Description="ToolBarItem.Icon 是按钮自身属性；ToolBar 继承 WPF ItemsControl，也支持 ItemsSource + ItemContainerStyle 绑定；Orientation=Vertical 切换纵向。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.ToolBarDemo}">
-                <StackPanel>
-                    <jv:ToolBar
-                        HorizontalAlignment="Left"
-                        FontFamily="{DynamicResource IconFont}"
-                        FontSize="16"
-                        Foreground="{DynamicResource Theme.Brush.Text.Primary}">
-                        <jv:ToolBarItem Icon="&#xE60F;" ToolTip="设置" />
-                        <jv:ToolBarItem Icon="&#xE611;" ToolTip="刷新" />
-                        <jv:ToolBarItem Icon="&#xE932;" ToolTip="告警" />
-                        <jv:ToolBarItem Icon="&#xE60C;" ToolTip="截图" />
-                    </jv:ToolBar>
-                    <jv:ToolBar
-                        Width="48"
-                        Margin="0,8,0,0"
-                        HorizontalAlignment="Left"
-                        FontFamily="{DynamicResource IconFont}"
-                        FontSize="16"
-                        Foreground="{DynamicResource Theme.Brush.Text.Primary}"
-                        Orientation="Vertical">
-                        <jv:ToolBarItem Icon="&#xE60F;" ToolTip="设置" />
-                        <jv:ToolBarItem Icon="&#xE611;" ToolTip="刷新" />
-                        <jv:ToolBarItem Icon="&#xE932;" ToolTip="告警" />
-                    </jv:ToolBar>
-                </StackPanel>
-            </demo:DemoSection>
+                <demo:DemoSection
+                    Title="jv:TreeMenu（树形导航）"
+                    Description="jv:TreeMenuItem 为 POCO 数据模型（Title/Icon/Children），由默认 HierarchicalDataTemplate 渲染；默认容器样式已启用 atc:ExpanderBehavior.Enable：双击/Enter 展开或折叠文件夹，激活叶节点时执行 NavigateCommand（本页以 MessageBarService 反馈）。根级与嵌套层级均参与虚拟化。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.TreeMenuDemo}">
+                    <jv:TreeMenu
+                        x:Name="TreeNav"
+                        Height="200"
+                        DisplayMode="Normal"
+                        atc:Icon.FontFamily="{DynamicResource IconFont}"
+                        atc:Icon.IconSize="16" />
+                </demo:DemoSection>
 
-            <demo:DemoSection
-                Title="jv:Toolbox（悬浮工具箱：悬停分组打开 Popup，工具可拖放）"
-                Description="任意时刻最多展开一个分组；ToolItem 按住可发起 Copy 拖放（IsDragEnabled 默认 True，十字指针）；图标颜色由 atc:Icon.IconForeground 控制、标题颜色由 Foreground 控制。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.ToolboxDemo}">
-                <jv:Toolbox HorizontalAlignment="Left">
-                    <jv:ToolboxItem Icon="&#xE60F;" Title="基础工具">
-                        <jv:ToolItem Icon="&#xE611;" Title="刷新" />
-                        <jv:ToolItem Icon="&#xE60C;" Title="截图" />
-                        <jv:ToolItem Icon="&#xE650;" Title="移动" />
-                        <jv:ToolItem Icon="&#xE932;" Title="检测" />
-                    </jv:ToolboxItem>
-                    <jv:ToolboxItem Icon="&#xE66B;" Title="视觉工具">
-                        <jv:ToolItem Icon="&#xE981;" Title="定位" />
-                        <jv:ToolItem Icon="&#xE60F;" Title="标定" />
-                    </jv:ToolboxItem>
-                </jv:Toolbox>
-            </demo:DemoSection>
+                <demo:DemoSection
+                    Title="jv:TabMenu（可关闭页签 + TabClosing 拦截）"
+                    Description="IsClosable 控制是否显示关闭按钮（默认 True）；双击文字标题可重命名（CanRename）；CanCloseLastTab=False 保护最后一个页签；TabClosing 事件可取消关闭。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.TabMenuDemo}">
+                    <jv:TabMenu
+                        Height="220"
+                        CanCloseLastTab="False"
+                        TabClosing="OnTabClosing">
+                        <jv:TabMenuItem Header="相机 1" Icon="&#xE66B;">
+                            <TextBlock Margin="16" Text="相机 1 的内容区域（虚拟数据演示页签内容）。" />
+                        </jv:TabMenuItem>
+                        <jv:TabMenuItem Header="日志">
+                            <TextBlock Margin="16" Text="日志页签内容。" />
+                        </jv:TabMenuItem>
+                        <jv:TabMenuItem Header="保护页">
+                            <TextBlock Margin="16" Text="尝试关闭此页签：TabClosing 事件会取消并弹出提示。" />
+                        </jv:TabMenuItem>
+                    </jv:TabMenu>
+                </demo:DemoSection>
 
-        </StackPanel>
-    </ScrollViewer>
+                <demo:DemoSection
+                    Title="jv:ToolBar（横向 / 纵向）"
+                    Description="ToolBarItem.Icon 是按钮自身属性；ToolBar 继承 WPF ItemsControl，也支持 ItemsSource + ItemContainerStyle 绑定；Orientation=Vertical 切换纵向。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.ToolBarDemo}">
+                    <StackPanel>
+                        <jv:ToolBar
+                            HorizontalAlignment="Left"
+                            FontFamily="{DynamicResource IconFont}"
+                            FontSize="16"
+                            Foreground="{DynamicResource Theme.Brush.Text.Primary}">
+                            <jv:ToolBarItem Icon="&#xE60F;" ToolTip="设置" />
+                            <jv:ToolBarItem Icon="&#xE611;" ToolTip="刷新" />
+                            <jv:ToolBarItem Icon="&#xE932;" ToolTip="告警" />
+                            <jv:ToolBarItem Icon="&#xE60C;" ToolTip="截图" />
+                        </jv:ToolBar>
+                        <jv:ToolBar
+                            Width="48"
+                            Margin="0,8,0,0"
+                            HorizontalAlignment="Left"
+                            FontFamily="{DynamicResource IconFont}"
+                            FontSize="16"
+                            Foreground="{DynamicResource Theme.Brush.Text.Primary}"
+                            Orientation="Vertical">
+                            <jv:ToolBarItem Icon="&#xE60F;" ToolTip="设置" />
+                            <jv:ToolBarItem Icon="&#xE611;" ToolTip="刷新" />
+                            <jv:ToolBarItem Icon="&#xE932;" ToolTip="告警" />
+                        </jv:ToolBar>
+                    </StackPanel>
+                </demo:DemoSection>
+
+                <demo:DemoSection
+                    Title="jv:Toolbox（悬浮工具箱：悬停分组打开 Popup，工具可拖放）"
+                    Description="任意时刻最多展开一个分组；ToolItem 按住可发起 Copy 拖放（IsDragEnabled 默认 True，十字指针）；图标颜色由 atc:Icon.IconForeground 控制、标题颜色由 Foreground 控制。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.ToolboxDemo}">
+                    <jv:Toolbox HorizontalAlignment="Left">
+                        <jv:ToolboxItem Icon="&#xE60F;" Title="基础工具">
+                            <jv:ToolItem Icon="&#xE611;" Title="刷新" />
+                            <jv:ToolItem Icon="&#xE60C;" Title="截图" />
+                            <jv:ToolItem Icon="&#xE650;" Title="移动" />
+                            <jv:ToolItem Icon="&#xE932;" Title="检测" />
+                        </jv:ToolboxItem>
+                        <jv:ToolboxItem Icon="&#xE66B;" Title="视觉工具">
+                            <jv:ToolItem Icon="&#xE981;" Title="定位" />
+                            <jv:ToolItem Icon="&#xE60F;" Title="标定" />
+                        </jv:ToolboxItem>
+                    </jv:Toolbox>
+                </demo:DemoSection>
+
+                <demo:DemoSection
+                    Title="jv:AppBar Mode=Expandable（可展开标题栏：抽屉 + 居中标题 + 系统按钮）"
+                    Description="AppBar 经 Mode 枚举切换布局（Default / MenuBar / Expandable）。Expandable：最左侧为抽屉开关（设置了 Drawer 内容才显示），点击在标题栏下方展开悬浮抽屉——点抽屉外部收起，再次点击开关同样收起（开合防抖）；AutoCloseOnDrawerClick=True 时点击抽屉内的列表项等未处理点击自动收起。标题在整条标题栏内居中；最右侧最小化 / 最大化（还原）/ 关闭按钮经 SystemCommands 作用于所在窗口——即本演示程序，Close 会真的关闭它，请慎点。拖动仍交由宿主 WindowChrome caption 区（建议 CaptionHeight 绑定本控件 ActualHeight）。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.AppBarExpandableDemo}">
+                    <jv:AppBar
+                        Height="56"
+                        Mode="Expandable"
+                        AutoCloseOnDrawerClick="True"
+                        Content="Junevy Studio"
+                        atc:Icon.FontFamily="{DynamicResource IconFont}">
+                        <jv:AppBar.Drawer>
+                            <ListBox MinWidth="200">
+                                <ListBoxItem Content="首页" IsSelected="True" />
+                                <ListBoxItem Content="数据采集" />
+                                <ListBoxItem Content="报表中心" />
+                                <ListBoxItem Content="系统设置" />
+                            </ListBox>
+                        </jv:AppBar.Drawer>
+                    </jv:AppBar>
+                </demo:DemoSection>
+
+                <demo:DemoSection
+                    Title="jv:InfoBar（用户信息条：头像 + 名称 / 仅头像，点击弹出菜单或面板）"
+                    Description="Text 布局：头像（AvatarSource 图片，或名称首字符字标）+ 名称 + 可选设置按钮（SettingsClick 路由事件）；AvatarOnly 布局：仅头像（指定宽度时居中），悬停经 ToolTip 显示名称。点击弹出与控件等宽的菜单：菜单项可在 XAML 中直接编写（作为 Items），也可经 ItemsSource 绑定列表（项外观用 ItemTemplate 定制）；设 MenuContent 后弹层变为任意面板内容（ListBox / UserControl / 复杂布局），宽度用 MenuWidth 指定、高度用 MenuMaxHeight 限制。默认向上展开（MenuPlacement 可换），点菜单外部或再次点击收起，AutoCloseOnMenuClick=True 时点击菜单内按钮项自动收起。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.InfoBarDemo}">
+                    <StackPanel>
+                        <jv:InfoBar
+                            Width="280"
+                            HorizontalAlignment="Left"
+                            UserName="xuhill07"
+                            AutoCloseOnMenuClick="True"
+                            SettingsClick="OnInfoBarSettingsClick">
+                            <jv:Button
+                                HorizontalContentAlignment="Left"
+                                Content="&#xE60F; 应用设置"
+                                Style="{StaticResource NoBorderButtonStyle}" />
+                            <jv:Button
+                                HorizontalContentAlignment="Left"
+                                Content="&#xE651; 个人资料"
+                                Style="{StaticResource NoBorderButtonStyle}" />
+                            <jv:Button
+                                HorizontalContentAlignment="Left"
+                                Content="&#xE639; 退出登录"
+                                Style="{StaticResource NoBorderButtonStyle}" />
+                        </jv:InfoBar>
+                        <jv:InfoBar
+                            Width="120"
+                            Margin="0,12,0,0"
+                            HorizontalAlignment="Left"
+                            DisplayMode="AvatarOnly"
+                            UserName="xuhill07"
+                            AvatarSource="pack://application:,,,/Junevy.Controls;component/Resources/Pictures/Author.png"
+                            ItemsSource="{Binding InfoBarMenuItems, ElementName=PageRoot}"
+                            ItemTemplate="{StaticResource InfoBarMenuItemTemplate}"
+                            ButtonBase.Click="OnInfoBarMenuItemClick"
+                            SettingsClick="OnInfoBarSettingsClick" />
+                        <jv:InfoBar
+                            Width="280"
+                            Margin="0,12,0,0"
+                            HorizontalAlignment="Left"
+                            UserName="操作面板"
+                            MenuWidth="360"
+                            MenuMaxHeight="240"
+                            SettingsClick="OnInfoBarSettingsClick">
+                            <!--  MenuContent:任意面板内容(ListBox / UserControl / 复杂布局),
+                                  等宽约束被 MenuWidth 覆盖;AutoCloseOnMenuClick 只对按钮项生效  -->
+                            <jv:InfoBar.MenuContent>
+                                <StackPanel>
+                                    <TextBlock
+                                        Margin="8,8,8,4"
+                                        FontWeight="Bold"
+                                        Text="快捷操作" />
+                                    <ListBox BorderThickness="0">
+                                        <ListBoxItem Content="任务 1:导出检测报告" />
+                                        <ListBoxItem Content="任务 2:重建索引" />
+                                        <ListBoxItem Content="任务 3:清理缓存" />
+                                    </ListBox>
+                                </StackPanel>
+                            </jv:InfoBar.MenuContent>
+                        </jv:InfoBar>
+                    </StackPanel>
+                </demo:DemoSection>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
 </UserControl>

@@ -431,6 +431,69 @@ namespace Junevy.Controls.Showcase
             </jv:Toolbox>
             """;
 
+        // ---------------- 菜单与导航（MenusPage）· 可展开标题栏 / 用户信息 ----------------
+
+        public const string AppBarExpandableDemo = """
+            <!-- Mode=Expandable：最左抽屉开关（设置 Drawer 内容才显示）+ 整条居中的标题 + 右侧最小化/最大化/关闭；
+                 抽屉经 Popup 从标题栏下方悬浮展开：点外部收起，再次点开关同样收起（开合防抖），
+                 AutoCloseOnDrawerClick=True 时点击抽屉内未处理的左键（如列表项）自动收起。
+                 caption 按钮经 SystemCommands 作用于所在窗口；
+                 拖动交由宿主 WindowChrome caption 区，建议 CaptionHeight="{Binding ActualHeight, ElementName=Bar}" -->
+            <jv:AppBar
+                Height="56"
+                Mode="Expandable"
+                AutoCloseOnDrawerClick="True"
+                Content="Junevy Studio"
+                atc:Icon.FontFamily="{DynamicResource IconFont}">
+                <jv:AppBar.Drawer>
+                    <ListBox MinWidth="200">
+                        <ListBoxItem Content="首页" IsSelected="True" />
+                        <ListBoxItem Content="数据采集" />
+                        <ListBoxItem Content="报表中心" />
+                        <ListBoxItem Content="系统设置" />
+                    </ListBox>
+                </jv:AppBar.Drawer>
+            </jv:AppBar>
+            """;
+
+        public const string InfoBarDemo = """
+            <!-- Text 布局:头像(AvatarSource 图片,或名称首字符字标)+ 名称 + 设置按钮(SettingsClick);
+                 菜单项在 XAML 中直接编写(作为 Items),AutoCloseOnMenuClick=True 时点击菜单内按钮自动收起 -->
+            <jv:InfoBar Width="280" UserName="xuhill07" AutoCloseOnMenuClick="True"
+                        SettingsClick="OnInfoBarSettingsClick">
+                <jv:Button Content="&#xE60F; 应用设置" HorizontalContentAlignment="Left"
+                           Style="{StaticResource NoBorderButtonStyle}" />
+                <jv:Button Content="&#xE651; 个人资料" HorizontalContentAlignment="Left"
+                           Style="{StaticResource NoBorderButtonStyle}" />
+                <jv:Button Content="&#xE639; 退出登录" HorizontalContentAlignment="Left"
+                           Style="{StaticResource NoBorderButtonStyle}" />
+            </jv:InfoBar>
+
+            <!-- AvatarOnly 布局:仅头像(指定宽度时居中显示),悬停经 ToolTip 显示名称;
+                 菜单经 ItemsSource 绑定列表,项外观用 ItemTemplate 定制;菜单与控件等宽 -->
+            <jv:InfoBar Width="120" DisplayMode="AvatarOnly" UserName="xuhill07"
+                        AvatarSource="pack://application:,,,/Junevy.Controls;component/Resources/Pictures/Author.png"
+                        ItemsSource="{Binding InfoBarMenuItems, ElementName=PageRoot}"
+                        ItemTemplate="{StaticResource InfoBarMenuItemTemplate}"
+                        ButtonBase.Click="OnInfoBarMenuItemClick"
+                        SettingsClick="OnInfoBarSettingsClick" />
+
+            <!-- 面板模式:MenuContent 放任意内容(ListBox / UserControl / 复杂布局),
+                 MenuWidth 覆盖等宽约束,MenuMaxHeight 限制弹层高度 -->
+            <jv:InfoBar Width="280" UserName="操作面板" MenuWidth="360" MenuMaxHeight="240"
+                        SettingsClick="OnInfoBarSettingsClick">
+                <jv:InfoBar.MenuContent>
+                    <StackPanel>
+                        <TextBlock Margin="8,8,8,4" FontWeight="Bold" Text="快捷操作" />
+                        <ListBox BorderThickness="0">
+                            <ListBoxItem Content="任务 1:导出检测报告" />
+                            <ListBoxItem Content="任务 2:重建索引" />
+                        </ListBox>
+                    </StackPanel>
+                </jv:InfoBar.MenuContent>
+            </jv:InfoBar>
+            """;
+
         // ---------------- 布局控件（LayoutPage） ----------------
 
         public const string GroupBoxDemo = """

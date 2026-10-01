@@ -7,234 +7,241 @@
     xmlns:jv="github.com.junevy"
     xmlns:sample="clr-namespace:Junevy.Controls.Showcase">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel MaxWidth="1080" HorizontalAlignment="Center">
+    <Border
+        Padding="10"
+        Background="{DynamicResource Theme.Brush.Background.App}"
+        BorderBrush="{DynamicResource Theme.Brush.Border.Subtle}"
+        BorderThickness="1"
+        CornerRadius="15,0,0,15">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel MaxWidth="1080" HorizontalAlignment="Center">
 
-            <TextBlock Style="{StaticResource DemoPageTitle}" Text="输入与选择" />
-            <TextBlock
-                Style="{StaticResource DemoPageSubtitle}"
-                Text="jv:CheckBox / jv:TextBox / jv:ComboBox / DatePicker / jv:Slider。本页重点演示附加属性：PlaceholderAssist、TitleAssist、Icon、ShowClear、CommandButton、DatePickerAssist。" />
+                <TextBlock Style="{StaticResource DemoPageTitle}" Text="输入与选择" />
+                <TextBlock
+                    Style="{StaticResource DemoPageSubtitle}"
+                    Text="jv:CheckBox / jv:TextBox / jv:ComboBox / DatePicker / jv:Slider。本页重点演示附加属性：PlaceholderAssist、TitleAssist、Icon、ShowClear、CommandButton、DatePickerAssist。" />
 
-            <demo:DemoSection
-                Title="jv:CheckBox"
-                Description="保留 WPF 三态与禁用行为；IsChecked={x:Null} 显示不确定态。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.CheckBoxDemo}">
-                <WrapPanel>
-                    <jv:CheckBox Content="启用检测" IsChecked="True" />
-                    <jv:CheckBox Content="未选中" />
-                    <jv:CheckBox Content="不确定态" IsChecked="{x:Null}" IsThreeState="True" />
-                    <jv:CheckBox Content="禁用" IsChecked="True" IsEnabled="False" />
-                </WrapPanel>
-            </demo:DemoSection>
+                <demo:DemoSection
+                    Title="jv:CheckBox"
+                    Description="保留 WPF 三态与禁用行为；IsChecked={x:Null} 显示不确定态。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.CheckBoxDemo}">
+                    <WrapPanel>
+                        <jv:CheckBox Content="启用检测" IsChecked="True" />
+                        <jv:CheckBox Content="未选中" />
+                        <jv:CheckBox Content="不确定态" IsChecked="{x:Null}" IsThreeState="True" />
+                        <jv:CheckBox Content="禁用" IsChecked="True" IsEnabled="False" />
+                    </WrapPanel>
+                </demo:DemoSection>
 
-            <demo:DemoSection
-                Title="jv:TextBox —— PlaceholderAssist / Icon / ShowClear / CommandButton"
-                Description="占位符仅在控件无值时显示（TextBox：文本为空且未聚焦）；占位内容为 object，iconfont 字形时字体族跟随 atc:Icon.FontFamily；原生 TextBox 经附加属性同样生效；Tag 不再被模板消费。命令按钮与清空按钮互斥。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.TextBoxAssist}">
-                <WrapPanel>
-                    <jv:TextBox
-                        Width="240"
-                        atc:PlaceholderAssist.Placeholder="相机名称（纯占位符）" />
-                    <jv:TextBox
-                        Width="240"
-                        atc:Icon.FontFamily="{DynamicResource IconFont}"
-                        atc:Icon.Icon="&#xE60C;"
-                        atc:PlaceholderAssist.Placeholder="图标 + 占位符 + 清空"
-                        ShowClear="True" />
-                    <jv:TextBox
-                        Width="240"
-                        atc:Icon.FontFamily="{DynamicResource IconFont}"
-                        atc:Icon.Icon="&#xE60F;"
-                        atc:PlaceholderAssist.Placeholder="&#xE60F; 检索设备（iconfont 占位符）"
-                        ShowClear="True" />
-                    <jv:TextBox
-                        Width="240"
-                        atc:Icon.FontFamily="{DynamicResource IconFont}"
-                        atc:Icon.Icon="&#xE60C;"
-                        atc:PlaceholderAssist.Placeholder="ShowClear=False 无清空按钮"
-                        ShowClear="False" />
-                    <jv:TextBox
-                        Width="240"
-                        atc:Icon.FontFamily="{DynamicResource IconFont}"
-                        atc:PlaceholderAssist.Placeholder="命令按钮（与清空互斥）"
-                        ShowClear="False"
-                        ShowCommandButton="True"
-                        CommandButtonContent="&#xE611;"
-                        CommandButtonCommand="{Binding TextBoxCommandButtonCommand}"
-                        CommandButtonCommandParameter="来自 TextBox 命令按钮" />
-                    <TextBox
-                        Width="240"
-                        atc:PlaceholderAssist.Placeholder="原生 TextBox 借用外观" />
-                    <jv:TextBox Text="有值时占位符自动隐藏" Width="240" />
-                </WrapPanel>
-            </demo:DemoSection>
-
-            <demo:DemoSection
-                Title="jv:TextBox —— TitleAssist（输入框外侧标题）"
-                Description="标题内容为 object（可直接设 iconfont 字形）；TitlePlacement 四方位、间距固定 4 DIP；字体族/字号未设置时继承控件自身值，颜色未设置时取主题次级文本色。TitleWidth 为标题区域固定宽度（默认 NaN 自适应）：表单式布局中统一设置后，不同长度的标题保持一致的标题—输入框间距，输入框整列对齐（左方位标题自动右对齐贴合输入框）。IsRequired 为 true 时标题旁显示必填图标：默认主题 Danger 色小圆点，IsRequiredIcon 可自定义内容（如星号「*」），IsRequiredIconPlacement 控制图标在标题左侧或右侧（默认右侧）；未设置 Title 时不显示必填标识。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.TextBoxTitleAssist}">
-                <StackPanel>
+                <demo:DemoSection
+                    Title="jv:TextBox —— PlaceholderAssist / Icon / ShowClear / CommandButton"
+                    Description="占位符仅在控件无值时显示（TextBox：文本为空且未聚焦）；占位内容为 object，iconfont 字形时字体族跟随 atc:Icon.FontFamily；原生 TextBox 经附加属性同样生效；Tag 不再被模板消费。命令按钮与清空按钮互斥。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.TextBoxAssist}">
                     <WrapPanel>
                         <jv:TextBox
-                            Width="220"
-                            atc:TitleAssist.Title="Server IP（Top）" />
+                            Width="240"
+                            atc:PlaceholderAssist.Placeholder="相机名称（纯占位符）" />
                         <jv:TextBox
-                            Width="220"
-                            atc:TitleAssist.Title="Server IP（Left）"
-                            atc:TitleAssist.TitlePlacement="Left" />
+                            Width="240"
+                            atc:Icon.FontFamily="{DynamicResource IconFont}"
+                            atc:Icon.Icon="&#xE60C;"
+                            atc:PlaceholderAssist.Placeholder="图标 + 占位符 + 清空"
+                            ShowClear="True" />
                         <jv:TextBox
-                            Width="220"
-                            atc:TitleAssist.Title="Server IP（Bottom）"
-                            atc:TitleAssist.TitlePlacement="Bottom" />
+                            Width="240"
+                            atc:Icon.FontFamily="{DynamicResource IconFont}"
+                            atc:Icon.Icon="&#xE60F;"
+                            atc:PlaceholderAssist.Placeholder="&#xE60F; 检索设备（iconfont 占位符）"
+                            ShowClear="True" />
                         <jv:TextBox
-                            Width="220"
-                            atc:TitleAssist.Title="Server IP（Right）"
-                            atc:TitleAssist.TitlePlacement="Right" />
-                        <jv:ComboBox
-                            Width="220"
-                            atc:TitleAssist.Title="&#xE60F; Settings"
-                            atc:TitleAssist.TitleFontFamily="{DynamicResource IconFont}"
-                            atc:TitleAssist.TitleFontSize="14"
-                            atc:TitleAssist.TitleFontWeight="Bold"
-                            atc:TitleAssist.TitleForeground="OrangeRed"
-                            atc:PlaceholderAssist.Placeholder="iconfont 标题 ComboBox" />
+                            Width="240"
+                            atc:Icon.FontFamily="{DynamicResource IconFont}"
+                            atc:Icon.Icon="&#xE60C;"
+                            atc:PlaceholderAssist.Placeholder="ShowClear=False 无清空按钮"
+                            ShowClear="False" />
+                        <jv:TextBox
+                            Width="240"
+                            atc:Icon.FontFamily="{DynamicResource IconFont}"
+                            atc:PlaceholderAssist.Placeholder="命令按钮（与清空互斥）"
+                            ShowClear="False"
+                            ShowCommandButton="True"
+                            CommandButtonContent="&#xE611;"
+                            CommandButtonCommand="{Binding TextBoxCommandButtonCommand}"
+                            CommandButtonCommandParameter="来自 TextBox 命令按钮" />
+                        <TextBox
+                            Width="240"
+                            atc:PlaceholderAssist.Placeholder="原生 TextBox 借用外观" />
+                        <jv:TextBox Text="有值时占位符自动隐藏" Width="240" />
                     </WrapPanel>
-                    <WrapPanel Margin="0,12,0,0">
-                        <jv:TextBox
-                            Width="220"
-                            atc:TitleAssist.IsRequired="True"
-                            atc:TitleAssist.Title="服务器地址（默认圆点）" />
-                        <jv:ComboBox
-                            Width="220"
-                            atc:TitleAssist.IsRequired="True"
-                            atc:TitleAssist.IsRequiredIcon="*"
-                            atc:TitleAssist.Title="采集模式（自定义星号）" />
-                        <jv:TextBox
-                            Width="220"
-                            atc:TitleAssist.IsRequired="True"
-                            atc:TitleAssist.IsRequiredIconPlacement="Left"
-                            atc:TitleAssist.Title="设备名称（图标在左）" />
-                        <jv:TextBox
-                            Width="220"
-                            atc:TitleAssist.IsRequired="True"
-                            atc:TitleAssist.IsRequiredIcon="*"
-                            atc:TitleAssist.IsRequiredIconPlacement="Left"
-                            atc:TitleAssist.TitlePlacement="Right"
-                            atc:TitleAssist.Title="备注（Right 方位）" />
-                    </WrapPanel>
-                    <StackPanel Margin="0,12,0,0">
-                        <jv:TextBox
-                            Width="260"
-                            HorizontalAlignment="Left"
-                            atc:TitleAssist.IsRequired="True"
-                            atc:TitleAssist.Title="用户名"
-                            atc:TitleAssist.TitlePlacement="Left"
-                            atc:TitleAssist.TitleWidth="110" />
-                        <jv:ComboBox
-                            Width="260"
-                            Margin="0,8,0,0"
-                            HorizontalAlignment="Left"
-                            atc:TitleAssist.IsRequired="True"
-                            atc:TitleAssist.IsRequiredIcon="*"
-                            atc:TitleAssist.Title="电子邮箱地址"
-                            atc:TitleAssist.TitlePlacement="Left"
-                            atc:TitleAssist.TitleWidth="110" />
-                        <jv:TextBox
-                            Width="260"
-                            Margin="0,8,0,0"
-                            HorizontalAlignment="Left"
-                            atc:TitleAssist.Title="部门"
-                            atc:TitleAssist.TitlePlacement="Left"
-                            atc:TitleAssist.TitleWidth="110" />
+                </demo:DemoSection>
+
+                <demo:DemoSection
+                    Title="jv:TextBox —— TitleAssist（输入框外侧标题）"
+                    Description="标题内容为 object（可直接设 iconfont 字形）；TitlePlacement 四方位、间距固定 4 DIP；字体族/字号未设置时继承控件自身值，颜色未设置时取主题次级文本色。TitleWidth 为标题区域固定宽度（默认 NaN 自适应）：表单式布局中统一设置后，不同长度的标题保持一致的标题—输入框间距，输入框整列对齐（左方位标题自动右对齐贴合输入框）。IsRequired 为 true 时标题旁显示必填图标：默认主题 Danger 色小圆点，IsRequiredIcon 可自定义内容（如星号「*」），IsRequiredIconPlacement 控制图标在标题左侧或右侧（默认右侧）；未设置 Title 时不显示必填标识。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.TextBoxTitleAssist}">
+                    <StackPanel>
+                        <WrapPanel>
+                            <jv:TextBox
+                                Width="220"
+                                atc:TitleAssist.Title="Server IP（Top）" />
+                            <jv:TextBox
+                                Width="220"
+                                atc:TitleAssist.Title="Server IP（Left）"
+                                atc:TitleAssist.TitlePlacement="Left" />
+                            <jv:TextBox
+                                Width="220"
+                                atc:TitleAssist.Title="Server IP（Bottom）"
+                                atc:TitleAssist.TitlePlacement="Bottom" />
+                            <jv:TextBox
+                                Width="220"
+                                atc:TitleAssist.Title="Server IP（Right）"
+                                atc:TitleAssist.TitlePlacement="Right" />
+                            <jv:ComboBox
+                                Width="220"
+                                atc:TitleAssist.Title="&#xE60F; Settings"
+                                atc:TitleAssist.TitleFontFamily="{DynamicResource IconFont}"
+                                atc:TitleAssist.TitleFontSize="14"
+                                atc:TitleAssist.TitleFontWeight="Bold"
+                                atc:TitleAssist.TitleForeground="OrangeRed"
+                                atc:PlaceholderAssist.Placeholder="iconfont 标题 ComboBox" />
+                        </WrapPanel>
+                        <WrapPanel Margin="0,12,0,0">
+                            <jv:TextBox
+                                Width="220"
+                                atc:TitleAssist.IsRequired="True"
+                                atc:TitleAssist.Title="服务器地址（默认圆点）" />
+                            <jv:ComboBox
+                                Width="220"
+                                atc:TitleAssist.IsRequired="True"
+                                atc:TitleAssist.IsRequiredIcon="*"
+                                atc:TitleAssist.Title="采集模式（自定义星号）" />
+                            <jv:TextBox
+                                Width="220"
+                                atc:TitleAssist.IsRequired="True"
+                                atc:TitleAssist.IsRequiredIconPlacement="Left"
+                                atc:TitleAssist.Title="设备名称（图标在左）" />
+                            <jv:TextBox
+                                Width="220"
+                                atc:TitleAssist.IsRequired="True"
+                                atc:TitleAssist.IsRequiredIcon="*"
+                                atc:TitleAssist.IsRequiredIconPlacement="Left"
+                                atc:TitleAssist.TitlePlacement="Right"
+                                atc:TitleAssist.Title="备注（Right 方位）" />
+                        </WrapPanel>
+                        <StackPanel Margin="0,12,0,0">
+                            <jv:TextBox
+                                Width="260"
+                                HorizontalAlignment="Left"
+                                atc:TitleAssist.IsRequired="True"
+                                atc:TitleAssist.Title="用户名"
+                                atc:TitleAssist.TitlePlacement="Left"
+                                atc:TitleAssist.TitleWidth="110" />
+                            <jv:ComboBox
+                                Width="260"
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Left"
+                                atc:TitleAssist.IsRequired="True"
+                                atc:TitleAssist.IsRequiredIcon="*"
+                                atc:TitleAssist.Title="电子邮箱地址"
+                                atc:TitleAssist.TitlePlacement="Left"
+                                atc:TitleAssist.TitleWidth="110" />
+                            <jv:TextBox
+                                Width="260"
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Left"
+                                atc:TitleAssist.Title="部门"
+                                atc:TitleAssist.TitlePlacement="Left"
+                                atc:TitleAssist.TitleWidth="110" />
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-            </demo:DemoSection>
+                </demo:DemoSection>
 
-            <demo:DemoSection
-                Title="jv:ComboBox"
-                Description="不可编辑时单击主体区域与单击箭头等效；jv:ComboBox 未设置占位符时隐式样式保留历史默认文案 “Select an item...”；原生 ComboBox 无默认文案，可经附加属性提供。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.ComboBoxDemo}">
-                <WrapPanel>
-                    <jv:ComboBox ItemsSource="{Binding Cameras}" SelectedIndex="0" />
-                    <jv:ComboBox atc:PlaceholderAssist.Placeholder="选择采集模式...">
-                        <jv:ComboBoxItem Content="Continuous" />
-                        <jv:ComboBoxItem Content="Trigger" />
-                        <jv:ComboBoxItem Content="Software" />
-                    </jv:ComboBox>
-                    <jv:ComboBox
-                        IsEditable="True"
-                        atc:PlaceholderAssist.Placeholder="可编辑 + 占位符" />
-                    <jv:ComboBox />
-                    <ComboBox atc:PlaceholderAssist.Placeholder="原生 ComboBox 占位" />
-                </WrapPanel>
-            </demo:DemoSection>
+                <demo:DemoSection
+                    Title="jv:ComboBox"
+                    Description="不可编辑时单击主体区域与单击箭头等效；jv:ComboBox 未设置占位符时隐式样式保留历史默认文案 “Select an item...”；原生 ComboBox 无默认文案，可经附加属性提供。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.ComboBoxDemo}">
+                    <WrapPanel>
+                        <jv:ComboBox ItemsSource="{Binding Cameras}" SelectedIndex="0" />
+                        <jv:ComboBox atc:PlaceholderAssist.Placeholder="选择采集模式...">
+                            <jv:ComboBoxItem Content="Continuous" />
+                            <jv:ComboBoxItem Content="Trigger" />
+                            <jv:ComboBoxItem Content="Software" />
+                        </jv:ComboBox>
+                        <jv:ComboBox
+                            IsEditable="True"
+                            atc:PlaceholderAssist.Placeholder="可编辑 + 占位符" />
+                        <jv:ComboBox />
+                        <ComboBox atc:PlaceholderAssist.Placeholder="原生 ComboBox 占位" />
+                    </WrapPanel>
+                </demo:DemoSection>
 
-            <demo:DemoSection
-                Title="DatePicker —— DatePickerAssist.PlaceHolder"
-                Description="DatePicker 为官方控件完整主题接管；注意占位符是 DatePickerAssist.PlaceHolder（大写 H，string 类型），与 PlaceholderAssist.Placeholder 区分。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.DatePickerDemo}">
-                <WrapPanel>
-                    <DatePicker atc:DatePickerAssist.PlaceHolder="选择开始日期" />
-                    <DatePicker SelectedDate="2026-09-20" atc:DatePickerAssist.PlaceHolder="选择结束日期" />
-                </WrapPanel>
-            </demo:DemoSection>
+                <demo:DemoSection
+                    Title="DatePicker —— DatePickerAssist.PlaceHolder"
+                    Description="DatePicker 为官方控件完整主题接管；注意占位符是 DatePickerAssist.PlaceHolder（大写 H，string 类型），与 PlaceholderAssist.Placeholder 区分。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.DatePickerDemo}">
+                    <WrapPanel>
+                        <DatePicker atc:DatePickerAssist.PlaceHolder="选择开始日期" />
+                        <DatePicker SelectedDate="2026-09-20" atc:DatePickerAssist.PlaceHolder="选择结束日期" />
+                    </WrapPanel>
+                </demo:DemoSection>
 
-            <demo:DemoSection
-                Title="jv:Slider（数值框）"
-                Description="数值框（ShowValueBox/ValueBoxSide/ValueFormatString）为 jv:Slider 专有；回车或失焦提交，越界自动夹取，非法文本还原显示；原生 Slider 仅有外观，数值框自动折叠。"
-                XamlCode="{x:Static sample:ShowcaseSnippets.SliderDemo}">
-                <StackPanel>
-                    <jv:Slider
-                        Margin="0,2,0,2"
-                        Maximum="100"
-                        Minimum="0"
-                        TickFrequency="10"
-                        TickPlacement="BottomRight"
-                        Value="60"
-                        ValueBoxSide="Right"
-                        ValueFormatString="F0" />
-                    <jv:Slider
-                        Margin="0,2,0,2"
-                        Maximum="16"
-                        Minimum="1"
-                        TickFrequency="1"
-                        TickPlacement="BottomRight"
-                        Value="8"
-                        ValueBoxSide="Left"
-                        ValueFormatString="F1" />
-                    <jv:Slider
-                        Margin="0,2,0,2"
-                        Maximum="100"
-                        Minimum="0"
-                        Value="45"
-                        ValueBoxSide="Bottom"
-                        ValueFormatString="p0" />
-                    <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+                <demo:DemoSection
+                    Title="jv:Slider（数值框）"
+                    Description="数值框（ShowValueBox/ValueBoxSide/ValueFormatString）为 jv:Slider 专有；回车或失焦提交，越界自动夹取，非法文本还原显示；原生 Slider 仅有外观，数值框自动折叠。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.SliderDemo}">
+                    <StackPanel>
                         <jv:Slider
-                            Width="200"
-                            Margin="0,0,32,0"
+                            Margin="0,2,0,2"
                             Maximum="100"
                             Minimum="0"
-                            ShowValueBox="False"
+                            TickFrequency="10"
                             TickPlacement="BottomRight"
-                            TickFrequency="10"
-                            Value="30" />
+                            Value="60"
+                            ValueBoxSide="Right"
+                            ValueFormatString="F0" />
                         <jv:Slider
-                            Height="180"
-                            Orientation="Vertical"
-                            TickFrequency="10"
-                            TickPlacement="TopLeft"
-                            Value="65" />
+                            Margin="0,2,0,2"
+                            Maximum="16"
+                            Minimum="1"
+                            TickFrequency="1"
+                            TickPlacement="BottomRight"
+                            Value="8"
+                            ValueBoxSide="Left"
+                            ValueFormatString="F1" />
                         <jv:Slider
-                            Height="180"
-                            Margin="32,0,0,0"
-                            IsEnabled="False"
-                            Orientation="Vertical"
-                            Value="35" />
+                            Margin="0,2,0,2"
+                            Maximum="100"
+                            Minimum="0"
+                            Value="45"
+                            ValueBoxSide="Bottom"
+                            ValueFormatString="p0" />
+                        <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+                            <jv:Slider
+                                Width="200"
+                                Margin="0,0,32,0"
+                                Maximum="100"
+                                Minimum="0"
+                                ShowValueBox="False"
+                                TickPlacement="BottomRight"
+                                TickFrequency="10"
+                                Value="30" />
+                            <jv:Slider
+                                Height="180"
+                                Orientation="Vertical"
+                                TickFrequency="10"
+                                TickPlacement="TopLeft"
+                                Value="65" />
+                            <jv:Slider
+                                Height="180"
+                                Margin="32,0,0,0"
+                                IsEnabled="False"
+                                Orientation="Vertical"
+                                Value="35" />
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-            </demo:DemoSection>
+                </demo:DemoSection>
 
-        </StackPanel>
-    </ScrollViewer>
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
 </UserControl>
