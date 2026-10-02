@@ -588,5 +588,89 @@ namespace Junevy.Controls.Showcase
                  var dialog = new DialogWindow { Title = "演示", Content = new TextBlock { Text = "..." } };
                  dialog.ShowDialog(); -->
             """;
+
+        // ---------------- 图标字体（IconsPage） ----------------
+
+        public const string IconFontUsage = """
+            <!-- FontFamily 资源（库已内置，码点两套完全一致）：
+                 {DynamicResource IconFont}        线性/描边 iconfont.ttf
+                 {DynamicResource IconFontFilled}  面性/填充 iconfont-filled.ttf -->
+            <TextBlock FontFamily="{DynamicResource IconFont}" FontSize="24" Text="&#xE63F;" />
+            <TextBlock FontFamily="{DynamicResource IconFontFilled}" FontSize="24" Text="&#xE63F;" />
+
+            <!-- 附带属性用法（默认线性）：atc:Icon.Icon 传图标字符 -->
+            <jv:Button atc:Icon.Icon="&#xE63F;" atc:Icon.IconSize="16" Content="保存" />
+            <jv:Button atc:Icon.FontFamily="{StaticResource IconFontFilled}"
+                       atc:Icon.Icon="&#xE63F;" atc:Icon.IconSize="16" Content="保存" />
+            """;
+
+        public const string IconFontApply = """
+            <jv:Button atc:Icon.Icon="&#xE63F;" atc:Icon.IconSize="16" Content="保存（线性）" />
+            <jv:Button atc:Icon.FontFamily="{StaticResource IconFontFilled}"
+                       atc:Icon.Icon="&#xE63F;" atc:Icon.IconSize="16" Content="保存（面性）" />
+            """;
+
+        // ---------------- 进度条（ProgressPage） ----------------
+
+        public const string ProgressBarLinearDemo = """
+            <!-- Value / Minimum / Maximum 走 WPF 标准管线（注意 Slider 默认 Maximum=10，需显式调大），
+                 可与 Slider 等直接绑定 -->
+            <StackPanel>
+                <jv:ProgressBar ShowProgressText="True" Value="{Binding Value, ElementName=ProgressSlider}" />
+                <Slider x:Name="ProgressSlider" Margin="0,12,0,0" Maximum="100" Value="45" />
+            </StackPanel>
+            """;
+
+        public const string ProgressBarIndeterminateDemo = """
+            <!-- IsIndeterminate=True：来回扫动动画，用于百分比未知的等待场景 -->
+            <jv:ProgressBar IsIndeterminate="True" />
+            """;
+
+        public const string ProgressBarCircularDemo = """
+            <!-- ShapeMode=Circular：环形；确定模式按值绘制圆弧、ShowProgressText 显示在圆心，
+                 RingThickness 控制弧线宽；不确定模式为持续旋转的四分之一圆弧 -->
+            <WrapPanel>
+                <jv:ProgressBar
+                    Width="56"
+                    Height="56"
+                    RingThickness="5"
+                    ShapeMode="Circular"
+                    ShowProgressText="True"
+                    Value="{Binding Value, ElementName=ProgressSlider}" />
+                <jv:ProgressBar
+                    Width="32"
+                    Height="32"
+                    Margin="24,0,0,0"
+                    RingThickness="3"
+                    ShapeMode="Circular"
+                    Value="{Binding Value, ElementName=ProgressSlider}" />
+                <jv:ProgressBar
+                    Width="32"
+                    Height="32"
+                    Margin="24,0,0,0"
+                    IsIndeterminate="True"
+                    RingThickness="3"
+                    ShapeMode="Circular" />
+            </WrapPanel>
+            """;
+
+        public const string ProgressBarTextFormatDemo = """
+            <!-- ProgressTextFormat 中 {0} 为 0-100 整数百分比；不设置时默认 "{0}%" -->
+            <jv:ProgressBar
+                ProgressTextFormat="已完成 {0}%"
+                ShowProgressText="True"
+                Value="{Binding Value, ElementName=ProgressSlider}" />
+            """;
+
+        public const string ProgressBarWindowDemo = """
+            <!-- ProgressBarWindow 为纯 C# API（进度对话框，默认环形、无边框可拖动）：
+                 var dialog = new ProgressBarWindow { Title = "固件部署", Message = "正在部署固件…", Owner = this };
+                 dialog.Show();                       // 或 ShowDialog() 模态
+                 dialog.Report(45);                   // 后台线程安全汇报进度
+                 dialog.UpdateMessage / UpdateDetail  // 更新主/次说明文本
+                 dialog.RequestClose();               // 任务完成由代码关闭（或 CloseAfter(task) 自动关闭）
+                 dialog.CloseButtonEnabled = false;   // 禁止用户取消（隐藏关闭按钮并拦截 Esc / Alt+F4）
+                 dialog.IsCancelled / Cancelled       // 获知用户是否主动取消了等待 -->
+            """;
     }
 }

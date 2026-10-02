@@ -42,9 +42,11 @@ namespace Junevy.Controls.Showcase
                 "集合与数据" => new DataPage(),
                 "文本与状态" => new TextStatePage(),
                 "通知" => new NotifyPage(),
+                "进度条" => new ProgressPage(),
                 "布局控件" => new LayoutPage(),
                 "菜单与导航" => new MenusPage(),
                 "窗口与图像" => new WindowImagePage(),
+                "图标字体" => new IconsPage(),
                 _ => new ButtonsPage()
             };
             _pageCache[title] = page;
