@@ -8,7 +8,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>Junevy.Controls.CodeCompletion</PackageId>
-		<Version>2.1.1</Version>
+		<Version>1.0.2</Version>
 		<Authors>Junevy</Authors>
 		<Company>Junevy</Company>
 		<Description>Junevy.Controls CodeEditor 的 Roslyn 代码补全伴生包（系统类 IntelliSense）。按需引用：会引入 Microsoft.CodeAnalysis.CSharp.Features 依赖链（约 40 MB 运行时程序集）。</Description>
