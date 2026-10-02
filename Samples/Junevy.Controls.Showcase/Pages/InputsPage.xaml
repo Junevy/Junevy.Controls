@@ -19,7 +19,7 @@
                 <TextBlock Style="{StaticResource DemoPageTitle}" Text="输入与选择" />
                 <TextBlock
                     Style="{StaticResource DemoPageSubtitle}"
-                    Text="jv:CheckBox / jv:TextBox / jv:ComboBox / DatePicker / jv:Slider。本页重点演示附加属性：PlaceholderAssist、TitleAssist、Icon、ShowClear、CommandButton、DatePickerAssist。" />
+                    Text="jv:CheckBox / jv:TextBox / jv:PasswordBox / jv:ComboBox / DatePicker / jv:Slider。本页重点演示附加属性：PlaceholderAssist、TitleAssist、Icon、ShowClear、CommandButton、DatePickerAssist。" />
 
                 <demo:DemoSection
                     Title="jv:CheckBox"
@@ -154,6 +154,32 @@
                                 atc:TitleAssist.TitleWidth="110" />
                         </StackPanel>
                     </StackPanel>
+                </demo:DemoSection>
+
+                <demo:DemoSection
+                    Title="jv:PasswordBox"
+                    Description="右侧眼睛按钮显示明文：RevealMode 默认 Click（点击切换），PressAndHold 按下即显示、松开立即隐藏；IsError=true 时输入区背景微微泛红；Password 是真正的依赖属性（原生 PasswordBox 密码不可绑定），明文态可直接编辑并与掩码内容同步。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.PasswordBoxDemo}">
+                    <WrapPanel>
+                        <jv:PasswordBox
+                            Width="240"
+                            atc:Icon.FontFamily="{DynamicResource IconFont}"
+                            atc:PlaceholderAssist.Placeholder="请输入密码" />
+                        <jv:PasswordBox
+                            Width="240"
+                            RevealMode="PressAndHold"
+                            atc:PlaceholderAssist.Placeholder="长按眼睛显示（PressAndHold）" />
+                        <jv:PasswordBox
+                            Width="240"
+                            IsError="True"
+                            atc:PlaceholderAssist.Placeholder="IsError=True 错误泛红" />
+                        <jv:PasswordBox Width="240" Password="{Binding DemoPassword}" />
+                        <jv:PasswordBox
+                            Width="240"
+                            IsError="{Binding PasswordInvalid}"
+                            atc:TitleAssist.Title="登录密码"
+                            atc:TitleAssist.IsRequired="True" />
+                    </WrapPanel>
                 </demo:DemoSection>
 
                 <demo:DemoSection

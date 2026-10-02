@@ -195,7 +195,7 @@
             CornerRadius="{DynamicResource Theme.ControlCornerRadius}"
             SnapsToDevicePixels="True"
             UseLayoutRounding="True">
-            <ScrollViewer x:Name="DG_ScrollViewer" Focusable="False">
+            <ScrollViewer x:Name="PART_ScrollViewer" Focusable="False">
                 <ScrollViewer.Template>
                     <ControlTemplate TargetType="ScrollViewer">
                         <Grid>
@@ -337,6 +337,13 @@
         <Setter Property="EnableColumnVirtualization" Value="True" />
         <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
         <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
+        <!--  像素滚动：行偏移不再吸附到行边界，滚轮补间（SmoothScrolling）才能连续滑动  -->
+        <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel" />
+        <!--  预生成视口前后各一页的行容器：行生成提前到滚动到达之前，消除补间中的实体化顿挫  -->
+        <Setter Property="VirtualizingPanel.CacheLength" Value="1,1" />
+        <Setter Property="VirtualizingPanel.CacheLengthUnit" Value="Page" />
+        <!--  平滑滚轮默认开启：滚轮刻度补间滚动，实例上设 atc:SmoothScrolling.IsEnabled=False 可单独关闭  -->
+        <Setter Property="atc:SmoothScrolling.IsEnabled" Value="True" />
         <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
         <Setter Property="CanUserAddRows" Value="False" />
         <Setter Property="CanUserDeleteRows" Value="False" />

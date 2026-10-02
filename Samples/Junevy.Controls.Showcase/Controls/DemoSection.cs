@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Junevy.Controls.AttachedProperties;
 using Junevy.Controls.Common;
 using Junevy.Controls.Controls.Bar;
 
@@ -25,7 +26,7 @@ namespace Junevy.Controls.Showcase.Controls
             DependencyProperty.Register(nameof(XamlCode), typeof(string), typeof(DemoSection), new PropertyMetadata(string.Empty, OnXamlCodeChanged));
 
         public static readonly DependencyProperty IsCodeExpandedProperty =
-            DependencyProperty.Register(nameof(IsCodeExpanded), typeof(bool), typeof(DemoSection), new PropertyMetadata(true));
+            DependencyProperty.Register(nameof(IsCodeExpanded), typeof(bool), typeof(DemoSection), new PropertyMetadata(false));
 
         private TextBlock? _codeTextBlock;
         private ScrollViewer? _codeScroll;
@@ -57,7 +58,8 @@ namespace Junevy.Controls.Showcase.Controls
             set => SetValue(XamlCodeProperty, value);
         }
 
-        /// <summary>代码块是否展开（默认展开，可经「收起代码」切换）。</summary>
+        /// <summary>代码块是否展开（默认折叠：快速滚动时光标扫过展开的代码块会吞掉竖向滚轮，
+        /// 造成页面停顿/回弹感——WPF 原生 ScrollViewer 行为；可经「展开代码」切换）。</summary>
         public bool IsCodeExpanded
         {
             get => (bool)GetValue(IsCodeExpandedProperty);
@@ -134,7 +136,9 @@ namespace Junevy.Controls.Showcase.Controls
         /// <summary>
         /// 代码块内层 ScrollViewer 纵向滚动是禁用的（只横向滚动），
         /// 但它会把滚轮事件吞掉，导致鼠标悬停在代码块上时外层页面无法滚动。
-        /// 这里在内层自身无法纵向消费滚轮时，把事件转发给外层可滚动的 ScrollViewer。
+        /// 这里在内层自身无法纵向消费滚轮时，经 <see cref="SmoothScrolling.ScrollByWheel"/>
+        /// 把滚轮增量交给外层可滚动的 ScrollViewer：外层启用平滑时与真实滚轮共用
+        /// 同一补间路径（目标累加、不打断进行中的补间），未启用时为瞬时滚动。
         /// </summary>
         private void OnCodeScrollPreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -158,12 +162,7 @@ namespace Junevy.Controls.Showcase.Controls
             }
 
             e.Handled = true;
-            var forwarded = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
-            {
-                RoutedEvent = UIElement.MouseWheelEvent,
-                Source = inner
-            };
-            outer.RaiseEvent(forwarded);
+            SmoothScrolling.ScrollByWheel(outer, e.Delta);
         }
 
         private static ScrollViewer? FindOuterScrollViewer(DependencyObject current)

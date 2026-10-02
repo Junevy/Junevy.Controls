@@ -32,7 +32,7 @@ xmlns:jv="github.com.junevy"
 xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Controls"
 ```
 
-`jv` 包含控件库的全部公开控件。`atc` 用于 `Icon`、`TitleAssist`、`PlaceholderAssist`、`DataGridAssist`、`DatePickerAssist` 和 `ExpanderBehavior` 附加属性。
+`jv` 包含控件库的全部公开控件。`atc` 用于 `Icon`、`TitleAssist`、`PlaceholderAssist`、`DataGridAssist`、`DatePickerAssist`、`TreeViewAssist`、`ExpanderBehavior` 和 `SmoothScrolling` 附加属性。
 
 ### 官方同名控件自动生效
 
@@ -48,9 +48,10 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `<DataGrid>` | 外观 + 交互 | 完整等效（含专属模板）；空态提示通过附加属性 `atc:DataGridAssist.EmptyText` 提供，原生与 `jv:` 实例均可用 |
 | `<DatePicker>` | 外观 + 交互 | 完整等效（含日历全套模板）；占位符通过附加属性 `atc:DatePickerAssist.PlaceHolder` 提供，原生实例可用 |
 | `<Slider>` | 外观 + 交互 | 完整等效（轨道、滑块、分页、刻度、选择区段）；数值框（`ShowValueBox`/`ValueBoxSide`/`ValueFormatString`）为本库 `jv:Slider` 专有，原生实例上自动折叠 |
+| `<TreeView>` | 外观 + 交互 | 完整等效（卡片容器、ExpanderPanel 同款旋转展开图标、悬停/选中态、虚拟化）；`DisplayMode` / `NavigateCommand` / 悬停与选中画刷经 `atc:TreeViewAssist` 附加属性承载，原生实例同样可用（`jv:TreeView` 另提供同名实例属性） |
 | `<ToolTip>` | 外观 | 完整等效，任意元素的 `ToolTip` 属性自动获得主题样式 |
 
-以下控件因依赖自有依赖属性（样式触发器直接引用），**必须使用 `jv:` 前缀**：`RadioButton`、`ToggleButton`（`DisplayMode`/`SwitchSize`）、`Label`（`DisplayMode`）、`TextBlock`（`Text`/`TextAlignment`/`TextWrapping`）、`ProgressBar`（`ProgressText` 等）、`Slider`（`ShowValueBox`/`ValueBoxSide`/`ValueFormatString`，原生实例仅有外观）。
+以下控件因依赖自有依赖属性（样式触发器直接引用），**必须使用 `jv:` 前缀**：`RadioButton`、`ToggleButton`（`DisplayMode`/`SwitchSize`）、`Label`（`DisplayMode`）、`TextBlock`（`Text`/`TextAlignment`/`TextWrapping`）、`ProgressBar`（`ProgressText` 等）、`Slider`（`ShowValueBox`/`ValueBoxSide`/`ValueFormatString`，原生实例仅有外观）、`PasswordBox`（模板复合控件，原生 `PasswordBox` 为密封类不提供接管样式：`Password` 可绑定、`RevealMode`/`IsError` 等均为 `jv:` 实例属性）。
 
 ## 主题
 
@@ -145,9 +146,9 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 
 ### 官方 WPF 控件的继承范围
 
-把 `Generic.xaml` 合并进 `Application.Resources`（`Samples/Junevy.Controls.Showcase/App.xaml` 即此写法）后，库里的隐式样式会自动作用于这些**官方**控件，无需换成 `jv:` 版本：`Button`、`TextBox`、`ToolTip`、`ScrollBar`、`ListView`、`ListBox`、`DatePicker`、`DatePickerTextBox`、`DataGrid`、`ComboBox`、`CheckBox`、`Slider`，以及日历家族的 `Calendar` / `CalendarItem` / `CalendarDayButton` / `CalendarButton`。
+把 `Generic.xaml` 合并进 `Application.Resources`（`Samples/Junevy.Controls.Showcase/App.xaml` 即此写法）后，库里的隐式样式会自动作用于这些**官方**控件，无需换成 `jv:` 版本：`Button`、`TextBox`、`ToolTip`、`ScrollBar`、`ListView`、`ListBox`、`DatePicker`、`DatePickerTextBox`、`DataGrid`、`ComboBox`、`CheckBox`、`Slider`、`TreeView`，以及日历家族的 `Calendar` / `CalendarItem` / `CalendarDayButton` / `CalendarButton`。
 
-以下官方类型**不会**被重新着色（库里的同名隐式样式写在模板内部，只服务 `jv:` 控件自己的部件，不外溢）：`TextBlock`、`Label`、`RadioButton`、`ToggleButton`、`Menu`、`MenuItem`、`Separator`、`ListBoxItem`、`Border`、`GroupBox`、`ProgressBar`、`TabControl`、`TreeView`、`Expander`、`ContextMenu`、`Window`。用 `jv:` 对应控件，或自行绑 `Theme.Brush.*`：
+以下官方类型**不会**被重新着色（库里的同名隐式样式写在模板内部，只服务 `jv:` 控件自己的部件，不外溢）：`TextBlock`、`Label`、`RadioButton`、`ToggleButton`、`Menu`、`MenuItem`、`Separator`、`ListBoxItem`、`Border`、`GroupBox`、`ProgressBar`、`TabControl`、`Expander`、`ContextMenu`、`Window`。用 `jv:` 对应控件，或自行绑 `Theme.Brush.*`：
 
 ```xml
 <Window
@@ -213,8 +214,8 @@ ThemeManager.ToggleTheme();
 | 附加属性 | 默认值 | 实际效果 |
 | --- | --- | --- |
 | `atc:Icon.Icon` | `null` | 设置图标内容。可以是图标字体字符，也可以是 `Image`、`Path` 或其他对象。模板支持的控件会在值为空时折叠图标本身；周围布局是否收缩由具体控件决定。 |
-| `atc:Icon.FontFamily` | 内置 `iconfont` | 设置图标字体。用于 `Button`、`CardButton`、`TextBox`、`Label`、`AppBar`、`SideMenu`、`TreeMenu`、`TabMenu` 等控件。 |
-| `atc:Icon.IconSize` | `14` | 设置图标尺寸。`Button`、`AppBar`、`SideMenu` 和 `TreeMenu` 的模板会读取该值。 |
+| `atc:Icon.FontFamily` | 内置 `iconfont` | 设置图标字体。用于 `Button`、`CardButton`、`TextBox`、`Label`、`AppBar`、`SideMenu`、`TreeView`、`TabMenu` 等控件。 |
+| `atc:Icon.IconSize` | `14` | 设置图标尺寸。`Button`、`AppBar`、`SideMenu` 和 `TreeView` 的模板会读取该值。 |
 | `atc:Icon.IconForeground` | `Gray` | 设置图标颜色。`ToolboxItem` 和 `ToolItem` 的默认模板会读取该值；其他控件是否支持取决于其模板。 |
 
 `ToolboxItem` 和 `ToolItem` 的图标字体字符跟随 `IconForeground`，标题跟随 `Foreground`；其他控件的图标字体字符通常跟随 `Foreground`。`Image` 或带固定 `Fill` 的 `Path` 不会自动重新着色。
@@ -248,9 +249,56 @@ Showcase 的「图标字体」页提供全部 67 个图标的总览，支持线�
 
 ### ExpanderBehavior
 
-`atc:ExpanderBehavior.Enable` 用于 `TreeViewItem`。启用后，双击非叶节点会展开或折叠；双击叶节点会调用最近的 `TreeMenu.NavigateCommand`，命令参数是该容器的数据对象（对数据类型无要求；`TreeMenu` 中即对应的 `TreeMenuItem`）。叶/枝由容器的 `HasItems` 判断，因此任意 POCO 数据均可工作。
+`atc:ExpanderBehavior.Enable` 用于 `TreeViewItem`。启用后，双击非叶节点会展开或折叠；双击叶节点会调用最近 `TreeView` 的 `NavigateCommand`（`atc:TreeViewAssist.NavigateCommand` / `jv:TreeView.NavigateCommand`，同一 DP），命令参数是该容器的数据对象（对数据类型无要求；`TreeView` 中即对应的 `TreeMenuItem`）。叶/枝由容器的 `HasItems` 判断，因此任意 POCO 数据均可工作。
 
-`TreeMenu` 的默认容器样式已经自动启用该行为，通常不需要手动设置。
+`TreeView` 的默认容器样式已经自动启用该行为，通常不需要手动设置。
+
+### SmoothScrolling
+
+`atc:SmoothScrolling` 把鼠标滚轮的离散跳变改为连续的补间滚动。WPF 的滚轮滚动没有任何动画，一个刻度就是一次瞬移；按项滚动下偏移还会被吸附到条目边界，观感上就是"从第 1 项直接跳到第 2 项"。启用后，滚轮目标偏移由逐帧渲染回调以指数趋近方式收敛过去（与浏览器平滑滚动同款手感：连续滚动时目标累加、速度连续，不存在逐格重启动画的脉冲感）；拖动滑块、点击箭头/轨道、按下鼠标、键盘滚动等用户操作会立即停止补间、交还控制权。
+
+| 附加属性 | 默认值 | 实际效果 |
+| --- | --- | --- |
+| `atc:SmoothScrolling.IsEnabled` | `false`（库内列表控件经默认样式为 `true`） | 是否启用平滑滚轮。可设在任意 `ScrollViewer` 或可滚动控件上；设在控件上时，其模板须按库内约定命名 `PART_ScrollViewer` 部件，缺失时保持 WPF 原生行为 |
+| `atc:SmoothScrolling.Step` | `NaN` | 每个滚轮刻度的滚动像素数；`NaN` 时跟随系统"滚轮滚动行数"折算（N 行 × 16px；系统设为"一次滚动一页"时按一个视口计） |
+
+本库 `ListBox` / `ListView` / `DataGrid` / `ComboBox` / `SideMenu` 的默认样式已启用平滑滚轮，实例上设为 `False` 可单独关闭：
+
+```xml
+<!-- 关闭平滑滚轮 / 自定义每刻度步长 -->
+<jv:ListBox ItemsSource="{Binding Devices}"
+            atc:SmoothScrolling.IsEnabled="False" />
+
+<jv:ListBox ItemsSource="{Binding Devices}"
+            atc:SmoothScrolling.Step="120" />
+```
+
+页面级的普通 `ScrollViewer` 默认不在启用范围内。要让应用内**所有**滚动宿主（页面、模板内部）统一获得同款手感，在 `App.xaml` 加一条隐式样式即可；嵌套时滚轮仍归最内层宿主，列表控件经控件挂接持有宿主引用、读取自身 `Step`，不受该样式影响：
+
+```xml
+<Style TargetType="ScrollViewer">
+    <Setter Property="atc:SmoothScrolling.IsEnabled" Value="True" />
+    <Setter Property="atc:SmoothScrolling.Step" Value="100" />
+</Style>
+```
+
+**注意事项（WPF 原生行为，与平滑滚动无关）**：原生 `ScrollViewer` 的 `OnMouseWheel` 会**无条件吞掉竖向滚轮**——即使它竖向根本不可滚。典型如 `VerticalScrollBarVisibility="Disabled"`、仅横向可滚的宿主（代码块、标尺条、单行滚动区等）：光标悬停其上时，页面/外层宿主不会滚动。启用全应用平滑后快速滚动，光标扫过这类宿主（如演示页展开的 XAML 代码块）会出现"页面停顿、像被抢滚轮"的感觉——滚动变丝滑后，原生的停顿反而更醒目；把这类宿主折叠或让光标避开即可恢复。本库已保证平滑层不参与该行为（竖向不可滚的宿主不会被接管；完全未挂接的原生 `ScrollViewer` 同样吞滚轮）。若希望这类宿主把竖向滚轮交还外层（页面），在宿主上处理 `PreviewMouseWheel` 并经 `SmoothScrolling.ScrollByWheel` 转发——转发与真实滚轮共用同一补间路径与步长折算（连续转发、与真实滚轮混用都不会互相拉扯），外层未启用平滑时为瞬时滚动：
+
+```csharp
+codeScroll.PreviewMouseWheel += (s, e) =>
+{
+    if (s is ScrollViewer sv && sv.ScrollableHeight <= 0)
+    {
+        e.Handled = true;
+        SmoothScrolling.ScrollByWheel(outerScrollViewer, e.Delta);
+    }
+};
+```
+
+- **需要像素级滚动与预生成缓存**：连续补间要求 `VirtualizingPanel.ScrollUnit="Pixel"`，并建议配合 `VirtualizingPanel.CacheLength="1,1"`（`CacheLengthUnit="Page"`）把容器生成提前到滚动到达之前，消除跨越条目边界时的实体化顿挫——两者本库列表样式均已内置。若把 `ScrollUnit` 改回 `Item`（按项滚动），行为自动退回 WPF 原生滚轮，不会出现阶梯状补间。
+- **嵌套就近接管**：滚轮始终作用于离鼠标最近的滚动宿主——`ScrollViewer` 内嵌 `DataGrid`/`ListView`、条目模板自带滚动区时滚轮归最内层；内层滚到边界时不接力外层，均与 WPF 原生语义一致。
+- **横向退化路径同步受益**：`jv:ListBox`/`jv:ListView` 横向模式的滚轮折算经同一补间出口，竖向滚不动退化为水平滚动时同样平滑，折算单位跟随面板的实际滚动单位。
+- **虚拟化失效诊断（DEBUG）**：DEBUG 构建下，`jv:ListBox`/`jv:ListView`/`jv:DataGrid` 在滚动方向收到无约束（∞）测量（典型于无定高嵌套在 `StackPanel` 或未定高的外层 `ScrollViewer` 中）时，会向调试输出一次性警告——此时条目虚拟化已失效，请为控件设置 `Height`/`MaxHeight` 或避免外层滚动宿主；Release 构建零开销。
 
 ### TitleAssist
 
@@ -370,7 +418,7 @@ Showcase 的「图标字体」页提供全部 67 个图标的总览，支持线�
 
 悬停/按压采用**状态层（state layer）**反馈：不替换固定底色、也不降低整体透明度，而是在任意背景上叠一层固定透明度的纱——`Theme.Brush.State.HoverScrim`（浅色 8% 墨 `#14070B10` / 深色 8% 白 `#14FFFFFF`）与 `Theme.Brush.State.PressedScrim`（两主题各 15%：`#26070B10` / `#26FFFFFF`）。文字与图标全程保持实色，反馈比旧版整体变淡明显得多；鲜艳背景（如红色按钮）悬停/按压时只是「同色相加深一档」（深色主题反向提亮），不会跳到灰色系产生割裂，用户自定义背景同样成立。禁用态仍为整体 0.5 透明度 + 禁用表面。`NoBorderButtonStyle` 透明背景（幽灵按钮）的悬停/按压为纱色填充出圆角色块。
 
-同一反馈方案已推广至其余可交互控件：**背景可自定义的按钮/卡片类**（`CardButton`、`ToolBarItem`、`ToolboxItem`、`ToolItem`）与**内部图标小按钮**（`MessageBar` / `ProgressBarWindow` 关闭按钮、`ImageViewer` 工具栏按钮、`DialogWindow` 标题栏按钮、`ToggleButton` Expander 展开按钮、`DatePicker` 日历导航/头部/下拉按钮）悬停/按压均为状态层纱色；`MenuBar` / `ContextMenu` / `TabMenu` / `SideMenu` / `TreeMenu`、`ListBox` / `ListView` / `DataGrid`、`GroupBox` / `ExpanderPanel` 等中性表面上的列表/菜单项仍保留 `Surface.Hover` 灰底悬停高亮。两个纱色为 `DynamicResource` 主题令牌（`Themes/AppColors.*.xaml` 生成，守卫脚本断言其对卡片的 ΔL\* 落在可感知区间），宿主可整体覆盖。
+同一反馈方案已推广至其余可交互控件：**背景可自定义的按钮/卡片类**（`CardButton`、`ToolBarItem`、`ToolboxItem`、`ToolItem`）与**内部图标小按钮**（`MessageBar` / `ProgressBarWindow` 关闭按钮、`ImageViewer` 工具栏按钮、`DialogWindow` 标题栏按钮、`ToggleButton` Expander 展开按钮、`DatePicker` 日历导航/头部/下拉按钮）悬停/按压均为状态层纱色；`MenuBar` / `ContextMenu` / `TabMenu` / `SideMenu` / `TreeView`、`ListBox` / `ListView` / `DataGrid`、`GroupBox` / `ExpanderPanel` 等中性表面上的列表/菜单项仍保留 `Surface.Hover` 灰底悬停高亮。两个纱色为 `DynamicResource` 主题令牌（`Themes/AppColors.*.xaml` 生成，守卫脚本断言其对卡片的 ΔL\* 落在可感知区间），宿主可整体覆盖。
 
 `jv:Button` 可选一层只向下散开的浮起阴影（默认关闭，常态贴平，与 ComboBox / TextBox 等同级控件一致），设 `ShowShadow=True` 打开；按压或禁用时自动消失（贴回地面），与降透明度的状态反馈叠加使用。阴影取自新令牌 `Theme.ButtonShadow`（浅色 `BlurRadius=16 / ShadowDepth=5 / Opacity=0.18`，深色 `18 / 6 / 0.40`；载体色 `#26070B10` / `#B3070B10`），与 `Theme.PopupShadow` 同族同强度，只按控件尺寸收紧模糊与偏移：实测按钮下方 1–9px 相对压暗 `8.47%`，MessageBar 弹层同距离为 `9.50%`；`5–9px / 1–5px` 衰减比 `0.58` 对弹层 `0.63`，即同一族形状而非另立一套观感。Effect 只挂在模板内**不含任何子元素**的背景层 `Border` 上，文字仍走 ClearType；官方 `Button`、`NoBorderButtonStyle` 与 `CardButton`（自带模板）都不带这层阴影。宿主 App 在 `Application.Resources` 写同名键即可整体调淡或关掉（应用自身条目的优先级高于 `ThemeManager` 追加的主题字典，因此这一份覆盖值会同时用于浅色与深色，需要分档时自行取两套参数）：
 
@@ -435,7 +483,7 @@ Showcase 的「图标字体」页提供全部 67 个图标的总览，支持线�
 | 属性 | 效果 |
 | --- | --- |
 | `IsChecked` | 标准可空选中状态 |
-| `DisplayMode` | 形状状态属性；当前只由 `ExpanderButton` 样式的触发器读取 |
+| `DisplayMode` | 形状状态属性；当前模板不读取，为开关形状扩展保留 |
 | `SwitchSize` | 开关整体高度，轨道宽度按 2:1 比例自动推导，默认 `20`，建议不小于 `12` |
 
 开关采用「轨道 + 滑块」结构，几何由控件统一推导（`TrackHeight` / `TrackWidth` / `TrackPadding` / `TrackCornerRadius` / `ThumbSize` / `ThumbCornerRadius` / `ThumbTravel` 均为只读派生属性，仅供模板绑定，外部不应设置）。推导时先把尺寸换算成**整数设备像素**再折回 DIP，滑块的四边内缩由同一个内缩值决定，因此在 100% / 125% / 150% 等任意缩放下上下左右严格相等，不会出现一边多 1 像素；代价是渲染高度落在整数设备像素上，与 `SwitchSize` 设定值最多相差半个设备像素（125% 下 ≤0.4 DIP）。窗口换到不同缩放的显示器后会在下一次测量时按新比例重新吸附。胶囊模板圆角 = 轨道高 / 2，矩形模板使用 `Theme.SmallCornerRadius`，滑块圆角恒比轨道圆角小一个内缩量，内外圆角视觉吻合。切换时滑块以缓动动画滑动到对侧。
@@ -448,7 +496,7 @@ Showcase 的「图标字体」页提供全部 67 个图标的总览，支持线�
     Template="{StaticResource SwitchToggleButton_Radius}" />
 ```
 
-普通开关需要显式选择 `SwitchToggleButton_Radius` 或 `SwitchToggleButton_Rect` 模板；仅设置 `DisplayMode` 不会替换普通开关的模板。`ExpanderButton` 是库内公开的箭头开关样式，`TreeMenu` 使用它显示展开按钮。
+普通开关需要显式选择 `SwitchToggleButton_Radius` 或 `SwitchToggleButton_Rect` 模板；仅设置 `DisplayMode` 不会替换普通开关的模板。原「`ExpanderButton` 箭头开关样式」（及 `ExpanderControlTemplate` 模板）自 `jv:TreeMenu` 更名 `jv:TreeView` 起已随其唯一消费方一并移除——`TreeView` 的展开图标改用 ExpanderPanel 同款 iconfont 旋转箭头（详见 [TreeView](#treeview-与-treemenuitem)）。
 
 ### RadioButton
 
@@ -515,6 +563,36 @@ Showcase 的「图标字体」页提供全部 67 个图标的总览，支持线�
     CommandButtonCommandParameter="{Binding SearchKeyword}"
     atc:PlaceholderAssist.Placeholder="Search camera" />
 ```
+
+### PasswordBox
+
+`jv:PasswordBox` 是模板复合控件：WPF 原生 `PasswordBox` 为密封类无法派生，故模板内嵌一个原生密码框承载真实输入（IME、粘贴、`MaxLength` 等走原生管线），右侧眼睛按钮点击/长按显示明文，明文态为可编辑文本框并与掩码内容双向同步（显示中可直接改写密码）。相比原生控件的增强：`Password` 是真正的依赖属性，可双向绑定 ViewModel（原生密码不可绑定）。
+
+| 属性 | 效果 |
+| --- | --- |
+| `Password`（依赖属性） | 密码内容，默认双向绑定；掩码输入、明文编辑、程序设值三者自动同步，变化触发路由事件 `PasswordChanged` |
+| `RevealMode`（依赖属性） | 显示密码按钮的触发方式：`Click`（默认，点击切换显示/隐藏）或 `PressAndHold`（按下即显示，松开或按住移出按钮立即隐藏）；切换取值时自动收起明文 |
+| `IsRevealed`（依赖属性） | 当前是否以明文显示，可双向绑定（如把「显示密码」挂到 ViewModel）；切换时键盘焦点跟随掩码框/明文框 |
+| `IsError`（依赖属性） | 密码错误状态：`true` 时输入区背景叠加一层低透明度主题 `Status.Danger` 色（微微泛红），边框与文字不变，由业务侧验证失败时置位 |
+| `PasswordChar`（依赖属性） | 掩码字符，默认 `●` |
+| `MaxLength`（依赖属性） | 最大密码长度（0 不限制），同时作用于掩码框与明文框 |
+| `atc:PlaceholderAssist.Placeholder` | 占位文本（支持 iconfont 字形），密码为空、未持焦点且未显示明文时显示 |
+| `atc:Icon.Icon` / `atc:TitleAssist.Title` 系列 | 前置图标与外侧标题，语义同 `jv:TextBox`，详见 [Icon](#icon) / [TitleAssist](#titleassist) |
+
+```xml
+<!-- 点击眼睛显示明文；Password 可绑定（原生 PasswordBox 做不到），错误泛红由业务绑定驱动 -->
+<jv:PasswordBox
+    Width="260"
+    atc:Icon.FontFamily="{DynamicResource IconFont}"
+    atc:PlaceholderAssist.Placeholder="请输入密码"
+    Password="{Binding LoginPassword}"
+    IsError="{Binding PasswordInvalid}" />
+
+<!-- 长按显示：按下即显示、松开立即隐藏 -->
+<jv:PasswordBox Width="260" RevealMode="PressAndHold" />
+```
+
+安全说明：掩码态保持原生密码框行为（不可复制、内容不进剪贴板）；明文态（`IsRevealed="True"`）的明文可选中复制，与主流密码框一致。注意原生 `<PasswordBox>` 不提供本库接管样式（见「官方同名控件自动生效」），请使用 `jv:PasswordBox`。
 
 ### ComboBox 与 ComboBoxItem
 
@@ -647,7 +725,7 @@ Showcase 的「图标字体」页提供全部 67 个图标的总览，支持线�
 
 横向模式实际把项目面板替换为横向 `VirtualizingStackPanel`，虚拟化与回收模式保持启用，条目数量很多时不会一次性实例化全部容器。项目高度默认撑满控件（容器 `VerticalAlignment` 为 `Stretch`），需要固定尺寸时在 `ItemContainerStyle` 中设置 `Height`、`Width` 或对齐方式。官方 `<ListBox>` 实例沿用 WPF 原生排列，仅外观被本库接管；使用水平滑动请使用 `jv:ListBox`。
 
-横向模式下鼠标滚轮同样左右滚动。WPF 的 `ScrollViewer` 只把滚轮用于竖直滚动，竖向滚不动时不会自动退化为水平滚动，`jv:ListBox` 在竖向不可滚动时补上这一步折算，折算量与 WPF 竖向滚轮保持一致（逻辑滚动按 `SystemParameters.WheelScrollLines` 条项目滚动，像素滚动按一个行高折算）；条目模板内部自带滚动控件时（例如条目里还有 `ScrollViewer`）滚轮仍归内层控件。竖向列表、`Orientation` 行为以及原生 `<ListBox>` 完全沿用 WPF 原生滚轮行为。
+横向模式下鼠标滚轮同样左右滚动。WPF 的 `ScrollViewer` 只把滚轮用于竖直滚动，竖向滚不动时不会自动退化为水平滚动，`jv:ListBox` 在竖向不可滚动时补上这一步折算，折算量跟随面板的实际滚动单位（`ScrollUnit=Pixel` 或未启用逻辑滚动时按 `SystemParameters.WheelScrollLines` × 行高折算像素，`ScrollUnit=Item` 时按条目数折算）；条目模板内部自带滚动控件时（例如条目里还有 `ScrollViewer`）滚轮仍归内层控件。竖向列表、`Orientation` 行为以及原生 `<ListBox>` 完全沿用 WPF 原生滚轮行为。默认样式已启用像素滚动（`VirtualizingPanel.ScrollUnit=Pixel`）与平滑滚轮（`atc:SmoothScrolling`，见「附加属性 → SmoothScrolling」），横向折算与竖向滚轮共用同一补间出口。
 
 自定义模板时请保留名为 `PART_ScrollViewer` 的 `ScrollViewer`（本库两个模板均如此命名），滚轮折算依赖该部件定位滚动宿主；缺少该部件时不会报错，只是退回 WPF 原生滚轮行为。
 
@@ -655,7 +733,7 @@ Showcase 的「图标字体」页提供全部 67 个图标的总览，支持线�
 
 ### ListView
 
-`jv:ListView` 继承 WPF `ListView`，同时支持普通列表和标准 `GridView`。控件保留 WPF 的 `View` 管线，可以正常使用 `GridViewColumn.DisplayMemberBinding`、单元格模板和自定义 `ItemTemplate`。普通列表同样支持横向带状排列与水平滑动。选中项以主色强调（背景 `Surface.Selected`、描边 `Accent.Primary`），点击获得键盘焦点后描边仍保持主色；青色焦点环只出现在未选中的聚焦项上。条目文字前景跟随控件 `Foreground`（默认为随主题切换的 `Text.Secondary`，`GridView` 列单元格经行呈现器同样跟随；选中项由触发器升为 `Text.Primary`、禁用态为 `State.DisabledForeground`）；在实例上设置 `Foreground` 会传导到所有条目，撤销覆盖用 `ClearValue(ForegroundProperty)`。
+`jv:ListView` 继承 WPF `ListView`，同时支持普通列表和标准 `GridView`。控件保留 WPF 的 `View` 管线，可以正常使用 `GridViewColumn.DisplayMemberBinding`、单元格模板和自定义 `ItemTemplate`。普通列表同样支持横向带状排列与水平滑动。选中项以主色强调（背景 `Surface.Selected`、描边 `Accent.Primary`），点击获得键盘焦点后描边仍保持主色；青色焦点环只出现在未选中的聚焦项上。条目文字前景跟随控件 `Foreground`（默认为随主题切换的 `Text.Secondary`，`GridView` 列单元格经行呈现器同样跟随；选中项由触发器升为 `Text.Primary`、禁用态为 `State.DisabledForeground`）；在实例上设置 `Foreground` 会传导到所有条目，撤销覆盖用 `ClearValue(ForegroundProperty)`。默认样式已启用像素滚动与平滑滚轮（`atc:SmoothScrolling`，见「附加属性 → SmoothScrolling」）。
 
 | 属性 | 默认值 | 效果 |
 | --- | --- | --- |
@@ -693,7 +771,7 @@ Showcase 的「图标字体」页提供全部 67 个图标的总览，支持线�
 
 ### DataGrid
 
-`jv:DataGrid` 继承 WPF `DataGrid`，提供专属控件模板（官方 Aero2 宿主结构：`ScrollViewer`（自定义模板：列头、行视口 `PART_ScrollContentPresenter` 与纵/横滚动条）→ `ItemsPresenter` → `DataGridRowsPresenter`（DataGrid 默认 ItemsPanel，运行时命名 `PART_RowsPresenter`）；列头 `PART_ColumnHeadersPresenter` 位于 ScrollViewer 模板内，垂直滚动时保持固定）与库内统一的卡片式视觉：Sunken 列标题（悬停高亮、排序方向箭头）、透明单元格（行悬停与选中色直接透出、键盘焦点时底边切换为焦点色）、行悬停/选中高亮。默认启用行列虚拟化，关闭新增行、删除行和行高调整，并使用整行单选。合并 `Themes/Generic.xaml` 后，原生写法 `<DataGrid>` 直接生效，无需 `jv:` 前缀。
+`jv:DataGrid` 继承 WPF `DataGrid`，提供专属控件模板（官方 Aero2 宿主结构：`ScrollViewer`（自定义模板：列头、行视口 `PART_ScrollContentPresenter` 与纵/横滚动条）→ `ItemsPresenter` → `DataGridRowsPresenter`（DataGrid 默认 ItemsPanel，运行时命名 `PART_RowsPresenter`）；列头 `PART_ColumnHeadersPresenter` 位于 ScrollViewer 模板内，垂直滚动时保持固定）与库内统一的卡片式视觉：Sunken 列标题（悬停高亮、排序方向箭头）、透明单元格（行悬停与选中色直接透出、键盘焦点时底边切换为焦点色）、行悬停/选中高亮。默认启用行列虚拟化、像素滚动（`VirtualizingPanel.ScrollUnit=Pixel`）与平滑滚轮（`atc:SmoothScrolling`，见「附加属性 → SmoothScrolling」），关闭新增行、删除行和行高调整，并使用整行单选。合并 `Themes/Generic.xaml` 后，原生写法 `<DataGrid>` 直接生效，无需 `jv:` 前缀。
 
 ```xml
 <jv:DataGrid AutoGenerateColumns="False"
@@ -832,7 +910,7 @@ editor.CompletionProvider = provider;
 
 ### MenuItem
 
-`jv:MenuItem` 是导航数据控件，继承 `ContentControl`，供 `SideMenu` 使用（`TreeMenu` 自 `1.9.0` 起改用 `TreeMenuItem` 数据模型）。它与 WPF `MenuItem` 没有继承关系。
+`jv:MenuItem` 是导航数据控件，继承 `ContentControl`，供 `SideMenu` 使用（`TreeView`（更名前 `TreeMenu`）自 `1.9.0` 起改用 `TreeMenuItem` 数据模型）。它与 WPF `MenuItem` 没有继承关系。
 
 | 属性 | 效果 |
 | --- | --- |
@@ -858,13 +936,19 @@ editor.CompletionProvider = provider;
 | 属性 | 效果 |
 | --- | --- |
 | `Orientation` | 菜单项面板排列方向，默认 `Vertical`。这是 `jv:SideMenu` 自有的属性，与 `jv:ListBox` 的 `Orientation`（列表排列和滚动方向）含义不同、互不影响 |
-| `DisplayMode="Horizontal"` | 图标与标题横向排列 |
-| `DisplayMode="Vertical"` | 紧凑图标模式，默认宽度调整为 `60` |
+| `DisplayMode="Horizontal"` | 图标与标题横向排列（枚举 `SideMenuDisplayMode`） |
+| `DisplayMode="Vertical"` | 紧凑图标模式（图标在上、标题在下），默认宽度调整为 `60`；隐藏 `Title` 即为纯图标导航栏 |
 | `ItemHeight` | 固定项目高度；默认 `NaN`，使用内容自然高度 |
 | `atc:Icon.FontFamily` | 所有菜单项图标字体 |
 | `atc:Icon.IconSize` | 所有菜单项图标尺寸 |
 | `ItemHoverBackground` | 菜单项悬停背景画刷；默认 `Surface.Base`（悬停项「浮起」变亮） |
 | `SelectedItemBackground` | 选中项背景画刷；默认 `Surface.Sunken`（中性灰、无阴影）——浅色下与 `Background.Second` 同值，侧栏底色为 `Background.Second` 时选中填充不可见，可自定义 |
+
+条目行为约定：
+
+- **超宽标题省略号截断**：竖向导航禁用横向滚动条（`HorizontalScrollBarVisibility=Disabled`），测宽约束自视口逐层传入条目，长标题以 `CharacterEllipsis` 截断，不再把整条导航栏撑出横向滚动条；横向丝带菜单（`Orientation=Horizontal`）经样式触发器恢复 `Auto`，条目横向超出时滚动而非截断。
+- **条目 ToolTip 与自动化名称随 `Title`**：`Title` 为空时不显示空 ToolTip。图标导航栏（隐藏 `Title`）若需要悬停提示，提示文本需另有来源（当前 `Title` 即提示来源，置空后无提示文案）。
+- **`Icon` 与 `Title` 双空的条目整体隐藏**，不产生可点击的空白行。
 
 ```xml
 <jv:SideMenu
@@ -878,7 +962,7 @@ editor.CompletionProvider = provider;
 
 `NavigationItems` 可以是包含 `Title` 和 `Icon` 属性的普通 ViewModel 集合，也可以是 `jv:MenuItem` 集合。
 
-选中与悬停的底色由两个画刷属性控制（默认经样式取状态层纱色，随主题与底色自适应深浅）：
+选中与悬停的底色由两个画刷属性控制：
 
 | 属性 | 默认 | 效果 |
 | --- | --- | --- |
@@ -892,18 +976,30 @@ editor.CompletionProvider = provider;
 ```
 
 选中项**不再套用阴影**（1.14.0 起移除；如需阴影可在 `ItemContainerStyle` 的 `IsSelected` 触发器中自行添加 `Effect`）。
-Item
 
-`jv:TreeMenu` 继承 WPF `TreeView`；`jv:TreeMenuItem` 是普通数据模型类（实现 `INotifyPropertyChanged`，不是控件），作为 `ItemsSource` 条目使用，由默认的 `HierarchicalDataTemplate` 渲染 `Title` 与 `Icon`，层级由 `Children` 提供。数据模型不继承 `DispatcherObject`，可在任意线程构建。
+### TreeView 与 TreeMenuItem
 
-| 属性 | 效果 |
+`jv:TreeView`（原 `jv:TreeMenu`，自 `TreeView` 更名起官方 `<TreeView>` 写法自动继承库样式）继承 WPF `TreeView`；`jv:TreeMenuItem` 是普通数据模型类（实现 `INotifyPropertyChanged`，不是控件），作为 `ItemsSource` 条目使用，由默认的 `HierarchicalDataTemplate` 渲染 `Title` 与 `Icon`，层级由 `Children` 提供。数据模型不继承 `DispatcherObject`，可在任意线程构建。
+
+合并 `Themes/Generic.xaml` 后，官方 `<TreeView>`（无 `jv:` 前缀）自动获得同一外观与交互；`jv` 专有能力经 `atc:TreeViewAssist` 附加属性承载，两类实例通用：
+
+| 属性（`jv:TreeView` 实例 / `atc:TreeViewAssist` 附加） | 效果 |
 | --- | --- |
-| `TreeMenu.DisplayMode` | `Normal` 显示展开箭头；`Icon` 使用左侧层级指示器 |
-| `TreeMenu.NavigateCommand` | 激活叶节点时执行（双击或按 `Enter`），参数为叶节点的数据对象 |
-| `TreeMenuItem.Children` | 子节点集合，构造时自动初始化，直接 `Add` 即可更新视图 |
-| `TreeMenuItem.IsExpanded` | 展开/收起状态，与容器 `TreeViewItem.IsExpanded` 双向绑定，可直接赋值控制节点展开，虚拟化/容器回收后状态不丢失 |
-| `TreeMenuItem.IsSelected` | 选中状态，与容器 `TreeViewItem.IsSelected` 双向绑定，可直接赋值选中节点 |
-| `TreeMenuItem.IsLeaf` | 根据 `Children` 是否为空计算的只读状态 |
+| `DisplayMode` | `Normal` 显示展开箭头；`Icon` 折叠箭头，仅选中的带子项节点显示左侧 accent 指示条 |
+| `NavigateCommand` | 激活叶节点时执行（双击或按 `Enter`），参数为叶节点的数据对象 |
+| `ItemHoverBackground` | 节点悬停背景画刷，默认 `Surface.Hover` |
+| `SelectedItemBackground` | 选中节点背景画刷，默认 `Surface.Sunken` 中性灰 |
+
+| `TreeMenuItem` 成员 | 效果 |
+| --- | --- |
+| `Children` | 子节点集合，构造时自动初始化，直接 `Add` 即可更新视图 |
+| `IsExpanded` | 展开/收起状态，与容器 `TreeViewItem.IsExpanded` 双向绑定，可直接赋值控制节点展开，虚拟化后状态不丢失 |
+| `IsSelected` | 选中状态，与容器 `TreeViewItem.IsSelected` 双向绑定，可直接赋值选中节点 |
+| `IsLeaf` | 根据 `Children` 是否为空计算的只读状态 |
+| `Title` / `Icon` / `TargetType` | 节点标题 / 图标（iconfont 字形或任意内容）/ 业务元数据 |
+
+| 其他附加属性 | 效果 |
+| --- | --- |
 | `atc:Icon.FontFamily` | 节点图标字体 |
 | `atc:Icon.IconSize` | `Icon` 模式的节点图标大小 |
 | `atc:ExpanderBehavior.Enable` | 默认容器样式已启用；控制双击/`Enter` 展开与激活导航 |
@@ -925,22 +1021,34 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
 ```
 
 ```xml
-<jv:TreeMenu
+<!-- jv:TreeView：实例属性直接设置 -->
+<jv:TreeView
     atc:Icon.IconSize="18"
     DisplayMode="Normal"
     ItemsSource="{Binding NavigationTree}"
     NavigateCommand="{Binding NavigateCommand}" />
+
+<!-- 官方 <TreeView>：扩展能力经附加属性，外观与交互一致 -->
+<TreeView
+    atc:Icon.FontFamily="{DynamicResource IconFont}"
+    atc:Icon.IconSize="18"
+    atc:TreeViewAssist.DisplayMode="Normal"
+    ItemsSource="{Binding NavigationTree}"
+    atc:TreeViewAssist.NavigateCommand="{Binding NavigateCommand}" />
 ```
 
-默认模板按 `TreeMenuItem` 的约定渲染（`Title` / `Icon` / `Children`）。使用其他数据类型时，为 `TreeMenu` 提供自定义 `HierarchicalDataTemplate`（含 `ItemsSource` 绑定）即可；展开/激活行为按容器 `HasItems` 判断叶/枝，不依赖具体数据类型。容器样式经 `ItemContainerStyle` 应用后沿层级递归传递到所有层级的 `TreeViewItem`。
+展开图标为 **ExpanderPanel 同款旋转箭头**（iconfont 字形 `&#xE650;`，展开旋转 90°，悬停加深、禁用置灰），宿主为 WPF 基类 `ToggleButton`（`ClickMode=Press`、`Focusable=False`，与官方 TreeViewItem 模板一致），不再是库内 `jv:ToggleButton` 开关样式；`HasItems=False` 的叶节点隐藏箭头占位，`Icon` 模式折叠箭头——**蓝色 accent 指示条仅标示「选中的带子项节点」**（蓝色提示 = 真实选中，非选中分支不显示；所有行经隐藏占位预留指示条槽位，选中时布局不跳动）。
+
+默认模板按 `TreeMenuItem` 的约定渲染（`Title` / `Icon` / `Children`）。使用其他数据类型时，为 `TreeView` 提供自定义 `HierarchicalDataTemplate`（含 `ItemsSource` 绑定）即可；展开/激活行为按容器 `HasItems` 判断叶/枝，不依赖具体数据类型。容器样式经 `ItemContainerStyle` 应用后沿层级递归传递到所有层级的 `TreeViewItem`。
 
 交互约定：
 
 - 单击选中节点；双击文件夹节点切换展开/收起，双击叶节点触发 `NavigateCommand`。
 - 键盘方向键沿用 WPF `TreeView` 原生行为：`↑`/`↓` 移动选择，`→`/`←` 展开/收起；`Enter` 激活叶节点或切换文件夹展开。
 - 悬停、选中、禁用三种视觉状态使用主题色区分，并作用于整行；长列表自动显示垂直滚动条。
-- 条目文字与图标的前景色跟随 `TreeMenu.Foreground`（默认为随主题切换的 `Text.Secondary`，禁用态使用 `State.DisabledForeground`）。系统 `TreeViewItem` 默认样式会把前景钉在恒黑的 `ControlTextBrush` 上（优先级高于属性继承），因此默认容器样式显式绑定宿主前景：在 `TreeMenu` 实例上设置 `Foreground` 会同步传导到所有层级的条目，撤销覆盖（`ClearValue`）后恢复主题色。
-- 根级与嵌套层级均使用 `VirtualizingStackPanel`（Recycling），整棵树参与虚拟化；`MaxWidth` 钳制使子级宽度不超过本级内容宽度，不会向上撑大控件。
+- **悬停高亮仅作用于鼠标所在的行**：`IsMouseOver` 会随可视子树向上传染（悬停子行时父/祖先行的 `IsMouseOver` 也为真），模板以「子级承载区（`ItemsPresenter`）不悬停」为附加条件过滤——悬停子行时父/祖行不再误高亮，悬停父行自身仍正常高亮。
+- 条目文字与图标的前景色跟随宿主 `Foreground`（默认为随主题切换的 `Text.Secondary`，禁用态使用 `State.DisabledForeground`）。系统 `TreeViewItem` 默认样式会把前景钉在恒黑的 `ControlTextBrush` 上（优先级高于属性继承），因此默认容器样式显式绑定宿主前景：在实例（`jv:TreeView` 或官方 `<TreeView>`）上设置 `Foreground` 会同步传导到所有层级的条目，撤销覆盖（`ClearValue`）后恢复主题色。
+- 根级与嵌套层级均使用 `VirtualizingStackPanel`（标准模式：整棵树按需实例化容器；`TreeViewItem` 自带展开/选中状态，不采用 Recycling 容器复用，避免复用时双向绑定把上一节点的展开/选中状态串写到新节点）；`MaxWidth` 钳制使子级宽度不超过本级内容宽度，不会向上撑大控件。
 
 ### TabMenu 与 TabMenuItem
 
@@ -1043,6 +1151,8 @@ public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
 ### Toolbox、ToolboxItem 与 ToolItem
 
 `jv:Toolbox` 是一级悬浮工具箱，继承 WPF `ItemsControl`；`jv:ToolboxItem` 是分组触发器和 Popup 容器，继承 `HeaderedItemsControl`；`jv:ToolItem` 继承 WPF `Button`，保留标准 `Command`、`CommandParameter`、`Click`、焦点和禁用行为。任意时刻最多展开一个分组。
+
+条目布局约定：分组触发条目 `DisplayMode=IconAndTitle` 时条目高 60（`IconOnly` 保持默认 48）；弹层内 `ToolItem` 高 68（`IconOnly` 收缩为 40，悬停底覆盖整行）。容器模板常驻 `ScrollViewer`——分组条目超出工具箱高度时自动滚动（默认与紧凑档行为一致）；竖向导航式分组列不出现横向滚动条。键盘焦点使用库内焦点环样式（`DefaultControlFocusVisualStyle`）。
 
 `Toolbox` 的公开属性和方法：
 
@@ -1354,14 +1464,18 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 
 ### ExpanderPanel
 
-`jv:ExpanderPanel` 继承 WPF `HeaderedContentControl`，提供可折叠的头部与内容区，支持平滑的展开/折叠过渡动画，并可通过模板重写、命令绑定与依赖属性绑定无缝集成到现有项目。
+`jv:ExpanderPanel` 继承 WPF `HeaderedContentControl`，提供可折叠的头部与内容区，支持平滑的展开/折叠过渡动画，并可通过模板重写、命令绑定与依赖属性绑定无缝集成到现有项目。`DisplayMode` 提供两种头部形态：**经典模式**（默认，窄条头部，四方向展开）与**卡片模式**（高头部卡片，内容向下展开）。
 
 | 属性/事件/方法 | 默认值 | 效果 |
 | --- | --- | --- |
-| `Header` | `null` | 头部内容；点击头部切换展开/折叠 |
+| `Header` | `null` | 头部内容；经典模式即整条头部，卡片模式作为加粗标题（点击头部切换展开/折叠） |
 | `Content` | `null` | 内容区 |
 | `IsExpanded` | `true` | 是否展开；支持双向绑定 |
-| `ExpandDirection` | `Down` | 展开方向，与 WPF `Expander` 语义一致：`Down` 头部在上、内容向下展开；`Up` 头部在下、内容向上展开；`Left` 头部在右、内容向左展开；`Right` 头部在左、内容向右展开 |
+| `DisplayMode`（依赖属性） | `Classic` | 头部形态：`Classic` 窄条头部（旋转箭头 + Header，支持四方向）；`Card` 卡片式高头部——左侧图标 + 标题/补充说明 + 右侧扩展槽 + 展开箭头，整卡带底色描边，内容向下展开（`ExpandDirection` 不生效） |
+| `Icon`（依赖属性） | `null` | 卡片模式头部左侧图标：iconfont 字形或任意内容；为 `null` 时图标槽折叠不占位。字体族/字号经 `atc:Icon.FontFamily` / `atc:Icon.IconSize` 配置（卡片默认 `20`） |
+| `Description`（依赖属性） | `null` | 卡片模式标题下方的补充说明（次级色小号文字）；为 `null` 时整体折叠，头部自适应变矮 |
+| `HeaderExtra`（依赖属性） | `null` | 卡片模式头部右侧扩展槽：可放开关、按钮等控件。槽内交互控件独立命中（按下即处理事件，不会误触发展开/折叠），空白区域点击仍穿透到头部照常切换 |
+| `ExpandDirection` | `Down` | 展开方向（经典模式），与 WPF `Expander` 语义一致：`Down` 头部在上、内容向下展开；`Up` 头部在下、内容向上展开；`Left` 头部在右、内容向左展开；`Right` 头部在左、内容向右展开 |
 | `AnimationDuration` | `200 ms` | 展开/折叠过渡动画时长；`Automatic` 或 `Forever` 视为无效，`0` 表示无过渡动画直接切换 |
 | `ToggleCommand` | `null` | 状态切换时执行的命令；`CanExecute` 返回 `false` 时不会执行 |
 | `CommandParameter` | `null` | 传给 `ToggleCommand` 的参数 |
@@ -1378,6 +1492,24 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
     <Grid>
         <TextBlock Text="Camera settings" />
     </Grid>
+</jv:ExpanderPanel>
+```
+
+卡片模式示例（`Header` 复用为标题；右侧开关独立于展开切换）：
+
+```xml
+<jv:ExpanderPanel
+    DisplayMode="Card"
+    Icon="&#xE60F;"
+    Header="自动曝光"
+    Description="启用后由相机驱动自动调整曝光时间与增益">
+    <jv:ExpanderPanel.HeaderExtra>
+        <StackPanel Orientation="Horizontal">
+            <jv:ToggleButton IsChecked="{Binding AutoExposure}" />
+            <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" Text="{Binding AutoExposureText}" />
+        </StackPanel>
+    </jv:ExpanderPanel.HeaderExtra>
+    <TextBlock Text="曝光策略内容区。" />
 </jv:ExpanderPanel>
 ```
 
@@ -1624,7 +1756,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | 通知 | `Badge`、`MessageBar`、`MessageBarPresenter`、`MessageBarService`、`ToolTip` |
 | 窗口 | `DialogWindow` |
 | 布局 | `ExpanderPanel`、`SidePanel`、`GroupBox` |
-| 菜单/导航 | `ContextMenu`、`ContextMenuItem`、`MenuItem`、`SideMenu`、`TreeMenu`、`TreeMenuItem`、`TabMenu`、`TabMenuItem`、`ToolBar`、`ToolBarItem`、`Toolbox`、`ToolboxItem`、`ToolItem` |
+| 菜单/导航 | `ContextMenu`、`ContextMenuItem`、`MenuItem`、`SideMenu`、`TreeView`、`TreeMenuItem`、`TabMenu`、`TabMenuItem`、`ToolBar`、`ToolBarItem`、`Toolbox`、`ToolboxItem`、`ToolItem` |
 | 图像 | `ImageViewer` |
 
 ## 控件依赖速查
@@ -1658,8 +1790,8 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ContextMenuItem` | WPF `MenuItem`、`JunevyContextMenuItemStyle` | 无 |
 | `MenuItem` | WPF `ContentControl`；作为 `SideMenu` 的导航数据 | 无 |
 | `SideMenu` | WPF `ListBox`、`ListBoxItem`、导航数据模板 | `Icon.FontFamily`、`Icon.IconSize` |
-| `TreeMenu` | WPF `TreeView`、`TreeMenuItem`（数据模型）、`jv:ToggleButton` | `Icon.FontFamily`、`Icon.IconSize`、`ExpanderBehavior.Enable` |
-| `TreeMenuItem` | 普通数据模型（`INotifyPropertyChanged`）、`ObservableCollection<TreeMenuItem>`；经所在 `TreeMenu` 使用图标附加属性 | 无 |
+| `TreeView` | WPF `TreeView`、`TreeMenuItem`（数据模型）、主题资源 | `Icon.FontFamily`、`Icon.IconSize`、`ExpanderBehavior.Enable`、`TreeViewAssist`（`DisplayMode` / `NavigateCommand` / `ItemHoverBackground` / `SelectedItemBackground`） |
+| `TreeMenuItem` | 普通数据模型（`INotifyPropertyChanged`）、`ObservableCollection<TreeMenuItem>`；经所在 `TreeView` 使用图标附加属性 | 无 |
 | `TabMenu` | WPF `TabControl`、`TabMenuItem`、`jv:TextBox`、`jv:Button` | `IsClosable`（控件自身属性）、`Icon.FontFamily` |
 | `TabMenuItem` | WPF `TabItem`、`DefaultTabMenuItemStyle`、`TabMenu.CloseTabCommand` | 继承所在 `TabMenu` 的相关附加属性 |
 | `ToolBar` | WPF `ItemsControl`、`ToolBarItem`、虚拟化面板 | 无；图标由项目自身属性提供 |
@@ -1677,7 +1809,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 `Samples/Junevy.Controls.Showcase` 是使用本控件库开发的分类展示程序，运行：`dotnet run --project Samples/Junevy.Controls.Showcase`（net8.0-windows）。
 
 - **主窗口**：无边框 + `WindowChrome` + `jv:AppBar`（默认模板 DefaultAppBar；一个程序仅一个 AppBar，此处展示默认状态，工具栏按钮演示 `ThemeManager` 主题切换与打开 `jv:SidePanel` 设置抽屉）、`jv:SideMenu` 分类导航、`MessageBarService` 通知宿主。
-- **分类页**：按钮 / 输入与选择（PlaceholderAssist、TitleAssist、ShowClear、DatePickerAssist、Slider 数值框）/ 集合与数据（虚拟数据：ListBox 竖向+横向、ListView GridView、DataGrid、EmptyText 空态）/ 文本与状态（Label 全模式、TextBlock、ToolTip）/ 通知（Badge、MessageBar、MessageBarService）/ 布局（GroupBox、ExpanderPanel、Border.CornerRadius）/ 菜单与导航（ContextMenu、TreeMenu、TabMenu、ToolBar、Toolbox）/ 窗口与图像（ImageViewer、DialogWindow）。
+- **分类页**：按钮 / 输入与选择（PlaceholderAssist、TitleAssist、ShowClear、DatePickerAssist、Slider 数值框）/ 集合与数据（虚拟数据：ListBox 竖向+横向、ListView GridView、DataGrid、EmptyText 空态）/ 文本与状态（Label 全模式、TextBlock、ToolTip）/ 通知（Badge、MessageBar、MessageBarService）/ 进度条（ProgressBar、ProgressBarWindow）/ 布局（GroupBox、ExpanderPanel、Border.CornerRadius）/ 菜单与导航（ContextMenu、TabMenu、ToolBar、Toolbox）/ 树形视图（TreeView 四区块演示）/ 窗口与图像（ImageViewer、DialogWindow）/ 图标字体。
 - **演示区块（DemoSection）**：每个控件演示统一为「标题 + 用法说明 + 演示内容卡片 + XAML 源码块」结构（`Samples/Junevy.Controls.Showcase/Controls/DemoSection`），源码块带轻量语法高亮（`XamlHighlighter`，配色取主题令牌、随明暗主题切换）、「收起/展开代码」与「复制代码」按钮；片段文本集中在 `ShowcaseSnippets.cs`，与页面演示同步维护。
 - **注意**：`jv:Button` 默认 `IsTextScaled=True`，内容缩放**只缩小不放大**——空间充足时保持原始字号，仅按钮被挤压时文字/图标等比缩小并保持居中，内容自适应布局无需再显式关闭；展示页保留一个固定尺寸的等比缩小演示。
 

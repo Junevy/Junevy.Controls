@@ -7,10 +7,12 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/FeedbackOpacity.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <Style x:Key="DefaultToolboxStyle" TargetType="{x:Type local:Toolbox}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
@@ -31,7 +33,13 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="{DynamicResource Theme.ToolboxCornerRadius}">
-                        <ItemsPresenter />
+                        <!--  条目溢出时滚动（此前仅 Compact 模板有 ScrollViewer，默认模板直接裁剪）；
+                              竖向滚动为像素级（CanContentScroll 默认 False），横向条目固定宽不溢出、禁用  -->
+                        <ScrollViewer Focusable="False"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      VerticalScrollBarVisibility="Auto">
+                            <ItemsPresenter />
+                        </ScrollViewer>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
@@ -58,7 +66,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                FocusVisualStyle="{x:Null}"
+                                FocusVisualStyle="{DynamicResource DefaultControlFocusVisualStyle}"
                                 ToolTip="{TemplateBinding Title}"
                                 AutomationProperties.Name="{TemplateBinding Title}">
                             <Button.Template>
@@ -117,8 +125,7 @@
                                     CornerRadius="{DynamicResource Theme.ControlCornerRadius}"
                                     Effect="{DynamicResource Theme.PopupShadow}">
                                 <ScrollViewer HorizontalScrollBarVisibility="Disabled"
-                                              VerticalScrollBarVisibility="Auto"
-                                              CanContentScroll="True">
+                                              VerticalScrollBarVisibility="Auto">
                                     <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"
                                                     KeyboardNavigation.TabNavigation="Cycle" />
                                 </ScrollViewer>
@@ -126,8 +133,10 @@
                         </Popup>
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <!--  IconAndTitle 的高度补偿落在条目自身（无 TargetName 的 Setter 作用于模板父级，
+                              可正确覆盖样式 Height=48，条目随内容增高而不是 60px 按钮溢出 48px 条目）  -->
                         <Trigger Property="DisplayMode" Value="IconAndTitle">
-                            <Setter TargetName="PART_TriggerButton" Property="MinHeight" Value="60" />
+                            <Setter Property="Height" Value="60" />
                             <Setter TargetName="TriggerTitle" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -160,13 +169,14 @@
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="4" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=Title}" />
         <Setter Property="AutomationProperties.Name" Value="{Binding RelativeSource={RelativeSource Self}, Path=Title}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ToolItem}">
                     <Border x:Name="Root"
+                            Padding="{TemplateBinding Padding}"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
@@ -190,8 +200,11 @@
                         </StackPanel>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <!--  IconOnly 的高度收缩落在条目自身（无 TargetName 的 Setter 作用于模板父级，
+                              可正确覆盖样式 Height=68）——UniformGrid 单元格随之收缩，
+                              悬停底覆盖整行，不再出现 68px 行内 40px 高亮底的错位  -->
                         <Trigger Property="DisplayMode" Value="IconOnly">
-                            <Setter TargetName="Root" Property="Height" Value="40" />
+                            <Setter Property="Height" Value="40" />
                             <Setter TargetName="ToolTitle" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -246,30 +259,13 @@
 
     <!--
         紧凑工具栏容器：内边距收窄（40px 窄列下尽量让出内容空间），
-        默认使用紧凑项样式，并为纵向内容溢出提供滚动支持（避免条目过多时被直接裁剪）。
+        默认使用紧凑项样式。滚动支持已上移到默认模板（ScrollViewer 常驻），
+        此处不再整段复制 ControlTemplate。
     -->
     <Style x:Key="CompactToolboxStyle"
            BasedOn="{StaticResource DefaultToolboxStyle}"
            TargetType="{x:Type local:Toolbox}">
         <Setter Property="Padding" Value="1" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource CompactToolboxItemStyle}" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:Toolbox}">
-                    <Border Padding="{TemplateBinding Padding}"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{DynamicResource Theme.ToolboxCornerRadius}">
-                        <ScrollViewer Focusable="False"
-                                      CanContentScroll="True"
-                                      HorizontalScrollBarVisibility="Disabled"
-                                      VerticalScrollBarVisibility="Auto">
-                            <ItemsPresenter />
-                        </ScrollViewer>
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
     </Style>
 </ResourceDictionary>

@@ -8,12 +8,6 @@ namespace Junevy.Controls.Controls.Menu
     //[TemplatePart(Name = "PART_SIDEMENU", Type = typeof(ListBox))]
     public class SideMenu : ListBox
     {
-        public enum Mode : byte
-        {
-            Horizontal = 0x01,
-            Vertical = 0x01 << 1
-        }
-
         static SideMenu()
         {
             DefaultStyleKeyProperty.OverrideMetadata(
@@ -33,16 +27,20 @@ namespace Junevy.Controls.Controls.Menu
             DependencyProperty.Register("Orientation", typeof(Orientation), typeof(SideMenu), new PropertyMetadata(Orientation.Vertical));
 
 
-        public Mode DisplayMode
+        /// <summary>
+        /// 显示模式：<see cref="SideMenuDisplayMode.Horizontal"/> 图标与标题横向排列，
+        /// <see cref="SideMenuDisplayMode.Vertical"/> 图标在上、标题在下（紧凑图标导航，默认宽度 60）。
+        /// </summary>
+        public SideMenuDisplayMode DisplayMode
         {
-            get { return (Mode)GetValue(DisplayModeProperty); }
+            get { return (SideMenuDisplayMode)GetValue(DisplayModeProperty); }
             set { SetValue(DisplayModeProperty, value); }
         }
         public static readonly DependencyProperty DisplayModeProperty =
-            DependencyProperty.Register("DisplayMode", typeof(Mode), typeof(SideMenu), new PropertyMetadata(Mode.Horizontal));
+            DependencyProperty.Register("DisplayMode", typeof(SideMenuDisplayMode), typeof(SideMenu), new PropertyMetadata(SideMenuDisplayMode.Horizontal));
 
         /// <summary>
-        /// 菜单项悬停背景画刷(默认经样式取 State.HoverScrim 状态层纱色,随主题自适应)。
+        /// 菜单项悬停背景画刷(默认经样式取 Surface.Base——悬停项「浮起」变亮,随主题自适应)。
         /// </summary>
         public Brush ItemHoverBackground
         {
@@ -53,7 +51,7 @@ namespace Junevy.Controls.Controls.Menu
             DependencyProperty.Register("ItemHoverBackground", typeof(Brush), typeof(SideMenu), new PropertyMetadata(null));
 
         /// <summary>
-        /// 选中项背景画刷(默认经样式取 State.PressedScrim 状态层纱色——中性灰,不再是强调蓝;
+        /// 选中项背景画刷(默认经样式取 Surface.Sunken 中性灰,不再是强调蓝;
         /// 需要强调色时设为 Theme.Brush.Surface.Selected 或任意画刷)。
         /// </summary>
         public Brush SelectedItemBackground

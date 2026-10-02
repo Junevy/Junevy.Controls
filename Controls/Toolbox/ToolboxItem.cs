@@ -212,6 +212,9 @@ public sealed class ToolboxItem : HeaderedItemsControl
         {
             _popup.CustomPopupPlacementCallback = GetCustomPopupPlacements;
             _popup.Opened += OnPopupOpened;
+            // Popup 经系统路径自行关闭（如宿主窗口关闭）时，TemplateBinding 单向绑定不会
+            // 回写只读 IsOpen，经 Closed 事件同步回条目并通知协调器清空 ActiveItem。
+            _popup.Closed += OnPopupClosed;
         }
 
         ApplyOwnerLayout();
@@ -294,6 +297,7 @@ public sealed class ToolboxItem : HeaderedItemsControl
         {
             _popup.CustomPopupPlacementCallback = null;
             _popup.Opened -= OnPopupOpened;
+            _popup.Closed -= OnPopupClosed;
         }
 
         _triggerButton = null;
@@ -400,6 +404,20 @@ public sealed class ToolboxItem : HeaderedItemsControl
         }
     }
 
+    // Popup 经系统路径自行关闭（宿主窗口关闭、Popup.Close 被外部调用等）时，
+    // TemplateBinding 单向绑定不会回写只读 IsOpen——在 Closed 事件里同步回条目，
+    // 并交由协调器清空 ActiveItem/计时器（常规关闭路径 IsOpen 已为 false，此处为空操作）。
+    private void OnPopupClosed(object? sender, EventArgs e)
+    {
+        if (!IsOpen)
+        {
+            return;
+        }
+
+        SetIsOpen(false);
+        Owner?.NotifyItemInvalidated(this);
+    }
+
     private CustomPopupPlacement[] GetCustomPopupPlacements(
         Size popupSize,
         Size targetSize,
@@ -475,7 +493,7 @@ public sealed class ToolboxItem : HeaderedItemsControl
         double availableHeight = Math.Max(0d, workArea.Height - 16d);
         _popupRoot.MaxHeight = Math.Min(Owner.PopupMaxHeight, availableHeight);
 
-        UniformGrid? panel = FindVisualChild<UniformGrid>(_popupRoot);
+        UniformGrid? panel = FindPopupItemsPanel(_popupRoot);
         if (panel is not null)
         {
             BindingOperations.SetBinding(
@@ -483,6 +501,31 @@ public sealed class ToolboxItem : HeaderedItemsControl
                 UniformGrid.ColumnsProperty,
                 new Binding(nameof(Toolbox.ColumnCount)) { Source = Owner });
         }
+    }
+
+    /// <summary>
+    /// 弹层网格按「ItemsPresenter 的直接子级」定位（ItemsPanel 模板的根元素）：
+    /// 宿主替换 ItemsPanel 为非 UniformGrid 时静默跳过，条目内容中嵌套的
+    /// UniformGrid 不会被误绑。
+    /// </summary>
+    private static UniformGrid? FindPopupItemsPanel(DependencyObject popupRoot)
+    {
+        ItemsPresenter? presenter = FindVisualChild<ItemsPresenter>(popupRoot);
+        return presenter is null ? null : FindDirectVisualChild<UniformGrid>(presenter);
+    }
+
+    private static T? FindDirectVisualChild<T>(DependencyObject root)
+        where T : DependencyObject
+    {
+        for (int index = 0; index < VisualTreeHelper.GetChildrenCount(root); index++)
+        {
+            if (VisualTreeHelper.GetChild(root, index) is T match)
+            {
+                return match;
+            }
+        }
+
+        return null;
     }
 
     internal void RepositionPopup()

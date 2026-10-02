@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Junevy.Controls.Common;
 
 namespace Junevy.Controls.Controls.Box
 {
@@ -44,6 +45,16 @@ namespace Junevy.Controls.Controls.Box
                 typeof(Orientation),
                 typeof(ListBox),
                 new PropertyMetadata(Orientation.Vertical));
+
+        /// <summary>
+        /// 测量约束在滚动方向上无界（∞）时条目虚拟化失效，DEBUG 构建输出一次性
+        /// 诊断警告（详见 <see cref="VirtualizationDiagnostics"/>）。
+        /// </summary>
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            VirtualizationDiagnostics.ReportIfUnbounded(this, this.Orientation, availableSize);
+            return base.MeasureOverride(availableSize);
+        }
 
         /// <summary>
         /// 横向模式下把鼠标滚轮折算成水平滚动。

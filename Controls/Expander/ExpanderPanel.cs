@@ -13,6 +13,7 @@ namespace Junevy.Controls.Controls.Expander;
 /// 可折叠面板控件：提供头部与内容区，支持展开/折叠的平滑过渡动画，
 /// 可通过 <see cref="IsExpanded"/> 双向绑定状态、<see cref="ExpandDirection"/>
 /// 配置展开方向、<see cref="AnimationDuration"/> 配置动画时长。
+/// <see cref="DisplayMode"/> 可切换经典窄条头部与卡片式高头部（图标 + 标题/补充说明 + 右侧扩展槽）。
 /// </summary>
 [TemplatePart(Name = PartContentHost, Type = typeof(FrameworkElement))]
 [TemplatePart(Name = PartScaleTransform, Type = typeof(ScaleTransform))]
@@ -23,6 +24,34 @@ public class ExpanderPanel : HeaderedContentControl
 
     private FrameworkElement? _contentHost;
     private ScaleTransform? _scaleTransform;
+
+    public static readonly DependencyProperty DisplayModeProperty =
+        DependencyProperty.Register(
+            nameof(DisplayMode),
+            typeof(ExpanderDisplayMode),
+            typeof(ExpanderPanel),
+            new PropertyMetadata(ExpanderDisplayMode.Classic));
+
+    public static readonly DependencyProperty IconProperty =
+        DependencyProperty.Register(
+            nameof(Icon),
+            typeof(object),
+            typeof(ExpanderPanel),
+            new PropertyMetadata(null));
+
+    public static readonly DependencyProperty DescriptionProperty =
+        DependencyProperty.Register(
+            nameof(Description),
+            typeof(object),
+            typeof(ExpanderPanel),
+            new PropertyMetadata(null));
+
+    public static readonly DependencyProperty HeaderExtraProperty =
+        DependencyProperty.Register(
+            nameof(HeaderExtra),
+            typeof(object),
+            typeof(ExpanderPanel),
+            new PropertyMetadata(null));
 
     public static readonly DependencyProperty IsExpandedProperty =
         DependencyProperty.Register(
@@ -82,6 +111,37 @@ public class ExpanderPanel : HeaderedContentControl
         DefaultStyleKeyProperty.OverrideMetadata(
             typeof(ExpanderPanel),
             new FrameworkPropertyMetadata(typeof(ExpanderPanel)));
+    }
+
+    /// <summary>头部呈现模式：默认 <see cref="ExpanderDisplayMode.Classic"/>（窄条头部，四方向展开）；
+    /// <see cref="ExpanderDisplayMode.Card"/> 为卡片式高头部（图标 + 标题/补充说明 + 右侧扩展槽），内容向下展开。</summary>
+    public ExpanderDisplayMode DisplayMode
+    {
+        get => (ExpanderDisplayMode)GetValue(DisplayModeProperty);
+        set => SetValue(DisplayModeProperty, value);
+    }
+
+    /// <summary>卡片模式头部左侧的图标：iconfont 字形或任意内容；为 <see langword="null"/> 时图标槽折叠不占位。
+    /// 字体族/字号经 <c>atc:Icon.FontFamily</c> / <c>atc:Icon.IconSize</c> 配置（卡片样式默认 20）。</summary>
+    public object? Icon
+    {
+        get => GetValue(IconProperty);
+        set => SetValue(IconProperty, value);
+    }
+
+    /// <summary>卡片模式标题（Header）下方的补充说明文字或内容；为 <see langword="null"/> 时整体折叠，头部自动变矮。</summary>
+    public object? Description
+    {
+        get => GetValue(DescriptionProperty);
+        set => SetValue(DescriptionProperty, value);
+    }
+
+    /// <summary>卡片模式头部右侧的扩展槽：可放置开关、按钮等控件。该槽位于头部切换按钮之上且独立命中，
+    /// 其中的交互控件（按下即处理事件的按钮类）不会误触发展开/折叠；空白区域点击仍穿透到头部照常切换。</summary>
+    public object? HeaderExtra
+    {
+        get => GetValue(HeaderExtraProperty);
+        set => SetValue(HeaderExtraProperty, value);
     }
 
     /// <summary>是否展开；支持双向绑定。</summary>

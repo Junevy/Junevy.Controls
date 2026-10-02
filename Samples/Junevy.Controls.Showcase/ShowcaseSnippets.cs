@@ -144,6 +144,28 @@ namespace Junevy.Controls.Showcase
                          atc:TitleAssist.Title="电子邮箱地址" atc:TitleAssist.TitlePlacement="Left" atc:TitleAssist.TitleWidth="110" />
             """;
 
+        public const string PasswordBoxDemo = """
+            <!-- 默认（Click）：右侧眼睛按钮点击切换明文；占位符、图标、标题与 jv:TextBox 同源 -->
+            <jv:PasswordBox Width="240"
+                            atc:Icon.FontFamily="{DynamicResource IconFont}"
+                            atc:PlaceholderAssist.Placeholder="请输入密码" />
+
+            <!-- 长按显示：按下即显示、松开立即隐藏 -->
+            <jv:PasswordBox Width="240" RevealMode="PressAndHold"
+                            atc:PlaceholderAssist.Placeholder="长按眼睛显示（PressAndHold）" />
+
+            <!-- 错误泛红：IsError=true 时输入区背景微微发红，由业务验证失败时置位 -->
+            <jv:PasswordBox Width="240" IsError="True"
+                            atc:PlaceholderAssist.Placeholder="IsError=True 错误泛红" />
+
+            <!-- Password 是真正的依赖属性，可直接绑定 ViewModel（原生 PasswordBox 做不到） -->
+            <jv:PasswordBox Width="240" Password="{Binding DemoPassword}" />
+
+            <!-- 密码错误状态可绑定，明文态 IsRevealed 亦可双向绑定 -->
+            <jv:PasswordBox Width="240" IsError="{Binding PasswordInvalid}"
+                            atc:TitleAssist.Title="登录密码" atc:TitleAssist.IsRequired="True" />
+            """;
+
         public const string ComboBoxDemo = """
             <!-- ItemsSource 绑定 -->
             <jv:ComboBox ItemsSource="{Binding Cameras}" SelectedIndex="0" />
@@ -376,18 +398,57 @@ namespace Junevy.Controls.Showcase
             </jv:Button>
             """;
 
-        public const string TreeMenuDemo = """
+        // ---------------- 树形视图（TreeViewPage） ----------------
+
+        public const string TreeViewDemo = """
             <!-- TreeMenuItem 为 POCO 数据模型（Title/Icon/Children），默认 HierarchicalDataTemplate 渲染；
-                 双击/Enter：非叶节点切换展开，叶节点执行 NavigateCommand（参数为叶节点数据对象） -->
-            <jv:TreeMenu x:Name="TreeNav" Height="200" DisplayMode="Normal"
+                 展开图标为 ExpanderPanel 同款旋转箭头；双击/Enter：非叶节点切换展开，叶节点执行 NavigateCommand；
+                 根级与嵌套层级均参与虚拟化（标准模式，TreeViewItem 携带状态、不回收容器） -->
+            <jv:TreeView x:Name="MainTree" Width="400" Height="420"
                          atc:Icon.FontFamily="{DynamicResource IconFont}"
                          atc:Icon.IconSize="16" />
 
             <!-- 数据构建（任意线程，POCO 不依赖 UI 线程）：
-                 var root = new TreeMenuItem { Title = "相机", Icon = "\uE66B" };
-                 root.Children.Add(new TreeMenuItem { Title = "实时预览" });
-                 TreeNav.ItemsSource = new ObservableCollection<TreeMenuItem> { root };
-                 TreeNav.NavigateCommand = new RelayCommand(() => { ... }); -->
+                 var root = new TreeMenuItem { Title = "检测工作站", Icon = "\uE6BC", IsExpanded = true };
+                 root.Children.Add(new TreeMenuItem { Title = "图像采集", Icon = "\uE60C", IsExpanded = true });
+                 MainTree.ItemsSource = new[] { root };
+                 MainTree.NavigateCommand = new RelayCommand(() => { ... }); -->
+            """;
+
+        public const string TreeViewIconModeDemo = """
+            <!-- DisplayMode=Icon：隐藏展开箭头；蓝色 accent 指示条仅标示「选中的带子项节点」
+                 （蓝色提示 = 真实选中，非选中分支不显示）；图标字号取 atc:Icon.IconSize。
+                 DisplayMode 经 atc:TreeViewAssist.DisplayMode 附加属性承载 -->
+            <jv:TreeView Width="400" Height="300" DisplayMode="Icon"
+                         atc:Icon.FontFamily="{DynamicResource IconFont}"
+                         atc:Icon.IconSize="18" />
+            """;
+
+        public const string TreeViewNativeDemo = """
+            <!-- 合并 Themes/Generic.xaml 后，官方 <TreeView>（无 jv: 前缀）自动获得同一外观；
+                 扩展能力经附加属性提供：图标字体、选中画刷、NavigateCommand -->
+            <TreeView x:Name="NativeTree" Width="400" Height="300"
+                      atc:Icon.FontFamily="{DynamicResource IconFont}"
+                      atc:Icon.IconSize="16"
+                      atc:TreeViewAssist.SelectedItemBackground="{DynamicResource Theme.Brush.Surface.Selected}" />
+
+            <!-- 代码设置导航命令（对官方实例同样生效）：
+                 Junevy.Controls.AttachedProperties.TreeViewAssist.SetNavigateCommand(
+                     NativeTree, new ParameterRelayCommand(p => ...)); -->
+            """;
+
+        public const string TreeViewInteractionDemo = """
+            <!-- TreeMenuItem.IsExpanded / IsSelected 与容器双向绑定，代码直接赋值即可控制；
+                 悬停/选中背景画刷逐实例自定义（默认 Surface.Hover / Surface.Sunken） -->
+            <jv:Button Click="OnExpandAllClick" Content="展开全部" />
+            <jv:TreeView x:Name="ControlledTree" Width="400" Height="260"
+                         ItemHoverBackground="{DynamicResource Theme.Brush.Surface.Hover}"
+                         SelectedItemBackground="{DynamicResource Theme.Brush.Surface.Selected}"
+                         atc:Icon.FontFamily="{DynamicResource IconFont}" atc:Icon.IconSize="16" />
+
+            <!-- 代码控制：写入数据模型，容器经双向绑定跟随，虚拟化回收后状态不丢失
+                 static void SetExpanded(TreeMenuItem node, bool v) { node.IsExpanded = v; ... }
+                 path[^1].IsSelected = true; // 选中前先展开祖先使目标可见 -->
             """;
 
         public const string TabMenuDemo = """
@@ -536,6 +597,34 @@ namespace Junevy.Controls.Showcase
                               AnimationDuration="0:0:0.25" ExpandDirection="Left" />
             <jv:ExpanderPanel Width="360" Header="Right（内容向右展开）"
                               AnimationDuration="0:0:0.25" ExpandDirection="Right" />
+            """;
+
+        public const string ExpanderPanelCardDemo = """
+            <!-- 卡片模式（DisplayMode=Card）：高头部 = 图标 + 标题(Header)/补充说明(Description) + 右侧扩展槽 + 展开箭头；
+                 图标为 iconfont 字形时字体族/字号跟随 atc:Icon.FontFamily / atc:Icon.IconSize（卡片默认 20） -->
+            <jv:ExpanderPanel DisplayMode="Card" Icon="&#xE60C;"
+                              Header="采集通道配置"
+                              Description="展开后配置各通道的触发模式与采样率">
+                <TextBlock Text="卡片展开后的内容区。整卡带底色与描边，内容向下展开。" />
+            </jv:ExpanderPanel>
+
+            <!-- 右侧扩展槽（HeaderExtra）：其中的开关/按钮独立交互，不会误触发展开；空白处点击仍切换 -->
+            <jv:ExpanderPanel DisplayMode="Card" IsExpanded="False" Icon="&#xE60F;"
+                              Header="自动曝光"
+                              Description="启用后由相机驱动自动调整曝光时间与增益">
+                <jv:ExpanderPanel.HeaderExtra>
+                    <StackPanel Orientation="Horizontal">
+                        <jv:ToggleButton IsChecked="True" />
+                        <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" Text="On" />
+                    </StackPanel>
+                </jv:ExpanderPanel.HeaderExtra>
+                <TextBlock Text="曝光策略内容区。" />
+            </jv:ExpanderPanel>
+
+            <!-- 无图标/无说明/无右侧控件：相应槽位自动折叠，头部随之变矮 -->
+            <jv:ExpanderPanel DisplayMode="Card" Header="仅标题的卡片" IsExpanded="False">
+                <TextBlock Text="无图标、无说明、无右侧控件。" />
+            </jv:ExpanderPanel>
             """;
 
         public const string CornerRadiusDemo = """

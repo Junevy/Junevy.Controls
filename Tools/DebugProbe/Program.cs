@@ -9,6 +9,9 @@ internal static class Program
     {
         int failures = CodeEditorProbe.Run();
         failures += RoslynCompletionProbe.RunAsync().GetAwaiter().GetResult();
+        failures += SmoothScrollProbe.Run();
+        failures += PasswordBoxProbe.Run();
+        failures += ExpanderPanelProbe.Run();
         return failures == 0 ? 0 : 1;
     }
 }

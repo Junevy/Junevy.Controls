@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using Junevy.Controls.Common;
@@ -7,12 +6,9 @@ using Junevy.Controls.Controls.Menu;
 
 namespace Junevy.Controls.Showcase.Pages
 {
-    /// <summary>菜单与导航展示页：ContextMenu / TreeMenu / TabMenu / ToolBar / Toolbox。</summary>
+    /// <summary>菜单与导航展示页：ContextMenu / TabMenu / ToolBar / Toolbox。</summary>
     public partial class MenusPage : UserControl
     {
-        /// <summary>TreeMenu 虚拟导航树。</summary>
-        public ObservableCollection<TreeMenuItem> NavTree { get; } = [];
-
         /// <summary>InfoBar 菜单列表(经 ItemsSource 绑定的演示数据)。</summary>
         public System.Collections.Generic.IEnumerable<string> InfoBarMenuItems { get; } =
             new[] { "应用设置", "个人资料", "切换语言", "退出登录" };
@@ -20,29 +16,6 @@ namespace Junevy.Controls.Showcase.Pages
         public MenusPage()
         {
             InitializeComponent();
-
-            NavTree.Add(new TreeMenuItem
-            {
-                Title = "相机",
-                Icon = "\uE66B",
-                Children =
-                {
-                    new TreeMenuItem { Title = "实时预览", TargetType = typeof(Window) },
-                    new TreeMenuItem { Title = "参数设置", TargetType = typeof(Window) },
-                    new TreeMenuItem
-                    {
-                        Title = "标定",
-                        Icon = "\uE60F",
-                        Children = { new TreeMenuItem { Title = "九点标定" }, new TreeMenuItem { Title = "手眼标定" } }
-                    }
-                }
-            });
-            NavTree.Add(new TreeMenuItem { Title = "日志", Icon = "\uE651" });
-            NavTree.Add(new TreeMenuItem { Title = "帮助", Icon = "\uE932" });
-
-            TreeNav.ItemsSource = NavTree;
-            TreeNav.NavigateCommand = new RelayCommand(() =>
-                MessageBarService.Show("TreeMenu", "叶节点已激活（NavigateCommand）"));
         }
 
         private void OnInfoBarSettingsClick(object sender, RoutedEventArgs e)

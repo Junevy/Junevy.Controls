@@ -1,0 +1,92 @@
+<UserControl
+    x:Class="Junevy.Controls.Showcase.Pages.TreeViewPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Controls"
+    xmlns:demo="clr-namespace:Junevy.Controls.Showcase.Controls"
+    xmlns:jv="github.com.junevy"
+    xmlns:sample="clr-namespace:Junevy.Controls.Showcase">
+
+    <Border
+        Padding="10"
+        Background="{DynamicResource Theme.Brush.Background.App}"
+        BorderBrush="{DynamicResource Theme.Brush.Border.Subtle}"
+        BorderThickness="1"
+        CornerRadius="15,0,0,15">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel MaxWidth="1080" HorizontalAlignment="Center">
+
+                <TextBlock Style="{StaticResource DemoPageTitle}" Text="树形视图" />
+                <TextBlock
+                    Style="{StaticResource DemoPageSubtitle}"
+                    Text="jv:TreeView（原 jv:TreeMenu）与官方 &lt;TreeView&gt;（合并 Generic.xaml 后自动继承本库样式）：TreeMenuItem 数据模型 + HierarchicalDataTemplate、DisplayMode 双模式、atc:TreeViewAssist 附加属性、代码控制展开/选中。" />
+
+                <demo:DemoSection
+                    Title="jv:TreeView + TreeMenuItem（数据模型驱动）"
+                    Description="TreeMenuItem 为 POCO 数据模型（Title/Icon/Children），由默认 HierarchicalDataTemplate 渲染，可在任意线程构建；根级与嵌套层级均参与虚拟化（标准模式，TreeViewItem 携带状态、不回收容器）。默认容器样式已启用 atc:ExpanderBehavior.Enable：双击/Enter 切换分支展开，激活叶节点执行 NavigateCommand（本页以 MessageBar 反馈节点标题）；展开图标为 ExpanderPanel 同款旋转箭头。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.TreeViewDemo}">
+                    <jv:TreeView
+                        x:Name="MainTree"
+                        Width="400"
+                        Height="420"
+                        atc:Icon.FontFamily="{DynamicResource IconFont}"
+                        atc:Icon.IconSize="16" />
+                </demo:DemoSection>
+
+                <demo:DemoSection
+                    Title="DisplayMode=Icon（左侧层级指示器模式）"
+                    Description="Icon 模式隐藏展开箭头；蓝色 accent 指示条仅标示「选中的带子项节点」（蓝色提示 = 真实选中，非选中分支不显示，行宽经隐藏占位预留、选中时不跳动）。节点图标字号取 atc:Icon.IconSize，标题仍正常显示。DisplayMode 经 atc:TreeViewAssist.DisplayMode 附加属性承载，官方 &lt;TreeView&gt; 上同样可用。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.TreeViewIconModeDemo}">
+                    <jv:TreeView
+                        x:Name="IconModeTree"
+                        Width="400"
+                        Height="300"
+                        DisplayMode="Icon"
+                        atc:Icon.FontFamily="{DynamicResource IconFont}"
+                        atc:Icon.IconSize="18" />
+                </demo:DemoSection>
+
+                <demo:DemoSection
+                    Title="官方 TreeView 自动继承样式（无需 jv: 前缀）"
+                    Description="合并 Themes/Generic.xaml 后，官方 &lt;TreeView&gt; 自动获得同一外观（卡片容器、展开箭头、悬停/选中态、虚拟化）。jv 专有能力经附加属性同样可用：atc:Icon.FontFamily 提供图标字体，atc:TreeViewAssist.SelectedItemBackground 定制选中画刷（本例改为强调蓝），atc:TreeViewAssist.NavigateCommand 激活叶节点（代码设置，见片段注释）。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.TreeViewNativeDemo}">
+                    <TreeView
+                        x:Name="NativeTree"
+                        Width="400"
+                        Height="300"
+                        atc:Icon.FontFamily="{DynamicResource IconFont}"
+                        atc:Icon.IconSize="16"
+                        atc:TreeViewAssist.SelectedItemBackground="{DynamicResource Theme.Brush.Surface.Selected}" />
+                </demo:DemoSection>
+
+                <demo:DemoSection
+                    Title="代码控制展开/选中 + 自定义悬停与选中画刷"
+                    Description="TreeMenuItem.IsExpanded / IsSelected 与容器双向绑定：代码直接赋值即可展开/收起、选中节点（选中分支节点前自动展开其祖先），虚拟化/容器回收后状态仍保留在模型上。悬停与选中背景画刷可逐实例自定义（jv:TreeView 实例属性，或官方实例上的 atc:TreeViewAssist.* 附加属性），默认取 Surface.Hover / Surface.Sunken 中性灰。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.TreeViewInteractionDemo}">
+                    <StackPanel>
+                        <WrapPanel Margin="0,0,0,12">
+                            <jv:Button Click="OnExpandAllClick" Content="展开全部" />
+                            <jv:Button
+                                Margin="8,0,0,0"
+                                Click="OnCollapseAllClick"
+                                Content="收起全部" />
+                            <jv:Button
+                                Margin="8,0,0,0"
+                                Click="OnSelectCalibrationClick"
+                                Content="选中「九点标定」" />
+                        </WrapPanel>
+                        <jv:TreeView
+                            x:Name="ControlledTree"
+                            Width="400"
+                            Height="260"
+                            ItemHoverBackground="{DynamicResource Theme.Brush.Surface.Hover}"
+                            SelectedItemBackground="{DynamicResource Theme.Brush.Surface.Selected}"
+                            atc:Icon.FontFamily="{DynamicResource IconFont}"
+                            atc:Icon.IconSize="16" />
+                    </StackPanel>
+                </demo:DemoSection>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
+</UserControl>

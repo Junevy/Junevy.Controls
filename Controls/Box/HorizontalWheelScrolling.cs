@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Junevy.Controls.AttachedProperties;
 
 namespace Junevy.Controls.Controls.Box
 {
@@ -12,18 +13,15 @@ namespace Junevy.Controls.Controls.Box
     /// <remarks>
     /// WPF 的 <see cref="ScrollViewer.OnMouseWheel"/> 只调用 <c>MouseWheelUp</c>/<c>MouseWheelDown</c>，
     /// 并且无论是否真的滚动过都会把事件标记为已处理；竖向滚不动时不会自动退化为水平滚动。
-    /// 因此横向列表需要自己完成这一步折算。折算量与 WPF 竖向滚轮保持一致：
-    /// 逻辑滚动（<see cref="ScrollViewer.CanContentScroll"/> 为 <c>true</c>）按
-    /// <see cref="SystemParameters.WheelScrollLines"/> 条项目滚动，像素滚动按一个文本行高折算。
+    /// 因此横向列表需要自己完成这一步折算。折算量跟随面板的实际滚动单位：
+    /// 像素滚动（ScrollUnit=Pixel 或 CanContentScroll=false）按
+    /// <see cref="SystemParameters.WheelScrollLines"/> × 文本行高折算，
+    /// 按项滚动（ScrollUnit=Item）按条目数折算。
+    /// 宿主启用平滑滚动（<see cref="SmoothScrolling"/>）时，折算出的目标偏移
+    /// 经 <see cref="SmoothScrolling"/> 补间过去，与竖向滚轮手感一致；未启用时瞬时定位。
     /// </remarks>
     internal static class HorizontalWheelScrolling
     {
-        /// <summary>一个滚轮刻度对应的角度增量。</summary>
-        private const double WheelNotch = 120.0;
-
-        /// <summary>像素滚动模式下一个文本行的估算高度，与 WPF 竖向滚轮的换算基准一致。</summary>
-        private const double PixelLineHeight = 16.0;
-
         /// <summary>
         /// 模板中承载滚动的 <see cref="ScrollViewer"/> 部件名，与本库的 ListBox/ListView 模板约定一致。
         /// </summary>
@@ -47,20 +45,24 @@ namespace Junevy.Controls.Controls.Box
                 return false;
             }
 
-            ScrollViewer viewer = FindOwnScrollViewer(owner, e.OriginalSource as DependencyObject);
+            ScrollViewer? viewer = FindOwnScrollViewer(owner, e.OriginalSource as DependencyObject);
             if (viewer == null || viewer.ScrollableWidth <= 0 || viewer.ScrollableHeight > 0)
             {
                 return false;
             }
 
-            double notches = e.Delta / WheelNotch;
+            double notches = e.Delta / SmoothScrolling.WheelNotch;
             double lines = SystemParameters.WheelScrollLines;
-            double step = viewer.CanContentScroll
-                ? (lines > 0 ? lines : Math.Max(1.0, viewer.ViewportWidth))
-                : (lines > 0 ? lines : 1.0) * PixelLineHeight;
+
+            // 折算单位跟随面板的实际滚动单位：ScrollUnit=Pixel 或未启用逻辑滚动（CanContentScroll=false）
+            // 时偏移即像素，按文本行高折算；仍按项滚动（ScrollUnit=Item）时偏移是条目数，按条目数折算
+            double step = !viewer.CanContentScroll
+                || VirtualizingPanel.GetScrollUnit(owner) == ScrollUnit.Pixel
+                ? (lines > 0 ? lines : 1.0) * SmoothScrolling.PixelLineHeight
+                : lines > 0 ? lines : Math.Max(1.0, viewer.ViewportWidth);
 
             double target = viewer.HorizontalOffset - (notches * step);
-            viewer.ScrollToHorizontalOffset(Math.Max(0.0, Math.Min(viewer.ScrollableWidth, target)));
+            SmoothScrolling.ScrollToHorizontalOffset(viewer, target);
             return true;
         }
 
@@ -72,7 +74,7 @@ namespace Junevy.Controls.Controls.Box
         /// 只有当它就是模板里那个滚动宿主时才接管，避免抢走条目模板内部自带滚动控件的滚轮。
         /// 模板被整体替换且未命名该部件时返回 <c>null</c>，此时保持 WPF 原生行为。
         /// </remarks>
-        private static ScrollViewer FindOwnScrollViewer(Control owner, DependencyObject source)
+        private static ScrollViewer? FindOwnScrollViewer(Control owner, DependencyObject? source)
         {
             var own = owner.Template?.FindName(ScrollViewerPartName, owner) as ScrollViewer;
             if (own == null)

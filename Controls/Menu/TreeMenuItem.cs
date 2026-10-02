@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 namespace Junevy.Controls.Controls.Menu
 {
     /// <summary>
-    /// TreeMenu 的树节点数据模型（POCO，非控件）。作为 <see cref="TreeMenu"/> 的
+    /// TreeView 的树节点数据模型（POCO，非控件）。作为 <see cref="TreeView"/> 的
     /// <c>ItemsSource</c> 条目使用，由默认的 <see cref="System.Windows.HierarchicalDataTemplate"/>
     /// 渲染 <see cref="Title"/> 与 <see cref="Icon"/>，层级由 <see cref="Children"/> 提供。
     /// 不继承 DispatcherObject，可在任意线程构建数据。
@@ -49,7 +49,7 @@ namespace Junevy.Controls.Controls.Menu
             }
         }
 
-        /// <summary>节点对应的页面类型等业务元数据，由 <c>TreeMenu.NavigateCommand</c> 的处理方自行解释。</summary>
+        /// <summary>节点对应的页面类型等业务元数据，由 <c>TreeView.NavigateCommand</c> 的处理方自行解释。</summary>
         public Type? TargetType
         {
             get => _targetType;

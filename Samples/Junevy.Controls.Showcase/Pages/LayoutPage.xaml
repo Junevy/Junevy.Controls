@@ -107,6 +107,51 @@
                 </demo:DemoSection>
 
                 <demo:DemoSection
+                    Title="jv:ExpanderPanel —— 卡片模式（DisplayMode=Card）"
+                    Description="高头部卡片：图标 + 标题/补充说明 + 右侧扩展槽 + 展开箭头，整卡带底色描边、内容向下展开（ExpandDirection 仅经典模式生效）。Header 复用为标题；右侧控件槽独立命中——其中的开关/按钮不会误触发展开，空白处点击仍切换；无图标/说明时槽位折叠、头部自适应变矮。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.ExpanderPanelCardDemo}">
+                    <StackPanel>
+                        <jv:ExpanderPanel
+                            DisplayMode="Card"
+                            Icon="&#xE60C;"
+                            Header="采集通道配置"
+                            Description="展开后配置各通道的触发模式与采样率">
+                            <Border
+                                Padding="8"
+                                Background="{DynamicResource Theme.Brush.Background.App}"
+                                CornerRadius="6">
+                                <TextBlock Text="卡片展开后的内容区。整卡带底色与描边，内容向下展开。" />
+                            </Border>
+                        </jv:ExpanderPanel>
+
+                        <jv:ExpanderPanel
+                            DisplayMode="Card"
+                            IsExpanded="False"
+                            Icon="&#xE60F;"
+                            Header="自动曝光"
+                            Description="启用后由相机驱动自动调整曝光时间与增益">
+                            <jv:ExpanderPanel.HeaderExtra>
+                                <StackPanel Orientation="Horizontal">
+                                    <jv:ToggleButton IsChecked="True" />
+                                    <TextBlock
+                                        Margin="8,0,0,0"
+                                        VerticalAlignment="Center"
+                                        Text="On" />
+                                </StackPanel>
+                            </jv:ExpanderPanel.HeaderExtra>
+                            <TextBlock Margin="4" Text="曝光策略内容区。试着点击右侧开关——它独立于展开切换。" />
+                        </jv:ExpanderPanel>
+
+                        <jv:ExpanderPanel
+                            DisplayMode="Card"
+                            Header="仅标题的卡片"
+                            IsExpanded="False">
+                            <TextBlock Margin="4" Text="无图标、无说明、无右侧控件。" />
+                        </jv:ExpanderPanel>
+                    </StackPanel>
+                </demo:DemoSection>
+
+                <demo:DemoSection
                     Title="Border.CornerRadius 附加用法（Button 圆角示例，经样式 Setter 设置）"
                     Description="Border.CornerRadius 是 System.Windows.Control 的附加属性用法：逐实例 attribute 写法会被编译器拒绝，需经样式 Setter 设置。"
                     XamlCode="{x:Static sample:ShowcaseSnippets.CornerRadiusDemo}">

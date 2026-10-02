@@ -10,13 +10,16 @@
         <ResourceDictionary Source="/Junevy.Controls;component/Generic/Style/DefaultFocusStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <cvt:BoolToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    <cvt:BoolToVisibilityConverter x:Key="SideMenuVisibilityConverter" />
     <cvt:SideMenuIconFontFamilyConverter x:Key="SideMenuIconFontFamilyConverter" />
 
+    <!--  图标槽：Min 尺寸随 IconSize（字形按 FontSize 渲染自然占位），非字形图标（Image/Path 等）
+          大于 IconSize 时槽位随之撑大、不再被钉死裁切；Foreground 走属性继承（ListBoxItem 触发器
+          选中/禁用改前景时自动跟随）。  -->
     <Style x:Key="SideMenuIconPresenterStyle" TargetType="{x:Type ContentControl}">
-        <Setter Property="Width"
+        <Setter Property="MinWidth"
                 Value="{Binding RelativeSource={RelativeSource AncestorType=local:SideMenu}, Path=(atc:Icon.IconSize)}" />
-        <Setter Property="Height"
+        <Setter Property="MinHeight"
                 Value="{Binding RelativeSource={RelativeSource AncestorType=local:SideMenu}, Path=(atc:Icon.IconSize)}" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -34,14 +37,15 @@
         </Setter>
         <Setter Property="FontSize"
                 Value="{Binding RelativeSource={RelativeSource AncestorType=local:SideMenu}, Path=(atc:Icon.IconSize)}" />
-        <Setter Property="Foreground"
-                Value="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=Foreground}" />
         <Setter Property="Visibility"
-                Value="{Binding Icon, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                Value="{Binding Icon, Converter={StaticResource SideMenuVisibilityConverter}}" />
     </Style>
 
-    <!--  horizontal mode / normal style  -->
-    <DataTemplate x:Key="DefaultSideMenuStyle" DataType="{x:Type local:MenuItem}">
+    <!--  horizontal mode / normal style：图标与标题横向排列（条目 Orientation 默认）。
+          横排用 DockPanel 让标题占满剩余宽度——横向 StackPanel 给子元素的测宽约束是无穷大，
+          TextTrimming 永远不会生效；条目 Orientation=Vertical 时经 DataTemplate.Triggers
+          切换为纵排 StackPanel（纵排对子元素有宽度约束，截断同样生效）。  -->
+    <DataTemplate x:Key="SideMenuHorizontalItemTemplate" DataType="{x:Type local:MenuItem}">
         <Grid>
             <!-- The indicator overlays the item so it does not offset content. -->
             <Border
@@ -50,30 +54,55 @@
                 HorizontalAlignment="Left"
                 Background="{DynamicResource Theme.Brush.Accent.Primary}"
                 CornerRadius="2"
-                Visibility="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                Visibility="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Converter={StaticResource SideMenuVisibilityConverter}}" />
 
-            <StackPanel
+            <DockPanel
+                x:Name="HorizontalHost"
                 Margin="8,0"
                 VerticalAlignment="Center"
-                Orientation="{Binding Orientation}">
+                LastChildFill="True">
                 <ContentControl
                     Margin="5"
+                    DockPanel.Dock="Left"
                     Style="{StaticResource SideMenuIconPresenterStyle}" />
 
                 <TextBlock
                     Margin="5"
                     VerticalAlignment="Center"
                     Background="Transparent"
-                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:SideMenu}, Path=FontSize}"
-                    Foreground="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=Foreground}"
                     Text="{Binding Title}"
-                    Visibility="{Binding Title, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    TextTrimming="CharacterEllipsis"
+                    Visibility="{Binding Title, Converter={StaticResource SideMenuVisibilityConverter}}" />
+            </DockPanel>
+
+            <StackPanel
+                x:Name="VerticalHost"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Orientation="Vertical"
+                Visibility="Collapsed">
+                <ContentControl Style="{StaticResource SideMenuIconPresenterStyle}" />
+
+                <TextBlock
+                    Margin="0,2,0,0"
+                    HorizontalAlignment="Center"
+                    Text="{Binding Title}"
+                    TextTrimming="CharacterEllipsis"
+                    Visibility="{Binding Title, Converter={StaticResource SideMenuVisibilityConverter}}" />
             </StackPanel>
         </Grid>
+
+        <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding Orientation}" Value="Vertical">
+                <Setter TargetName="HorizontalHost" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="VerticalHost" Property="Visibility" Value="Visible" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
     </DataTemplate>
 
-    <!--  icon mode / vertical mode  -->
-    <DataTemplate x:Key="IconMenuStyle" DataType="{x:Type local:MenuItem}">
+    <!--  icon mode / vertical mode：图标在上、标题在下。标题超宽省略号截断；
+          Title 为空时标题折叠、图标保持居中（图标导航用法）。  -->
+    <DataTemplate x:Key="SideMenuVerticalItemTemplate" DataType="{x:Type local:MenuItem}">
         <Grid>
             <!-- Keep this out of the content layout so an icon stays centered. -->
             <Border
@@ -82,7 +111,7 @@
                 HorizontalAlignment="Left"
                 Background="{DynamicResource Theme.Brush.Accent.Primary}"
                 CornerRadius="2"
-                Visibility="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                Visibility="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Converter={StaticResource SideMenuVisibilityConverter}}" />
 
             <StackPanel
                 HorizontalAlignment="Center"
@@ -92,10 +121,9 @@
                 <TextBlock
                     Margin="0,2,0,0"
                     HorizontalAlignment="Center"
-                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:SideMenu}, Path=FontSize}"
-                    Foreground="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=Foreground}"
                     Text="{Binding Title}"
-                    Visibility="{Binding Title, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    TextTrimming="CharacterEllipsis"
+                    Visibility="{Binding Title, Converter={StaticResource SideMenuVisibilityConverter}}" />
             </StackPanel>
         </Grid>
     </DataTemplate>
@@ -103,8 +131,17 @@
     <!--  style  -->
     <Style x:Key="DefaultSideMenu" TargetType="{x:Type local:SideMenu}">
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
         <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
+        <!--  像素滚动：偏移不再吸附到条目边界，滚轮补间（SmoothScrolling）才能连续滑动；
+              预生成前后各一页容器消除补间中的实体化顿挫；
+              平滑滚轮默认开启，实例上设 atc:SmoothScrolling.IsEnabled=False 可单独关闭  -->
+        <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel" />
+        <Setter Property="VirtualizingPanel.CacheLength" Value="1,1" />
+        <Setter Property="VirtualizingPanel.CacheLengthUnit" Value="Page" />
+        <Setter Property="atc:SmoothScrolling.IsEnabled" Value="True" />
         <Setter Property="Width" Value="150" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -119,7 +156,9 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
-        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+        <!--  竖向导航禁用横向滚动：测宽约束自视口逐层传入条目，超宽标题以省略号截断，
+              不再把整条导航栏撑出横向滚动条；横向丝带菜单（Orientation=Horizontal）由触发器恢复 Auto  -->
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
 
         <!--  SideMenu容器  -->
@@ -164,6 +203,10 @@
                     <Setter Property="Margin" Value="2" />
                     <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource AncestorType=local:SideMenu}, Path=ItemHeight}" />
                     <Setter Property="Background" Value="Transparent" />
+                    <!--  悬停提示与自动化名称随 Title（纯图标导航项的语义来源）；Title 为空时
+                          不显示空 ToolTip（ToolTip 置 null，见模板后的 Style.Triggers）  -->
+                    <Setter Property="ToolTip" Value="{Binding Title}" />
+                    <Setter Property="AutomationProperties.Name" Value="{Binding Title}" />
 
                     <Setter Property="Template">
                         <Setter.Value>
@@ -201,18 +244,51 @@
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>
+
+                    <!--  Title 为空/null 时不显示空 ToolTip；Icon 与 Title 双空的条目
+                          不产生可点击的空白行  -->
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Title}" Value="{x:Null}">
+                            <Setter Property="ToolTip" Value="{x:Null}" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Title}" Value="">
+                            <Setter Property="ToolTip" Value="{x:Null}" />
+                        </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Icon}" Value="{x:Null}" />
+                                <Condition Binding="{Binding Title}" Value="" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Icon}" Value="{x:Null}" />
+                                <Condition Binding="{Binding Title}" Value="{x:Null}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
                 </Style>
             </Setter.Value>
         </Setter>
+
+        <!--  横向丝带菜单（Orientation=Horizontal）恢复横向滚动：条目横向超出视口时滚动而非截断；
+              竖向导航保持 Disabled，使超宽标题以省略号截断  -->
+        <Style.Triggers>
+            <Trigger Property="Orientation" Value="Horizontal">
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style BasedOn="{StaticResource DefaultSideMenu}" TargetType="{x:Type local:SideMenu}">
         <Style.Triggers>
             <Trigger Property="DisplayMode" Value="Horizontal">
-                <Setter Property="ItemTemplate" Value="{StaticResource DefaultSideMenuStyle}" />
+                <Setter Property="ItemTemplate" Value="{StaticResource SideMenuHorizontalItemTemplate}" />
             </Trigger>
             <Trigger Property="DisplayMode" Value="Vertical">
-                <Setter Property="ItemTemplate" Value="{StaticResource IconMenuStyle}" />
+                <Setter Property="ItemTemplate" Value="{StaticResource SideMenuVerticalItemTemplate}" />
                 <Setter Property="Width" Value="60" />
             </Trigger>
         </Style.Triggers>

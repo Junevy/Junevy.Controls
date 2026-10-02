@@ -2,6 +2,7 @@
     x:Class="Junevy.Controls.Showcase.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Controls"
     StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -9,6 +10,15 @@
                 <ResourceDictionary Source="/Junevy.Controls;component/Themes/Generic.xaml" />
                 <ResourceDictionary Source="/Junevy.Controls.Showcase;component/Controls/DemoSection.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!--  全应用 ScrollViewer 平滑滚动示范（README「附加属性 → SmoothScrolling」）：
+                  页面级滚动宿主不在库内控件默认启用范围内，经隐式样式统一开启；
+                  Step 提高到 100px/刻度匹配高页面浏览手感——列表控件的宿主是控件自身、
+                  读自身 Step（默认跟随系统），不受本样式影响  -->
+            <Style TargetType="ScrollViewer">
+                <Setter Property="atc:SmoothScrolling.IsEnabled" Value="True" />
+                <Setter Property="atc:SmoothScrolling.Step" Value="100" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

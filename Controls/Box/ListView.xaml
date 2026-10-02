@@ -1,6 +1,7 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
     xmlns:cvt="clr-namespace:Junevy.Controls.Converters"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Box">
 
@@ -271,6 +272,13 @@
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
         <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
+        <!--  像素滚动：偏移不再吸附到条目边界，滚轮补间（SmoothScrolling）才能连续滑动  -->
+        <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel" />
+        <!--  预生成视口前后各一页的容器：容器生成提前到滚动到达之前，消除补间中的实体化顿挫  -->
+        <Setter Property="VirtualizingPanel.CacheLength" Value="1,1" />
+        <Setter Property="VirtualizingPanel.CacheLengthUnit" Value="Page" />
+        <!--  平滑滚轮默认开启：滚轮刻度补间滚动，实例上设 atc:SmoothScrolling.IsEnabled=False 可单独关闭  -->
+        <Setter Property="atc:SmoothScrolling.IsEnabled" Value="True" />
         <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />

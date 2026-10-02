@@ -12,40 +12,6 @@
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
     <QuadraticEase x:Key="EaseOut" EasingMode="EaseOut" />
 
-    <ControlTemplate x:Key="ExpanderControlTemplate" TargetType="{x:Type local:ToggleButton}">
-        <Border x:Name="Host">
-            <ContentControl
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Content="{TemplateBinding Content}"
-                ContentStringFormat="{TemplateBinding ContentStringFormat}"
-                ContentTemplate="{TemplateBinding ContentTemplate}"
-                ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
-                FontFamily="{TemplateBinding FontFamily}"
-                FontSize="{TemplateBinding FontSize}"
-                Foreground="{TemplateBinding Foreground}" />
-        </Border>
-
-        <ControlTemplate.Triggers>
-            <!--  状态层纱色:悬停/按压在任意底色上叠一层墨/白纱,文字实色、色相不变  -->
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Host" Property="Background" Value="{DynamicResource Theme.Brush.State.HoverScrim}" />
-            </Trigger>
-
-            <!--  Pressed(按住鼠标):纱色加深一档  -->
-            <Trigger Property="IsMouseCaptured" Value="True">
-                <Setter TargetName="Host" Property="Background" Value="{DynamicResource Theme.Brush.State.PressedScrim}" />
-            </Trigger>
-
-            <!--  Disabled（最后声明，保证覆盖所有状态）  -->
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Opacity" Value="0.5" />
-                <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
-            </Trigger>
-        </ControlTemplate.Triggers>
-    </ControlTemplate>
-
-
     <ControlTemplate x:Key="SwitchToggleButton_Rect" TargetType="{x:Type local:ToggleButton}">
         <Grid>
             <Grid.ColumnDefinitions>
@@ -298,26 +264,6 @@
         <Setter Property="Template" Value="{StaticResource SwitchToggleButton_Radius}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="SwitchSize" Value="20" />
-    </Style>
-
-
-    <Style
-        x:Key="ExpanderButton"
-        BasedOn="{StaticResource DefaultToggleButton}"
-        TargetType="{x:Type local:ToggleButton}">
-        <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
-        <Setter Property="Content" Value="&#xe650;" />
-        <Setter Property="Template" Value="{StaticResource ExpanderControlTemplate}" />
-
-        <Style.Triggers>
-            <Trigger Property="DisplayMode" Value="Circular">
-                <Setter Property="Template" Value="{StaticResource SwitchToggleButton_Radius}" />
-            </Trigger>
-
-            <Trigger Property="DisplayMode" Value="Rectangular">
-                <Setter Property="Template" Value="{StaticResource SwitchToggleButton_Rect}" />
-            </Trigger>
-        </Style.Triggers>
     </Style>
 
 

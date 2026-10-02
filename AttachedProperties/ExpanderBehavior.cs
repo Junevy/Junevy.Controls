@@ -1,7 +1,6 @@
-﻿using Junevy.Controls.Controls.Button;
-using Junevy.Controls.Controls.Menu;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -9,7 +8,7 @@ namespace Junevy.Controls.AttachedProperties
 {
     /// <summary>
     /// TreeViewItem 的双击/Enter 行为：非叶节点切换展开/收起，叶节点触发最近
-    /// <see cref="Junevy.Controls.Controls.Menu.TreeMenu"/> 的 <c>NavigateCommand</c>，
+    /// <see cref="System.Windows.Controls.TreeView"/> 的 <see cref="TreeViewAssist.NavigateCommand"/>，
     /// 命令参数为该容器的数据对象（对数据类型无要求）。
     /// </summary>
     public static class ExpanderBehavior
@@ -49,7 +48,7 @@ namespace Junevy.Controls.AttachedProperties
             if (e.ClickCount != 2 || sender is not TreeViewItem item)
                 return;
 
-            // 展开箭头本身是 ToggleButton，单击即切换展开状态；
+            // 展开箭头本身是 ToggleButton（基类宿主），单击即切换展开状态；
             // 双击箭头时避免再切换一次，造成“展开后立刻收起”的抖动。
             if (FindAncestor<ToggleButton>(e.OriginalSource as DependencyObject) != null)
                 return;
@@ -81,8 +80,9 @@ namespace Junevy.Controls.AttachedProperties
                 return;
             }
 
-            // 叶节点：激活，交给最近 TreeMenu 的 NavigateCommand，参数为该节点的数据对象。
-            if (FindAncestor<TreeMenu>(item)?.NavigateCommand is ICommand command)
+            // 叶节点：激活，交给最近 TreeView 的 NavigateCommand（TreeViewAssist 附加属性，
+            // jv:TreeView 的实例属性与其同一 DP），参数为该节点的数据对象。
+            if (FindAncestor<TreeView>(item)?.GetValue(TreeViewAssist.NavigateCommandProperty) is ICommand command)
             {
                 command.Execute(item.DataContext);
             }

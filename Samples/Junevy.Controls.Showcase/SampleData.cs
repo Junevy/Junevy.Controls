@@ -51,6 +51,12 @@ namespace Junevy.Controls.Showcase
         /// <summary>TextBox 命令按钮（CommandButton）演示：点击时经 MessageBarService 弹出通知。</summary>
         public RelayCommand TextBoxCommandButtonCommand { get; }
 
+        /// <summary>PasswordBox Password 绑定演示：jv:PasswordBox 的 Password 是依赖属性，可双向绑定。</summary>
+        public string DemoPassword { get; set; } = string.Empty;
+
+        /// <summary>PasswordBox IsError 绑定演示：业务侧验证失败时置 true，输入区背景泛红。</summary>
+        public bool PasswordInvalid { get; set; } = true;
+
         private SampleData()
         {
             PanelToggleCommand = new RelayCommand(() =>

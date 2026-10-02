@@ -30,7 +30,7 @@
                 <TextBlock Style="{StaticResource DemoPageTitle}" Text="菜单与导航" />
                 <TextBlock
                     Style="{StaticResource DemoPageSubtitle}"
-                    Text="jv:ContextMenu / jv:TreeMenu（TreeMenuItem 数据模型 + ExpanderBehavior）/ jv:TabMenu / jv:ToolBar / jv:Toolbox。jv:SideMenu 已作为本程序左侧导航使用。" />
+                    Text="jv:ContextMenu / jv:TabMenu / jv:ToolBar / jv:Toolbox。jv:SideMenu 已作为本程序左侧导航使用；树形视图请见「树形视图」演示页。" />
 
                 <demo:DemoSection
                     Title="jv:ContextMenu（右键按钮打开）"
@@ -56,18 +56,6 @@
                             </jv:Button.ContextMenu>
                         </jv:Button>
                     </StackPanel>
-                </demo:DemoSection>
-
-                <demo:DemoSection
-                    Title="jv:TreeMenu（树形导航）"
-                    Description="jv:TreeMenuItem 为 POCO 数据模型（Title/Icon/Children），由默认 HierarchicalDataTemplate 渲染；默认容器样式已启用 atc:ExpanderBehavior.Enable：双击/Enter 展开或折叠文件夹，激活叶节点时执行 NavigateCommand（本页以 MessageBarService 反馈）。根级与嵌套层级均参与虚拟化。"
-                    XamlCode="{x:Static sample:ShowcaseSnippets.TreeMenuDemo}">
-                    <jv:TreeMenu
-                        x:Name="TreeNav"
-                        Height="200"
-                        DisplayMode="Normal"
-                        atc:Icon.FontFamily="{DynamicResource IconFont}"
-                        atc:Icon.IconSize="16" />
                 </demo:DemoSection>
 
                 <demo:DemoSection

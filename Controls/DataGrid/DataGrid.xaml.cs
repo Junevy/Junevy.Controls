@@ -1,4 +1,6 @@
 using System.Windows;
+using System.Windows.Controls;
+using Junevy.Controls.Common;
 
 namespace Junevy.Controls.Controls.DataGrid
 {
@@ -25,6 +27,16 @@ namespace Junevy.Controls.Controls.DataGrid
             FrameworkElement.DefaultStyleKeyProperty.OverrideMetadata(
                 typeof(DataGrid),
                 new FrameworkPropertyMetadata(typeof(DataGrid)));
+        }
+
+        /// <summary>
+        /// 测量高度无界（∞）时行虚拟化失效，DEBUG 构建输出一次性诊断警告
+        /// （详见 <see cref="VirtualizationDiagnostics"/>）；宽度方向由列虚拟化负责，不在此检查。
+        /// </summary>
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            VirtualizationDiagnostics.ReportIfUnbounded(this, Orientation.Vertical, availableSize);
+            return base.MeasureOverride(availableSize);
         }
     }
 }

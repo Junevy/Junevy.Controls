@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Junevy.Controls.Common;
 using Junevy.Controls.Controls.Bar;
 using Junevy.Controls.Showcase.Pages;
@@ -15,6 +17,9 @@ namespace Junevy.Controls.Showcase
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static readonly ImageSource AppbarIconLight = CreateAppbarIconSource("github_light.png");
+        private static readonly ImageSource AppbarIconDark = CreateAppbarIconSource("github_dark.png");
+
         private readonly Dictionary<string, UserControl> _pageCache = [];
 
         public MainWindow()
@@ -26,6 +31,9 @@ namespace Junevy.Controls.Showcase
 
             // 默认进入第一个分类
             NavMenu.SelectedIndex = 0;
+
+            // 主题可在窗口创建前被外部切换，图标与当前主题保持同步
+            UpdateAppbarIcon();
         }
 
         private UserControl GetPage(string title)
@@ -45,6 +53,7 @@ namespace Junevy.Controls.Showcase
                 "进度条" => new ProgressPage(),
                 "布局控件" => new LayoutPage(),
                 "菜单与导航" => new MenusPage(),
+                "树形视图" => new TreeViewPage(),
                 "窗口与图像" => new WindowImagePage(),
                 "图标字体" => new IconsPage(),
                 _ => new ButtonsPage()
@@ -64,7 +73,27 @@ namespace Junevy.Controls.Showcase
         private void OnToggleThemeClick(object sender, RoutedEventArgs e)
         {
             ThemeManager.ToggleTheme();
+            UpdateAppbarIcon();
             MessageBarService.Show(MessageBarAppearance.Informational, "ThemeManager", "已切换浅色/深色主题");
+        }
+
+        /// <summary>
+        /// AppBar 应用图标随主题切换：浅色用白底字标（github_light），深色用暗底字标（github_dark）。
+        /// </summary>
+        private void UpdateAppbarIcon()
+        {
+            AppbarIcon.Source = ThemeManager.CurrentTheme == AppTheme.Dark ? AppbarIconDark : AppbarIconLight;
+        }
+
+        private static ImageSource CreateAppbarIconSource(string fileName)
+        {
+            var source = new BitmapImage();
+            source.BeginInit();
+            source.UriSource = new Uri($"pack://application:,,,/Junevy.Controls;component/Resources/Pictures/{fileName}", UriKind.Absolute);
+            source.CacheOption = BitmapCacheOption.OnLoad;
+            source.EndInit();
+            source.Freeze();
+            return source;
         }
 
         private void OnOpenSettingsClick(object sender, RoutedEventArgs e)

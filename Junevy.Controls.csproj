@@ -36,7 +36,8 @@
 	  <None Remove="Resources\Pictures\Author.png" />
 	  <None Remove="Resources\Pictures\bullseye.png" />
 	  <None Remove="Resources\Pictures\camera.png" />
-	  <None Remove="Resources\Pictures\Github_junevy.png" />
+	  <None Remove="Resources\Pictures\github_dark.png" />
+	  <None Remove="Resources\Pictures\github_light.png" />
 	  <None Remove="Resources\Pictures\whiteCheckBoard_big.png" />
 	</ItemGroup>
 
@@ -67,7 +68,10 @@
 	  <Resource Include="Resources\Pictures\camera.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Resource>
-	  <Resource Include="Resources\Pictures\Github_junevy.png">
+	  <Resource Include="Resources\Pictures\github_dark.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Resources\Pictures\github_light.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Resource>
 	  <Resource Include="Resources\Pictures\whiteCheckBoard_big.png">
