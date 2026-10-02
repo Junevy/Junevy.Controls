@@ -31,11 +31,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Font\iconfont-filled.ttf" />
 	  <None Remove="Resources\Font\iconfont.ttf" />
 	  <None Remove="Resources\Pictures\Author.png" />
 	  <None Remove="Resources\Pictures\bullseye.png" />
 	  <None Remove="Resources\Pictures\camera.png" />
+	  <None Remove="Resources\Pictures\Github_junevy.png" />
 	  <None Remove="Resources\Pictures\whiteCheckBoard_big.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Remove="Resources\Font\IconFont.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -43,9 +49,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Resource Include="Resources\Font\iconfont.ttf">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Resource>
+  <Resource Include="Resources\Font\iconfont-filled.ttf">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </Resource>
+  <Resource Include="Resources\Font\iconfont.ttf">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </Resource>
+  <Resource Include="Resources\Font\IconFont.xaml">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </Resource>
 	  <Resource Include="Resources\Pictures\Author.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Resource>
@@ -54,6 +66,9 @@
 	  </Resource>
 	  <Resource Include="Resources\Pictures\camera.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Resources\Pictures\Github_junevy.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Resource>
 	  <Resource Include="Resources\Pictures\whiteCheckBoard_big.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>

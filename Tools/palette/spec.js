@@ -28,7 +28,7 @@ const chroma = (h) => {
 // 规格只有一份：Pal / Roles / Effect 来自 spec.js，校验器与生成器共用同一张表
 const Pal = {
   Chalk: {
-    0: '#FFFFFF', 50: '#F6F6F6', 75: '#EBEDEF', 100: '#E9EAEA', 150: '#DADEE2', 300: '#B0B7BE', 400: '#8C939C', 550: '#686F79',
+    0: '#FFFFFF', 25: '#DADEE2', 50: '#F6F6F6', 75: '#EBEDEF', 100: '#E9EAEA', 150: '#DADEE2', 300: '#B0B7BE', 400: '#8C939C', 550: '#686F79',
     600: '#60666E', 700: '#494F57', 800: '#24282E',
   },
   /*  1.14.0 手调（浅色减淡 / 深色纯灰化）后的台阶，均以「实际消费方」的取值为准：
@@ -41,7 +41,7 @@ const Pal = {
         Text.Inverse / Text.OnAccent（深色主色按钮文字随之 #232323，见 Roles）。 */
   Slate: {
     0: '#070B10', 25: '#1D1D1D', 30: '#232323', 50: '#2F2F2F', 75: '#1F2226', 100: '#232323', 125: '#2C2C2C',
-    150: '#2C2C2C', 175: '#454A51', 250: '#697078', 400: '#969BA4',
+    150: '#2C2C2C', 175: '#454A51', 200: '#51575E', 250: '#697078', 400: '#969BA4',
     500: '#AAB0B8', 800: '#DDE0E5',
   },
   Cobalt: {
@@ -106,7 +106,10 @@ const Roles = {
   'Text.Inverse': ['Chalk.0', 'Slate.30'],
   'Text.OnAccent': ['Chalk.0', 'Slate.30'],
 
-  'Border.Default': ['Chalk.300', 'Slate.175'],
+  /*  Border.Default 浅色 2026-10-02 手调减淡：Chalk.300（#B0B7BE，2.03:1）→ Chalk.25
+      （#DADEE2，1.35:1，与 Subtle 同值）——用户反馈静止描边仍偏重；守卫下限随之锚定
+      （emit.js / check.js 的浅色 Default 下限已放至 1.3）。 */
+  'Border.Default': ['Chalk.25', 'Slate.175'],
   'Border.Subtle': ['Chalk.150', 'Slate.150'],
   /*  区域分隔线（Shell 级）：侧栏/内容、页签区这类「分区而非控件」的界线。
       比控件边框全部再退一档，且按画布（Background.App）计量而非卡片——
@@ -114,6 +117,11 @@ const Roles = {
       色阶差 + 线双重边缘被用户反馈「太明显」；现在侧栏与内容共用画布底，
       只剩这条线：浅色 1.22:1 / 深色 1.24:1（对画布）。 */
   'Border.Divider': ['Chalk.150', 'Slate.125'],
+  /*  Border.Medium：Default 与 Strong 的中间强调档（2026-10-02 新增）。首个消费方是
+      开关未选中滑块（PART_Thumb）——原用 Strong 被反馈「太黑」；按「向 Default 移约 1/3」
+      取阶：浅 Chalk.400（Strong→Default 的 34% 处），深 Slate.200（Slate.250→Slate.175
+      同比例插值，纯灰线上）。两端台阶由守卫断言（≥3 ΔL*），防止与相邻档混同。 */
+  'Border.Medium': ['Chalk.400', 'Slate.200'],
   'Border.Strong': ['Chalk.550', 'Slate.250'],
   /*  焦点环：浅色保持 Coating.600；深色按用户要求改用 accent 本色（Cobalt.450 =
       Accent.Primary），青色环曾与 Accent.Secondary 同源、和主色按钮抢视线。

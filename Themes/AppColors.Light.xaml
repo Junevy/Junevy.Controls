@@ -41,6 +41,7 @@
 
     <!--  Chalk — 纸白到墨黑，仍落在 214° 那条线上，但彩度封顶 C*≤7（旧值 16）——灰就是灰，蓝交给 Cobalt。浅色主题自上而下取用。  -->
     <Color x:Key="Palette.Chalk.0">#FFFFFF</Color>
+    <Color x:Key="Palette.Chalk.25">#DADEE2</Color>
     <Color x:Key="Palette.Chalk.50">#F6F6F6</Color>
     <Color x:Key="Palette.Chalk.75">#EBEDEF</Color>
     <Color x:Key="Palette.Chalk.100">#E9EAEA</Color>
@@ -62,6 +63,7 @@
     <Color x:Key="Palette.Slate.125">#2C2C2C</Color>
     <Color x:Key="Palette.Slate.150">#2C2C2C</Color>
     <Color x:Key="Palette.Slate.175">#454A51</Color>
+    <Color x:Key="Palette.Slate.200">#51575E</Color>
     <Color x:Key="Palette.Slate.250">#697078</Color>
     <Color x:Key="Palette.Slate.400">#969BA4</Color>
     <Color x:Key="Palette.Slate.500">#AAB0B8</Color>
@@ -146,9 +148,10 @@
     <Color x:Key="Theme.Color.Text.OnAccent">#FFFFFF</Color>  <!--  = Palette.Chalk.0  -->
 
     <!--  边框  -->
-    <Color x:Key="Theme.Color.Border.Default">#B0B7BE</Color>  <!--  = Palette.Chalk.300  -->
+    <Color x:Key="Theme.Color.Border.Default">#DADEE2</Color>  <!--  = Palette.Chalk.25  -->
     <Color x:Key="Theme.Color.Border.Subtle">#DADEE2</Color>  <!--  = Palette.Chalk.150  -->
     <Color x:Key="Theme.Color.Border.Divider">#DADEE2</Color>  <!--  = Palette.Chalk.150  -->
+    <Color x:Key="Theme.Color.Border.Medium">#8C939C</Color>  <!--  = Palette.Chalk.400  -->
     <Color x:Key="Theme.Color.Border.Strong">#686F79</Color>  <!--  = Palette.Chalk.550  -->
     <Color x:Key="Theme.Color.Border.Focus">#00768D</Color>  <!--  = Palette.Coating.600  -->
 
@@ -223,9 +226,10 @@
     <SolidColorBrush x:Key="Theme.Brush.Text.OnAccent" Color="{StaticResource Palette.Chalk.0}" />
 
     <!--  边框  -->
-    <SolidColorBrush x:Key="Theme.Brush.Border.Default" Color="{StaticResource Palette.Chalk.300}" />
+    <SolidColorBrush x:Key="Theme.Brush.Border.Default" Color="{StaticResource Palette.Chalk.25}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Subtle" Color="{StaticResource Palette.Chalk.150}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Divider" Color="{StaticResource Palette.Chalk.150}" />
+    <SolidColorBrush x:Key="Theme.Brush.Border.Medium" Color="{StaticResource Palette.Chalk.400}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Strong" Color="{StaticResource Palette.Chalk.550}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Focus" Color="{StaticResource Palette.Coating.600}" />
 

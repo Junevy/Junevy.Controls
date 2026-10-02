@@ -1,3 +1,62 @@
+## Showcase 新增「进度条」演示页（jv:ProgressBar + ProgressBarWindow 全 API 演示）
+
+### 本次更新（Showcase 此前缺少 ProgressBar 控件的演示入口，新增侧边栏「进度条」页：线性确定（Slider 联动 Value 标准管线 + ShowProgressText）、线性不确定（IsIndeterminate 扫动）、环形（ShapeMode=Circular 确定圆弧 / 中心文本 / RingThickness / 旋转 spinner）、自定义进度文本（ProgressTextFormat）、ProgressBarWindow 进度对话框（后台任务 Report/UpdateDetail 线程安全汇报 + RequestClose 关闭 + Cancelled 取消感知 + CloseButtonEnabled=false 禁止取消），XAML/C# 用法片段随页展示）— 2026-10-02
+
+- **新增文件**：`Samples/Junevy.Controls.Showcase/Pages/ProgressPage.xaml` / `.cs`（演示页），`ShowcaseSnippets.cs` 追加 5 段演示片段（ProgressBarLinearDemo / ProgressBarIndeterminateDemo / ProgressBarCircularDemo / ProgressBarTextFormatDemo / ProgressBarWindowDemo）。
+- **注册**：`MainWindow.xaml` 侧边栏在「通知」后新增 `<jv:MenuItem Title="进度条" Icon="&#xE609;" />`（E609 时钟箭头，寓意进行中/耗时）；`MainWindow.xaml.cs` 页面工厂新增 `"进度条" => new ProgressPage()` 分支，沿用 `_pageCache` 缓存模式。
+- **演示实现**：进度对话框两个入口按钮——「确定模式（可取消）」用 `Task.Delay` 循环模拟后台部署，`Report(percent)` + `UpdateDetail` 汇报（ProgressBarWindow 内部自动调度 UI 线程），用户点关闭按钮经 `Cancelled` 事件取消任务（CancellationTokenSource）并弹 Warning MessageBar，完成弹 Success；「不确定模式（禁止取消）」`CloseButtonEnabled=false` 3 秒后由代码 `RequestClose()`。
+- **踩坑记录**：WPF `Slider` 默认 `Maximum=10`（非 100），演示里 `Value="45"` 会被钳制成 10——Slider 需显式 `Maximum="100"`；该坑已写进演示片段注释。
+- **验证**：Showcase 编译零错误；实机运行（UIA 自动导航到「进度条」页 + DPI 感知截屏）目检——线性 45% 填充与右侧文本、不确定扫动动画（双帧像素差非空）、环形 45% 圆弧 + 圆心文本 + 旋转 spinner、`已完成 45%` 自定义格式均正确；RTB 探针复核四种变体渲染一致。
+
+## 开关未选中滑块降档：新增 `Border.Medium` 中间强调档 + 调色板管线对齐（Chalk.25 手调回移、镜像漂移修复）
+
+### 本次更新（① `ToggleButton` 未选中滑块（`PART_Thumb`）填充由 `Border.Strong` 降为新增的 `Theme.Brush.Border.Medium`——用户反馈「太黑」，按「向 Default 移约 1/3」取阶：浅 `Chalk.400` `#8C939C`（白卡 3.10:1）、深新增 `Slate.200` `#51575E`（对卡面 2.19:1）；② 管线对齐：工作区已有的浅色 `Border.Default` 手调（`Chalk.25` `#DADEE2`）回移 `spec.js`，修复 `Theme.Color.Border.Default` 镜像漂移（#B0B7BE → #DADEE2），守卫重锚定后 `check.js` 113/113 通过、`emit.js` 重新生成两份主题）— 2026-10-02
+
+- **新令牌 `Border.Medium`（`spec.js` Roles）**：`['Chalk.400', 'Slate.200']`——Default 与 Strong 之间的中间强调档，首个消费方是开关未选中滑块（矩形 / 胶囊两套模板的 `PART_Thumb`）。深色 `Slate.200` 为 `Slate.250 → Slate.175` 的 1/3 比例插值（与浅色 `Chalk.400` 在 `Chalk.550 → Chalk.25` 间 34% 位置对称），落在既有低彩度中性线上（C\* 4.9 ≤ 7）。两端台阶由守卫断言（与 Default、Strong 各距 ≥3 ΔL\*：浅 27.7/14、深 5.5/10.2），防止与相邻档混同。
+- **管线对齐（重要）**：工作区此前有一处未同步的手调——浅色 `Border.Default` 已指向新增的 `Palette.Chalk.25`（`#DADEE2`，白卡 1.35:1），但 `spec.js` 仍为 `Chalk.300`、`Theme.Color` 镜像仍为 `#B0B7BE`，且 `emit.js` / `check.js` 的「Default ≥ 1.6:1」守卫已被击穿（1.35 < 1.6，emit 会拒绝生成或再生成时覆盖手调）。本次：`Pal.Chalk` 补 `25: '#DADEE2'`、`Border.Default` 改 `['Chalk.25', 'Slate.175']`、镜像随再生成自动归位。
+- **守卫重锚定（`emit.js` / `check.js`）**：浅色 Default 下限 1.6 → 1.3（深色维持 1.6）；浅色 Strong↔Default 的 ΔL\* 带宽上限 40 → 45（手调后实测 41.7）；角色表条目数 47 → 48；新增 Medium 两端台阶断言；`check.js` 113/113 通过，`emit.js` 回读自检（Palette 一致 / 镜像无漂移 / 无悬空引用）通过。
+- **模板改动（`Controls/Button/ToggleButton.xaml`）**：`SwitchToggleButton_Rect` / `SwitchToggleButton_Radius` 两处 `PART_Thumb` 的 `Background` 由 `Theme.Brush.Border.Strong` 换为 `Theme.Brush.Border.Medium`（`ExpanderButton` 复用同模板随之生效）；选中 / 悬停 / 禁用等状态颜色不变。
+- **文档**：README「边框分四级」改为五级叙述并补 `Border.Medium` 令牌行，`Border.Default` / `Border.Strong` 两行的取值、对比度与用途描述同步勘正（浅色 Default 取值此前未随手调更新）。
+- **验证**：核心库与 Showcase 编译零错误；Showcase 实机目检开关未选中态滑块明暗两主题均比原先轻一档、仍清晰可辨。
+
+## AppBar 窗口操作按钮图标字号资源化（`AppBarCaptionIconSize` 18 → 15）
+
+### 本次更新（图标字体统一为满幅 em（墨迹边长=字号）后，标题栏最小化 / 最大化 / 还原 / 关闭字形由旧字体的 13.4~14.6px 视觉尺寸放大到 18px 满幅，在 40×32 按钮内贴边甚至被裁剪（用户实测最大化 / 还原图标截断）。新增资源键 `AppBarCaptionIconSize=15`，`DefaultAppBar` / `MenuBarAppBar` / `ExpandableAppBar` 三模板共 9 个系统按钮 + 抽屉开关按钮统一引用，消费方可在应用级 ResourceDictionary 覆写）— 2026-10-02
+
+- **改动点**：`Controls/Bar/AppBar.xaml` 新增 `<sys:Double x:Key="AppBarCaptionIconSize">15</sys:Double>`（根节点补 `xmlns:sys`），三模板内 10 处 `FontSize="18"`（最小化×3、最大化/还原×3、关闭×3、抽屉开关×1）全部改为 `FontSize="{StaticResource AppBarCaptionIconSize}"`。抽屉开关与系统按钮同属标题栏 iconfont 按钮，一并纳入保持风格统一。
+- **取值依据**：旧字体同四码点在 18px 字号下墨迹为 13.4~14.6px（还原 18px 系离群满幅设计）；统一字体墨迹边长=字号，取 15 即恢复原设计视觉重量并留出边距。15 直接决定视觉尺寸，后续如再调只动这一个键。
+- **未动部分**：左侧应用图标区（`FontSize=atc:Icon.IconSize` 语义不变）；`TextBox` 清空按钮 / `TabMenu` 关闭按钮（自适应宿主字号，非本次反馈范围）；`DialogWindow` 标题栏按钮（矢量 Geometry，不经图标字体）。
+- **验证**：库（net8.0-windows / net48）与 Showcase 编译零错误；Showcase DPI 感知实机截屏目检——常规窗口下最小化 / 最大化 / 关闭（含悬停红底白叉态）与最大化窗口下的还原图标均完整无裁剪、边距舒适。
+- **文档**：README「AppBar」属性表新增 `AppBarCaptionIconSize` 资源键行（默认值、满幅语义与覆写方式）。
+
+## CheckBox / RadioButton / ToggleButton 静止态边框降档（`Border.Strong` → `Border.Default`）
+
+### 本次更新（三控件未选中态勾选框 / 开关描边由 `Theme.Brush.Border.Strong` 改为 `Theme.Brush.Border.Default`——用户反馈原色太重，静止态回归「发丝线勾轮廓」的设计口径；悬停 / 选中 / 按下 / 禁用各状态颜色不变）— 2026-10-02
+
+- **改动点**：`Controls/Box/CheckBox.xaml` 的 `CheckBorder`、`Controls/Button/RadioButton.xaml` Rect / Circular 两套模板的 `CheckBorder`、`Controls/Button/ToggleButton.xaml` Rect / Radius 两套开关模板的 `ToggleHost`，共 5 处 `BorderBrush` 由 `Theme.Brush.Border.Strong`（浅色 `#686F79`、深色 `#697078`，≥3:1）降为 `Theme.Brush.Border.Default`（浅色 `#B0B7BE` 2.03:1、深色 `#454A51` 1.79:1）。WCAG 1.4.11 的 3:1 由可交互态（悬停即 accent 描边）承担，与「静止发丝线不承诺对比」的设计取向一致。
+- **未动部分**：开关未选中滑块（`PART_Thumb`）填充仍为 `Border.Strong`（属填充色非边框，如需同步降档可另行调整）；`Slider` 静态描边与 TextBox / ComboBox / DatePicker / ListBox / ListView / CodeEditor 的悬停描边仍用 `Border.Strong`，本次仅涉及三控件。
+- **验证**：`Theme.Brush.Border.Default` 明暗两主题均已定义，资源键零新增；改动为纯模板内 DynamicResource 换档，公共 API 与状态触发器结构零变化。
+
+
+
+### 本次更新（① AppBar 三个模板（Default/Simple/MenuBar）的图标区由 `Width=IconSize` 正方形锁死改为 `Height=IconSize` + `MinWidth=IconSize`：高度与最小宽度不变，内容宽于 `IconSize`（宽幅 Logo 图）时图标区自动加宽——字形、方形图、未设图标三种既有场景布局不变；② Showcase 主窗口 AppBar 左上应用图标由 iconfont 字形 `&#xE66B;` 替换为 `Github_junevy.png`（2172×724 白底字标，3:1），按 `IconSize=26` 高度等比缩放并启用 `HighQuality` 缩放；③ csproj 新增该 PNG 的 Resource 嵌入）— 2026-10-02
+
+- **模板改动（`Controls/Bar/AppBar.xaml`）**：`DefaultAppBar` / `SimpleAppBar` / `MenuBarAppBar` 三处图标 `ContentControl` 的 `Width` 绑定改为 `MinWidth`（`Height` 绑定保留）。`atc:Icon.Icon` 本为 `object` 类型（README 亦写明可放 `Image`），但图标区此前被锁成正方形，宽幅图片经 Uniform 缩放会被压成约 26×8 的细条不可读；改为最小宽度后图标字体字形（字宽≈em 宽≈FontSize）、方形图（README 示例的显式 40×40）、未设图标（仍按 `MinWidth` 保留 IconSize 占位）渲染与既有版本一致，仅宽内容可横向扩展。`ExpandableAppBar` 无图标位，不涉及。
+- **Showcase（`MainWindow.xaml`）**：`atc:Icon.Icon` 由字形 `&#xE66B;` 改为属性元素语法内嵌 `Image`（`pack://application:,,,/Junevy.Controls;component/Resources/Pictures/Github_junevy.png`），不写显式宽高（按 `IconSize=26` 高度等比缩放至约 78×26），并设置 `RenderOptions.BitmapScalingMode="HighQuality"`——2172px 源图缩至 26px 高，默认线性缩放会有明显锯齿。
+- **资源（`Junevy.Controls.csproj`）**：新增 `Resources\Pictures\Github_junevy.png` 的 `None Remove` + `Resource`（`CopyToOutputDirectory=Always`），与其余 Pictures 同一模式；未在 `Resources/Pictures/Image.xaml` 追加 BitmapImage 键——Showcase 与样例页一致直接引用 pack URI，避免新增未引用资源。
+- **已知事项**：源图为 24bpp 白底（无 Alpha 通道），浅色主题下与标题栏底色融合良好，深色主题下图标区会呈现白色底块；如需深色适配，后续提供透明底/反色版本替换该文件即可，代码无需改动。
+- **验证**：库（net8.0-windows / net48）与 Showcase 编译零错误；Showcase 实机运行截图目检——Logo 等比缩放清晰无锯齿、垂直居中、与标题无重叠，标题栏拖动区与工具栏布局不受影响。
+- **文档**：README「AppBar」属性表同步 `atc:Icon.IconSize` 行为说明（高度=图标区高度、同时为最小宽度，宽内容自动加宽），并在默认模板示例后补充宽幅 Logo 用法说明。
+
+## 图标字体全量重绘：线性/面性双风格（iconfont.ttf 重建 + 新增 iconfont-filled.ttf），码点零变更
+
+### 本次更新（① 原单文件 iconfont.ttf 中 67 个图标线性/面性混杂、光学尺寸与基线不一，按统一设计系统全量重绘：24×24 设计网格、线性版统一 2/24 描边圆头圆角、面性版统一实心剪影+镂空细节；重建 iconfont.ttf（线性）并新增 iconfont-filled.ttf（面性），两套码点/字形名/度量（1024 em、896/-128）与旧字体完全一致——消费方零改动即获统一线性风格，引用新增的 `{DynamicResource IconFontFilled}` 即可整套切换面性；② 重绘工具链入库 `Tools/iconfont/`（spec.py 规格唯一真值 + pipeline.py 描边转轮廓/布尔运算/TrueType 绕向归一化 + emit.py 编译与码点守卫），TTF 不再手改；③ Showcase 新增「图标字体」页：67 图标总览、线性/面性切换、尺寸滑块、名称/码点过滤与控件用法示例）— 2026-10-02
+
+- **重绘范围**：67/67 码点全部重绘。同语义重复码点（保存×3、设置×6、播放×5、相机×4、文件夹×3、主页×2 等）全部保留并共用同一基元函数（齿轮/房子/软盘/播放/灯泡/相机/星形/箭头），仅齿数、孔径等微差保证家族一致；歧义占位图形（icon-、icon-test、cj、total、lujing 等）按名称语义重新具象化（粗对勾、主题对比环、层叠、环形箭头、路径站点等）。
+- **技术**：SVG 路径 → svgpathtools 解析 → skia 圆头描边转填充轮廓 + 布尔并/差 → 按轮廓嵌套深度归一化 TrueType 绕向（外顺内逆，修复镂空被填实）→ fontTools FontBuilder 编译；emit 前从原始字体快照（.workbuddy/tmp/iconfont.orig.ttf）全量校验码点/字形名，缺失或多出直接构建失败；产物 28KB / 25KB。
+- **接口变化**：无破坏。`IconFont` 资源键不变（内容由混杂风格变为统一线性）；新增 `IconFontFilled` 资源键；`atc:Icon` 附加属性用法不变（`atc:Icon.FontFamily` 指向新字体即可）；csproj 新增 iconfont-filled.ttf 的 Resource 嵌入。
+- **验收**：PIL 双档字号（110px 与 16px×3 联）全量拼图核对 67×2 字形；Showcase 实机运行核对图标页两风格切换、滑块缩放、名称/码点过滤与按钮用法示例。
+
 ## 深色焦点环改用 accent 本色（`Border.Focus` 深色档：Coating 青 → Cobalt 蓝）
 
 ### 本次更新（深色主题焦点环 `Theme.Color/Brush.Border.Focus` 由 `Palette.Coating.300`（青 `#74CBDC`）改为 `Palette.Cobalt.450`（accent 本色 `#4E90E8`，与 `Accent.Primary` 同源）——用户反馈深色焦点环偏青、希望偏蓝或用 accent 色调；浅色主题不变（仍 `Coating.600`））— 2026-10-02

@@ -4,13 +4,20 @@
     xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
     xmlns:bt="clr-namespace:Junevy.Controls.Controls.Button"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Bar"
-    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework">
+    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls;component/Resources/Font/IconFont.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/Button.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/MenuBar.xaml" />
     </ResourceDictionary.MergedDictionaries>
+
+    <!--
+        标题栏图标字形字号。图标字体已统一为满幅 em(墨迹边长=字号)，
+        18 会让窗口操作按钮的字形贴满 40x32 按钮边缘，故取 15。
+    -->
+    <sys:Double x:Key="AppBarCaptionIconSize">15</sys:Double>
 
     <Style
         x:Key="CaptionButtonStyle"
@@ -77,10 +84,10 @@
                 <ColumnDefinition MaxWidth="120" />
             </Grid.ColumnDefinitions>
 
-            <!--  icon  -->
+            <!--  icon：高度固定 IconSize、最小宽度 IconSize；内容宽于 IconSize（宽幅 Logo 图）时图标区自动加宽  -->
             <ContentControl
                 Grid.Column="0"
-                Width="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
+                MinWidth="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
                 Height="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
                 Margin="8"
                 HorizontalAlignment="Left"
@@ -138,7 +145,7 @@
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                     Content="&#xe60e;"
                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
-                    FontSize="18"
+                    FontSize="{StaticResource AppBarCaptionIconSize}"
                     Style="{StaticResource CaptionButtonStyle}"
                     ToolTip="Minimize"
                     WindowChrome.IsHitTestVisibleInChrome="True" />
@@ -151,7 +158,7 @@
                     Grid.Column="1"
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
-                    FontSize="18"
+                    FontSize="{StaticResource AppBarCaptionIconSize}"
                     WindowChrome.IsHitTestVisibleInChrome="True">
                     <bt:Button.Style>
                         <Style BasedOn="{StaticResource CaptionButtonStyle}" TargetType="{x:Type bt:Button}">
@@ -174,7 +181,7 @@
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                     Content="&#xe639;"
                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
-                    FontSize="18"
+                    FontSize="{StaticResource AppBarCaptionIconSize}"
                     Style="{StaticResource CloseCaptionButtonStyle}"
                     ToolTip="Close" />
             </Grid>
@@ -191,7 +198,7 @@
 
             <ContentControl
                 Grid.Column="0"
-                Width="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
+                MinWidth="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
                 Height="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
                 Margin="15,8,15,8"
                 HorizontalAlignment="Center"
@@ -233,7 +240,7 @@
             <!--  icon  -->
             <ContentControl
                 Grid.Column="0"
-                Width="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
+                MinWidth="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
                 Height="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.IconSize)}"
                 Margin="8,0,4,0"
                 HorizontalAlignment="Left"
@@ -281,7 +288,7 @@
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                     Content="&#xe60e;"
                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
-                    FontSize="18"
+                    FontSize="{StaticResource AppBarCaptionIconSize}"
                     Style="{StaticResource CaptionButtonStyle}"
                     ToolTip="Minimize"
                     WindowChrome.IsHitTestVisibleInChrome="True" />
@@ -294,7 +301,7 @@
                     Grid.Column="1"
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
-                    FontSize="18"
+                    FontSize="{StaticResource AppBarCaptionIconSize}"
                     WindowChrome.IsHitTestVisibleInChrome="True">
                     <bt:Button.Style>
                         <Style BasedOn="{StaticResource CaptionButtonStyle}" TargetType="{x:Type bt:Button}">
@@ -317,7 +324,7 @@
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                     Content="&#xe639;"
                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
-                    FontSize="18"
+                    FontSize="{StaticResource AppBarCaptionIconSize}"
                     Style="{StaticResource CloseCaptionButtonStyle}"
                     ToolTip="Close" />
             </Grid>
@@ -364,7 +371,7 @@
                 VerticalAlignment="Center"
                 Content="{TemplateBinding DrawerToggleIcon}"
                 FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
-                FontSize="18"
+                FontSize="{StaticResource AppBarCaptionIconSize}"
                 Style="{StaticResource NoBorderButtonStyle}"
                 ToolTip="Menu"
                 Visibility="{TemplateBinding Drawer,
@@ -386,7 +393,7 @@
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                     Content="&#xe60e;"
                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
-                    FontSize="18"
+                    FontSize="{StaticResource AppBarCaptionIconSize}"
                     Style="{StaticResource CaptionButtonStyle}"
                     ToolTip="Minimize"
                     WindowChrome.IsHitTestVisibleInChrome="True" />
@@ -394,7 +401,7 @@
                     Grid.Column="1"
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
-                    FontSize="18"
+                    FontSize="{StaticResource AppBarCaptionIconSize}"
                     WindowChrome.IsHitTestVisibleInChrome="True">
                     <bt:Button.Style>
                         <Style BasedOn="{StaticResource CaptionButtonStyle}" TargetType="{x:Type bt:Button}">
@@ -417,7 +424,7 @@
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                     Content="&#xe639;"
                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:AppBar}, Path=(atc:Icon.FontFamily)}"
-                    FontSize="18"
+                    FontSize="{StaticResource AppBarCaptionIconSize}"
                     Style="{StaticResource CloseCaptionButtonStyle}"
                     ToolTip="Close"
                     WindowChrome.IsHitTestVisibleInChrome="True" />

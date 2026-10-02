@@ -31,7 +31,7 @@
                     Width="18"
                     Height="18"
                     Background="Transparent"
-                    BorderBrush="{DynamicResource Theme.Brush.Border.Strong}"
+                    BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
                     BorderThickness="1.5"
                     CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
 
@@ -128,7 +128,7 @@
                     Width="18"
                     Height="18"
                     Background="Transparent"
-                    BorderBrush="{DynamicResource Theme.Brush.Border.Strong}"
+                    BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
                     BorderThickness="1.5"
                     CornerRadius="45">
 

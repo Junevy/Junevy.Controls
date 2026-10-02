@@ -37,6 +37,7 @@
 
     <!--  Chalk — 纸白到墨黑，仍落在 214° 那条线上，但彩度封顶 C*≤7（旧值 16）——灰就是灰，蓝交给 Cobalt。浅色主题自上而下取用。  -->
     <Color x:Key="Palette.Chalk.0">#FFFFFF</Color>
+    <Color x:Key="Palette.Chalk.25">#DADEE2</Color>
     <Color x:Key="Palette.Chalk.50">#F6F6F6</Color>
     <Color x:Key="Palette.Chalk.75">#EBEDEF</Color>
     <Color x:Key="Palette.Chalk.100">#E9EAEA</Color>
@@ -58,6 +59,7 @@
     <Color x:Key="Palette.Slate.125">#2C2C2C</Color>
     <Color x:Key="Palette.Slate.150">#2C2C2C</Color>
     <Color x:Key="Palette.Slate.175">#454A51</Color>
+    <Color x:Key="Palette.Slate.200">#51575E</Color>
     <Color x:Key="Palette.Slate.250">#697078</Color>
     <Color x:Key="Palette.Slate.400">#969BA4</Color>
     <Color x:Key="Palette.Slate.500">#AAB0B8</Color>
@@ -145,6 +147,7 @@
     <Color x:Key="Theme.Color.Border.Default">#454A51</Color>  <!--  = Palette.Slate.175  -->
     <Color x:Key="Theme.Color.Border.Subtle">#2C2C2C</Color>  <!--  = Palette.Slate.150  -->
     <Color x:Key="Theme.Color.Border.Divider">#2C2C2C</Color>  <!--  = Palette.Slate.125  -->
+    <Color x:Key="Theme.Color.Border.Medium">#51575E</Color>  <!--  = Palette.Slate.200  -->
     <Color x:Key="Theme.Color.Border.Strong">#697078</Color>  <!--  = Palette.Slate.250  -->
     <Color x:Key="Theme.Color.Border.Focus">#4E90E8</Color>  <!--  = Palette.Cobalt.450  -->
 
@@ -222,6 +225,7 @@
     <SolidColorBrush x:Key="Theme.Brush.Border.Default" Color="{StaticResource Palette.Slate.175}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Subtle" Color="{StaticResource Palette.Slate.150}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Divider" Color="{StaticResource Palette.Slate.125}" />
+    <SolidColorBrush x:Key="Theme.Brush.Border.Medium" Color="{StaticResource Palette.Slate.200}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Strong" Color="{StaticResource Palette.Slate.250}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Focus" Color="{StaticResource Palette.Cobalt.450}" />
 

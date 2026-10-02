@@ -53,17 +53,23 @@ function guard(theme) {
   need('正文达到 AAA', ratio(at(theme, 'Text.Primary'), surface), 7.0);
   need('次级文字达到 AA', ratio(at(theme, 'Text.Secondary'), surface), 4.5);
   need('焦点环相对表面', ratio(at(theme, 'Border.Focus'), surface), 3.0);
-  // 边框分两级：静止态要「若有若无」，可交互态（悬停 / 勾选框描边 / 开关滑块）必须够 3:1。
-  need('Border.Strong 相对表面（悬停与勾选框描边）', ratio(at(theme, 'Border.Strong'), surface), 3.0);
-  need('Border.Default 相对表面（静止发丝线，下限）', ratio(at(theme, 'Border.Default'), surface), 1.6);
+  //  边框分级：静止态「若有若无」，可交互态（悬停描边）必须够 3:1。
+  //  Border.Strong 当前只服务输入类控件悬停描边（勾选框/开关静止描边 2026-10-02 已降为
+  //  Border.Default，开关未选中滑块走 Border.Medium），标签不再提勾选框描边。
+  need('Border.Strong 相对表面（悬停描边等可交互态）', ratio(at(theme, 'Border.Strong'), surface), 3.0);
+  //  浅色 Default 2026-10-02 手调减淡为 Chalk.25（1.35:1），下限随之锚定 1.3；深色维持 1.6。
+  need('Border.Default 相对表面（静止发丝线，下限）', ratio(at(theme, 'Border.Default'), surface), theme === 'light' ? 1.3 : 1.6);
   need('静止发丝线不得回到 3:1', ratio(at(theme, 'Border.Strong'), surface) - ratio(at(theme, 'Border.Default'), surface), theme === 'light' ? 1.0 : 1.2);
+  //  Border.Medium 是 Default 与 Strong 的中间强调档（开关未选中滑块），两端各留 ≥3 ΔL*。
+  need('Border.Medium 与 Default 拉开台阶', Math.abs(lstar(at(theme, 'Border.Medium')) - lstar(at(theme, 'Border.Default'))), 3);
+  need('Border.Medium 与 Strong 拉开台阶', Math.abs(lstar(at(theme, 'Border.Strong')) - lstar(at(theme, 'Border.Medium'))), 3);
   if (ratio(at(theme, 'Border.Default'), surface) > (theme === 'light' ? 2.3 : 2.0)) fails.push(`Border.Default 相对表面 ${ratio(at(theme, 'Border.Default'), surface).toFixed(2)}，已超出「若有若无」上限`);
   const peakNeutral = Math.max(...[...Object.values(Pal.Chalk), ...Object.values(Pal.Slate)].map(chroma));
   if (peakNeutral > 7) fails.push(`中性线峰值彩度 C*=${peakNeutral.toFixed(1)} > 7，纸面又变回蓝灰`);
   need('禁用文字不越界过亮', lstar(at(theme, 'Text.Disabled')), theme === 'light' ? 60 : 30);
 
   const covered = new Set(Object.keys(Roles));
-  if (covered.size !== 47) fails.push(`角色表条目数 ${covered.size}，与规格 47 不符`);
+  if (covered.size !== 48) fails.push(`角色表条目数 ${covered.size}，与规格 48 不符`);
 
   if (fails.length) {
     console.error(`拒绝生成 ${theme} — ${fails.length} 项未达标:\n  ` + fails.join('\n  '));

@@ -47,9 +47,14 @@ for (const mode of ['light', 'dark']) {
   //  深色 OnAccent 随画布手调落到 #232323 后，对按压色 Cobalt.500 实测约 4.05:1，锚定 4.0。
   A(mode, 'label on accent pressed', t['Text.OnAccent'], t['Accent.PrimaryPressed'], d ? 4.0 : 4.5);
   A(mode, 'interactive border / mark outline vs surface', t['Border.Strong'], t['Surface.Base'], 3.0);
-  A(mode, 'idle hairline still reads as an edge', t['Border.Default'], t['Surface.Base'], 1.6);
+  // 浅色 Default 手调减淡为 Chalk.25（1.35:1）后，下限随之锚定 1.3；深色维持 1.6。
+  A(mode, 'idle hairline still reads as an edge', t['Border.Default'], t['Surface.Base'], d ? 1.6 : 1.3);
   Alow(mode, 'idle hairline stays barely there', t['Border.Default'], t['Surface.Base'], d ? 2.0 : 2.3);
-  Dl(mode, 'hover border steps up from idle', t['Border.Strong'], t['Border.Default'], 10, 40);
+  // Border.Medium：Default 与 Strong 的中间强调档（开关未选中滑块），两端各留 ≥3 ΔL*。
+  Dl(mode, 'medium border splits idle from itself', t['Border.Medium'], t['Border.Default'], 3, 40);
+  Dl(mode, 'medium border stays clear of strong', t['Border.Strong'], t['Border.Medium'], 3, 40);
+  // 浅色 Default 手调减淡为 Chalk.25 后，Strong↔Default 实测 ΔL*=41.7，带宽上限随之锚定 45。
+  Dl(mode, 'hover border steps up from idle', t['Border.Strong'], t['Border.Default'], 10, d ? 40 : 45);
   A(mode, 'focus ring vs surface', t['Border.Focus'], t['Surface.Base'], 3.0);
   A(mode, 'success on surface', t['Status.Success'], t['Surface.Base'], 4.5);
   // 浅色 Warning 放行（1.14.0 手调）：浅色警告同样抬成真黄 Yellow.400（与深色一致），
