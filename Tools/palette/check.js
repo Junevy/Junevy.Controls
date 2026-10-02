@@ -143,7 +143,7 @@ console.log(`             body text ${ratio(Theme.light['Text.Primary'], Theme.l
 console.log(`  dark  canvas ${Theme.dark['Background.App']}, card ${Theme.dark['Surface.Base']}, body text ${Theme.dark['Text.Primary']} → ${ratio(Theme.dark['Text.Primary'], Theme.dark['Background.App']).toFixed(2)}:1`);
 console.log(`             was #ECECEE (L*${lstar('#ECECEE').toFixed(1)}) on neutral #202023; now L*${lstar(Theme.dark['Text.Primary']).toFixed(1)} on the low-chroma 214° line ${Theme.dark['Background.App']}`);
 console.log(`  old Info #2563EB vs old Accent #1E5EE6 → indistinguishable.`);
-console.log(`  new Info/Focus = Coating ${Theme.light['Status.Info']} / ${Theme.dark['Status.Info']} — a separate hue that only ever means "attention", never "primary action".`);
+console.log(`  new Info = Coating ${Theme.light['Status.Info']} / ${Theme.dark['Status.Info']} — a separate hue that only ever means "attention", never "primary action". (焦点环深色已改走 Cobalt accent，见 spec.js Border.Focus)`);
 
 if (problems.length) {
   console.error(`\n${problems.length} 项失败`);

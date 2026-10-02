@@ -88,8 +88,18 @@ namespace Junevy.Controls.Controls.CodeEditor
             }
 
             char entered = e.Text[0];
-            if (char.IsLetterOrDigit(entered) || entered == '_' || entered == '.')
+            if (entered == '.')
             {
+                // 点号切换到成员补全上下文：词内窗口收起且不提交（点号已照常插入文档），
+                // 以点号后的位置为新段起点重新请求
+                CloseCompletionWindow();
+                _ = ShowCompletionWindowAsync();
+            }
+            else if ((char.IsLetterOrDigit(entered) || entered == '_') && completionWindow == null)
+            {
+                // 仅在词首字符时开窗并请求一次；窗口存续期间的后续按键由 CompletionWindow
+                // 内建的段追踪 + 子串过滤（IsFiltering，默认开启）接管——逐键关闭重开窗口
+                // 会让替换段归零（选中项只插入不替换前缀，"str" 变 "strstring"）且弹窗闪烁
                 _ = ShowCompletionWindowAsync();
             }
         }
@@ -113,7 +123,8 @@ namespace Junevy.Controls.Controls.CodeEditor
 
         private async Task ShowCompletionWindowAsync()
         {
-            if (CompletionProvider == null || editor == null)
+            // 窗口存续期间不再重复请求：段内输入由 CompletionWindow 内建过滤接管
+            if (CompletionProvider == null || editor == null || completionWindow != null)
             {
                 return;
             }
@@ -149,15 +160,35 @@ namespace Junevy.Controls.Controls.CodeEditor
                 return;
             }
 
-            // 请求期间文本或光标已变化 → 结果过期
+            // 请求期间文本或光标已变化：
+            //  · 仍在同一标识符内续打（快速输入的常态）→ 以最新上下文重发请求
+            //    （弹窗尚未打开、无重入；items 匹配短前缀 + CompletionList 按当前段子串过滤，语义仍正确）
+            //  · 否则上下文已变（回退、换行、进入字符串等）→ 结果作废
             if (editor.Document.Text != text || editor.CaretOffset != caret)
             {
+                if (IsIdentifierContinuation(editor.Document.Text, caret, editor.CaretOffset))
+                {
+                    _ = ShowCompletionWindowAsync();
+                }
+
                 return;
             }
 
             CloseCompletionWindow();
 
             var window = new CompletionWindow(editor.TextArea);
+            // 窗口在词首字符敲入后才打开（TextEntered 是插入后事件），CompletionWindow 的段锚点
+            // 默认从当前光标起算、且文档变更时 StartOffset 用 BeforeInsertion 锚点不会向前扩展——
+            // 把段起点回扩到词首，让已输入的整个前缀纳入替换段与过滤文本
+            //（否则 Tab 补全只替换第二个字符起的部分："consol" + Tab → "cConsole"）。
+            // 点号场景词首即光标（前一个字符是 '.'），不受影响。
+            int wordStart = editor.CaretOffset;
+            while (wordStart > 0 && (char.IsLetterOrDigit(text[wordStart - 1]) || text[wordStart - 1] == '_'))
+            {
+                wordStart--;
+            }
+
+            window.StartOffset = wordStart;
             IList<ICompletionData> target = window.CompletionList.CompletionData;
             foreach (CodeCompletionItem item in result.Items)
             {
@@ -166,6 +197,34 @@ namespace Junevy.Controls.Controls.CodeEditor
             window.Closed += OnCompletionWindowClosed;
             completionWindow = window;
             window.Show();
+        }
+
+        /// <summary>
+        /// 判断从请求时光标到当前光标之间是否仍是同一标识符的连续输入
+        /// （词首到当前光标之间只出现标识符字符），用于快速输入时安全重发请求。
+        /// </summary>
+        private static bool IsIdentifierContinuation(string text, int queryCaret, int currentCaret)
+        {
+            if (currentCaret < queryCaret)
+            {
+                return false;
+            }
+
+            int start = queryCaret;
+            while (start > 0 && (char.IsLetterOrDigit(text[start - 1]) || text[start - 1] == '_'))
+            {
+                start--;
+            }
+
+            for (int i = start; i < currentCaret; i++)
+            {
+                if (!char.IsLetterOrDigit(text[i]) && text[i] != '_')
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private void OnCompletionWindowClosed(object? sender, EventArgs e)

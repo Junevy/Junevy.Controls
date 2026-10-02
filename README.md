@@ -73,7 +73,7 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 - **浅色适合阅读**：阅读面（卡片 `Surface.Base`）是纯白 `#FFFFFF`——1.10.0 曾把卡片封在 `#FBFCFD`、被反馈「整体太灰」，现改为白卡片，正文对比 14.8:1；1.14.0 手调后画布（`Background.App`）同为纯白，「白卡浮于灰画布」的亮度衬托不再存在，层级全交给阴影与描边表达。**侧栏用次级背景**（`Background.Subtle` `#EBEDEF`，比画布深 ΔL\* 2.1）：「次级在左、主背景在右」的区域层级，参考主流工具类应用的侧栏观感；悬停色为 Chalk.50（`#F6F6F6`，比白卡深约 3 个 ΔL\*）。
 - **深色不累眼**：正文 L\* 约 89 而非 93+（对深色画布 `#232323` 与卡片 `#1F2226` 均约 11.9:1，读数舒适但不发光）；1.14.0 手调后中性线整体去蓝改纯灰，悬停/按下/凹陷统一落在 `Slate.50`（`#2F2F2F`，比卡片亮约 6 个 ΔL\*），边框被刻意压低。
 - **边框分四级，静止态「若有若无」**：`Border.Default` 是发丝线（浅色 2.03:1、深色 1.79:1），只勾一层控件轮廓；`Border.Subtle` 更淡（浅色 1.35:1、深色 1.15:1）做纯装饰分隔线；`Border.Divider` 是 **Shell 级区域分隔线**——侧栏 / 内容区这种「分区而非控件」的界线（浅色对画布 1.35:1、深色 1.13:1，对次级侧栏底 1.15:1 / 1.04:1）；侧栏铺次级背景后，分隔线对两侧仍保持可辨。需要被清楚看见的状态才升到 3:1 以上——悬停与勾选框 / 开关描边用 `Border.Strong`（浅色 5.07:1、深色 3.19:1），焦点环用 `Border.Focus`。WCAG 1.4.11 的 3:1 由「可交互态」满足，静止发丝线不承诺。
-- **两条蓝各司其职**：`Cobalt` 只做主操作（`Accent.Primary`）；`Coating`（镜片镀膜的青）只做信息与焦点环（`Status.Info` / `Border.Focus` / `Accent.Secondary`）。旧方案里 `Info` 与 `Accent` 是同一个蓝，读不出「这是状态还是这是按钮」。
+- **两条蓝各司其职**：`Cobalt` 只做主操作（`Accent.Primary`）；`Coating`（镜片镀膜的青）只做信息与次色（`Status.Info` / `Accent.Secondary`）。焦点环 `Border.Focus` 浅色走 `Coating.600`，深色自 2026-10-02 起改用 accent 本色 `Cobalt.450`（用户要求焦点偏蓝而非青；对深色画布 4.85:1）。旧方案里 `Info` 与 `Accent` 是同一个蓝，读不出「这是状态还是这是按钮」。
 - **状态色不带复古感**：`Danger` 由砖红 `#A82828`（L\* 37.8）抬亮为朱红 `#BE3E2B`（L\* 45），`Success` 由橄榄 `#157A46` 改为 `#057E42`；`Warning` 独立成 `Palette.Yellow` 一族（Lab 色相角 97–102°），深色 `#E2C600` 压得住深灰墨字约 9.2:1、拆出来当无边框前景对画布也是 9.2:1。
 - **浅色警告随真黄放宽（1.14.0 手调）**：1.13.0 时代浅色 `Warning` 停在琥珀 `#A08700`（AA-Large，3.5:1）；手调后两主题统一为真黄 `#E2C600`，白卡上对比度只有约 1.7:1——对比度不再是这一档的目标，`check.js` / `emit.js` 的浅色下限已按实测值锚定（若要恢复 AA-Large，把 spec.js 的 `Status.Warning` 改回 `Yellow.600` 并同步守卫）。因此浅色警告色块上**不要**放白字或深灰小字，优先「淡底 + 深色前景」（`Status.WarningSubtle` + `Text.Primary`）。
 
@@ -103,7 +103,7 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `Theme.Brush.Border.Subtle` | `#DADEE2` | `#2C2C2C` | 分隔线（装饰性，刻意压得很淡） |
 | `Theme.Brush.Border.Divider` | `#DADEE2` | `#2C2C2C` | Shell 级区域分隔线（侧栏 / 内容区等分区界线；侧栏铺次级背景后，对两侧 1.15:1 / 1.04:1） |
 | `Theme.Brush.Border.Strong` | `#686F79` | `#697078` | 强调边框：悬停描边、勾选框 / 开关描边（≥3:1，满足非文本对比） |
-| `Theme.Brush.Border.Focus` | `#00768D` | `#74CBDC` | 焦点环 |
+| `Theme.Brush.Border.Focus` | `#00768D` | `#4E90E8` | 焦点环（深色取 accent 本色 `Cobalt.450`） |
 | `Theme.Brush.Accent.Primary` | `#1F5FC4` | `#4E90E8` | 主操作 |
 | `Theme.Brush.Accent.PrimaryHover` | `#174CA4` | `#639BE9` | 主操作悬停 |
 | `Theme.Brush.Accent.PrimaryPressed` | `#123C82` | `#3E82D6` | 主操作按下 |
@@ -171,7 +171,7 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 
 阴影只换了载体色相（浅色 `#26070B10`、深色 `#B3070B10`，取代原来的 `#1A0D1520` 与纯黑 `#99000000`），`BlurRadius`、`ShadowDepth`、`Opacity` 三个参数逐条保持原样。WPF 的 `DropShadowEffect` 并不读取 `Color` 的 alpha 通道，浓淡只由 `Opacity` 决定，所以换色相不会改变阴影浓度——离屏实测六个令牌改版前后压暗量漂移均为 `0.00%`。
 
-改配色请先读 `Tools/palette/README.md`：`node Tools/palette/check.js` 跑 95 条对比度 / 亮度台阶断言，`node Tools/palette/emit.js` 重新生成两份 `AppColors.*.xaml` 并回读校验（镜像层漂移、悬空引用、资源计数都会被拦下）。
+改配色请先读 `Tools/palette/README.md`：`node Tools/palette/check.js` 跑 109 条对比度 / 亮度台阶断言，`node Tools/palette/emit.js` 重新生成两份 `AppColors.*.xaml` 并回读校验（镜像层漂移、悬空引用、资源计数都会被拦下）。
 
 运行时切换主题：
 
@@ -770,7 +770,7 @@ var provider = new Junevy.Controls.CodeCompletion.RoslynCodeCompletionProvider()
 editor.CompletionProvider = provider;
 ```
 
-`RoslynCodeCompletionProvider` 引用 .NET 运行时目录中的基础类库（System.Console、System.Collections 等开箱即用，零额外包）；补全弹窗外观与主题画刷联动，深浅主题切换即时生效。已知限制：单文件发布形态不支持（MEF 需要按文件发现 Roslyn 程序集）；大文档逐键全量解析，超大文件建议配合只读或按需启用。
+`RoslynCodeCompletionProvider` 引用 .NET 运行时目录中的基础类库（System.Console、System.Collections 等开箱即用，零额外包）；补全弹窗外观与主题画刷联动，深浅主题切换即时生效。交互语义：**弹窗随词存续**——词首字符开窗一次，词内续打由 AvalonEdit 内建的段追踪与子串过滤（`CompletionList.IsFiltering`）接管（不逐键重建窗口，替换语义正确且无闪烁）；点号切换到成员补全上下文；Esc 关闭；Ctrl+Space 强制弹出。已知限制：单文件发布形态不支持（MEF 需要按文件发现 Roslyn 程序集）；词内匹配为子串过滤而非 Roslyn 级模糊匹配；大文档逐键全量解析，超大文件建议配合只读或按需启用。
 
 ## 菜单与导航控件
 

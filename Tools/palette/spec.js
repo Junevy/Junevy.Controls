@@ -115,7 +115,10 @@ const Roles = {
       只剩这条线：浅色 1.22:1 / 深色 1.24:1（对画布）。 */
   'Border.Divider': ['Chalk.150', 'Slate.125'],
   'Border.Strong': ['Chalk.550', 'Slate.250'],
-  'Border.Focus': ['Coating.600', 'Coating.300'],
+  /*  焦点环：浅色保持 Coating.600；深色按用户要求改用 accent 本色（Cobalt.450 =
+      Accent.Primary），青色环曾与 Accent.Secondary 同源、和主色按钮抢视线。
+      对深色表面 4.85:1，高于守卫的 3:1 线。 */
+  'Border.Focus': ['Coating.600', 'Cobalt.450'],
 
   'Accent.Primary': ['Cobalt.600', 'Cobalt.450'],
   'Accent.PrimaryHover': ['Cobalt.700', 'Cobalt.400'],

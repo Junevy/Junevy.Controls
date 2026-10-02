@@ -14,6 +14,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Junevy.Controls.csproj" />
+		<ProjectReference Include="..\..\Companion\Junevy.Controls.CodeCompletion\Junevy.Controls.CodeCompletion.csproj" />
 	</ItemGroup>
 
 </Project>

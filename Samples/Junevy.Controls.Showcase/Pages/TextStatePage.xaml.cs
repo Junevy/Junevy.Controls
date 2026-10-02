@@ -34,7 +34,9 @@ namespace Junevy.Controls.Showcase.Pages
         {
             InitializeComponent();
             CodeEditorInstance.Text = DemoCode;
-            CodeEditorInstance.CompletionProvider = new SimpleKeywordCompletionProvider();
+            // Roslyn 系统类 IntelliSense（伴生包 Junevy.Controls.CodeCompletion）：
+            // 输入标识符（如 str、Conso）弹类型/关键词补全，输入 Console. 弹成员
+            CodeEditorInstance.CompletionProvider = new Junevy.Controls.CodeCompletion.RoslynCodeCompletionProvider();
         }
     }
 }

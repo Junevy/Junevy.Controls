@@ -146,7 +146,7 @@
     <Color x:Key="Theme.Color.Border.Subtle">#2C2C2C</Color>  <!--  = Palette.Slate.150  -->
     <Color x:Key="Theme.Color.Border.Divider">#2C2C2C</Color>  <!--  = Palette.Slate.125  -->
     <Color x:Key="Theme.Color.Border.Strong">#697078</Color>  <!--  = Palette.Slate.250  -->
-    <Color x:Key="Theme.Color.Border.Focus">#74CBDC</Color>  <!--  = Palette.Coating.300  -->
+    <Color x:Key="Theme.Color.Border.Focus">#4E90E8</Color>  <!--  = Palette.Cobalt.450  -->
 
     <!--  主色 / 次色  -->
     <Color x:Key="Theme.Color.Accent.Primary">#4E90E8</Color>  <!--  = Palette.Cobalt.450  -->
@@ -223,7 +223,7 @@
     <SolidColorBrush x:Key="Theme.Brush.Border.Subtle" Color="{StaticResource Palette.Slate.150}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Divider" Color="{StaticResource Palette.Slate.125}" />
     <SolidColorBrush x:Key="Theme.Brush.Border.Strong" Color="{StaticResource Palette.Slate.250}" />
-    <SolidColorBrush x:Key="Theme.Brush.Border.Focus" Color="{StaticResource Palette.Coating.300}" />
+    <SolidColorBrush x:Key="Theme.Brush.Border.Focus" Color="{StaticResource Palette.Cobalt.450}" />
 
     <!--  主色 / 次色  -->
     <SolidColorBrush x:Key="Theme.Brush.Accent.Primary" Color="{StaticResource Palette.Cobalt.450}" />
