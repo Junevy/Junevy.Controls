@@ -48,7 +48,7 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `<DataGrid>` | 外观 + 交互 | 完整等效（含专属模板）；空态提示通过附加属性 `atc:DataGridAssist.EmptyText` 提供，原生与 `jv:` 实例均可用 |
 | `<DatePicker>` | 外观 + 交互 | 完整等效（含日历全套模板）；占位符通过附加属性 `atc:DatePickerAssist.PlaceHolder` 提供，原生实例可用 |
 | `<Slider>` | 外观 + 交互 | 完整等效（轨道、滑块、分页、刻度、选择区段）；数值框（`ShowValueBox`/`ValueBoxSide`/`ValueFormatString`）为本库 `jv:Slider` 专有，原生实例上自动折叠 |
-| `<TreeView>` | 外观 + 交互 | 完整等效（卡片容器、ExpanderPanel 同款旋转展开图标、悬停/选中态、层级缩进）；`DisplayMode`（`TreeViewDisplayMode`）/ `IndentSize` / `AutoExpandAncestors` / `NavigateCommand` / 悬停与选中画刷经 `atc:TreeViewAssist` 附加属性承载，原生实例同样可用（`jv:TreeView` 另提供同名实例属性）；整树 `ExpandAll()` / `CollapseAll()` 是本库实例方法，WPF 基类未提供，原生实例需逐节点递归 |
+| `<TreeView>` | 外观 + 交互 | 完整等效（卡片容器、ExpanderPanel 同款旋转展开图标、悬停/选中态、层级缩进）；`DisplayMode`（`TreeViewDisplayMode`）/ `IndentSize` / `AutoExpandAncestors` / `NavigateCommand` / 悬停与选中画刷经 `atc:TreeViewAssist` 附加属性承载，原生实例同样可用（`jv:TreeView` 另提供同名实例属性）；整树 `ExpandAll()` / `CollapseAll()` 是本库实例方法，WPF 基类未提供，原生实例需逐节点递归；命令导航语义分宿主：`jv:TreeView` 为选中驱动 + `ItemDoubleClick` 事件，官方 `<TreeView>`（经 `atc:TreeViewAssist`）保留叶激活旧语义 |
 | `<ToolTip>` | 外观 | 完整等效，任意元素的 `ToolTip` 属性自动获得主题样式 |
 
 以下控件因依赖自有依赖属性（样式触发器直接引用），**必须使用 `jv:` 前缀**：`RadioButton`、`ToggleButton`（`SwitchSize`）、`Label`（`DisplayMode`）、`TextBlock`（`Text`/`TextAlignment`/`TextWrapping`）、`ProgressBar`（`ProgressText` 等）、`Slider`（`ShowValueBox`/`ValueBoxSide`/`ValueFormatString`，原生实例仅有外观）、`PasswordBox`（模板复合控件，原生 `PasswordBox` 为密封类不提供接管样式：`Password` 可绑定、`RevealMode`/`IsError` 等均为 `jv:` 实例属性）。
@@ -282,10 +282,10 @@ Showcase 的「图标字体」页提供全部 67 个图标的总览，支持线�
 
 `atc:ExpanderBehavior.Enable` 用于 `TreeViewItem`，`TreeView` 的默认容器样式已经自动启用该行为，通常不需要手动设置。启用后：
 
-- **双击行**：分支节点切换展开/收起；叶节点调用最近 `TreeView` 的 `NavigateCommand`（`atc:TreeViewAssist.NavigateCommand` / `jv:TreeView.NavigateCommand`，同一 DP），命令参数是该容器的数据对象（`TreeView` 中即对应的 `TreeMenuItem`）。
-- **`Enter`**：与双击同一分流——分支切换展开/收起，叶节点执行 `NavigateCommand`。
+- **双击行**：分支节点切换展开/收起。导航职责已移出本类：`jv:TreeView` 的 `NavigateCommand` 为**选中驱动**（选中变化即执行，参数=数据项，见 [TreeView](#treeview-与-treemenuitem)），双击改用 `jv:TreeView.ItemDoubleClick` 路由事件（携带数据项）；官方 `<TreeView>` 保留**叶激活**旧语义——双击/Enter 叶节点时执行 `atc:TreeViewAssist.NavigateCommand`。
+- **`Enter`**：分支切换展开/收起；叶节点在 `jv:TreeView` 上不执行命令（键盘 ↑↓ 已承担导航），官方 `<TreeView>` 保留叶激活。
 - **来源守卫（`3.2.0` 新增）**：`Enter` 只在容器自身持有焦点（事件源即该 `TreeViewItem`）时接管；双击若由行内的可聚焦子控件发起——编辑框、密码框、下拉、列表类控件，或行首的展开箭头——行为不接管，双击选词、开合下拉等原生交互不再被吞掉；双击落在子孙行而非本行时同样不接管（祖先容器不替子孙做决定）。
-- **不抢未被消费的输入**：叶节点没挂 `NavigateCommand` 时，事件不再被标记为已处理，宿主自己的键鼠处理程序仍能看到。
+- **不抢未被消费的输入**：事件没有被接管（如叶节点未满足接管条件）时不标记已处理，宿主自己的键鼠处理程序仍能看到。
 - **选中自动展开祖先**：节点被选中时按**所属树**的 `atc:TreeViewAssist.AutoExpandAncestors`（默认 `true`）沿容器父链展开其所有祖先，选中行不会藏在收起的分支里；置 `false` 后由宿主自行展开。**生效边界（探针 C5 实测）**：这一步靠容器自己冒上来的 `Selected` 事件驱动，所以只对「容器已经生成」的节点起作用——祖先从未展开过时，子级容器还不存在，只把 `IsSelected` 写进数据模型并不会让祖先自动展开；这种「按路径选中」的场景必须由宿主沿刚查到的路径先置 `IsExpanded = true` 再写选中。整树展开用 `jv:TreeView.ExpandAll()` 不受此限制（它直接写数据模型）。该属性注册时未启用值继承，设在各容器上不会自动下发，库一律按「最近的 `TreeView`」读取（`jv:TreeView` 实例属性与附加属性是同一 DP）。嵌套树互不串味：内层树条目被选中只展开内层祖先，外层容器不接管。
 
 **叶/枝的判定按容器 `HasItems`，与数据类型无关**；但**展开/选中状态能否保留取决于条目是否暴露 `IsExpanded` / `IsSelected`**：默认容器样式把这两个属性与 `TreeMenuItem.IsExpanded` / `IsSelected` 双向绑定。换用自定义数据类型时必须在 `ItemContainerStyle` 里自行绑定这两条，否则首次展开子级时容器取默认值（收起 / 未选中），模型里的状态读不回来。
@@ -688,6 +688,8 @@ codeScroll.PreviewMouseWheel += (s, e) =>
 
 **占位符**：`atc:DatePickerAssist.PlaceHolder` 为附加属性（未选日期且文本为空时显示），官方原生实例同样支持，不设置则无占位文案。
 
+**默认宽度**：默认 `MinWidth=140`（容纳 6 字占位文本与常见日期格式 + 日历按钮列）；模板内日期文本框与日历按钮为分列布局，日期文本不会延伸到按钮下方。宿主显式设置 `Width`/`MinWidth` 时以宿主值为准。
+
 依赖：WPF `DatePicker`/`Calendar` 标准行为（`SelectedDateFormat`、`FirstDayOfWeek`、`BlackoutDates` 等）、主题滚动条与阴影令牌；附加属性 `atc:DatePickerAssist.PlaceHolder`（占位符）。
 
 ### Slider
@@ -953,6 +955,8 @@ editor.CompletionProvider = provider;
 
 也可以在 `jv:ContextMenu` 内使用原生 `<MenuItem>`；默认样式会统一应用到子菜单。不要在上下文菜单中使用 `<jv:MenuItem>`，因为它是 `SideMenu` 的导航数据控件，不是 WPF 菜单项。
 
+条目容器样式由库内 `JunevyMenuItemStyleSelector` 按条目类型分发（`MenuItem` → `JunevyContextMenuItemStyle`，`Separator` → 分隔符样式）——`Separator` 是 WPF `MenuBase` 的自带容器，若经 `ItemContainerStyle` 注入 TargetType=MenuItem 的样式，容器生成时会抛「样式不能应用于 Separator」直接闪退，因此库内条目样式一律走 `ItemContainerStyleSelector`。宿主自行设置 `ItemContainerStyle` 时菜单条目列表里不要再混放 `Separator`（`ItemsSource` 绑定场景不受影响——绑定列表里本就无法混放字面量分隔线）。
+
 `ItemsSource` 仍按 WPF 标准使用。绑定普通数据时通过 `ItemContainerStyle` 设置 `Header`、`Icon` 和 `Command`：
 
 ```xml
@@ -1048,7 +1052,7 @@ editor.CompletionProvider = provider;
 | `DisplayMode`（枚举 `TreeViewDisplayMode`） | `Chevron`（默认）显示可点击的展开箭头；`Indicator` 折叠箭头，改由「选中的有子项节点」左侧的 accent 指示条标示层级归属。**两种观感都渲染图标与标题**，图标字号一律取 `atc:Icon.IconSize`。类型与取值自 `3.2.0` 更名（原 `DisplayMode` 的 `Normal` / `Icon`） |
 | `IndentSize` | 子级相对本级的缩进宽度（DIP），默认 `10`（对应官方 `TreeViewItem` 的行首缩进观感）。经库内 `cvt:IndentSizeToMarginConverter` 落为子级承载区的左内缩 `Margin`，逐级累加，只影响子级、不影响本级行首 |
 | `AutoExpandAncestors` | 选中节点时是否自动展开其所有祖先，默认 `true`；置 `false` 后宿主需自行展开。展开由容器自身的 `Selected` 事件驱动，只对**容器已生成**的节点生效——选中一个尚未生成容器的深层节点时，宿主仍需先展开路径上的祖先（或先 `jv:TreeView.ExpandAll()` 展开全部），见 [ExpanderBehavior](#expanderbehavior) 的生效边界 |
-| `NavigateCommand` | 激活叶节点时执行（双击或按 `Enter`，见 [ExpanderBehavior](#expanderbehavior)），参数为叶节点的数据对象；未挂命令时事件不被吞，宿主仍可自处理 |
+| `NavigateCommand` | **选中驱动**：选中项变化（单击、键盘 `↑`/`↓`、程序化 `IsSelected=true`）即执行，参数为新选中的数据项（模型对象，非容器）；清除选中与 `ExpandAll()`/`CollapseAll()` 引起的选中变化不触发；`CanExecute=false` 静默跳过；命令处理器内同步改选中不会二次触发（重定向请派发到 Dispatcher 队列） |
 | `ItemHoverBackground` | 节点悬停背景画刷。**未设置或显式设 `null` 时回退到令牌 `Theme.Brush.Surface.Hover`**（模板的回退触发器，`DynamicResource` 引用，随主题切换） |
 | `SelectedItemBackground` | 选中节点背景画刷。同样在 `null` 时回退到 `Theme.Brush.Surface.Sunken` 中性灰——宿主替换 `Style` 或把画刷置空时高亮不再整体消失 |
 
@@ -1071,7 +1075,7 @@ WPF 基类 `TreeView` **没有**这两个实例方法，官方 `<TreeView>` 只�
 | --- | --- |
 | `atc:Icon.FontFamily` | 节点图标字体 |
 | `atc:Icon.IconSize` | 节点图标字号（`Chevron` 与 `Indicator` 两种观感都生效；`3.2.0` 修复前 `Chevron` 模式完全不读取该值） |
-| `atc:ExpanderBehavior.Enable` | 默认容器样式已启用；控制双击/`Enter` 展开与激活导航、键鼠来源守卫、选中时展开祖先 |
+| `atc:ExpanderBehavior.Enable` | 默认容器样式已启用；控制双击/`Enter` 展开切换、键鼠来源守卫、选中时展开祖先 |
 
 ```csharp
 public ObservableCollection<TreeMenuItem> NavigationTree { get; } =
@@ -1139,8 +1143,8 @@ node.IsSelected = true;
 
 交互约定：
 
-- 单击选中节点；双击文件夹节点切换展开/收起，双击叶节点触发 `NavigateCommand`。
-- 键盘方向键沿用 WPF `TreeView` 原生行为：`↑`/`↓` 移动选择，`→`/`←` 展开/收起；`Enter` 激活叶节点或切换文件夹展开。`Enter` 与双击都带**来源守卫**：焦点在行内子控件（编辑框、下拉、按钮）上时由该控件自己处理，行首箭头的单击也不会被双击重复触发；叶节点没挂命令时事件不再被吞。
+- 单击选中节点（选中变化即触发 `NavigateCommand`，参数=数据项）；双击文件夹节点切换展开/收起；双击任意节点触发 `ItemDoubleClick` 路由事件（携带数据项；双击展开箭头不触发）。
+- 键盘方向键沿用 WPF `TreeView` 原生行为：`↑`/`↓` 移动选择（选中变化即触发 `NavigateCommand`），`→`/`←` 展开/收起；`Enter` 切换分支展开（`jv:TreeView` 上不再执行命令——导航由选中驱动承担）。`Enter` 与双击都带**来源守卫**：焦点在行内子控件（编辑框、下拉、按钮）上时由该控件自己处理，行首箭头的单击也不会被双击重复触发。
 - 悬停、选中、禁用三种视觉状态使用主题色区分，并作用于整行；长列表自动显示垂直滚动条。
 - **悬停高亮仅作用于鼠标所在的行**：`IsMouseOver` 会随可视子树向上传染（悬停子行时父/祖先行的 `IsMouseOver` 也为真），模板以「子级承载区（`ItemsPresenter`）不悬停」为附加条件过滤——悬停子行时父/祖行不再误高亮，悬停父行自身仍正常高亮。
 - 条目文字与图标的前景色跟随宿主 `Foreground`（默认为随主题切换的 `Text.Secondary`，禁用态使用 `State.DisabledForeground`）。系统 `TreeViewItem` 默认样式会把前景钉在恒黑的 `ControlTextBrush` 上（优先级高于属性继承），因此默认容器样式显式绑定宿主前景：在实例（`jv:TreeView` 或官方 `<TreeView>`）上设置 `Foreground` 会同步传导到所有层级的条目，撤销覆盖（`ClearValue`）后恢复主题色。
@@ -1940,7 +1944,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 `Samples/Junevy.Controls.Showcase` 是使用本控件库开发的分类展示程序，运行：`dotnet run --project Samples/Junevy.Controls.Showcase`（net8.0-windows）。
 
 - **主窗口**：无边框 + `WindowChrome` + `jv:AppBar`（默认模板 DefaultAppBar；一个程序仅一个 AppBar，此处展示默认状态，工具栏按钮演示 `ThemeManager` 主题切换与打开 `jv:SidePanel` 设置抽屉）、`jv:SideMenu` 分类导航、`MessageBarService` 通知宿主。
-- **分类页**（与「控件索引」的控件族分类一一对应）：按钮（Button、CardButton、ToggleButton、RadioButton）/ 输入与选择（CheckBox、TextBox、PasswordBox、GroupBox、ComboBox、DatePicker、Slider；含 PlaceholderAssist、TitleAssist、ShowClear、DatePickerAssist、Slider 数值框）/ 集合与数据（ListBox 竖向+横向、ListView GridView、DataGrid、EmptyText 空态、PagingAssist 分页）/ 文本与状态（Label 全模式、TextBlock、CodeEditor）/ 菜单与导航（SideMenu、原生 Menu 菜单栏样式、ContextMenu、TabControl）/ 树形视图（TreeView 四区块演示）/ 栏与工具（ToolBar、Toolbox 双样式、AppBar Expandable、InfoBar）/ 通知（Badge、MessageBar、MessageBarService、ToolTip）/ 进度条（ProgressBar 线性/环形/文本格式）/ 布局（ExpanderPanel 经典+卡片、SidePanel 滑出面板、Border.CornerRadius）/ 窗口与对话框（DialogWindow、ProgressBarWindow）/ 图像（ImageViewer、TransparentBackground）/ 图标字体。
+- **分类页**（与「控件索引」的控件族分类一一对应）：按钮（Button、CardButton、ToggleButton、RadioButton）/ 输入与选择（CheckBox、TextBox、PasswordBox、GroupBox、ComboBox、DatePicker、Slider；含 PlaceholderAssist、TitleAssist、ShowClear、DatePickerAssist、Slider 数值框）/ 集合与数据（ListBox 竖向+横向、ListView GridView、DataGrid、EmptyText 空态、PagingAssist 分页）/ 文本与状态（Label 全模式、TextBlock、CodeEditor）/ 菜单与导航（SideMenu、原生 Menu 菜单栏样式、ContextMenu、TreeView 四区块演示、TabControl）/ 栏与工具（ToolBar、Toolbox 双样式、AppBar Expandable、InfoBar）/ 通知（Badge、MessageBar、MessageBarService、ToolTip）/ 进度条（ProgressBar 线性/环形/文本格式）/ 布局（ExpanderPanel 经典+卡片、SidePanel 滑出面板、Border.CornerRadius）/ 窗口与对话框（DialogWindow、ProgressBarWindow）/ 图像（ImageViewer、TransparentBackground）/ 图标字体。
 - **演示区块（DemoSection）**：每个控件演示统一为「标题 + 用法说明 + 演示内容卡片 + XAML 源码块」结构（`Samples/Junevy.Controls.Showcase/Controls/DemoSection`），源码块带轻量语法高亮（`XamlHighlighter`，配色取主题令牌、随明暗主题切换）、「收起/展开代码」与「复制代码」按钮；片段文本集中在 `ShowcaseSnippets.cs`，与页面演示同步维护。
 
 ## 开发注意事项

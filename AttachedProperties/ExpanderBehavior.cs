@@ -7,10 +7,11 @@ using System.Windows.Media;
 namespace Junevy.Controls.AttachedProperties
 {
     /// <summary>
-    /// TreeViewItem 的双击 / Enter 行为：分支节点切换展开或收起，叶节点触发最近
-    /// <see cref="System.Windows.Controls.TreeView"/> 的 <see cref="TreeViewAssist.NavigateCommand"/>，
-    /// 命令参数为该容器的数据对象；容器自身被选中时按其所属树的
-    /// <see cref="TreeViewAssist.AutoExpandAncestorsProperty"/> 展开该容器的所有祖先。
+    /// TreeViewItem 的双击 / Enter 行为：分支节点切换展开或收起。
+    /// 导航命令的执行分宿主：<see cref="Junevy.Controls.Controls.Menu.TreeView"/> 上
+    /// <see cref="TreeViewAssist.NavigateCommand"/> 为**选中驱动**（本类不执行，避免与选中路径双发）；
+    /// 官方 <see cref="System.Windows.Controls.TreeView"/> 上保留**叶激活**旧语义——双击/Enter 叶节点时执行。
+    /// 容器自身被选中时按其所属树的 <see cref="TreeViewAssist.AutoExpandAncestorsProperty"/> 展开该容器的所有祖先。
     /// </summary>
     /// <remarks>
     /// 叶 / 枝由容器自身的 <see cref="TreeViewItem.HasItems"/> 判定，与条目的数据类型无关；
@@ -115,13 +116,22 @@ namespace Junevy.Controls.AttachedProperties
                 return true;
             }
 
-            if (FindAncestor<TreeView>(item)?.GetValue(TreeViewAssist.NavigateCommandProperty) is ICommand command)
+            // jv:TreeView 的导航已改为选中驱动（选中变化即执行 NavigateCommand，见
+            // TreeView.OnSelectedItemChanged），双击/Enter 在这里再执行会与选中路径「双发」——
+            // 故 jv 宿主上叶节点不再激活，Enter/双击只承担分支展开切换。
+            if (FindAncestor<Junevy.Controls.Controls.Menu.TreeView>(item) != null)
+            {
+                return false;
+            }
+
+            // 官方 <TreeView>（经 atc:TreeViewAssist 挂命令）保留叶激活旧语义：双击/Enter 执行命令。
+            if (FindAncestor<System.Windows.Controls.TreeView>(item)?.GetValue(TreeViewAssist.NavigateCommandProperty) is ICommand command)
             {
                 command.Execute(item.DataContext);
                 return true;
             }
 
-            return false;   // 叶节点没挂命令：不吞事件，宿主自己的处理仍能看到
+            return false;
         }
 
         private static T? FindAncestor<T>(DependencyObject? current) where T : DependencyObject

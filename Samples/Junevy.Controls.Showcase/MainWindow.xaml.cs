@@ -50,7 +50,6 @@ namespace Junevy.Controls.Showcase
                 "集合与数据" => new DataPage(),
                 "文本与状态" => new TextStatePage(),
                 "菜单与导航" => new MenusPage(),
-                "树形视图" => new TreeViewPage(),
                 "栏与工具" => new BarsPage(),
                 "通知" => new NotifyPage(),
                 "进度条" => new ProgressPage(),

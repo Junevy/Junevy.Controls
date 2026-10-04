@@ -23,6 +23,9 @@
                 Value="{Binding RelativeSource={RelativeSource AncestorType=local:SideMenu}, Path=(atc:Icon.IconSize)}" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
+        <!--  水平居中：ContentControl 的 Width 固定为 IconSize，Stretch 对齐在显式定宽时按
+              槽位原点排布（WPF 经典陷阱）——纵排模板里标题比图标宽时图标会整体偏左  -->
+        <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="Content" Value="{Binding Icon}" />
         <Setter Property="FontFamily">
             <Setter.Value>

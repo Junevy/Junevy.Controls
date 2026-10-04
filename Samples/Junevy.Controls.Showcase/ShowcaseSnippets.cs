@@ -480,11 +480,12 @@ namespace Junevy.Controls.Showcase
             """;
 
 
-        // ---------------- 树形视图（TreeViewPage） ----------------
+        // ---------------- 树形视图（并入「菜单与导航」页） ----------------
 
         public const string TreeViewDemo = """
             <!-- TreeMenuItem 为 POCO 数据模型（Title/Icon/Children），默认 HierarchicalDataTemplate 渲染；
-                 展开图标为 ExpanderPanel 同款旋转箭头；双击/Enter：非叶节点切换展开，叶节点执行 NavigateCommand；
+                 展开图标为 ExpanderPanel 同款旋转箭头；NavigateCommand 为选中驱动（单击/键盘/程序化选中即执行，
+                 参数=数据项），双击另有 ItemDoubleClick 事件（携带数据项，双击展开箭头不触发）；
                  TreeViewItem 容器不复用（框架默认 Standard），展开/选中状态保存在 TreeMenuItem 数据模型上 -->
             <jv:TreeView x:Name="MainTree" Width="400" Height="420"
                          atc:Icon.FontFamily="{DynamicResource IconFont}"
@@ -495,9 +496,11 @@ namespace Junevy.Controls.Showcase
                  root.Children.Add(new TreeMenuItem { Title = "图像采集", Icon = "\uE60C", IsExpanded = true });
                  MainTree.ItemsSource = new[] { root };
                  MainTree.NavigateCommand = new ParameterRelayCommand(node => { ... });
-                 注意：NavigateCommand 的执行参数是被激活的叶节点数据对象，
+                 注意：NavigateCommand 为选中驱动——选中项变化（单击、键盘、程序化选中）即执行，
+                 参数是新选中的节点数据对象（分组/叶子都会发，消费方自滤）；
                  丢弃参数的命令（如库内 Common/RelayCommand.cs 的 RelayCommand(Action)）收不到该节点，
-                 示例页自带的 ParameterRelayCommand(Action<object?>) 即为携带参数的宿主侧命令 -->
+                 示例页自带的 ParameterRelayCommand(Action<object?>) 即为携带参数的宿主侧命令；
+                 双击打开类需求请订阅 ItemDoubleClick 路由事件（e.Item 为数据项） -->
             """;
 
         public const string TreeViewIndicatorDemo = """

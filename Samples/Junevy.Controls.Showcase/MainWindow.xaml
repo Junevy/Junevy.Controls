@@ -134,7 +134,6 @@
                         <jv:MenuItem Title="集合与数据" Icon="&#xE66B;" />
                         <jv:MenuItem Title="文本与状态" Icon="&#xE651;" />
                         <jv:MenuItem Title="菜单与导航" Icon="&#xE65D;" />
-                        <jv:MenuItem Title="树形视图" Icon="&#xE6BC;" />
                         <jv:MenuItem Title="栏与工具" Icon="&#xE60F;" />
                         <jv:MenuItem Title="通知" Icon="&#xE932;" />
                         <jv:MenuItem Title="进度条" Icon="&#xE609;" />

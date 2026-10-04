@@ -16,7 +16,12 @@ namespace Junevy.Controls.AttachedProperties
         public static readonly DependencyProperty DisplayModeProperty =
             DependencyProperty.RegisterAttached("DisplayMode", typeof(TreeViewDisplayMode), typeof(TreeViewAssist), new PropertyMetadata(TreeViewDisplayMode.Chevron));
 
-        /// <summary>激活叶节点时执行的命令（双击或按 Enter，见 <see cref="ExpanderBehavior"/>），参数为该节点的数据对象。</summary>
+        /// <summary>
+        /// 树导航命令，参数为节点的数据对象。语义按宿主分：
+        /// <c>jv:TreeView</c>（实例属性与其同源）为**选中驱动**——选中项变化即执行（见
+        /// <see cref="Junevy.Controls.Controls.Menu.TreeView"/>）；官方 <c>&lt;TreeView&gt;</c> 上为**叶激活**旧语义
+        /// ——双击/Enter 叶节点时执行（见 <see cref="ExpanderBehavior"/>）。
+        /// </summary>
         public static readonly DependencyProperty NavigateCommandProperty =
             DependencyProperty.RegisterAttached("NavigateCommand", typeof(ICommand), typeof(TreeViewAssist), new PropertyMetadata(null));
 

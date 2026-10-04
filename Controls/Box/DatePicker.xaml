@@ -352,38 +352,44 @@
                 BorderThickness="{TemplateBinding BorderThickness}"
                 CornerRadius="{TemplateBinding Border.CornerRadius}"
                 SnapsToDevicePixels="True">
-                <DatePickerTextBox
-                    x:Name="PART_TextBox"
-                    Padding="{TemplateBinding Padding}"
-                    VerticalContentAlignment="Center"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    FocusVisualStyle="{x:Null}"
-                    FontSize="{TemplateBinding FontSize}"
-                    Foreground="{TemplateBinding Foreground}" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <DatePickerTextBox
+                        x:Name="PART_TextBox"
+                        Grid.Column="0"
+                        Padding="{TemplateBinding Padding}"
+                        VerticalContentAlignment="Center"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        FocusVisualStyle="{x:Null}"
+                        FontSize="{TemplateBinding FontSize}"
+                        Foreground="{TemplateBinding Foreground}" />
+                    <Button
+                        x:Name="PART_Button"
+                        Grid.Column="1"
+                        Width="30"
+                        Margin="0,2,2,2"
+                        Background="Transparent"
+                        Focusable="False"
+                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                        Style="{x:Null}"
+                        Template="{StaticResource DefaultDatePickerCalendarButtonTemplate}">
+                        <Path
+                            Width="14"
+                            Height="14"
+                            Data="M 3.5 0.75 L 3.5 3 M 10.5 0.75 L 10.5 3 M 0.75 2.5 L 13.25 2.5 L 13.25 13.25 L 0.75 13.25 Z M 0.75 5.25 L 13.25 5.25"
+                            Stroke="{DynamicResource Theme.Brush.Text.Secondary}"
+                            StrokeEndLineCap="Round"
+                            StrokeLineJoin="Round"
+                            StrokeStartLineCap="Round"
+                            StrokeThickness="1.4"
+                            Stretch="None" />
+                    </Button>
+                </Grid>
             </Border>
-
-            <Button
-                x:Name="PART_Button"
-                Width="30"
-                Margin="0,2,2,2"
-                HorizontalAlignment="Right"
-                Background="Transparent"
-                Focusable="False"
-                Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
-                Style="{x:Null}"
-                Template="{StaticResource DefaultDatePickerCalendarButtonTemplate}">
-                <Path
-                    Width="14"
-                    Height="14"
-                    Data="M 3.5 0.75 L 3.5 3 M 10.5 0.75 L 10.5 3 M 0.75 2.5 L 13.25 2.5 L 13.25 13.25 L 0.75 13.25 Z M 0.75 5.25 L 13.25 5.25"
-                    Stroke="{DynamicResource Theme.Brush.Text.Secondary}"
-                    StrokeEndLineCap="Round"
-                    StrokeLineJoin="Round"
-                    StrokeStartLineCap="Round"
-                    StrokeThickness="1.4"
-                    Stretch="None" />
-            </Button>
 
             <!--
                 官方契约部件名是 PART_Popup（DatePicker 内部 GetTemplateChild("PART_Popup")）。
@@ -474,6 +480,8 @@
     </Style>
 
     <Style x:Key="DefaultDatePickerStyle" TargetType="DatePicker">
+        <!--  默认宽度须容纳 6 字占位文本与日期文本（含日历按钮列），过窄会互相挤压  -->
+        <Setter Property="MinWidth" Value="140" />
         <Setter Property="MinHeight" Value="30" />
         <Setter Property="Padding" Value="{DynamicResource Theme.ControlPadding}" />
         <Setter Property="FontSize" Value="14" />

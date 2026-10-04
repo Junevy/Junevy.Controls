@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Media;
+using Junevy.Controls.AttachedProperties;
 
 namespace Junevy.Controls.Controls.Menu
 {
@@ -9,14 +10,19 @@ namespace Junevy.Controls.Controls.Menu
     /// </summary>
     public class ContextMenu : System.Windows.Controls.ContextMenu
     {
-        /// <summary>菜单项悬停/子菜单打开背景画刷(默认 Surface.Hover;可自定义,模板触发器经 AncestorType 绑定)。</summary>
+        /// <summary>
+        /// 菜单项悬停/子菜单打开背景画刷（默认 Surface.Hover，由默认样式注入）。
+        /// 本属性是 <see cref="MenuAssist.ItemHoverBackground"/> 在 <see cref="ContextMenu"/> 上的同源代理——
+        /// 条目模板经 <c>AncestorType=MenuBase</c> 读取共享附加属性，因此原生 <c>Menu</c>
+        /// （JunevyMenuBarStyle）的下拉条目同样消费该画刷（经 atc:MenuAssist 设置）。
+        /// </summary>
         public Brush ItemHoverBackground
         {
             get { return (Brush)GetValue(ItemHoverBackgroundProperty); }
             set { SetValue(ItemHoverBackgroundProperty, value); }
         }
         public static readonly DependencyProperty ItemHoverBackgroundProperty =
-            DependencyProperty.Register("ItemHoverBackground", typeof(Brush), typeof(ContextMenu), new PropertyMetadata(null));
+            MenuAssist.ItemHoverBackgroundProperty.AddOwner(typeof(ContextMenu));
 
         static ContextMenu()
         {

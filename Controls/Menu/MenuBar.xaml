@@ -1,6 +1,7 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/ContextMenu.xaml" />
@@ -8,9 +9,12 @@
 
     <!--
         Top-level bar item. Submenu items are not styled here: the
-        ItemContainerStyle below hands every deeper level to
-        JunevyContextMenuItemStyle, which self-propagates, so nested popups
-        keep the right-pointing context-menu look.
+        ItemContainerStyleSelector below hands every deeper level to
+        JunevyMenuItemStyleSelector, which dispatches MenuItems to
+        JunevyContextMenuItemStyle and Separators to the separator style —
+        Separator 是自带容器，经 ItemContainerStyle 注入 MenuItem 样式会在容器
+        生成时抛异常（右键闪退），所以条目样式一律走选择器；下拉条目的悬停画刷
+        由 JunevyMenuBarStyle 注入的 atc:MenuAssist.ItemHoverBackground 提供。
     -->
     <Style x:Key="JunevyMenuBarItemStyle" TargetType="{x:Type MenuItem}">
         <Style.Resources>
@@ -26,7 +30,7 @@
         <Setter Property="FontSize" Value="12" />
         <Setter Property="Padding" Value="9,4" />
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
-        <Setter Property="ItemContainerStyle" Value="{DynamicResource JunevyContextMenuItemStyle}" />
+        <Setter Property="ItemContainerStyleSelector" Value="{StaticResource JunevyMenuItemStyleSelector}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type MenuItem}">
@@ -108,6 +112,8 @@
         <Setter Property="FontSize" Value="12" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+        <!--  下拉条目的悬停画刷：条目模板经 AncestorType=MenuBase 读取该附加属性（与 jv:ContextMenu 同一读取路径）  -->
+        <Setter Property="atc:MenuAssist.ItemHoverBackground" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource JunevyMenuBarItemStyle}" />
         <Setter Property="Template">
             <Setter.Value>
