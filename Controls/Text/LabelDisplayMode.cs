@@ -36,7 +36,7 @@ namespace Junevy.Controls.Controls.Text
         BorderlessNotice = 11,
 
         /// <summary>
-        /// 中性标签：背景跟随 <see cref="Background"/>，图标由 <c>atc:Icon.Icon</c> 提供，为空时折叠图标区域。
+        /// 中性标签：默认中性灰底（<c>Theme.Brush.Status.Neutral</c>），可用 <see cref="System.Windows.Controls.Control.Background"/> 局部覆盖（如红/黄色块），覆盖后悬停变色自然失效；无默认图标，图标由 <c>atc:Icon.Icon</c> 提供，为空时折叠图标区域。
         /// </summary>
         Neutral = 100,
     }

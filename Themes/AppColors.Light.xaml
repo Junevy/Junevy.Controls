@@ -175,6 +175,8 @@
     <Color x:Key="Theme.Color.Status.Danger">#BE3E2B</Color>  <!--  = Palette.Red.600  -->
     <Color x:Key="Theme.Color.Status.DangerHover">#99352C</Color>  <!--  = Palette.Red.700  -->
     <Color x:Key="Theme.Color.Status.DangerSubtle">#FFF0EE</Color>  <!--  = Palette.Red.100  -->
+    <Color x:Key="Theme.Color.Status.Neutral">#686F79</Color>  <!--  = Palette.Chalk.550  -->
+    <Color x:Key="Theme.Color.Status.NeutralHover">#60666E</Color>  <!--  = Palette.Chalk.600  -->
 
     <!--  禁用态  -->
     <Color x:Key="Theme.Color.State.DisabledSurface">#E9EAEA</Color>  <!--  = Palette.Chalk.100  -->
@@ -253,6 +255,8 @@
     <SolidColorBrush x:Key="Theme.Brush.Status.Danger" Color="{StaticResource Palette.Red.600}" />
     <SolidColorBrush x:Key="Theme.Brush.Status.DangerHover" Color="{StaticResource Palette.Red.700}" />
     <SolidColorBrush x:Key="Theme.Brush.Status.DangerSubtle" Color="{StaticResource Palette.Red.100}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.Neutral" Color="{StaticResource Palette.Chalk.550}" />
+    <SolidColorBrush x:Key="Theme.Brush.Status.NeutralHover" Color="{StaticResource Palette.Chalk.600}" />
 
     <!--  禁用态  -->
     <SolidColorBrush x:Key="Theme.Brush.State.DisabledSurface" Color="{StaticResource Palette.Chalk.100}" />

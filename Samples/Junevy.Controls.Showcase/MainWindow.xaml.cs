@@ -49,12 +49,14 @@ namespace Junevy.Controls.Showcase
                 "输入与选择" => new InputsPage(),
                 "集合与数据" => new DataPage(),
                 "文本与状态" => new TextStatePage(),
+                "菜单与导航" => new MenusPage(),
+                "树形视图" => new TreeViewPage(),
+                "栏与工具" => new BarsPage(),
                 "通知" => new NotifyPage(),
                 "进度条" => new ProgressPage(),
                 "布局控件" => new LayoutPage(),
-                "菜单与导航" => new MenusPage(),
-                "树形视图" => new TreeViewPage(),
-                "窗口与图像" => new WindowImagePage(),
+                "窗口与对话框" => new WindowPage(),
+                "图像" => new ImagePage(),
                 "图标字体" => new IconsPage(),
                 _ => new ButtonsPage()
             };
@@ -68,6 +70,21 @@ namespace Junevy.Controls.Showcase
             {
                 PageHost.Content = GetPage(title);
             }
+        }
+
+        private void OnGoHomeClick(object sender, RoutedEventArgs e)
+        {
+            NavMenu.SelectedIndex = 0;
+        }
+
+        private void OnShowNotificationClick(object sender, RoutedEventArgs e)
+        {
+            MessageBarService.Show(MessageBarAppearance.Informational, "MessageBarService", "这是一条来自 AppBar 工具栏的通知演示");
+        }
+
+        private void OnToggleWindowStateClick(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
         }
 
         private void OnToggleThemeClick(object sender, RoutedEventArgs e)

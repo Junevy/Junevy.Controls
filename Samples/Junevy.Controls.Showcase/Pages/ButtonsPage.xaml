@@ -47,19 +47,6 @@
                 </demo:DemoSection>
 
                 <demo:DemoSection
-                    Title="jv:Button —— IsTextScaled 内容自适应缩放"
-                    Description="jv:Button 默认 IsTextScaled=True，缩放只缩小不放大：空间充足时保持原始字号，按钮被挤压（显式尺寸或布局约束小于内容）时文字/图标等比缩小并保持居中；设为 False 恢复完全固定字号（挤压时不缩小）。需要大字内容应直接设置 FontSize。"
-                    XamlCode="{x:Static sample:ShowcaseSnippets.ButtonTextScaled}">
-                    <WrapPanel>
-                        <jv:Button
-                            Width="150"
-                            Height="56"
-                            Content="IsTextScaled=True：内容超出按钮时文字等比缩小"
-                            IsTextScaled="True" />
-                    </WrapPanel>
-                </demo:DemoSection>
-
-                <demo:DemoSection
                     Title="jv:Button —— ShowShadow 浮起阴影开关"
                     Description="常态阴影默认关闭（贴平，与 ComboBox / TextBox 等同级控件一致）；需要浮起感强调的按钮（主操作、独立 CTA）可对单个按钮设 True，或用基于隐式样式的 Setter 批量开启。只影响常态阴影，悬停/按压反馈与尺寸不变。"
                     XamlCode="{x:Static sample:ShowcaseSnippets.ButtonShadow}">

@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
     xmlns:cvt="clr-namespace:Junevy.Controls.Converters"
+    xmlns:paging="clr-namespace:Junevy.Controls.Controls.Paging"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.DataGrid">
 
     <!--
@@ -195,7 +196,19 @@
             CornerRadius="{DynamicResource Theme.ControlCornerRadius}"
             SnapsToDevicePixels="True"
             UseLayoutRounding="True">
-            <ScrollViewer x:Name="PART_ScrollViewer" Focusable="False">
+            <DockPanel>
+                <!--  分页页脚：atc:PagingAssist.HasPager 为真时出现，方位随 atc:PagingAssist.Placement  -->
+                <Border
+                    x:Name="PagingFooter"
+                    DockPanel.Dock="Bottom"
+                    Padding="4,3"
+                    Background="{DynamicResource Theme.Brush.Surface.Base}"
+                    BorderBrush="{DynamicResource Theme.Brush.Border.Divider}"
+                    BorderThickness="0,1,0,0"
+                    Visibility="Collapsed">
+                    <paging:DataPager x:Name="Pager" />
+                </Border>
+                <ScrollViewer x:Name="PART_ScrollViewer" Focusable="False">
                 <ScrollViewer.Template>
                     <ControlTemplate TargetType="ScrollViewer">
                         <Grid>
@@ -317,7 +330,34 @@
                 -->
                 <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
             </ScrollViewer>
+            </DockPanel>
         </Border>
+
+        <ControlTemplate.Triggers>
+            <!--
+                分页页脚显隐与方位：读宿主上的附加属性。
+                必须用 Trigger（Property=附加属性）：DataTrigger + Binding(RelativeSource TemplatedParent)
+                在 ControlTemplate.Triggers 内解析不到 TemplatedParent，方位会整体失效。
+            -->
+            <Trigger Property="atc:PagingAssist.HasPager" Value="True">
+                <Setter TargetName="PagingFooter" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="atc:PagingAssist.Placement" Value="Top">
+                <Setter TargetName="PagingFooter" Property="DockPanel.Dock" Value="Top" />
+                <Setter TargetName="PagingFooter" Property="BorderThickness" Value="0,0,0,1" />
+                <Setter TargetName="Pager" Property="Orientation" Value="Horizontal" />
+            </Trigger>
+            <Trigger Property="atc:PagingAssist.Placement" Value="Left">
+                <Setter TargetName="PagingFooter" Property="DockPanel.Dock" Value="Left" />
+                <Setter TargetName="PagingFooter" Property="BorderThickness" Value="0,0,1,0" />
+                <Setter TargetName="Pager" Property="Orientation" Value="Vertical" />
+            </Trigger>
+            <Trigger Property="atc:PagingAssist.Placement" Value="Right">
+                <Setter TargetName="PagingFooter" Property="DockPanel.Dock" Value="Right" />
+                <Setter TargetName="PagingFooter" Property="BorderThickness" Value="1,0,0,0" />
+                <Setter TargetName="Pager" Property="Orientation" Value="Vertical" />
+            </Trigger>
+        </ControlTemplate.Triggers>
     </ControlTemplate>
 
     <!--  DataGrid 控件样式  -->

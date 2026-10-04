@@ -19,11 +19,11 @@
                 <TextBlock Style="{StaticResource DemoPageTitle}" Text="文本与状态" />
                 <TextBlock
                     Style="{StaticResource DemoPageSubtitle}"
-                    Text="jv:Label（DisplayMode）/ jv:TextBlock / ToolTip（官方控件主题接管）。" />
+                    Text="jv:Label（DisplayMode 全模式）/ jv:TextBlock / jv:CodeEditor。ToolTip 已归入「通知」演示页。" />
 
                 <demo:DemoSection
                     Title="jv:Label（DisplayMode 全模式）"
-                    Description="各模式通过样式触发器注入默认图标（atc:Icon.Icon），可用局部值覆盖；图标为空时折叠图标区域；Neutral 模式背景跟随 Background。"
+                    Description="各模式通过样式触发器注入默认图标（atc:Icon.Icon），可用局部值覆盖；图标为空时折叠图标区域，文字保持居中；Neutral 默认中性灰底，可用局部 Background 覆盖。"
                     XamlCode="{x:Static sample:ShowcaseSnippets.LabelDemo}">
                     <StackPanel>
                         <WrapPanel>
@@ -35,6 +35,7 @@
                             <jv:Label Content="BorderlessError" DisplayMode="BorderlessError" />
                             <jv:Label Content="BorderlessWarning" DisplayMode="BorderlessWarning" />
                             <jv:Label Content="BorderlessNotice" DisplayMode="BorderlessNotice" />
+                            <jv:Label Content="Neutral（默认灰底）" DisplayMode="Neutral" />
                             <jv:Label
                                 atc:Icon.Icon="&#xE651;"
                                 Content="Neutral + 自定义图标"
@@ -79,25 +80,6 @@
                     </StackPanel>
                 </demo:DemoSection>
 
-                <demo:DemoSection
-                    Title="ToolTip（合并 Generic.xaml 后任意元素自动生效）"
-                    Description="库主题字典合并后，原生 ToolTip 全局自动应用主题样式，无需逐元素设置。"
-                    XamlCode="{x:Static sample:ShowcaseSnippets.ToolTipDemo}">
-                    <WrapPanel>
-                        <TextBlock
-                            Margin="0,4"
-                            Text="悬浮到我这里查看原生 ToolTip"
-                            ToolTip="取值范围 1.0 - 16.0，调整后立即生效" />
-                        <jv:Button
-                            Margin="16,0,0,0"
-                            Content="按钮 ToolTip"
-                            ToolTip="jv:Button 上的 ToolTip 同样获得主题样式" />
-                        <jv:CheckBox
-                            Margin="16,0,0,0"
-                            Content="复选框 ToolTip"
-                            ToolTip="任意 FrameworkElement 的 ToolTip 属性" />
-                    </WrapPanel>
-                </demo:DemoSection>
                 <demo:DemoSection
                     Title="jv:CodeEditor（代码编辑器）"
                     Description="内部封装 AvalonEdit：SyntaxLanguage 运行时可切换，语法着色统一映射主题画刷（点右上角按钮切主题即可验证）；本页已挂关键词补全（输入如 ret / name 触发，Ctrl+Space 强制弹出），完整系统类 IntelliSense 见伴生包 Junevy.Controls.CodeCompletion。"

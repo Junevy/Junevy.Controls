@@ -23,7 +23,7 @@
 
                 <demo:DemoSection
                     Title="jv:TreeView + TreeMenuItem（数据模型驱动）"
-                    Description="TreeMenuItem 为 POCO 数据模型（Title/Icon/Children），由默认 HierarchicalDataTemplate 渲染，可在任意线程构建；根级与嵌套层级均参与虚拟化（标准模式，TreeViewItem 携带状态、不回收容器）。默认容器样式已启用 atc:ExpanderBehavior.Enable：双击/Enter 切换分支展开，激活叶节点执行 NavigateCommand（本页以 MessageBar 反馈节点标题）；展开图标为 ExpanderPanel 同款旋转箭头。"
+                    Description="TreeMenuItem 为 POCO 数据模型（Title/Icon/Children），由默认 HierarchicalDataTemplate 渲染，可在任意线程构建；TreeViewItem 容器不复用（框架默认 Standard），展开/选中状态保存在 TreeMenuItem 数据模型上。默认容器样式已启用 atc:ExpanderBehavior.Enable：双击/Enter 切换分支展开，激活叶节点执行 NavigateCommand（本页以 MessageBar 反馈节点标题）；展开图标为 ExpanderPanel 同款旋转箭头。"
                     XamlCode="{x:Static sample:ShowcaseSnippets.TreeViewDemo}">
                     <jv:TreeView
                         x:Name="MainTree"
@@ -34,21 +34,21 @@
                 </demo:DemoSection>
 
                 <demo:DemoSection
-                    Title="DisplayMode=Icon（左侧层级指示器模式）"
-                    Description="Icon 模式隐藏展开箭头；蓝色 accent 指示条仅标示「选中的带子项节点」（蓝色提示 = 真实选中，非选中分支不显示，行宽经隐藏占位预留、选中时不跳动）。节点图标字号取 atc:Icon.IconSize，标题仍正常显示。DisplayMode 经 atc:TreeViewAssist.DisplayMode 附加属性承载，官方 &lt;TreeView&gt; 上同样可用。"
-                    XamlCode="{x:Static sample:ShowcaseSnippets.TreeViewIconModeDemo}">
+                    Title="DisplayMode=Indicator（左侧层级指示器模式）"
+                    Description="Indicator 模式隐藏展开箭头；蓝色 accent 指示条仅标示「选中的带子项节点」（蓝色提示 = 真实选中，非选中分支不显示，行宽经隐藏占位预留、选中时不跳动）。节点图标字号取 atc:Icon.IconSize，标题仍正常显示。DisplayMode 经 atc:TreeViewAssist.DisplayMode 附加属性承载，官方 &lt;TreeView&gt; 上同样可用。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.TreeViewIndicatorDemo}">
                     <jv:TreeView
-                        x:Name="IconModeTree"
+                        x:Name="IndicatorTree"
                         Width="400"
                         Height="300"
-                        DisplayMode="Icon"
+                        DisplayMode="Indicator"
                         atc:Icon.FontFamily="{DynamicResource IconFont}"
                         atc:Icon.IconSize="18" />
                 </demo:DemoSection>
 
                 <demo:DemoSection
                     Title="官方 TreeView 自动继承样式（无需 jv: 前缀）"
-                    Description="合并 Themes/Generic.xaml 后，官方 &lt;TreeView&gt; 自动获得同一外观（卡片容器、展开箭头、悬停/选中态、虚拟化）。jv 专有能力经附加属性同样可用：atc:Icon.FontFamily 提供图标字体，atc:TreeViewAssist.SelectedItemBackground 定制选中画刷（本例改为强调蓝），atc:TreeViewAssist.NavigateCommand 激活叶节点（代码设置，见片段注释）。"
+                    Description="合并 Themes/Generic.xaml 后，官方 &lt;TreeView&gt; 自动获得同一外观（卡片容器、展开箭头、悬停/选中态；容器不复用，展开/选中状态在数据模型上）。jv 专有能力经附加属性同样可用：atc:Icon.FontFamily 提供图标字体，atc:TreeViewAssist.SelectedItemBackground 定制选中画刷（本例改为强调蓝），atc:TreeViewAssist.NavigateCommand 激活叶节点（代码设置，见片段注释）。"
                     XamlCode="{x:Static sample:ShowcaseSnippets.TreeViewNativeDemo}">
                     <TreeView
                         x:Name="NativeTree"
@@ -61,7 +61,7 @@
 
                 <demo:DemoSection
                     Title="代码控制展开/选中 + 自定义悬停与选中画刷"
-                    Description="TreeMenuItem.IsExpanded / IsSelected 与容器双向绑定：代码直接赋值即可展开/收起、选中节点（选中分支节点前自动展开其祖先），虚拟化/容器回收后状态仍保留在模型上。悬停与选中背景画刷可逐实例自定义（jv:TreeView 实例属性，或官方实例上的 atc:TreeViewAssist.* 附加属性），默认取 Surface.Hover / Surface.Sunken 中性灰。"
+                    Description="TreeMenuItem.IsExpanded / IsSelected 与容器双向绑定：代码直接赋值即可展开/收起、选中节点（选中已生成的容器时库自动展开其祖先；若目标在收起分支里、容器尚未生成，宿主需先沿自己查到的路径展开祖先），递归展开/收起整树用 jv:TreeView.ExpandAll / CollapseAll（收起记住被 WPF 原生语义上提的选中，紧随的展开还原回原节点）；容器不复用（框架默认 Standard），状态保存在数据模型上。悬停与选中背景画刷可逐实例自定义（jv:TreeView 实例属性，或官方实例上的 atc:TreeViewAssist.* 附加属性），默认取 Surface.Hover / Surface.Sunken 中性灰。"
                     XamlCode="{x:Static sample:ShowcaseSnippets.TreeViewInteractionDemo}">
                     <StackPanel>
                         <WrapPanel Margin="0,0,0,12">

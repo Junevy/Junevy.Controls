@@ -22,15 +22,6 @@ namespace Junevy.Controls.Showcase
             <jv:Button Content="圆角 16（Border.CornerRadius）" Style="{StaticResource CornerRadius16Button}" />
             """;
 
-        public const string ButtonTextScaled = """
-            <!-- 默认 IsTextScaled=True：只缩小不放大。空间充足时保持原始字号；
-                 按钮被挤压（尺寸小于内容自然尺寸）时文字/图标等比缩小并保持居中。 -->
-            <jv:Button Width="150" Height="56" Content="IsTextScaled=True：内容超出按钮时文字等比缩小" />
-
-            <!-- 设为 False 恢复完全固定字号（被挤压时也不缩小） -->
-            <jv:Button Content="固定字号" IsTextScaled="False" />
-            """;
-
         public const string ButtonShadow = """
             <!-- 常态阴影默认关闭（与 ComboBox 等同级控件贴平一致），需要浮起感时逐个开启 -->
             <jv:ComboBox Width="140" SelectedIndex="0">
@@ -82,6 +73,7 @@ namespace Junevy.Controls.Showcase
             <jv:RadioButton Content="方形标记 A" DisplayMode="Rectangular" GroupName="ShowcaseShape" IsChecked="True" />
             <jv:RadioButton Content="方形标记 B" DisplayMode="Rectangular" GroupName="ShowcaseShape" />
             """;
+
 
         // ---------------- 输入与选择（InputsPage） ----------------
 
@@ -166,6 +158,22 @@ namespace Junevy.Controls.Showcase
                             atc:TitleAssist.Title="登录密码" atc:TitleAssist.IsRequired="True" />
             """;
 
+        public const string GroupBoxDemo = """
+            <!-- 单击标题折叠/展开（IsCollapsible 默认 True）；IsCollapsed 初始折叠；
+                 标题内交互元素不受点击折叠影响 -->
+            <jv:GroupBox Header="默认：单击标题折叠 / 展开">
+                <jv:TextBox Width="220" HorizontalAlignment="Left" atc:PlaceholderAssist.Placeholder="采集名称" />
+            </jv:GroupBox>
+
+            <jv:GroupBox Header="初始折叠（IsCollapsed=True）" IsCollapsed="True">
+                <TextBlock Text="折叠后内容区域完全隐藏，不占布局空间。" />
+            </jv:GroupBox>
+
+            <jv:GroupBox Header="不可折叠（IsCollapsible=False）" IsCollapsible="False">
+                <TextBlock Text="标题仅作展示，悬停无高亮。" />
+            </jv:GroupBox>
+            """;
+
         public const string ComboBoxDemo = """
             <!-- ItemsSource 绑定 -->
             <jv:ComboBox ItemsSource="{Binding Cameras}" SelectedIndex="0" />
@@ -206,6 +214,7 @@ namespace Junevy.Controls.Showcase
                        ShowValueBox="False" TickFrequency="10" TickPlacement="BottomRight" />
             <jv:Slider Height="180" Orientation="Vertical" Value="65" TickFrequency="10" TickPlacement="TopLeft" />
             """;
+
 
         // ---------------- 集合与数据（DataPage） ----------------
 
@@ -285,11 +294,35 @@ namespace Junevy.Controls.Showcase
             </jv:DataGrid>
             """;
 
+
+        // ---------------- 集合与数据（DataPage）· 分页 ----------------
+
+        public const string PagingDemo = """
+            <!-- PageSize 启用客户端分页：页脚自动出现（首页/滑窗页码/末页/每页条数/总数）；
+                 Placement 切换页码栏方位 Bottom/Top/Left/Right（左/右为竖排页码栏）；
+                 排序（列头点击）发生在分页之前，为全局排序语义；PageSize 置 0 恢复不分页 -->
+            <jv:DataGrid ItemsSource="{Binding PagedRows}"
+                         atc:PagingAssist.PageSize="10"
+                         atc:PagingAssist.Placement="Bottom" />
+
+            <!-- 纯图标导航用法：ListBox 隐藏标题或直接绑定任意条目集合 -->
+            <jv:ListBox ItemsSource="{Binding PagedRows}"
+                        atc:PagingAssist.PageSize="5"
+                        atc:PagingAssist.Placement="Left" />
+
+            <!-- 任意 ItemsControl 均可启用数据切片；页码控件也可独立摆放：
+                 <jv:DataPager CurrentPage="{Binding Path=(atc:PagingAssist.CurrentPage), ElementName=List, Mode=TwoWay}"
+                               PageCount="{Binding Path=(atc:PagingAssist.PageCount), ElementName=List}"
+                               TotalCount="{Binding Path=(atc:PagingAssist.TotalCount), ElementName=List}"
+                               PageSize="{Binding Path=(atc:PagingAssist.PageSize), ElementName=List, Mode=TwoWay}" /> -->
+            """;
+
+
         // ---------------- 文本与状态（TextStatePage） ----------------
 
         public const string LabelDemo = """
             <!-- 各模式经样式触发器注入默认图标（atc:Icon.Icon），可用局部值覆盖；
-                 图标为空时折叠图标区域；Neutral 模式背景跟随 Background -->
+                 图标为空时折叠图标区域，文字保持居中；Neutral 默认中性灰底，可用局部 Background 覆盖 -->
             <jv:Label Content="Error（默认）" DisplayMode="Error" />
             <jv:Label Content="Success" DisplayMode="Success" />
             <jv:Label Content="Warning" DisplayMode="Warning" />
@@ -297,6 +330,7 @@ namespace Junevy.Controls.Showcase
             <jv:Label Content="BorderlessError" DisplayMode="BorderlessError" />
             <jv:Label Content="BorderlessWarning" DisplayMode="BorderlessWarning" />
             <jv:Label Content="BorderlessNotice" DisplayMode="BorderlessNotice" />
+            <jv:Label Content="Neutral（默认灰底）" DisplayMode="Neutral" />
             <jv:Label Content="Neutral + 自定义图标" DisplayMode="Neutral" atc:Icon.Icon="&#xE651;" />
             """;
 
@@ -317,14 +351,6 @@ namespace Junevy.Controls.Showcase
                           ContentTemplate="{StaticResource IconTemplate}" Text="标题超宽时以省略号截断显示 Inspect" />
             """;
 
-        public const string ToolTipDemo = """
-            <!-- 合并库 Generic.xaml 后，任意元素的 ToolTip 自动获得主题样式 -->
-            <TextBlock Text="悬浮到我这里查看原生 ToolTip"
-                       ToolTip="取值范围 1.0 - 16.0，调整后立即生效" />
-            <jv:Button Content="按钮 ToolTip" ToolTip="jv:Button 上的 ToolTip 同样获得主题样式" />
-            <jv:CheckBox Content="复选框 ToolTip" ToolTip="任意 FrameworkElement 的 ToolTip 属性" />
-            """;
-
         public const string CodeEditorDemo = """
             <!-- 完全封装 AvalonEdit：公共 API 只暴露 Junevy 类型，高级场景经 InnerEditor 取内部实例。
                  SyntaxLanguage 运行时可切换：CSharp/VisualBasic/Cpp/Java/JavaScript/Html/Css/
@@ -332,6 +358,7 @@ namespace Junevy.Controls.Showcase
                  着色统一映射 Theme.Brush.*，点击右上角按钮切换主题即可验证。 -->
             <jv:CodeEditor Height="320" SyntaxLanguage="CSharp" ShowLineNumbers="True" />
             """;
+
 
         // ---------------- 通知（NotifyPage） ----------------
 
@@ -377,7 +404,45 @@ namespace Junevy.Controls.Showcase
             <jv:Button Click="OnServiceClearClick" Content="Clear()" />
             """;
 
+        public const string ToolTipDemo = """
+            <!-- 合并库 Generic.xaml 后，任意元素的 ToolTip 自动获得主题样式 -->
+            <TextBlock Text="悬浮到我这里查看原生 ToolTip"
+                       ToolTip="取值范围 1.0 - 16.0，调整后立即生效" />
+            <jv:Button Content="按钮 ToolTip" ToolTip="jv:Button 上的 ToolTip 同样获得主题样式" />
+            <jv:CheckBox Content="复选框 ToolTip" ToolTip="任意 FrameworkElement 的 ToolTip 属性" />
+            """;
+
+
         // ---------------- 菜单与导航（MenusPage） ----------------
+
+        public const string SideMenuDemo = """
+            <!-- DisplayMode=Horizontal：图标与标题横向排列（分类导航常用形态） -->
+            <jv:SideMenu Width="240" ItemHeight="40" SelectionChanged="OnSideMenuSelectionChanged"
+                         atc:Icon.FontFamily="{DynamicResource IconFont}" atc:Icon.IconSize="18">
+                <jv:MenuItem Icon="&#xE66B;" Title="数据采集" />
+                <jv:MenuItem Icon="&#xE646;" Title="报表中心" />
+                <jv:MenuItem Icon="&#xE60A;" Title="系统设置" />
+            </jv:SideMenu>
+
+            <!-- DisplayMode=Vertical + Orientation=Vertical：图标在上、标题在下的紧凑图标栏 -->
+            <jv:SideMenu Width="60" Orientation="Vertical" DisplayMode="Vertical" ItemHeight="52">
+                <jv:MenuItem Icon="&#xE66B;" Title="采集" />
+                <jv:MenuItem Icon="&#xE646;" Title="报表" />
+            </jv:SideMenu>
+            """;
+
+        public const string MenuBarDemo = """
+            <!-- 原生 <Menu> 顶栏样式：JunevyMenuBarStyle + JunevyMenuBarItemStyle，
+                 子级菜单项自动交给 JunevyContextMenuItemStyle 渲染 -->
+            <Menu Style="{StaticResource JunevyMenuBarStyle}">
+                <MenuItem Header="文件">
+                    <MenuItem Header="新建" InputGestureText="Ctrl+N" />
+                    <MenuItem Header="打开" InputGestureText="Ctrl+O" />
+                    <Separator />
+                    <MenuItem Header="退出" />
+                </MenuItem>
+            </Menu>
+            """;
 
         public const string ContextMenuDemo = """
             <!-- 附加到任意元素的 ContextMenu；菜单项用原生 MenuItem 或 jv:ContextMenuItem -->
@@ -398,12 +463,29 @@ namespace Junevy.Controls.Showcase
             </jv:Button>
             """;
 
+        public const string TabControlDemo = """
+            <!-- 可关闭页签：IsClosable 控制关闭按钮（默认 True）；双击标题可重命名（控件级 CanRename 默认 False，需显式开启）；
+                 CanCloseLastTab=False 保护最后一个页签；TabClosing 事件可取消关闭 -->
+            <jv:TabControl Height="220" CanRename="True" CanCloseLastTab="False" TabClosing="OnTabClosing">
+                <jv:TabControlItem Header="相机 1" Icon="&#xE66B;">
+                    <TextBlock Margin="16" Text="相机 1 的内容区域。" />
+                </jv:TabControlItem>
+                <jv:TabControlItem Header="日志">
+                    <TextBlock Margin="16" Text="日志页签内容。" />
+                </jv:TabControlItem>
+                <jv:TabControlItem Header="保护页">
+                    <TextBlock Margin="16" Text="尝试关闭此页签：TabClosing 会取消并弹出提示。" />
+                </jv:TabControlItem>
+            </jv:TabControl>
+            """;
+
+
         // ---------------- 树形视图（TreeViewPage） ----------------
 
         public const string TreeViewDemo = """
             <!-- TreeMenuItem 为 POCO 数据模型（Title/Icon/Children），默认 HierarchicalDataTemplate 渲染；
                  展开图标为 ExpanderPanel 同款旋转箭头；双击/Enter：非叶节点切换展开，叶节点执行 NavigateCommand；
-                 根级与嵌套层级均参与虚拟化（标准模式，TreeViewItem 携带状态、不回收容器） -->
+                 TreeViewItem 容器不复用（框架默认 Standard），展开/选中状态保存在 TreeMenuItem 数据模型上 -->
             <jv:TreeView x:Name="MainTree" Width="400" Height="420"
                          atc:Icon.FontFamily="{DynamicResource IconFont}"
                          atc:Icon.IconSize="16" />
@@ -412,14 +494,17 @@ namespace Junevy.Controls.Showcase
                  var root = new TreeMenuItem { Title = "检测工作站", Icon = "\uE6BC", IsExpanded = true };
                  root.Children.Add(new TreeMenuItem { Title = "图像采集", Icon = "\uE60C", IsExpanded = true });
                  MainTree.ItemsSource = new[] { root };
-                 MainTree.NavigateCommand = new RelayCommand(() => { ... }); -->
+                 MainTree.NavigateCommand = new ParameterRelayCommand(node => { ... });
+                 注意：NavigateCommand 的执行参数是被激活的叶节点数据对象，
+                 丢弃参数的命令（如库内 Common/RelayCommand.cs 的 RelayCommand(Action)）收不到该节点，
+                 示例页自带的 ParameterRelayCommand(Action<object?>) 即为携带参数的宿主侧命令 -->
             """;
 
-        public const string TreeViewIconModeDemo = """
-            <!-- DisplayMode=Icon：隐藏展开箭头；蓝色 accent 指示条仅标示「选中的带子项节点」
-                 （蓝色提示 = 真实选中，非选中分支不显示）；图标字号取 atc:Icon.IconSize。
-                 DisplayMode 经 atc:TreeViewAssist.DisplayMode 附加属性承载 -->
-            <jv:TreeView Width="400" Height="300" DisplayMode="Icon"
+        public const string TreeViewIndicatorDemo = """
+            <!-- DisplayMode=Indicator：折叠展开箭头；蓝色 accent 指示条仅标示「选中的带子项节点」
+                 （蓝色提示 = 真实选中，非选中分支不显示）；图标字号取 atc:Icon.IconSize，标题仍正常显示。
+                 DisplayMode 经 atc:TreeViewAssist.DisplayMode 附加属性承载，官方 <TreeView> 上同样可用 -->
+            <jv:TreeView Width="400" Height="300" DisplayMode="Indicator"
                          atc:Icon.FontFamily="{DynamicResource IconFont}"
                          atc:Icon.IconSize="18" />
             """;
@@ -446,26 +531,18 @@ namespace Junevy.Controls.Showcase
                          SelectedItemBackground="{DynamicResource Theme.Brush.Surface.Selected}"
                          atc:Icon.FontFamily="{DynamicResource IconFont}" atc:Icon.IconSize="16" />
 
-            <!-- 代码控制：写入数据模型，容器经双向绑定跟随，虚拟化回收后状态不丢失
-                 static void SetExpanded(TreeMenuItem node, bool v) { node.IsExpanded = v; ... }
-                 path[^1].IsSelected = true; // 选中前先展开祖先使目标可见 -->
+            <!-- 代码控制：写入数据模型，容器经双向绑定跟随；容器不复用（框架默认 Standard），状态保存在模型上。
+                 递归展开/收起走树级 API，未生成的容器同样被覆盖，宿主不必自写递归：
+                 ControlledTree.ExpandAll(); ControlledTree.CollapseAll();
+                 （收起按 WPF 原生语义把选中上提到最外层被收起的祖先，紧随的 ExpandAll 把选中还原回原节点）
+                 AutoExpandAncestors（默认 true）只在祖先容器已生成时生效，收起分支里的叶节点还没有容器，
+                 所以宿主沿自己查到的路径先展开祖先、再写选中：
+                 for (var i = 0; i < path.Count - 1; i++) path[i].IsExpanded = true;
+                 path[^1].IsSelected = true; -->
             """;
 
-        public const string TabMenuDemo = """
-            <!-- 可关闭页签：IsClosable 控制关闭按钮（默认 True）；双击标题可重命名（CanRename）；
-                 CanCloseLastTab=False 保护最后一个页签；TabClosing 事件可取消关闭 -->
-            <jv:TabMenu Height="220" CanCloseLastTab="False" TabClosing="OnTabClosing">
-                <jv:TabMenuItem Header="相机 1" Icon="&#xE66B;">
-                    <TextBlock Margin="16" Text="相机 1 的内容区域。" />
-                </jv:TabMenuItem>
-                <jv:TabMenuItem Header="日志">
-                    <TextBlock Margin="16" Text="日志页签内容。" />
-                </jv:TabMenuItem>
-                <jv:TabMenuItem Header="保护页">
-                    <TextBlock Margin="16" Text="尝试关闭此页签：TabClosing 会取消并弹出提示。" />
-                </jv:TabMenuItem>
-            </jv:TabMenu>
-            """;
+
+        // ---------------- 栏与工具（BarsPage） ----------------
 
         public const string ToolBarDemo = """
             <!-- 横向工具条；ToolBarItem.Icon 是按钮自身属性，Title 经 ToolTip 展示 -->
@@ -500,7 +577,31 @@ namespace Junevy.Controls.Showcase
             </jv:Toolbox>
             """;
 
-        // ---------------- 菜单与导航（MenusPage）· 可展开标题栏 / 用户信息 ----------------
+        public const string CompactToolboxDemo = """
+            <!-- 紧凑工具箱：整条约 25 DIP 窄列——容器 MaxWidth=25 兜底，实例级 ItemContainerStyle 指定更宽的
+                 项样式时窄列也不会被撑宽（但条目样式内固定 Width/MinWidth 大于约 21 DIP 会被裁剪，
+                 自定义项样式建议 BasedOn CompactToolboxItemStyle）；
+                 窄列容不下滚动条：条目溢出时滚动条隐藏，滚轮仍可滚动；弹出面板与工具项尺寸不受窄列影响 -->
+            <jv:Toolbox
+                Style="{StaticResource CompactToolboxStyle}"
+                HorizontalAlignment="Left"
+                ColumnCount="3"
+                PopupWidth="225">
+                <jv:ToolboxItem Icon="&#xE60F;" Title="基础工具">
+                    <jv:ToolItem Icon="&#xE611;" Title="刷新" />
+                    <jv:ToolItem Icon="&#xE60C;" Title="截图" />
+                    <jv:ToolItem Icon="&#xE932;" Title="检测" />
+                </jv:ToolboxItem>
+                <jv:ToolboxItem Icon="&#xE66B;" Title="视觉工具">
+                    <jv:ToolItem Icon="&#xE981;" Title="定位" />
+                    <jv:ToolItem Icon="&#xE60F;" Title="标定" />
+                </jv:ToolboxItem>
+                <jv:ToolboxItem Icon="&#xE650;" Title="布局工具">
+                    <jv:ToolItem Icon="&#xE60C;" Title="对齐" />
+                    <jv:ToolItem Icon="&#xE650;" Title="分布" />
+                </jv:ToolboxItem>
+            </jv:Toolbox>
+            """;
 
         public const string AppBarExpandableDemo = """
             <!-- Mode=Expandable：最左抽屉开关（设置 Drawer 内容才显示）+ 整条居中的标题 + 右侧最小化/最大化/关闭；
@@ -563,23 +664,8 @@ namespace Junevy.Controls.Showcase
             </jv:InfoBar>
             """;
 
+
         // ---------------- 布局控件（LayoutPage） ----------------
-
-        public const string GroupBoxDemo = """
-            <!-- 单击标题折叠/展开（IsCollapsible 默认 True）；IsCollapsed 初始折叠；
-                 标题内交互元素不受点击折叠影响 -->
-            <jv:GroupBox Header="默认：单击标题折叠 / 展开">
-                <jv:TextBox Width="220" HorizontalAlignment="Left" atc:PlaceholderAssist.Placeholder="采集名称" />
-            </jv:GroupBox>
-
-            <jv:GroupBox Header="初始折叠（IsCollapsed=True）" IsCollapsed="True">
-                <TextBlock Text="折叠后内容区域完全隐藏，不占布局空间。" />
-            </jv:GroupBox>
-
-            <jv:GroupBox Header="不可折叠（IsCollapsible=False）" IsCollapsible="False">
-                <TextBlock Text="标题仅作展示，悬停无高亮。" />
-            </jv:GroupBox>
-            """;
 
         public const string ExpanderPanelDemo = """
             <!-- 四方向展开 + 过渡动画（AnimationDuration=0 表示直接切换）；
@@ -626,6 +712,26 @@ namespace Junevy.Controls.Showcase
                 <TextBlock Text="无图标、无说明、无右侧控件。" />
             </jv:ExpanderPanel>
             """;
+        public const string SidePanelDemo = """
+            <!-- 作为浮层放入 Grid（不指定 Row/Column 自动跨满）；IsOpen/Toggle() 控制开合，
+                 Side 指定停靠边；CloseOnOutsideClick 默认开启，IsBackdropEnabled 显示遮罩 -->
+            <Grid Height="220">
+                <Border Background="{DynamicResource Theme.Brush.Surface.Base}" /> <!-- 页面内容示意 -->
+
+                <jv:SidePanel x:Name="LeftPanel" Side="Left">
+                    <StackPanel Width="240" Margin="20,16">
+                        <TextBlock FontWeight="Bold" Text="左侧面板（Side=Left）" />
+                        <jv:Button HorizontalAlignment="Left" Click="OnClosePanelClick" Content="关闭面板" />
+                    </StackPanel>
+                </jv:SidePanel>
+
+                <jv:SidePanel x:Name="RightPanel" Side="Right" IsBackdropEnabled="True">
+                    <StackPanel Width="240" Margin="20,16">
+                        <TextBlock FontWeight="Bold" Text="右侧面板（带遮罩）" />
+                    </StackPanel>
+                </jv:SidePanel>
+            </Grid>
+            """;
 
         public const string CornerRadiusDemo = """
             <!-- Border.CornerRadius 附加用法：经样式 Setter 设置（逐实例 attribute 写法被编译器拒绝） -->
@@ -644,7 +750,31 @@ namespace Junevy.Controls.Showcase
             <jv:Button Content="圆角 16" Style="{StaticResource Corner16Button}" />
             """;
 
-        // ---------------- 窗口与图像（WindowImagePage） ----------------
+
+        // ---------------- 窗口与对话框（WindowPage） ----------------
+
+        public const string DialogWindowDemo = """
+            <!-- DialogWindow 经代码实例化弹出（无边框、圆角、主题化标题栏；
+                 未启用 SizeToContent 覆盖时窗口尺寸完全跟随内容；Esc 可关闭） -->
+            <jv:Button Click="OnOpenDialogClick" Content="打开对话框" HorizontalAlignment="Left" />
+
+            <!-- 代码弹出：
+                 var dialog = new DialogWindow { Title = "演示", Content = new TextBlock { Text = "..." } };
+                 dialog.ShowDialog(); -->
+            """;
+
+        public const string ProgressBarWindowDemo = """
+            <!-- ProgressBarWindow 为纯 C# API（进度对话框，默认环形、无边框可拖动）：
+                 var dialog = new ProgressBarWindow { Title = "固件部署", Message = "正在部署固件…", Owner = this };
+                 dialog.Show();                       // 或 ShowDialog() 模态
+                 dialog.Report(45);                   // 后台线程安全汇报进度
+                 dialog.UpdateMessage / UpdateDetail  // 更新主/次说明文本
+                 dialog.RequestClose();               // 任务完成由代码关闭（或 CloseAfter(task) 自动关闭）
+                 dialog.CloseButtonEnabled = false;   // 禁止用户取消（隐藏关闭按钮并拦截 Esc / Alt+F4）
+                 dialog.IsCancelled / Cancelled       // 获知用户是否主动取消了等待 -->
+            """;
+
+        // ---------------- 图像（ImagePage） ----------------
 
         public const string ImageViewerDemo = """
             <!-- 滚轮缩放 0.05x-64x，左键拖动平移，右键菜单保存；
@@ -668,15 +798,6 @@ namespace Junevy.Controls.Showcase
             <!-- 左起：Small（4px 方格）/ 默认（8px）/ Large（16px）/ 纯几何自绘 -->
             """;
 
-        public const string DialogWindowDemo = """
-            <!-- DialogWindow 经代码实例化弹出（无边框、圆角、主题化标题栏；
-                 未启用 SizeToContent 覆盖时窗口尺寸完全跟随内容；Esc 可关闭） -->
-            <jv:Button Click="OnOpenDialogClick" Content="打开对话框" HorizontalAlignment="Left" />
-
-            <!-- 代码弹出：
-                 var dialog = new DialogWindow { Title = "演示", Content = new TextBlock { Text = "..." } };
-                 dialog.ShowDialog(); -->
-            """;
 
         // ---------------- 图标字体（IconsPage） ----------------
 
@@ -698,6 +819,7 @@ namespace Junevy.Controls.Showcase
             <jv:Button atc:Icon.FontFamily="{StaticResource IconFontFilled}"
                        atc:Icon.Icon="&#xE63F;" atc:Icon.IconSize="16" Content="保存（面性）" />
             """;
+
 
         // ---------------- 进度条（ProgressPage） ----------------
 
@@ -751,15 +873,5 @@ namespace Junevy.Controls.Showcase
                 Value="{Binding Value, ElementName=ProgressSlider}" />
             """;
 
-        public const string ProgressBarWindowDemo = """
-            <!-- ProgressBarWindow 为纯 C# API（进度对话框，默认环形、无边框可拖动）：
-                 var dialog = new ProgressBarWindow { Title = "固件部署", Message = "正在部署固件…", Owner = this };
-                 dialog.Show();                       // 或 ShowDialog() 模态
-                 dialog.Report(45);                   // 后台线程安全汇报进度
-                 dialog.UpdateMessage / UpdateDetail  // 更新主/次说明文本
-                 dialog.RequestClose();               // 任务完成由代码关闭（或 CloseAfter(task) 自动关闭）
-                 dialog.CloseButtonEnabled = false;   // 禁止用户取消（隐藏关闭按钮并拦截 Esc / Alt+F4）
-                 dialog.IsCancelled / Cancelled       // 获知用户是否主动取消了等待 -->
-            """;
     }
 }

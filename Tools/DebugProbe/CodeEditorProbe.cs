@@ -52,7 +52,7 @@ internal static class CodeEditorProbe
 
     public static int Run()
     {
-        var app = new Application();
+        var app = Application.Current ?? new Application();
         ThemeManager.ApplyTheme(AppTheme.Light);
 
         int failures = 0;

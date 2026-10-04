@@ -2,19 +2,38 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties"
+    xmlns:cvt="clr-namespace:Junevy.Controls.Converters"
     xmlns:local="clr-namespace:Junevy.Controls.Controls.Menu">
 
     <!--
-        TreeView：节点由 TreeMenuItem（POCO 数据模型）+ HierarchicalDataTemplate 驱动。
+        TreeView：节点由 TreeMenuItem（POCO 数据模型）+ 唯一一份 HierarchicalDataTemplate 驱动。
         共享样式 DefaultTreeViewStyle 以官方 TreeView 为 TargetType：合并 Themes/Generic.xaml 后，
         官方 <TreeView> 与库内 jv:TreeView 经各自的隐式样式继承同一份外观。
-        jv 专有能力（DisplayMode / NavigateCommand / 悬停与选中画刷）经 atc:TreeViewAssist 附加属性承载，
-        两类实例经同一绑定路径读取；展开图标为 ExpanderPanel 同款旋转箭头（iconfont 字形，非开关控件）。
+        jv 专有能力（DisplayMode / IndentSize / NavigateCommand / 悬停与选中画刷）经 atc:TreeViewAssist 附加属性承载，
+        两类实例经同一绑定路径读取；条目模板只有一份，TreeViewDisplayMode 只决定行首观感
+        （Chevron 展开箭头 / Indicator accent 指示条），不再切换模板。
+        层级缩进由 atc:TreeViewAssist.IndentSize 控制：只作用于子级承载区 ItemHost 的左 Margin，
+        本级行首观感不受影响；刻意不把 ItemHost 宽度绑回 Root.ActualWidth——那是把 arrange 结果喂给
+        下一次 measure，会形成布局反馈环（首测取到 0 导致整棵子树消失）。
+        刻意不对 TreeViewItem 复用容器（VirtualizationMode 保持框架默认 Standard），嵌套层级按需实例化
+        由框架默认的 VirtualizingPanel 值保证，因此样式不再重复声明 IsVirtualizing / VirtualizationMode；
+        也不在默认样式里钉死 HorizontalAlignment / VerticalAlignment（框架默认 Stretch，宿主可自行覆盖）。
+        高亮画刷有令牌回退：宿主替换 Style 或显式置 null 时，回退触发器仍取 Theme.Brush.Surface.Hover / Sunken
+        （DynamicResource，随主题切换）。
+        附加属性绑定一律写成 Path=(atc:Xxx.Yyy) 具名形式：位置式写法 {Binding (atc:Xxx.Yyy), …} 不会被 BAML 解析成
+        依赖属性引用，运行期报 BindingPath PathError 并静默失效（本字典此前的缩进 / 图标字号 / 观感 / 画刷透传即因此
+        全部无效；库内 Button.xaml 的图标槽一直用具名形式，故一直生效）。
         IconFont.xaml / DefaultFocusStyle.xaml 经 DynamicResource 使用，由 Themes/Generic.xaml 统一提供，不再重复合并。
     -->
 
-    <!--  Normal 模式条目模板：图标 + 标题。字体与前景色继承自宿主 TreeView，图标字体取 atc:Icon.FontFamily。  -->
-    <HierarchicalDataTemplate x:Key="TreeViewNormalItemTemplate" ItemsSource="{Binding Children}">
+    <cvt:IndentSizeToMarginConverter x:Key="IndentSizeToMargin" />
+
+    <!--
+        唯一条目模板：图标 + 标题，两种行首观感共用。
+        图标字体与字号取 atc:Icon.FontFamily / atc:Icon.IconSize（经 AncestorType=TreeView 绑定宿主实例），
+        字号源为 int，由 Binding 完成 int→double 转换（TemplateBinding 不做该转换，故不用）。
+    -->
+    <HierarchicalDataTemplate x:Key="TreeViewItemTemplate" ItemsSource="{Binding Children}">
         <Grid Background="Transparent">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -27,51 +46,13 @@
                 Margin="5"
                 VerticalAlignment="Center"
                 Content="{Binding Icon}"
-                TextElement.FontFamily="{Binding (atc:Icon.FontFamily), RelativeSource={RelativeSource AncestorType=TreeView}}" />
+                TextElement.FontFamily="{Binding Path=(atc:Icon.FontFamily), RelativeSource={RelativeSource AncestorType=TreeView}}"
+                TextElement.FontSize="{Binding Path=(atc:Icon.IconSize), RelativeSource={RelativeSource AncestorType=TreeView}}" />
 
             <TextBlock
                 x:Name="Title"
                 Grid.Column="1"
                 Margin="5"
-                VerticalAlignment="Center"
-                Text="{Binding Title}"
-                TextTrimming="CharacterEllipsis" />
-        </Grid>
-
-        <HierarchicalDataTemplate.Triggers>
-            <DataTrigger Binding="{Binding Icon}" Value="{x:Null}">
-                <Setter TargetName="Icon" Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Title}" Value="{x:Null}">
-                <Setter TargetName="Title" Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Title}" Value="">
-                <Setter TargetName="Title" Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </HierarchicalDataTemplate.Triggers>
-    </HierarchicalDataTemplate>
-
-    <!--  Icon 模式条目模板：图标字号取 atc:Icon.IconSize，标题间距与 Normal 模式一致。  -->
-    <HierarchicalDataTemplate x:Key="TreeViewIconItemTemplate" ItemsSource="{Binding Children}">
-        <Grid Background="Transparent">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <ContentPresenter
-                x:Name="Icon"
-                Grid.Column="0"
-                Margin="5"
-                VerticalAlignment="Center"
-                Content="{Binding Icon}"
-                TextElement.FontFamily="{Binding (atc:Icon.FontFamily), RelativeSource={RelativeSource AncestorType=TreeView}}"
-                TextElement.FontSize="{Binding (atc:Icon.IconSize), RelativeSource={RelativeSource AncestorType=TreeView}}" />
-
-            <TextBlock
-                x:Name="Title"
-                Grid.Column="1"
-                Margin="10"
                 VerticalAlignment="Center"
                 Text="{Binding Title}"
                 TextTrimming="CharacterEllipsis" />
@@ -91,12 +72,13 @@
     </HierarchicalDataTemplate>
 
     <!--
-        容器样式（Normal / Icon 两模式共用一套模板，经 DataTrigger 切换）：
+        容器样式（两种行首观感共用一套模板）：
         - IsExpanded / IsSelected 与 TreeMenuItem 同名属性双向绑定，状态落在数据模型上，虚拟化后不丢失；
-        - ItemsPanel 换成 VirtualizingStackPanel，使嵌套层级与根级一样参与虚拟化；
-          VirtualizationMode 用 Standard——TreeViewItem 自带展开/选中状态，Recycling 复用容器时
-          TwoWay 绑定会把上一节点的状态串写到新节点（实测初始展开状态被改写），WPF 官方树形虚拟化亦不推荐 Recycling；
-        - ItemsPresenter 的 MaxWidth 绑定本级内容 Border 宽度，子级不会向上撑大 TreeView，超出部分被截断。
+        - ItemsPanel 不继承，必须容器级声明一份，使嵌套层级与根级一样参与虚拟化；本库刻意不复用
+          TreeViewItem 容器（其自带展开/选中状态，复用会把上一节点状态串写到新节点），按需实例化由框架默认值保证；
+        - 头部 ContentPresenter 把 Horizontal/VerticalContentAlignment 透传为自身 Horizontal/VerticalAlignment
+          （WPF 官方模板同一写法，ContentPresenter 本身没有 ContentAlignment 属性），
+          使默认样式的 Stretch 有真实消费方，长标题才能在受限宽度内出省略号而不是撑宽整棵树。
     -->
     <Style x:Key="TreeViewItemContainerStyle" TargetType="TreeViewItem">
         <Setter Property="Margin" Value="0" />
@@ -109,8 +91,6 @@
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
         <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-        <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
-        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Standard" />
         <Setter Property="ItemsPanel">
             <Setter.Value>
                 <ItemsPanelTemplate>
@@ -176,6 +156,7 @@
                                 </ToggleButton.Template>
                             </ToggleButton>
 
+                            <!--  accent 指示条：与展开箭头同槽位（Grid.Column=0），Hidden 时保留宽度，选中切换不跳动  -->
                             <Border
                                 x:Name="Indicator"
                                 Grid.Column="0"
@@ -183,7 +164,7 @@
                                 Margin="1,0"
                                 Background="{DynamicResource Theme.Brush.Accent.Primary}"
                                 CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
-                                Visibility="Collapsed" />
+                                Visibility="Hidden" />
 
                             <Border
                                 x:Name="Root"
@@ -191,16 +172,18 @@
                                 Background="{TemplateBinding Background}"
                                 CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
                                 <ContentPresenter
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                     ContentSource="Header"
                                     RecognizesAccessKey="True"
                                     TextElement.Foreground="{TemplateBinding Foreground}" />
                             </Border>
                         </Grid>
 
+                        <!--  子级承载区：只经左 Margin 缩进 IndentSize，宽度由父级布局给定，不把自身宽度绑回 Root  -->
                         <ItemsPresenter
                             x:Name="ItemHost"
-                            MaxWidth="{Binding ElementName=Root, Path=ActualWidth}"
-                            ClipToBounds="True" />
+                            Margin="{Binding Path=(atc:TreeViewAssist.IndentSize), RelativeSource={RelativeSource AncestorType=TreeView}, Converter={StaticResource IndentSizeToMargin}}" />
                     </StackPanel>
 
                     <ControlTemplate.Triggers>
@@ -212,11 +195,28 @@
                                 <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True" />
                                 <Condition Binding="{Binding ElementName=ItemHost, Path=IsMouseOver}" Value="False" />
                             </MultiDataTrigger.Conditions>
-                            <Setter TargetName="Root" Property="Background" Value="{Binding (atc:TreeViewAssist.ItemHoverBackground), RelativeSource={RelativeSource AncestorType=TreeView}}" />
+                            <Setter TargetName="Root" Property="Background" Value="{Binding Path=(atc:TreeViewAssist.ItemHoverBackground), RelativeSource={RelativeSource AncestorType=TreeView}}" />
                         </MultiDataTrigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Root" Property="Background" Value="{Binding (atc:TreeViewAssist.SelectedItemBackground), RelativeSource={RelativeSource AncestorType=TreeView}}" />
+                            <Setter TargetName="Root" Property="Background" Value="{Binding Path=(atc:TreeViewAssist.SelectedItemBackground), RelativeSource={RelativeSource AncestorType=TreeView}}" />
                         </Trigger>
+                        <!--  回退：宿主替换 Style 或显式置 null 时仍保留状态高亮，取令牌值（DynamicResource 随主题切换）。
+                              触发器集合中后声明者优先，故画刷为 null 时本组生效，非 null 时上面两条仍是唯一命中者  -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=(atc:TreeViewAssist.ItemHoverBackground), RelativeSource={RelativeSource AncestorType=TreeView}}" Value="{x:Null}" />
+                                <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True" />
+                                <Condition Binding="{Binding ElementName=ItemHost, Path=IsMouseOver}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=(atc:TreeViewAssist.SelectedItemBackground), RelativeSource={RelativeSource AncestorType=TreeView}}" Value="{x:Null}" />
+                                <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
+                        </MultiDataTrigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
                             <Setter TargetName="Root" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
@@ -225,16 +225,14 @@
                         <Trigger Property="HasItems" Value="False">
                             <Setter TargetName="ExpanderButton" Property="Visibility" Value="Hidden" />
                         </Trigger>
-                        <!--  Icon 模式折叠展开箭头，所有行隐藏占位指示条槽位（预留宽度，选中时不跳动）；
-                              accent 指示条仅标示「选中的带子项节点」——蓝色提示 = 真实选中，非选中分支不显示，
-                              避免整组分支同时带蓝条被误读为子级全部选中。  -->
-                        <DataTrigger Binding="{Binding (atc:TreeViewAssist.DisplayMode), RelativeSource={RelativeSource AncestorType=TreeView}}" Value="Icon">
+                        <!--  Indicator 观感：折叠展开箭头（箭头槽位由指示条占据），accent 条仅标示「选中的带子项节点」——
+                              蓝色提示 = 真实选中，非选中分支不显示，避免整组分支同时带蓝条被误读为子级全部选中。  -->
+                        <DataTrigger Binding="{Binding Path=(atc:TreeViewAssist.DisplayMode), RelativeSource={RelativeSource AncestorType=TreeView}}" Value="Indicator">
                             <Setter TargetName="ExpanderButton" Property="Visibility" Value="Collapsed" />
-                            <Setter TargetName="Indicator" Property="Visibility" Value="Hidden" />
                         </DataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding (atc:TreeViewAssist.DisplayMode), RelativeSource={RelativeSource AncestorType=TreeView}}" Value="Icon" />
+                                <Condition Binding="{Binding Path=(atc:TreeViewAssist.DisplayMode), RelativeSource={RelativeSource AncestorType=TreeView}}" Value="Indicator" />
                                 <Condition Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="True" />
                                 <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True" />
                             </MultiDataTrigger.Conditions>
@@ -252,6 +250,7 @@
     <!--
         共享默认样式（TargetType=官方 TreeView）：宿主 DP 由 atc:TreeViewAssist 附加属性承载，
         经样式 Setter 提供主题默认值，官方实例与 jv:TreeView 实例均可逐实例覆盖。
+        DisplayMode 不再切换 ItemTemplate（只改变行首观感，见容器模板触发器）。
     -->
     <Style x:Key="DefaultTreeViewStyle" TargetType="{x:Type TreeView}">
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
@@ -259,10 +258,6 @@
         <Setter Property="atc:TreeViewAssist.ItemHoverBackground" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
         <Setter Property="atc:TreeViewAssist.SelectedItemBackground" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
         <Setter Property="FontSize" Value="12" />
-        <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
-        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Standard" />
-        <Setter Property="HorizontalAlignment" Value="Left" />
-        <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
         <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
@@ -271,7 +266,7 @@
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource TreeViewItemContainerStyle}" />
-        <Setter Property="ItemTemplate" Value="{StaticResource TreeViewNormalItemTemplate}" />
+        <Setter Property="ItemTemplate" Value="{StaticResource TreeViewItemTemplate}" />
 
         <Setter Property="Template">
             <Setter.Value>
@@ -301,13 +296,6 @@
                 </ItemsPanelTemplate>
             </Setter.Value>
         </Setter>
-
-        <Style.Triggers>
-            <!--  DisplayMode 经附加属性承载，官方 TreeView 与 jv:TreeView 均可切换 Icon 模式  -->
-            <Trigger Property="atc:TreeViewAssist.DisplayMode" Value="Icon">
-                <Setter Property="ItemTemplate" Value="{StaticResource TreeViewIconItemTemplate}" />
-            </Trigger>
-        </Style.Triggers>
     </Style>
 
     <!--  隐式样式（官方类型）：合并 Generic.xaml 后，<TreeView> 自动获得本库样式  -->

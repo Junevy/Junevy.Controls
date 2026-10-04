@@ -45,6 +45,9 @@ namespace Junevy.Controls.Showcase
 
         public ObservableCollection<string> Cameras { get; }
 
+        /// <summary>分页演示数据（53 条，供 PagingAssist/DataPager 演示）。</summary>
+        public ObservableCollection<PagedRowItem> PagedRows { get; }
+
         /// <summary>ExpanderPanel ToggleCommand 演示：切换时经 MessageBarService 弹出通知。</summary>
         public RelayCommand PanelToggleCommand { get; }
 
@@ -104,6 +107,18 @@ namespace Junevy.Controls.Showcase
                 "Camera-02 (Hik MV-CA013)",
                 "Camera-03 (Daheng MER-125)"
             ];
+
+            PagedRows = [];
+            for (int i = 1; i <= 53; i++)
+            {
+                PagedRows.Add(new PagedRowItem { Name = $"条目 {i:000}" });
+            }
+        }
+
+        /// <summary>分页演示行。</summary>
+        public sealed class PagedRowItem
+        {
+            public string Name { get; set; } = string.Empty;
         }
     }
 }

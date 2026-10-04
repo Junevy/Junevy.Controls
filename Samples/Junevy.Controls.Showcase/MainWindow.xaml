@@ -56,8 +56,10 @@
                     Content="Junevy.Controls Showcase"
                     FontSize="14"
                     Foreground="{DynamicResource Theme.Brush.Text.Secondary}">
-                    <!--  应用图标：GitHub 字标图（3:1 宽幅），随主题切换 light/dark 两版（MainWindow.UpdateAppbarIcon）；
-                          不写显式宽高，按 IconSize 高度等比缩放  -->
+                    <!--
+                        应用图标：GitHub 字标图（3:1 宽幅），随主题切换 light/dark 两版（MainWindow.UpdateAppbarIcon）；
+                        不写显式宽高，按 IconSize 高度等比缩放
+                    -->
                     <atc:Icon.Icon>
                         <Image
                             x:Name="AppbarIcon"
@@ -65,8 +67,13 @@
                             Source="pack://application:,,,/Junevy.Controls;component/Resources/Pictures/github_light.png" />
                     </atc:Icon.Icon>
                     <jv:AppBar.ToolBar>
-                        <!--  IsHitTestVisibleInChrome 可继承：让工具栏按钮在标题栏区域内可点击，同时保留标题区拖动  -->
+                        <!--
+                            IsHitTestVisibleInChrome 可继承：让工具栏按钮在标题栏区域内可点击，同时保留标题区拖动；
+                            图标字形选自 iconfont（详见 Showcase「图标字体」页）：首页/提示/最大化/保存/设置
+                        -->
                         <jv:ToolBar
+                            Margin="0,0,0,2"
+                            Padding="6,0"
                             HorizontalAlignment="Left"
                             BorderBrush="Transparent"
                             FontFamily="{DynamicResource IconFont}"
@@ -74,12 +81,29 @@
                             Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type jv:AppBar}}}"
                             WindowChrome.IsHitTestVisibleInChrome="True">
                             <jv:ToolBarItem
+                                Margin="0,0,5,0"
+                                Click="OnGoHomeClick"
+                                Icon="&#xE7FE;"
+                                ToolTip="回到首页" />
+                            <jv:ToolBarItem
+                                Margin="5,0"
+                                Click="OnShowNotificationClick"
+                                Icon="&#xE6D1;"
+                                ToolTip="通知演示（MessageBarService）" />
+                            <jv:ToolBarItem
+                                Margin="5,0"
+                                Click="OnToggleWindowStateClick"
+                                Icon="&#xE691;"
+                                ToolTip="最大化 / 还原窗口" />
+                            <jv:ToolBarItem
+                                Margin="5,0"
                                 Click="OnToggleThemeClick"
                                 Icon="&#xE611;"
                                 ToolTip="切换浅色/深色主题" />
                             <jv:ToolBarItem
+                                Margin="5,0"
                                 Click="OnOpenSettingsClick"
-                                Icon="&#xE60F;"
+                                Icon="&#xE60A;"
                                 ToolTip="打开设置面板（SidePanel 演示）" />
                         </jv:ToolBar>
                     </jv:AppBar.ToolBar>
@@ -109,12 +133,14 @@
                         <jv:MenuItem Title="输入与选择" Icon="&#xE60C;" />
                         <jv:MenuItem Title="集合与数据" Icon="&#xE66B;" />
                         <jv:MenuItem Title="文本与状态" Icon="&#xE651;" />
+                        <jv:MenuItem Title="菜单与导航" Icon="&#xE65D;" />
+                        <jv:MenuItem Title="树形视图" Icon="&#xE6BC;" />
+                        <jv:MenuItem Title="栏与工具" Icon="&#xE60F;" />
                         <jv:MenuItem Title="通知" Icon="&#xE932;" />
                         <jv:MenuItem Title="进度条" Icon="&#xE609;" />
                         <jv:MenuItem Title="布局控件" Icon="&#xE650;" />
-                        <jv:MenuItem Title="菜单与导航" Icon="&#xE65D;" />
-                        <jv:MenuItem Title="树形视图" Icon="&#xE6BC;" />
-                        <jv:MenuItem Title="窗口与图像" Icon="&#xE611;" />
+                        <jv:MenuItem Title="窗口与对话框" Icon="&#xE611;" />
+                        <jv:MenuItem Title="图像" Icon="&#xE72C;" />
                         <jv:MenuItem Title="图标字体" Icon="&#xE67E;" />
                     </jv:SideMenu>
                     <!--</Border>-->
@@ -157,8 +183,7 @@
                                 <jv:Button
                                     Margin="16,0,0,0"
                                     Click="OnCloseSettingsClick"
-                                    Content="关闭面板"
-                                    IsTextScaled="False" />
+                                    Content="关闭面板" />
                             </StackPanel>
                         </StackPanel>
                     </jv:SidePanel>

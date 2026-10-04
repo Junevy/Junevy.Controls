@@ -3,13 +3,12 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Junevy.Controls.AttachedProperties;
-using Junevy.Controls.Common;
 using Junevy.Controls.Controls.Bar;
 using Junevy.Controls.Controls.Menu;
 
 namespace Junevy.Controls.Showcase.Pages
 {
-    /// <summary>树形视图展示页：jv:TreeView 数据模型驱动 / Icon 模式 / 官方 TreeView 自动继承样式 / 代码控制展开与选中。</summary>
+    /// <summary>树形视图展示页：jv:TreeView 数据模型驱动 / DisplayMode=Indicator 层级指示器 / 官方 TreeView 自动继承样式 / TreeView.ExpandAll·CollapseAll 整树展开收起（含选中还原）。</summary>
     public partial class TreeViewPage : UserControl
     {
         /// <summary>NavigateCommand 收到的叶节点激活反馈（参数为叶节点的数据对象）。</summary>
@@ -23,7 +22,7 @@ namespace Junevy.Controls.Showcase.Pages
             MainTree.ItemsSource = new[] { BuildStationTree() };
             MainTree.NavigateCommand = navigateLeafCommand;
 
-            IconModeTree.ItemsSource = new[] { BuildStationTree() };
+            IndicatorTree.ItemsSource = new[] { BuildStationTree() };
 
             // 官方 <TreeView>：扩展能力全部经 atc:TreeViewAssist 附加属性提供
             NativeTree.ItemsSource = new[] { BuildStationTree() };
@@ -93,24 +92,12 @@ namespace Junevy.Controls.Showcase.Pages
 
         private void OnExpandAllClick(object sender, RoutedEventArgs e)
         {
-            foreach (var root in ControlledTree.Items)
-            {
-                if (root is TreeMenuItem node)
-                {
-                    SetExpanded(node, true);
-                }
-            }
+            ControlledTree.ExpandAll();
         }
 
         private void OnCollapseAllClick(object sender, RoutedEventArgs e)
         {
-            foreach (var root in ControlledTree.Items)
-            {
-                if (root is TreeMenuItem node)
-                {
-                    SetExpanded(node, false);
-                }
-            }
+            ControlledTree.CollapseAll();
         }
 
         private void OnSelectCalibrationClick(object sender, RoutedEventArgs e)
@@ -125,24 +112,17 @@ namespace Junevy.Controls.Showcase.Pages
                 var path = new List<TreeMenuItem>();
                 if (TryFindNode(node, "九点标定", path))
                 {
-                    // 展开祖先使目标可见，最后一级 IsSelected 双向绑定回写容器选中态
-                    for (int i = 0; i < path.Count - 1; i++)
+                    // 库的 AutoExpandAncestors 只在祖先容器已生成时生效；「标定」初始收起，其子级容器还不存在，
+                    // 因此宿主沿刚找到的路径展开祖先，再把 IsSelected 写入数据模型，选中才会经绑定显形。
+                    for (var i = 0; i < path.Count - 1; i++)
                     {
                         path[i].IsExpanded = true;
                     }
+
                     path[^1].IsSelected = true;
-                    MessageBarService.Show("TreeView", "已选中「九点标定」（IsSelected 写入数据模型）");
+                    MessageBarService.Show("TreeView", "已选中「九点标定」（展开祖先路径 + IsSelected 写入数据模型）");
                     return;
                 }
-            }
-        }
-
-        private static void SetExpanded(TreeMenuItem node, bool value)
-        {
-            node.IsExpanded = value;
-            foreach (var child in node.Children)
-            {
-                SetExpanded(child, value);
             }
         }
 

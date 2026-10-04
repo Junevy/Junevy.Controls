@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Junevy.Controls.Controls.Box
 {
@@ -11,12 +12,16 @@ namespace Junevy.Controls.Controls.Box
     /// 滑块控件：在官方 <see cref="System.Windows.Controls.Slider"/> 的拖拽、分页与刻度行为基础上，
     /// 增加一个可停靠在上/下/左/右任意一侧的数值框（<c>PART_ValueBox</c>）。数值框支持手动键入：
     /// 回车或失焦提交，越界自动夹取到 <see cref="RangeBase.Minimum"/> 与 <see cref="RangeBase.Maximum"/> 之间，
-    /// 非法输入还原为当前值；隐藏时不占据布局空间。视觉风格与控件库主题令牌保持一致。
+    /// 非法输入还原为当前值；隐藏时不占据布局空间；宽度按区间最宽可能值预留，拖拽中不随位数增减而回弹。
+    /// 视觉风格与控件库主题令牌保持一致。
     /// </summary>
     [TemplatePart(Name = PartValueBox, Type = typeof(TextBox))]
     public class Slider : System.Windows.Controls.Slider
     {
         private const string PartValueBox = "PART_ValueBox";
+
+        // 数值框按最宽可能值预留宽度之外的余量（DIP）：容纳行尾光标与亚像素取整，避免预留后光标贴边被裁
+        private const double ValueBoxWidthBuffer = 4;
 
         private TextBox? valueBox;
 
@@ -108,6 +113,7 @@ namespace Junevy.Controls.Controls.Box
             }
 
             UpdateValueBoxText();
+            UpdateValueBoxMinWidth();
         }
 
         /// <summary>
@@ -126,6 +132,7 @@ namespace Junevy.Controls.Controls.Box
         {
             base.OnMaximumChanged(oldMaximum, newMaximum);
             UpdateValueBoxText();
+            UpdateValueBoxMinWidth();
         }
 
         /// <summary>
@@ -135,11 +142,14 @@ namespace Junevy.Controls.Controls.Box
         {
             base.OnMinimumChanged(oldMinimum, newMinimum);
             UpdateValueBoxText();
+            UpdateValueBoxMinWidth();
         }
 
         private static void OnValueFormatStringChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((Slider)d).UpdateValueBoxText();
+            var slider = (Slider)d;
+            slider.UpdateValueBoxText();
+            slider.UpdateValueBoxMinWidth();
         }
 
         private void OnValueBoxLostFocus(object sender, RoutedEventArgs e)
@@ -214,6 +224,60 @@ namespace Junevy.Controls.Controls.Box
             {
                 return value.ToString(culture);
             }
+        }
+
+        /// <summary>
+        /// 按区间两端（<see cref="RangeBase.Minimum"/> / <see cref="RangeBase.Maximum"/> 经 <see cref="ValueFormatString"/>
+        /// 格式化后）最宽的显示文本为数值框预留 <see cref="FrameworkElement.MinWidth"/>：拖拽中任何合法值都不会超过
+        /// 该宽度，数值框不再随位数增减而改变尺寸、把 <c>PART_Track</c> 挤得回弹。预留只是下限——手动键入更长
+        /// 文本时数值框仍可自然增宽。
+        /// </summary>
+        private void UpdateValueBoxMinWidth()
+        {
+            if (valueBox is null)
+            {
+                return;
+            }
+
+            var widestText = Math.Max(
+                MeasureValueText(FormatValue(Minimum)),
+                MeasureValueText(FormatValue(Maximum)));
+
+            valueBox.MinWidth = Math.Ceiling(
+                widestText
+                + valueBox.Padding.Left
+                + valueBox.Padding.Right
+                + valueBox.BorderThickness.Left
+                + valueBox.BorderThickness.Right
+                + ValueBoxWidthBuffer);
+        }
+
+        /// <summary>
+        /// 用数值框自身的字体、流向与 DPI 度量单行文本宽度（画刷不参与测量，透明画刷即可）。
+        /// </summary>
+        private double MeasureValueText(string text)
+        {
+            if (valueBox is null)
+            {
+                return 0;
+            }
+
+            var typeface = new Typeface(
+                valueBox.FontFamily,
+                valueBox.FontStyle,
+                valueBox.FontWeight,
+                valueBox.FontStretch);
+
+            var formatted = new FormattedText(
+                text,
+                CultureInfo.CurrentCulture,
+                valueBox.FlowDirection,
+                typeface,
+                valueBox.FontSize,
+                Brushes.Transparent,
+                VisualTreeHelper.GetDpi(valueBox).PixelsPerDip);
+
+            return formatted.Width;
         }
     }
 }

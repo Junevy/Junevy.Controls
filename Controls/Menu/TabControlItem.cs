@@ -6,13 +6,13 @@ using System.Windows.Threading;
 namespace Junevy.Controls.Controls.Menu
 {
     /// <summary>
-    /// TabMenu 的页签容器，继承 WPF <see cref="TabItem"/>。
-    /// 提供图标、关闭按钮（经 <see cref="TabMenu.CloseTabCommand"/> 关闭）与双击标题重命名（<see cref="CanRename"/>）。
+    /// TabControl 的页签容器，继承 WPF <see cref="TabItem"/>。
+    /// 提供图标、关闭按钮（经 <see cref="TabControl.CloseTabCommand"/> 关闭）与双击标题重命名（<see cref="CanRename"/>）。
     /// </summary>
     [TemplatePart(Name = PART_EditHeaderTextBox, Type = typeof(TextBox))]
     [TemplatePart(Name = PART_CloseButton, Type = typeof(System.Windows.Controls.Button))]
     [TemplatePart(Name = PART_HeaderPresenter, Type = typeof(ContentPresenter))]
-    public class TabMenuItem : TabItem
+    public class TabControlItem : TabItem
     {
         private const string PART_EditHeaderTextBox = "PART_EditHeaderTextBox";
         private const string PART_CloseButton = "PART_CloseButton";
@@ -21,11 +21,11 @@ namespace Junevy.Controls.Controls.Menu
         private TextBox? headerTextBox;
         private System.Windows.Controls.Button? closeButton;
 
-        static TabMenuItem()
+        static TabControlItem()
         {
             DefaultStyleKeyProperty.OverrideMetadata(
-                typeof(TabMenuItem),
-                new FrameworkPropertyMetadata(typeof(TabMenuItem)));
+                typeof(TabControlItem),
+                new FrameworkPropertyMetadata(typeof(TabControlItem)));
         }
 
         public override void OnApplyTemplate()
@@ -61,40 +61,36 @@ namespace Junevy.Controls.Controls.Menu
 
         protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
         {
+            // 双击必须确由本页签自身的可视子树（页签头区域）发起才进入重命名：
+            // MouseLeftButtonDown / MouseDoubleClick 都是冒泡路由，内容区、嵌套控件等
+            // 其他子树的双击也可能投递到本容器，来源校验避免「内容双击误触更名」。
             if (!e.Handled
                 && CanRename
+                && HostAllowsRename()
                 && !IsEditing
                 && Header is string
-                && headerTextBox != null
-                && !IsDescendantOfCloseButton(e.OriginalSource as DependencyObject))
+                && headerTextBox is TextBox editBox
+                && TabControl.IsWithinSubtree(e.OriginalSource as DependencyObject, this)
+                && !TabControl.IsWithinSubtree(e.OriginalSource as DependencyObject, closeButton))
             {
                 e.Handled = true;
                 SetValue(IsEditingPropertyKey, true);
 
+                // 捕获本次的编辑框实例：延迟派发期间模板可能重建并把字段置空
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    headerTextBox.Focus();
-                    headerTextBox.SelectAll();
+                    editBox.Focus();
+                    editBox.SelectAll();
                 }), DispatcherPriority.Input);
             }
 
             base.OnMouseDoubleClick(e);
         }
 
-        private bool IsDescendantOfCloseButton(DependencyObject? source)
+        /// <summary>控件级重命名开关查询：所在 TabControl 的 CanRename；不在 TabControl 内时视为允许。</summary>
+        private bool HostAllowsRename()
         {
-            while (source is not null)
-            {
-                if (ReferenceEquals(source, closeButton))
-                {
-                    return true;
-                }
-
-                source = System.Windows.Media.VisualTreeHelper.GetParent(source)
-                    ?? System.Windows.LogicalTreeHelper.GetParent(source);
-            }
-
-            return false;
+            return (ItemsControl.ItemsControlFromItemContainer(this) as TabControl)?.CanRename ?? true;
         }
 
         private void CloseButton_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -134,7 +130,7 @@ namespace Junevy.Controls.Controls.Menu
             DependencyProperty.RegisterReadOnly(
                 nameof(IsEditing),
                 typeof(bool),
-                typeof(TabMenuItem),
+                typeof(TabControlItem),
                 new PropertyMetadata(false));
 
         public static readonly DependencyProperty IsEditingProperty = IsEditingPropertyKey.DependencyProperty;
@@ -142,11 +138,12 @@ namespace Junevy.Controls.Controls.Menu
         public bool IsEditing => (bool)GetValue(IsEditingProperty);
 
         /// <summary>
-        /// 是否允许双击标签头重命名（默认允许）。设为 false 后双击不再进入编辑态；
+        /// 是否允许双击页签标题进入重命名（条目级开关，默认允许）。设为 false 后双击不再进入编辑态；
         /// 若在编辑过程中被禁用，将立即退出编辑并保留当前文本。
+        /// 还需所在 <c>TabControl</c> 的控件级 <c>CanRename</c> 同为 true 才能进入重命名。
         /// </summary>
         public static readonly DependencyProperty CanRenameProperty =
-            DependencyProperty.Register("CanRename", typeof(bool), typeof(TabMenuItem), new PropertyMetadata(true, OnCanRenameChanged));
+            DependencyProperty.Register(nameof(CanRename), typeof(bool), typeof(TabControlItem), new PropertyMetadata(true, OnCanRenameChanged));
 
         public bool CanRename
         {
@@ -156,15 +153,15 @@ namespace Junevy.Controls.Controls.Menu
 
         private static void OnCanRenameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is TabMenuItem item && !(bool)e.NewValue && item.IsEditing)
+            if (d is TabControlItem item && !(bool)e.NewValue && item.IsEditing)
             {
                 item.SetValue(IsEditingPropertyKey, false);
             }
         }
 
-        /// <summary>页签图标；通常为图标字体字形字符串，字体族取所在 <c>TabMenu</c> 的 <c>atc:Icon.FontFamily</c>。</summary>
+        /// <summary>页签图标；通常为图标字体字形字符串，字体族取所在 <c>TabControl</c> 的 <c>atc:Icon.FontFamily</c>。</summary>
         public static readonly DependencyProperty IconProperty =
-            DependencyProperty.Register("Icon", typeof(object), typeof(TabMenuItem));
+            DependencyProperty.Register(nameof(Icon), typeof(object), typeof(TabControlItem));
 
         public object Icon
         {

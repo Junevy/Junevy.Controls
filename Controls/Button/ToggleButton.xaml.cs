@@ -1,5 +1,4 @@
-﻿using Junevy.Controls.Common;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
@@ -41,14 +40,6 @@ namespace Junevy.Controls.Controls.Button
             // 依赖属性默认值不会触发变更回调，构造时主动推导一次模板几何尺寸
             this.UpdateSwitchGeometry();
         }
-
-        public ShapeMode DisplayMode
-        {
-            get { return (ShapeMode)GetValue(DisplayModeProperty); }
-            set { SetValue(DisplayModeProperty, value); }
-        }
-        public static readonly DependencyProperty DisplayModeProperty =
-            DependencyProperty.Register("DisplayMode", typeof(ShapeMode), typeof(ToggleButton), new PropertyMetadata(ShapeMode.Rectangular));
 
         /// <summary>
         /// 开关整体高度（DIP）。轨道宽度固定按 2:1 比例自动推导，任何尺寸下比例恒定、不会变形；建议不小于 12。

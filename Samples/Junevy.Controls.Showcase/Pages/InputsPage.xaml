@@ -19,7 +19,7 @@
                 <TextBlock Style="{StaticResource DemoPageTitle}" Text="输入与选择" />
                 <TextBlock
                     Style="{StaticResource DemoPageSubtitle}"
-                    Text="jv:CheckBox / jv:TextBox / jv:PasswordBox / jv:ComboBox / DatePicker / jv:Slider。本页重点演示附加属性：PlaceholderAssist、TitleAssist、Icon、ShowClear、CommandButton、DatePickerAssist。" />
+                    Text="jv:CheckBox / jv:TextBox / jv:PasswordBox / jv:GroupBox / jv:ComboBox / DatePicker / jv:Slider。本页重点演示附加属性：PlaceholderAssist、TitleAssist、Icon、ShowClear、CommandButton、DatePickerAssist。" />
 
                 <demo:DemoSection
                     Title="jv:CheckBox"
@@ -180,6 +180,40 @@
                             atc:TitleAssist.Title="登录密码"
                             atc:TitleAssist.IsRequired="True" />
                     </WrapPanel>
+                </demo:DemoSection>
+
+                <demo:DemoSection
+                    Title="jv:GroupBox（可折叠分组卡片）"
+                    Description="单击标题折叠/展开（IsCollapsible 默认 True），IsCollapsed 控制初始状态（双向绑定可从代码控制）；IsCollapsible=False 时仅作展示；标题区的按钮、复选框等交互元素不受点击折叠影响。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.GroupBoxDemo}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style x:Key="DemoBox" BasedOn="{StaticResource {x:Type jv:GroupBox}}" TargetType="{x:Type jv:GroupBox}">
+                                <Setter Property="Margin" Value="0,6,0,0" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <jv:GroupBox Header="默认：单击标题折叠 / 展开（IsCollapsible=True）">
+                            <StackPanel>
+                                <jv:TextBox Width="220" HorizontalAlignment="Left" atc:PlaceholderAssist.Placeholder="采集名称" />
+                            </StackPanel>
+                        </jv:GroupBox>
+                        <jv:GroupBox
+                            Header="初始折叠（IsCollapsed=True，双向绑定可从代码控制）"
+                            IsCollapsed="True">
+                            <TextBlock Text="折叠后内容区域完全隐藏，不占布局空间。" />
+                        </jv:GroupBox>
+                        <jv:GroupBox Header="不可折叠（IsCollapsible=False，仅展示）" IsCollapsible="False">
+                            <TextBlock Text="标题仅作展示，悬停无高亮。" />
+                        </jv:GroupBox>
+                        <jv:GroupBox>
+                            <jv:GroupBox.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <jv:CheckBox Content="启用采集（标题内交互元素不受点击折叠影响）" IsChecked="True" />
+                                </StackPanel>
+                            </jv:GroupBox.Header>
+                            <TextBlock Text="标题区的按钮、复选框等交互元素照常响应。" />
+                        </jv:GroupBox>
+                    </StackPanel>
                 </demo:DemoSection>
 
                 <demo:DemoSection

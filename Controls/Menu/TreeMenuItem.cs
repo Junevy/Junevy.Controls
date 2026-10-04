@@ -14,7 +14,6 @@ namespace Junevy.Controls.Controls.Menu
     {
         private string _title = string.Empty;
         private object? _icon;
-        private Type? _targetType;
         private bool _isExpanded;
         private bool _isSelected;
 
@@ -49,23 +48,9 @@ namespace Junevy.Controls.Controls.Menu
             }
         }
 
-        /// <summary>节点对应的页面类型等业务元数据，由 <c>TreeView.NavigateCommand</c> 的处理方自行解释。</summary>
-        public Type? TargetType
-        {
-            get => _targetType;
-            set
-            {
-                if (_targetType != value)
-                {
-                    _targetType = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
         /// <summary>
         /// 展开/收起状态。默认容器样式将其与 <see cref="System.Windows.Controls.TreeViewItem.IsExpanded"/>
-        /// 双向绑定，直接修改即可展开或收起节点；虚拟化/容器回收后状态仍保留在模型上。
+        /// 双向绑定，直接修改即可展开或收起节点；容器不回收（框架默认 <c>Standard</c>），状态保存在数据模型上。
         /// </summary>
         public bool IsExpanded
         {
@@ -100,8 +85,25 @@ namespace Junevy.Controls.Controls.Menu
         /// <summary>子节点集合。构造时自动初始化，直接 <c>Add</c> 即可更新视图。</summary>
         public ObservableCollection<TreeMenuItem> Children { get; } = [];
 
-        /// <summary>是否为叶节点（<see cref="Children"/> 为空）。</summary>
-        public bool IsLeaf => Children.Count == 0;
+        /// <summary>递归展开本节点及所有后代。写的是数据模型，未生成的容器同样被覆盖。</summary>
+        public void ExpandAll()
+        {
+            IsExpanded = true;
+            foreach (var child in Children)
+            {
+                child.ExpandAll();
+            }
+        }
+
+        /// <summary>递归收起本节点及所有后代。</summary>
+        public void CollapseAll()
+        {
+            IsExpanded = false;
+            foreach (var child in Children)
+            {
+                child.CollapseAll();
+            }
+        }
 
         /// <inheritdoc />
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)

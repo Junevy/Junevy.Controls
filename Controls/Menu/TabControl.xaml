@@ -20,16 +20,24 @@
     <cvt:CornerRadiusFilterConverter x:Key="TopCornerRadius" Mode="Top" />
     <cvt:CornerRadiusFilterConverter x:Key="BottomCornerRadius" Mode="Bottom" />
 
-    <!--  1. TabItem style  -->
-    <Style x:Key="DefaultTabMenuItemStyle" TargetType="{x:Type local:TabMenuItem}">
+    <!--  1. 原生 TabItem 容器样式（官方 <TabControl> 的页签容器是原生 TabItem，无法使用 TabControlItem 样式）。
+              悬停/选中背景直接引用主题画刷：ItemHoverBackground / SelectedItemBackground 是派生
+              jv:TabControl 上的 DP，原生 TabControl 不存在。页签无关闭/图标/重命名能力。
+              圆角读 local:TabControl 的附加属性：官方类型上未赋值时取 DP 默认（头 4 / 内容 8），
+              宿主可写 jv:TabControl.HeaderCornerRadius="..." 自定义，不会产生绑定失败跟踪。  -->
+    <Style x:Key="DefaultTabItemStyle" TargetType="TabItem">
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="MinHeight" Value="20" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <!--  Stretch使页签底边始终对齐页签行底部，与内容区上边框无缝衔接  -->
         <Setter Property="VerticalAlignment" Value="Stretch" />
-        <Setter Property="HorizontalContentAlignment" Value="Left" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <!--  ContentAlignment 是 WPF TabControl 的内容区对齐契约：每次选中变化时
+              TabControl.UpdateSelectedContent 会把选中页签的两个 ContentAlignment 强制写到
+              内容承载器 PART_SelectedContentHost 上（控件模板无法拦截）。必须为 Stretch 内容才能
+              撑满内容区；页签标题的对齐由模板内 PART_HeaderPresenter 固定为 Left/Center，不受影响。  -->
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="TextElement.FontSize" Value="12" />
@@ -38,14 +46,87 @@
 
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:TabMenuItem}">
+                <ControlTemplate TargetType="TabItem">
                     <Border
                         x:Name="border"
                         Margin="0,0,2,0"
                         Background="{TemplateBinding Background}"
                         BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
                         BorderThickness="1,1,1,1"
-                        CornerRadius="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=HeaderCornerRadius, Converter={StaticResource TopCornerRadius}, FallbackValue=4}">
+                        CornerRadius="{Binding RelativeSource={RelativeSource AncestorType={x:Type TabControl}}, Path=(local:TabControl.HeaderCornerRadius), Converter={StaticResource TopCornerRadius}}">
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!--  指示器  -->
+                            <Border
+                                Grid.Column="0"
+                                Background="{DynamicResource Theme.Brush.Accent.Primary}"
+                                CornerRadius="2"
+                                Visibility="{TemplateBinding IsSelected,
+                                                             Converter={StaticResource BoolToVisibility}}" />
+
+                            <!--  标题对齐固定 Left/Center：容器的 ContentAlignment 属于 TabControl
+                                  的内容区契约（会同步到内容承载器），不承载标题对齐语义。  -->
+                            <Grid Grid.Column="1" Margin="5,0">
+                                <ContentPresenter
+                                    x:Name="PART_HeaderPresenter"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    ContentSource="Header"
+                                    RecognizesAccessKey="True"
+                                    TextElement.FontFamily="{TemplateBinding FontFamily}"
+                                    TextElement.FontSize="{TemplateBinding FontSize}"
+                                    TextElement.FontStretch="{TemplateBinding FontStretch}"
+                                    TextElement.FontStyle="{TemplateBinding FontStyle}"
+                                    TextElement.FontWeight="{TemplateBinding FontWeight}"
+                                    TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <!--  触发器后声明者优先：IsSelected需覆盖IsMouseOver，
+                              避免悬停选中页签时背景偏离内容区背景色  -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <!--  背景与内容区一致、去掉底边框，使选中页签与内容区视觉一体  -->
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.Background.App}" />
+                            <Setter TargetName="border" Property="BorderThickness" Value="1,1,1,0" />
+                            <!--  选中页签文字升为一级  -->
+                            <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  2. jv:TabControlItem 容器样式：基于原生样式叠加图标、关闭按钮（经 TabControl.CloseTabCommand）与双击重命名。
+              悬停/选中背景经 AncestorType 绑定宿主 jv:TabControl 的 DP（可自定义）。  -->
+    <Style
+        x:Key="DefaultTabControlItemStyle"
+        BasedOn="{StaticResource DefaultTabItemStyle}"
+        TargetType="{x:Type local:TabControlItem}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:TabControlItem}">
+                    <Border
+                        x:Name="border"
+                        Margin="0,0,2,0"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                        BorderThickness="1,1,1,1"
+                        CornerRadius="{Binding RelativeSource={RelativeSource AncestorType={x:Type TabControl}}, Path=(local:TabControl.HeaderCornerRadius), Converter={StaticResource TopCornerRadius}}">
 
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -76,7 +157,7 @@
                                     VerticalAlignment="Center"
                                     Content="{TemplateBinding Icon}"
                                     Focusable="False"
-                                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=(attach:Icon.FontFamily)}"
+                                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TabControl}, Path=(attach:Icon.FontFamily)}"
                                     FontSize="{TemplateBinding FontSize}"
                                     Foreground="{TemplateBinding Foreground}"
                                     Visibility="{TemplateBinding Icon,
@@ -84,11 +165,13 @@
 
                                 <!-- Header display follows the standard WPF
                                      HeaderedContentControl contract. -->
+                                <!--  标题对齐固定 Left/Center：容器的 ContentAlignment 属于 TabControl
+                                      的内容区契约（会同步到内容承载器），不承载标题对齐语义。  -->
                                 <Grid Grid.Column="1" Margin="5,0,20,0">
                                     <ContentPresenter
                                         x:Name="PART_HeaderPresenter"
-                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
                                         ContentSource="Header"
                                         RecognizesAccessKey="True"
                                         TextElement.FontFamily="{TemplateBinding FontFamily}"
@@ -113,13 +196,14 @@
                                     Grid.Column="2"
                                     Margin="5,0,5,0"
                                     HorizontalAlignment="Right"
-                                    Command="{x:Static local:TabMenu.CloseTabCommand}"
-                                    CommandTarget="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:TabMenuItem}}}"
+                                    AutomationProperties.Name="关闭页签"
+                                    Command="{x:Static local:TabControl.CloseTabCommand}"
+                                    CommandTarget="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:TabControlItem}}}"
                                     Content="&#xe639;"
-                                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=(attach:Icon.FontFamily)}"
+                                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:TabControl}, Path=(attach:Icon.FontFamily)}"
                                     Foreground="{TemplateBinding Foreground}"
                                     Template="{StaticResource NoBorderButtonTemplate}"
-                                    Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:TabMenu}, Path=IsClosable, Converter={StaticResource BoolToVisibility}}" />
+                                    Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:TabControl}, Path=IsClosable, Converter={StaticResource BoolToVisibility}}" />
                             </Grid>
                         </Grid>
                     </Border>
@@ -128,11 +212,11 @@
                         <!--  触发器后声明者优先：IsSelected需覆盖IsMouseOver，
                               避免悬停选中页签时背景偏离内容区背景色  -->
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{Binding ItemHoverBackground, RelativeSource={RelativeSource AncestorType=local:TabMenu}}" />
+                            <Setter TargetName="border" Property="Background" Value="{Binding ItemHoverBackground, RelativeSource={RelativeSource AncestorType=local:TabControl}}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
                             <!--  背景与内容区一致、去掉底边框，使选中页签与内容区视觉一体  -->
-                            <Setter TargetName="border" Property="Background" Value="{Binding SelectedItemBackground, RelativeSource={RelativeSource AncestorType=local:TabMenu}}" />
+                            <Setter TargetName="border" Property="Background" Value="{Binding SelectedItemBackground, RelativeSource={RelativeSource AncestorType=local:TabControl}}" />
                             <Setter TargetName="border" Property="BorderThickness" Value="1,1,1,0" />
                             <!--  选中页签文字升为一级  -->
                             <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
@@ -151,23 +235,24 @@
         </Setter>
     </Style>
 
-    <!--  2. TabControl 的完整样式  -->
-    <Style TargetType="{x:Type local:TabMenu}">
-        <Setter Property="ItemHoverBackground" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
-        <Setter Property="SelectedItemBackground" Value="{DynamicResource Theme.Brush.Background.App}" />
+    <!--  3. 键式 TabControl 样式（官方类型）：宿主合并本库字典后 <TabControl> 经隐式样式自动接管外观。
+              页签容器为原生 TabItem（无关闭/重命名能力）；圆角读 local:TabControl 的附加属性，官方类型亦可用
+              jv:TabControl.HeaderCornerRadius / ContentCornerRadius 自定义；ItemHoverBackground /
+              SelectedItemBackground 仍是 jv:TabControl 专有的 DP，原生样式直接取主题画刷，不绑定它们。  -->
+    <Style x:Key="DefaultTabControlStyle" TargetType="TabControl">
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Background.App}" />
-        <Setter Property="HeaderCornerRadius" Value="{DynamicResource Theme.SmallCornerRadius}" />
-        <Setter Property="ContentCornerRadius" Value="{DynamicResource Theme.LargeCornerRadius}" />
 
-        <Setter Property="ItemContainerStyle" Value="{StaticResource DefaultTabMenuItemStyle}" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource DefaultTabItemStyle}" />
 
-        <!--  标签头排列方式（可改成 WrapPanel 实现自动换行）  -->
+        <!--  标签头排列方式：单行 + 横向滚动。不可用 WrapPanel——页签行 ScrollViewer 的
+              HorizontalScrollBarVisibility=Auto 会给面板无限宽度，WrapPanel 永远只排一行，
+              「自动换行」实际不会发生（此前正是这一组合让换行承诺落空）。  -->
         <Setter Property="ItemsPanel">
             <Setter.Value>
                 <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal" />
+                    <StackPanel Orientation="Horizontal" />
                 </ItemsPanelTemplate>
             </Setter.Value>
         </Setter>
@@ -175,7 +260,7 @@
         <!--  最重要的：ControlTemplate 重写整体结构  -->
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:TabMenu}">
+                <ControlTemplate TargetType="TabControl">
                     <Grid Background="{TemplateBinding Background}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -192,24 +277,35 @@
                             Background="{DynamicResource Theme.Brush.Background.App}"
                             BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
                             BorderThickness="1,1,1,1"
-                            CornerRadius="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ContentCornerRadius, Converter={StaticResource BottomCornerRadius}, FallbackValue=8}">
+                            CornerRadius="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:TabControl.ContentCornerRadius), Converter={StaticResource BottomCornerRadius}}">
                             <ContentPresenter
                                 x:Name="PART_SelectedContentHost"
                                 Margin="{TemplateBinding Padding}"
                                 ContentSource="SelectedContent" />
                         </Border>
 
-                        <!--  标签头（绘制在内容区上边框线之上）  -->
-                        <ScrollViewer
-                            CanContentScroll="True"
-                            HorizontalScrollBarVisibility="Auto"
-                            VerticalScrollBarVisibility="Disabled">
+                        <!--  标签头（绘制在内容区上边框线之上）。StackPanel 不实现 IScrollInfo，
+                              故不设 CanContentScroll：竖向滚动天然为像素级，横向溢出由滚动条承接。  -->
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollBarVisibility="Disabled">
                             <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" />
                         </ScrollViewer>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!--  隐式样式（官方类型）：App 合并字典后 <TabControl> 自动接管为库主题  -->
+    <Style BasedOn="{StaticResource DefaultTabControlStyle}" TargetType="TabControl" />
+
+    <!--  隐式样式（派生类型）：jv:TabControl 叠加可自定义悬停/选中背景、圆角与功能页签容器  -->
+    <Style BasedOn="{StaticResource DefaultTabControlStyle}" TargetType="{x:Type local:TabControl}">
+        <Setter Property="ItemHoverBackground" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
+        <Setter Property="SelectedItemBackground" Value="{DynamicResource Theme.Brush.Background.App}" />
+        <Setter Property="HeaderCornerRadius" Value="{DynamicResource Theme.SmallCornerRadius}" />
+        <Setter Property="ContentCornerRadius" Value="{DynamicResource Theme.LargeCornerRadius}" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource DefaultTabControlItemStyle}" />
     </Style>
 
 </ResourceDictionary>

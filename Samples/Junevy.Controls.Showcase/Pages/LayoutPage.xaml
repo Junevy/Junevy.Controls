@@ -19,41 +19,7 @@
                 <TextBlock Style="{StaticResource DemoPageTitle}" Text="布局控件" />
                 <TextBlock
                     Style="{StaticResource DemoPageSubtitle}"
-                    Text="jv:GroupBox（单击标题折叠）/ jv:ExpanderPanel（四方向展开 + 动画）/ Border.CornerRadius 附加用法。" />
-
-                <demo:DemoSection
-                    Title="jv:GroupBox（可折叠卡片）"
-                    Description="单击标题折叠/展开（IsCollapsible 默认 True），IsCollapsed 控制初始状态（双向绑定可从代码控制）；IsCollapsible=False 时仅作展示；标题区的按钮、复选框等交互元素不受点击折叠影响。"
-                    XamlCode="{x:Static sample:ShowcaseSnippets.GroupBoxDemo}">
-                    <StackPanel>
-                        <StackPanel.Resources>
-                            <Style x:Key="DemoBox" BasedOn="{StaticResource {x:Type jv:GroupBox}}" TargetType="{x:Type jv:GroupBox}">
-                                <Setter Property="Margin" Value="0,6,0,0" />
-                            </Style>
-                        </StackPanel.Resources>
-                        <jv:GroupBox Header="默认：单击标题折叠 / 展开（IsCollapsible=True）">
-                            <StackPanel>
-                                <jv:TextBox Width="220" HorizontalAlignment="Left" atc:PlaceholderAssist.Placeholder="采集名称" />
-                            </StackPanel>
-                        </jv:GroupBox>
-                        <jv:GroupBox
-                            Header="初始折叠（IsCollapsed=True，双向绑定可从代码控制）"
-                            IsCollapsed="True">
-                            <TextBlock Text="折叠后内容区域完全隐藏，不占布局空间。" />
-                        </jv:GroupBox>
-                        <jv:GroupBox Header="不可折叠（IsCollapsible=False，仅展示）" IsCollapsible="False">
-                            <TextBlock Text="标题仅作展示，悬停无高亮。" />
-                        </jv:GroupBox>
-                        <jv:GroupBox>
-                            <jv:GroupBox.Header>
-                                <StackPanel Orientation="Horizontal">
-                                    <jv:CheckBox Content="启用采集（标题内交互元素不受点击折叠影响）" IsChecked="True" />
-                                </StackPanel>
-                            </jv:GroupBox.Header>
-                            <TextBlock Text="标题区的按钮、复选框等交互元素照常响应。" />
-                        </jv:GroupBox>
-                    </StackPanel>
-                </demo:DemoSection>
+                    Text="jv:ExpanderPanel（四方向展开 + 动画）/ jv:SidePanel（滑出面板）/ Border.CornerRadius 附加用法。GroupBox 已归入「输入与选择」演示页。" />
 
                 <demo:DemoSection
                     Title="jv:ExpanderPanel（四方向展开 + 过渡动画）"
@@ -148,6 +114,64 @@
                             IsExpanded="False">
                             <TextBlock Margin="4" Text="无图标、无说明、无右侧控件。" />
                         </jv:ExpanderPanel>
+                    </StackPanel>
+                </demo:DemoSection>
+
+                <demo:DemoSection
+                    Title="jv:SidePanel（滑出面板）"
+                    Description="作为浮层放入 Grid 等布局容器，经 IsOpen / Toggle() 控制滑出收回，Side 指定停靠边（Left / Right / Top / Bottom）；收起时不占布局空间，展开时叠加在兄弟内容上方。CloseOnOutsideClick 默认开启（点击面板外部、宿主窗口失焦或最小化时自动收回），IsBackdropEnabled=True 显示半透明遮罩；Opened / Closed 事件可感知开合。主窗口右上角齿轮打开的设置抽屉即本控件。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.SidePanelDemo}">
+                    <StackPanel>
+                        <WrapPanel>
+                            <jv:Button Click="OnLeftPanelClick" Content="从左侧滑出" />
+                            <jv:Button Margin="12,0,0,0" Click="OnRightPanelClick" Content="从右侧滑出（带遮罩）" />
+                        </WrapPanel>
+                        <Grid Height="220" Margin="0,12,0,0">
+                            <Border
+                                Background="{DynamicResource Theme.Brush.Surface.Base}"
+                                BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
+                                BorderThickness="1"
+                                CornerRadius="6">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                                    Text="面板滑出层的宿主区域（模拟页面内容）。" />
+                            </Border>
+                            <jv:SidePanel x:Name="LeftPanel" Side="Left">
+                                <StackPanel Width="240" Margin="20,16">
+                                    <TextBlock FontWeight="Bold" Text="左侧面板（Side=Left）" />
+                                    <TextBlock
+                                        Margin="0,6,0,12"
+                                        FontSize="12"
+                                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                                        Text="点面板外部自动收回（CloseOnOutsideClick 默认开启）。"
+                                        TextWrapping="Wrap" />
+                                    <jv:Button
+                                        HorizontalAlignment="Left"
+                                        Click="OnClosePanelClick"
+                                        Content="关闭面板" />
+                                </StackPanel>
+                            </jv:SidePanel>
+                            <jv:SidePanel
+                                x:Name="RightPanel"
+                                Side="Right"
+                                IsBackdropEnabled="True">
+                                <StackPanel Width="240" Margin="20,16">
+                                    <TextBlock FontWeight="Bold" Text="右侧面板（带遮罩）" />
+                                    <TextBlock
+                                        Margin="0,6,0,12"
+                                        FontSize="12"
+                                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                                        Text="IsBackdropEnabled=True 时显示半透明遮罩，点击遮罩同样收回。"
+                                        TextWrapping="Wrap" />
+                                    <jv:Button
+                                        HorizontalAlignment="Left"
+                                        Click="OnClosePanelClick"
+                                        Content="关闭面板" />
+                                </StackPanel>
+                            </jv:SidePanel>
+                        </Grid>
                     </StackPanel>
                 </demo:DemoSection>
 

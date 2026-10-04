@@ -19,7 +19,7 @@
                 <TextBlock Style="{StaticResource DemoPageTitle}" Text="通知" />
                 <TextBlock
                     Style="{StaticResource DemoPageSubtitle}"
-                    Text="jv:Badge / jv:MessageBar / MessageBarService（宿主已注册在主窗口底部，可通过本页按钮弹出通知）。" />
+                    Text="jv:Badge / jv:MessageBar / MessageBarService（宿主已注册在主窗口底部，可通过本页按钮弹出通知）/ ToolTip（原生控件主题接管）。" />
 
                 <demo:DemoSection
                     Title="jv:Badge（角标）"
@@ -101,6 +101,26 @@
                         <jv:Button Margin="12,0,0,0" Click="OnServiceWarningClick" Content="Warning" />
                         <jv:Button Margin="12,0,0,0" Click="OnServiceDangerClick" Content="Danger（5 秒超时）" />
                         <jv:Button Margin="12,0,0,0" Click="OnServiceClearClick" Content="Clear()" />
+                    </WrapPanel>
+                </demo:DemoSection>
+
+                <demo:DemoSection
+                    Title="ToolTip（合并 Generic.xaml 后任意元素自动生效）"
+                    Description="库主题字典合并后，原生 ToolTip 全局自动应用主题样式，无需逐元素设置。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.ToolTipDemo}">
+                    <WrapPanel>
+                        <TextBlock
+                            Margin="0,4"
+                            Text="悬浮到我这里查看原生 ToolTip"
+                            ToolTip="取值范围 1.0 - 16.0，调整后立即生效" />
+                        <jv:Button
+                            Margin="16,0,0,0"
+                            Content="按钮 ToolTip"
+                            ToolTip="jv:Button 上的 ToolTip 同样获得主题样式" />
+                        <jv:CheckBox
+                            Margin="16,0,0,0"
+                            Content="复选框 ToolTip"
+                            ToolTip="任意 FrameworkElement 的 ToolTip 属性" />
                     </WrapPanel>
                 </demo:DemoSection>
 

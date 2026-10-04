@@ -8,14 +8,13 @@
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/MenuBar.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Bar/ToolBar.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Toolbox/Toolbox.xaml" />
-        <!--  <ResourceDictionary Source="toolbar"  -->
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Bar/AppBar.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Bar/InfoBar.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/TreeView.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/ToggleButton.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/Button.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Button/RadioButton.xaml" />
-        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/TabMenu.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/TabControl.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Menu/ContextMenu.xaml" />
 
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Text/TextBox.xaml" />
@@ -44,5 +43,6 @@
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Expander/ExpanderPanel.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Panel/SidePanel.xaml" />
         <ResourceDictionary Source="/Junevy.Controls;component/Controls/Badge/Badge.xaml" />
+        <ResourceDictionary Source="/Junevy.Controls;component/Controls/Paging/DataPager.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

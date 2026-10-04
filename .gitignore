@@ -20,3 +20,7 @@
 ## AI 工具私有数据（工作笔记、会话、临时探针区——整个目录不入库）
 .workbuddy/
 .zcode/
+
+## Python 字节码（Tools/iconfont 脚本产物，不应入库）
+__pycache__/
+*.pyc

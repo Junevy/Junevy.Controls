@@ -6,11 +6,11 @@
 		<LangVersion>14</LangVersion>
 		<UseWPF>true</UseWPF>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<DefaultItemExcludes>$(DefaultItemExcludes);Tests\**\*;Samples\**\*;Tools\DebugProbe\**\*;Companion\**\*</DefaultItemExcludes>
+		<DefaultItemExcludes>$(DefaultItemExcludes);Samples\**\*;Tools\DebugProbe\**\*;Companion\**\*</DefaultItemExcludes>
 
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>Junevy.Controls</PackageId>
-		<Version>3.0.0</Version>
+		<Version>3.2.0</Version>
 		<Authors>Junevy</Authors>
 		<Company>Junevy</Company>
 		<Description>Junevy WPF Controls</Description>
@@ -25,9 +25,9 @@
 
 	<ItemGroup>
 		<Compile Remove="Controls\Menu\MenuItem.NodeType.cs" />
-		<Compile Remove="Tests\**\*.cs;Samples\**\*.cs" />
-		<Page Remove="Tests\**\*.xaml;Samples\**\*.xaml" />
-		<ApplicationDefinition Remove="Tests\**\*.xaml;Samples\**\*.xaml" />
+		<Compile Remove="Samples\**\*.cs" />
+		<Page Remove="Samples\**\*.xaml" />
+		<ApplicationDefinition Remove="Samples\**\*.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -54,7 +54,7 @@
     <CopyToOutputDirectory>Always</CopyToOutputDirectory>
   </Resource>
   <Resource Include="Resources\Font\iconfont.ttf">
-    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
   </Resource>
   <Resource Include="Resources\Font\IconFont.xaml">
     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

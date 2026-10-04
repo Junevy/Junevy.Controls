@@ -72,6 +72,11 @@ for (const mode of ['light', 'dark']) {
   Dl(mode, 'success hover step', t['Status.SuccessHover'], t['Status.Success'], 2, 12);
   Dl(mode, 'warning hover step', t['Status.WarningHover'], t['Status.Warning'], 2, 12);
   Dl(mode, 'danger hover step', t['Status.DangerHover'], t['Status.Danger'], 2, 12);
+  // Status.Neutral（Label Neutral 模式默认底，中性线灰）：与四状态色同守双重职责，无 Subtle 档。
+  A(mode, 'neutral on surface', t['Status.Neutral'], t['Surface.Base'], 4.5);
+  A(mode, 'label on neutral chip', t['Text.OnAccent'], t['Status.Neutral'], 4.5);
+  A(mode, 'label on neutral hover chip', t['Text.OnAccent'], t['Status.NeutralHover'], 4.5);
+  Dl(mode, 'neutral hover step', t['Status.NeutralHover'], t['Status.Neutral'], 2, 12);
   A(mode, 'scrollbar thumb vs surface', t['ScrollBar.Thumb'], t['Surface.Base'], d ? 1.6 : 1.9);
   // 深色棋盘格随手调纯灰化后 Alt(Base #1F2226 vs #1D1D1D)实测约 1.06:1，仍可辨；
   // 浅色保持 1.14（白 vs #DADEE2）。

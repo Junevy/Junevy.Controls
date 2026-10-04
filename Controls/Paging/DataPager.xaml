@@ -1,0 +1,130 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:btn="clr-namespace:Junevy.Controls.Controls.Button"
+    xmlns:box="clr-namespace:Junevy.Controls.Controls.Box"
+    xmlns:paging="clr-namespace:Junevy.Controls.Controls.Paging">
+
+    <!--  分页按钮：统一尺寸与字号  -->
+    <Style x:Key="DataPagerButtonStyle" TargetType="btn:Button" BasedOn="{StaticResource {x:Type btn:Button}}">
+        <Setter Property="MinWidth" Value="26" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Padding" Value="6,0" />
+        <Setter Property="Margin" Value="1" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+    <!--  页码按钮：当前页以 accent 淡底高亮且不可点击、不可聚焦（已在页上，避免 Tab 停留后回车触发）  -->
+    <Style x:Key="DataPagerPageButtonStyle" TargetType="btn:Button" BasedOn="{StaticResource DataPagerButtonStyle}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Theme.Brush.Accent.PrimarySubtle}" />
+                <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="Focusable" Value="False" />
+                <Setter Property="IsHitTestVisible" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="DefaultDataPagerStyle" TargetType="{x:Type paging:DataPager}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type paging:DataPager}">
+                    <StackPanel
+                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                        Orientation="{TemplateBinding Orientation}">
+                        <!--  导航按钮经路由命令驱动，CanExecute 自动控制可用态（见 DataPager 命令定义）  -->
+                        <btn:Button
+                            AutomationProperties.Name="首页"
+                            Command="{x:Static paging:DataPager.MoveToFirstPageCommand}"
+                            Content="«"
+                            Style="{StaticResource DataPagerButtonStyle}"
+                            ToolTip="首页" />
+                        <btn:Button
+                            AutomationProperties.Name="上一页"
+                            Command="{x:Static paging:DataPager.MoveToPreviousPageCommand}"
+                            Content="‹"
+                            Style="{StaticResource DataPagerButtonStyle}"
+                            ToolTip="上一页" />
+
+                        <ItemsControl x:Name="PART_PagesHost">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="{Binding Orientation, RelativeSource={RelativeSource AncestorType=paging:DataPager}}" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.Resources>
+                                <DataTemplate DataType="{x:Type paging:PageNumberItem}">
+                                    <btn:Button
+                                        AutomationProperties.Name="{Binding Page}"
+                                        Command="{x:Static paging:DataPager.MoveToPageCommand}"
+                                        CommandParameter="{Binding Page}"
+                                        Content="{Binding Page}"
+                                        Style="{StaticResource DataPagerPageButtonStyle}"
+                                        ToolTip="{Binding Page}" />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type paging:PageEllipsisItem}">
+                                    <TextBlock
+                                        Margin="3,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="12"
+                                        Foreground="{DynamicResource Theme.Brush.Text.Tertiary}"
+                                        Text="…" />
+                                </DataTemplate>
+                            </ItemsControl.Resources>
+                        </ItemsControl>
+
+                        <btn:Button
+                            AutomationProperties.Name="下一页"
+                            Command="{x:Static paging:DataPager.MoveToNextPageCommand}"
+                            Content="›"
+                            Style="{StaticResource DataPagerButtonStyle}"
+                            ToolTip="下一页" />
+                        <btn:Button
+                            AutomationProperties.Name="末页"
+                            Command="{x:Static paging:DataPager.MoveToLastPageCommand}"
+                            Content="»"
+                            Style="{StaticResource DataPagerButtonStyle}"
+                            ToolTip="末页" />
+
+                        <box:ComboBox
+                            x:Name="PART_PageSizeEditor"
+                            MinWidth="66"
+                            Height="24"
+                            Margin="8,0,0,0"
+                            FontSize="12"
+                            AutomationProperties.Name="每页条数"
+                            ToolTip="每页条数" />
+
+                        <TextBlock
+                            x:Name="TotalText"
+                            Margin="8,0,2,0"
+                            VerticalAlignment="Center"
+                            FontSize="12"
+                            Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                            Text="{Binding TotalCount, RelativeSource={RelativeSource TemplatedParent}, StringFormat=共 {0} 条}" />
+                    </StackPanel>
+
+                    <ControlTemplate.Triggers>
+                        <!--  竖排（Left/Right 方位页脚）：每页条数选择器与总数文本横向占宽，竖排下一并折叠  -->
+                        <Trigger Property="Orientation" Value="Vertical">
+                            <Setter TargetName="PART_PageSizeEditor" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="TotalText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  隐式样式：宿主覆写时 BasedOn 继承默认样式  -->
+    <Style BasedOn="{StaticResource DefaultDataPagerStyle}" TargetType="{x:Type paging:DataPager}" />
+</ResourceDictionary>

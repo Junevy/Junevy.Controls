@@ -7,7 +7,11 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
-        int failures = CodeEditorProbe.Run();
+        // LabelProbe 最先跑：自建 Application + OnExplicitShutdown（后续探针关窗不会连带关闭应用），
+        // 主题刷子断言依赖可用的 Application 资源查找；CodeEditorProbe 复用该实例。
+        // 任何探针先关光窗口都会令 OnLastWindowClose 关闭应用，pack URI 随之失效且实例无法重建。
+        int failures = LabelProbe.Run();
+        failures += CodeEditorProbe.Run();
         failures += RoslynCompletionProbe.RunAsync().GetAwaiter().GetResult();
         failures += SmoothScrollProbe.Run();
         failures += PasswordBoxProbe.Run();

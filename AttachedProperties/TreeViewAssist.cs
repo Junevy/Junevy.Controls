@@ -6,15 +6,15 @@ using Junevy.Controls.Controls.Menu;
 namespace Junevy.Controls.AttachedProperties
 {
     /// <summary>
-    /// TreeView 的扩展附加属性。DisplayMode / NavigateCommand / 悬停与选中画刷统一经附加属性注册，
-    /// 库内 <see cref="Junevy.Controls.Controls.Menu.TreeView"/> 以 AddOwner 暴露为同名实例依赖属性，
+    /// TreeView 的扩展附加属性。DisplayMode / IndentSize / AutoExpandAncestors / NavigateCommand / 悬停与选中画刷
+    /// 统一经附加属性注册，库内 <see cref="Junevy.Controls.Controls.Menu.TreeView"/> 以 AddOwner 暴露为同名实例依赖属性，
     /// 官方 <see cref="System.Windows.Controls.TreeView"/> 合并 Themes/Generic.xaml 后也可直接使用这些附加属性。
     /// </summary>
     public static class TreeViewAssist
     {
-        /// <summary>显示模式：<see cref="DisplayMode.Normal"/> 显示展开箭头，<see cref="DisplayMode.Icon"/> 使用左侧层级指示器（有子项的节点显示）。</summary>
+        /// <summary>行首观感：<see cref="TreeViewDisplayMode.Chevron"/> 显示展开箭头，<see cref="TreeViewDisplayMode.Indicator"/> 折叠箭头并由左侧 accent 指示条标示选中的有子项节点。</summary>
         public static readonly DependencyProperty DisplayModeProperty =
-            DependencyProperty.RegisterAttached("DisplayMode", typeof(DisplayMode), typeof(TreeViewAssist), new PropertyMetadata(DisplayMode.Normal));
+            DependencyProperty.RegisterAttached("DisplayMode", typeof(TreeViewDisplayMode), typeof(TreeViewAssist), new PropertyMetadata(TreeViewDisplayMode.Chevron));
 
         /// <summary>激活叶节点时执行的命令（双击或按 Enter，见 <see cref="ExpanderBehavior"/>），参数为该节点的数据对象。</summary>
         public static readonly DependencyProperty NavigateCommandProperty =
@@ -28,12 +28,12 @@ namespace Junevy.Controls.AttachedProperties
         public static readonly DependencyProperty SelectedItemBackgroundProperty =
             DependencyProperty.RegisterAttached("SelectedItemBackground", typeof(Brush), typeof(TreeViewAssist), new PropertyMetadata(null));
 
-        public static DisplayMode GetDisplayMode(DependencyObject obj)
+        public static TreeViewDisplayMode GetDisplayMode(DependencyObject obj)
         {
-            return (DisplayMode)obj.GetValue(DisplayModeProperty);
+            return (TreeViewDisplayMode)obj.GetValue(DisplayModeProperty);
         }
 
-        public static void SetDisplayMode(DependencyObject obj, DisplayMode value)
+        public static void SetDisplayMode(DependencyObject obj, TreeViewDisplayMode value)
         {
             obj.SetValue(DisplayModeProperty, value);
         }
@@ -66,6 +66,37 @@ namespace Junevy.Controls.AttachedProperties
         public static void SetSelectedItemBackground(DependencyObject obj, Brush? value)
         {
             obj.SetValue(SelectedItemBackgroundProperty, value);
+        }
+
+        /// <summary>子级相对本级的缩进宽度（DIP），默认 10。缩进只作用于子级承载区，本级行首观感不受影响。</summary>
+        public static readonly DependencyProperty IndentSizeProperty =
+            DependencyProperty.RegisterAttached("IndentSize", typeof(double), typeof(TreeViewAssist), new PropertyMetadata(10.0));
+
+        public static double GetIndentSize(DependencyObject obj)
+        {
+            return (double)obj.GetValue(IndentSizeProperty);
+        }
+
+        public static void SetIndentSize(DependencyObject obj, double value)
+        {
+            obj.SetValue(IndentSizeProperty, value);
+        }
+
+        /// <summary>
+        /// 选中节点时是否自动展开其所有祖先，默认 true。置 false 后宿主需自行展开祖先，
+        /// 否则被选中的节点可能位于收起的分支内而不可见。
+        /// </summary>
+        public static readonly DependencyProperty AutoExpandAncestorsProperty =
+            DependencyProperty.RegisterAttached("AutoExpandAncestors", typeof(bool), typeof(TreeViewAssist), new PropertyMetadata(true));
+
+        public static bool GetAutoExpandAncestors(DependencyObject obj)
+        {
+            return (bool)obj.GetValue(AutoExpandAncestorsProperty);
+        }
+
+        public static void SetAutoExpandAncestors(DependencyObject obj, bool value)
+        {
+            obj.SetValue(AutoExpandAncestorsProperty, value);
         }
     }
 }

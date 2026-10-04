@@ -150,6 +150,13 @@ const Roles = {
   'Status.Danger': ['Red.600', 'Red.300'],
   'Status.DangerHover': ['Red.700', 'Red.350'],
   'Status.DangerSubtle': ['Red.100', 'Red.950'],
+  /*  Status.Neutral（2026-10-04 新增）：中性灰徽章底，首个消费方是 Label 的 Neutral 模式
+      （默认底由 Accent.Primary 主题蓝改归中性）。取中性线（Chalk/Slate）本身，
+      浅色 Chalk.550 对 OnAccent 白字 5.07:1、深色 Slate.400 对 OnAccent 深字 5.63:1，
+      双重职责（色块填充 + 无边框前景）由 emit.js / check.js 的 Neutral 守卫单独断言
+      （无 Subtle 档，不进四状态色循环）。悬停浅色变深（→Chalk.600）、深色变亮（→Slate.500）。 */
+  'Status.Neutral': ['Chalk.550', 'Slate.400'],
+  'Status.NeutralHover': ['Chalk.600', 'Slate.500'],
 
   'State.DisabledSurface': ['Chalk.100', 'Slate.75'],
   'State.DisabledBorder': ['Chalk.150', 'Slate.125'],

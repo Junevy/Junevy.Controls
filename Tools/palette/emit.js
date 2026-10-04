@@ -43,6 +43,17 @@ function guard(theme) {
     need(`${s} 文字压在其 Subtle 底上`, ratio(fill, subtle), warnFloor.onSubtle);
     need(`${s}Subtle 与表面的台阶`, Math.abs(lstar(subtle) - lstar(surface)), 2.0);
   }
+  //  Status.Neutral（Label Neutral 模式默认底）走中性线，无 Subtle 档，单独断言双重职责：
+  //  色块填充（OnAccent 文字）+ 无边框前景（对表面 4.5:1），悬停浅色变深 / 深色变亮。
+  {
+    const fill = at(theme, 'Status.Neutral');
+    need('Neutral 色块上的 OnAccent 文字', ratio(onAccent, fill), 4.5);
+    need('NeutralHover 色块上的 OnAccent 文字', ratio(onAccent, at(theme, 'Status.NeutralHover')), 4.5);
+    const step = lstar(at(theme, 'Status.NeutralHover')) - lstar(fill);
+    need('Neutral 悬停方向（应' + (theme === 'dark' ? '变亮' : '变深') + '）', theme === 'dark' ? step : -step, 2.0);
+    need('Neutral 作为无边框前景文字', ratio(fill, surface), 4.5);
+    need('Neutral 色块相对表面的可辨度', ratio(fill, surface), 3.0);
+  }
   for (const a of ['Primary', 'PrimaryHover', 'PrimaryPressed']) {
     need(`Accent.${a} 上的 OnAccent 文字`, ratio(onAccent, at(theme, `Accent.${a}`)), 4.0);
     need(`Accent.${a} 与 Surface.Hover 的区分`, Math.abs(lstar(at(theme, `Accent.${a}`)) - lstar(at(theme, 'Surface.Hover'))), 10);
@@ -69,7 +80,7 @@ function guard(theme) {
   need('禁用文字不越界过亮', lstar(at(theme, 'Text.Disabled')), theme === 'light' ? 60 : 30);
 
   const covered = new Set(Object.keys(Roles));
-  if (covered.size !== 48) fails.push(`角色表条目数 ${covered.size}，与规格 48 不符`);
+  if (covered.size !== 50) fails.push(`角色表条目数 ${covered.size}，与规格 50 不符`);
 
   if (fails.length) {
     console.error(`拒绝生成 ${theme} — ${fails.length} 项未达标:\n  ` + fails.join('\n  '));

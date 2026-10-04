@@ -18,7 +18,7 @@
                 <TextBlock Style="{StaticResource DemoPageTitle}" Text="进度条" />
                 <TextBlock
                     Style="{StaticResource DemoPageSubtitle}"
-                    Text="jv:ProgressBar（线性 / 环形、确定 / 不确定、进度文本）与 ProgressBarWindow（进度对话框，线程安全汇报与取消）。" />
+                    Text="jv:ProgressBar（线性 / 环形、确定 / 不确定、进度文本）；进度对话框 ProgressBarWindow 请见「窗口与对话框」演示页。" />
 
                 <demo:DemoSection
                     Title="jv:ProgressBar 线性（确定模式）"
@@ -74,16 +74,6 @@
                         ProgressTextFormat="已完成 {0}%"
                         ShowProgressText="True"
                         Value="{Binding Value, ElementName=ProgressSlider}" />
-                </demo:DemoSection>
-
-                <demo:DemoSection
-                    Title="ProgressBarWindow（进度对话框）"
-                    Description="无系统标题栏的进度对话框，默认环形、可拖动。「确定模式」演示后台任务经 Report / UpdateDetail 线程安全汇报、完成后 RequestClose 关闭、用户可取消（取消经 Cancelled 事件感知）；「不确定模式」演示 CloseButtonEnabled=False 禁止用户取消、由代码延时关闭。"
-                    XamlCode="{x:Static sample:ShowcaseSnippets.ProgressBarWindowDemo}">
-                    <WrapPanel>
-                        <jv:Button Click="OnDeployWindowClick" Content="确定模式（可取消）" />
-                        <jv:Button Margin="12,0,0,0" Click="OnWaitingWindowClick" Content="不确定模式（禁止取消）" />
-                    </WrapPanel>
                 </demo:DemoSection>
 
             </StackPanel>

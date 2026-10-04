@@ -21,9 +21,6 @@ using System.Windows.Controls;
         public static readonly DependencyProperty OrientationProperty =
             DependencyProperty.Register("Orientation", typeof(Orientation), typeof(MenuItem), new PropertyMetadata(Orientation.Horizontal));
 
-        public static readonly DependencyProperty TargetTypeProperty =
-            DependencyProperty.Register("TargetType", typeof(Type), typeof(MenuItem));
-
         public string Title
         {
             get { return (string)GetValue(TitleProperty); }
@@ -40,12 +37,6 @@ using System.Windows.Controls;
         {
             get { return (Orientation)GetValue(OrientationProperty); }
             set { SetValue(OrientationProperty, value); }
-        }
-
-        public Type TargetType
-        {
-            get { return (Type)GetValue(TargetTypeProperty); }
-            set { SetValue(TargetTypeProperty, value); }
         }
     }
 }

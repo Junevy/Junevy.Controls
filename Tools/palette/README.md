@@ -5,7 +5,7 @@
 | 文件 | 作用 |
 | --- | --- |
 | `spec.js` | 原语阶梯 `Pal`、角色映射 `Roles`、效果色 `Effect`，以及 `hsl()` / `palOf()` / `solveToLstar()` / `solveInRamp()` 取色工具 |
-| `check.js` | 109 条对比度与感知台阶断言，两主题各跑一遍 |
+| `check.js` | 121 条对比度与感知台阶断言，两主题各跑一遍 |
 | `emit.js` | 生成两个主题字典；生成前先跑状态色「双重职责」守卫与中性线彩度封顶，不达标直接退出 |
 
 ```bash
@@ -25,7 +25,7 @@ node Tools/palette/emit.js     # 校验 + 写回 Themes/AppColors.*.xaml
 2. 只改 `Pal`（原语）或 `Roles`（角色 → 原语的映射）。`Theme.Color.*` / `Theme.Brush.*` 都是派生物。
    注意 1.14.0 手调后的两个特例：`Slate.30` 是只被深色消费的画布灰（与浅色反色墨 `Slate.0` 分叉）；
    部分档位只被单主题消费（Chalk.50/100 浅色、Slate.25–150 深色），改它们的值不会影响另一主题的渲染。
-3. `node Tools/palette/check.js` 必须 109/109，再 `node Tools/palette/emit.js`。
+3. `node Tools/palette/check.js` 必须 121/121，再 `node Tools/palette/emit.js`。
    `emit.js` 的守卫会检查：状态色当色块填充时文字是否够清楚、当无边框前景时是否够 4.5:1、
    悬停是否朝「更抢眼」的方向走（浅色变深 / 深色变亮）、色板与表面是否分得开、
    中性线峰值彩度是否 ≤7（超过就说明手挑的蓝灰又回来了）、静止边框是否还落在「若有若无」的 1.6–2.3 区间。

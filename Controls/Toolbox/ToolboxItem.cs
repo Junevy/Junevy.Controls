@@ -124,6 +124,7 @@ public sealed class ToolboxItem : HeaderedItemsControl
         IsPointerOverTrigger = false;
         IsPointerOverPopup = false;
         Owner = null;
+        ClearOwnerLayoutBindings();
     }
 
     internal void SetPointerOverTrigger(bool value)
@@ -500,6 +501,24 @@ public sealed class ToolboxItem : HeaderedItemsControl
                 panel,
                 UniformGrid.ColumnsProperty,
                 new Binding(nameof(Toolbox.ColumnCount)) { Source = Owner });
+        }
+    }
+
+    // 绑定 Source 直接指向宿主实例：条目换宿主或旧宿主被丢弃后，PopupWidth、ColumnCount
+    // 仍会跟随旧实例，故脱离宿主即清除；网格在 _popupRoot 子树内，模板未应用时整体跳过。
+    private void ClearOwnerLayoutBindings()
+    {
+        if (_popupRoot is null)
+        {
+            return;
+        }
+
+        BindingOperations.ClearBinding(_popupRoot, WidthProperty);
+
+        UniformGrid? panel = FindPopupItemsPanel(_popupRoot);
+        if (panel is not null)
+        {
+            BindingOperations.ClearBinding(panel, UniformGrid.ColumnsProperty);
         }
     }
 

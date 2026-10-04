@@ -11,7 +11,6 @@
     </ResourceDictionary.MergedDictionaries>
 
     <cvt:NullToCollapsedConverter x:Key="NullToVisibility" />
-    <cvt:IncreaseFontsizeConverter x:Key="IncreaseFontSize" />
 
     <!--
         状态反馈（状态层 / state layer）：悬停/按压不再替换固定底色，也不再降低整体透明度
@@ -22,7 +21,7 @@
     -->
     <sys:Double x:Key="Button.Disabled.Opacity">0.5</sys:Double>
 
-    <!--  官方 Button 模板：固定字号，无缩放宿主（官方类型没有 IsTextScaled 属性）  -->
+    <!--  官方 Button 模板  -->
     <ControlTemplate x:Key="ButtonTemplate" TargetType="Button">
         <Border
             x:Name="ContentBorder"
@@ -43,20 +42,21 @@
                 </Grid.ColumnDefinitions>
 
                 <!--
-                    图标区域：模板内一律使用 TemplateBinding 读取附加属性，
-                    避免 AncestorType 查找（更慢且在 Popup/嵌套模板中脆弱）；
-                    内容呈现使用 ContentPresenter 而非 ContentControl。
+                    图标区域：内容呈现使用 ContentPresenter 而非 ContentControl。
+                    IconSize 是 int，而 Width / FontSize 是 double——TemplateBinding 不做类型转换，
+                    写成 TemplateBinding 会静默失效（槽宽退化为 Auto），故这里与库内其他模板一致
+                    用 RelativeSource=TemplatedParent 绑定（不是 AncestorType 查找，无额外开销）。
                 -->
                 <ContentPresenter
                     x:Name="IconPresenter"
                     Grid.Column="0"
-                    Width="{TemplateBinding atc:Icon.IconSize}"
+                    Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconSize)}"
                     Margin="0,0,4,0"
                     VerticalAlignment="Center"
                     Content="{TemplateBinding atc:Icon.Icon}"
                     Focusable="False"
                     TextElement.FontFamily="{TemplateBinding atc:Icon.FontFamily}"
-                    TextElement.FontSize="{TemplateBinding atc:Icon.IconSize}"
+                    TextElement.FontSize="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconSize)}"
                     TextElement.Foreground="{TemplateBinding Foreground}"
                     Visibility="{TemplateBinding atc:Icon.Icon, Converter={StaticResource NullToVisibility}}" />
 
@@ -97,12 +97,8 @@
     </ControlTemplate>
 
     <!--
-        jv:Button 专属模板：双内容宿主。
-        NormalHost 固定字号；IsTextScaled=True 时切换到 ScaledHost（ShrinkBox 钳制 Viewbox）：
-        缩放系数以 1 为上限——空间充足时保持原始字号（与官方 Button 一致），
-        仅在按钮被挤压（显式尺寸或布局约束小于内容自然尺寸）时等比缩小（只缩小不放大）。
-        注意：模板触发器中 DataTrigger + TemplatedParent 绑定不生效，这里必须用
-        TargetType=local:Button 的 Property 触发器直接读依赖属性。
+        jv:Button 专属模板：背景层与内容层拆分（阴影只挂背景层、禁用变淡作用于根宿主），
+        状态层纱色叠在内容之上；内容始终以固定字号排版（与官方 Button 一致）。
     -->
     <ControlTemplate x:Key="JvButtonTemplate" TargetType="{x:Type local:Button}">
         <!--
@@ -133,78 +129,34 @@
                 Padding="{TemplateBinding Padding}"
                 BorderThickness="{TemplateBinding BorderThickness}">
                 <Grid>
-                    <Grid x:Name="NormalHost">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                        <ContentPresenter
-                            x:Name="IconPresenter"
-                            Grid.Column="0"
-                            Width="{TemplateBinding atc:Icon.IconSize}"
-                            Margin="0,0,4,0"
-                            VerticalAlignment="Center"
-                            Content="{TemplateBinding atc:Icon.Icon}"
-                            Focusable="False"
-                            TextElement.FontFamily="{TemplateBinding atc:Icon.FontFamily}"
-                            TextElement.FontSize="{TemplateBinding atc:Icon.IconSize}"
-                            TextElement.Foreground="{TemplateBinding Foreground}"
-                            Visibility="{TemplateBinding atc:Icon.Icon, Converter={StaticResource NullToVisibility}}" />
+                    <ContentPresenter
+                        x:Name="IconPresenter"
+                        Grid.Column="0"
+                        Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconSize)}"
+                        Margin="0,0,4,0"
+                        VerticalAlignment="Center"
+                        Content="{TemplateBinding atc:Icon.Icon}"
+                        Focusable="False"
+                        TextElement.FontFamily="{TemplateBinding atc:Icon.FontFamily}"
+                        TextElement.FontSize="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconSize)}"
+                        TextElement.Foreground="{TemplateBinding Foreground}"
+                        Visibility="{TemplateBinding atc:Icon.Icon, Converter={StaticResource NullToVisibility}}" />
 
-                        <ContentPresenter
-                            x:Name="ContentPresenter"
-                            Grid.Column="1"
-                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                            ContentSource="Content"
-                            RecognizesAccessKey="True"
-                            TextElement.FontFamily="{TemplateBinding FontFamily}"
-                            TextElement.FontSize="{TemplateBinding FontSize}"
-                            TextElement.Foreground="{TemplateBinding Foreground}" />
-                    </Grid>
-
-                    <!--
-                        缩放宿主：ShrinkBox 把 Viewbox 的可用尺寸钳制在内容自然尺寸内，
-                        使 Viewbox 的等比缩放系数恒不超过 1（只缩小不放大，详见 ShrinkBox 注释）。
-                    -->
-                    <local:ShrinkBox>
-                        <Viewbox
-                            x:Name="ScaledHost"
-                            Stretch="Uniform"
-                            Visibility="Collapsed">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-
-                                <ContentPresenter
-                                    x:Name="ScaledIconPresenter"
-                                    Grid.Column="0"
-                                    Width="{TemplateBinding atc:Icon.IconSize}"
-                                    Margin="0,0,4,0"
-                                    VerticalAlignment="Center"
-                                    Content="{TemplateBinding atc:Icon.Icon}"
-                                    Focusable="False"
-                                    TextElement.FontFamily="{TemplateBinding atc:Icon.FontFamily}"
-                                    TextElement.FontSize="{TemplateBinding atc:Icon.IconSize}"
-                                    TextElement.Foreground="{TemplateBinding Foreground}"
-                                    Visibility="{TemplateBinding atc:Icon.Icon, Converter={StaticResource NullToVisibility}}" />
-
-                                <ContentPresenter
-                                    x:Name="ScaledContentPresenter"
-                                    Grid.Column="1"
-                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    ContentSource="Content"
-                                    RecognizesAccessKey="True"
-                                    TextElement.FontFamily="{TemplateBinding FontFamily}"
-                                    TextElement.FontSize="{TemplateBinding FontSize}"
-                                    TextElement.Foreground="{TemplateBinding Foreground}" />
-                            </Grid>
-                        </Viewbox>
-                    </local:ShrinkBox>
+                    <ContentPresenter
+                        x:Name="ContentPresenter"
+                        Grid.Column="1"
+                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                        ContentSource="Content"
+                        RecognizesAccessKey="True"
+                        TextElement.FontFamily="{TemplateBinding FontFamily}"
+                        TextElement.FontSize="{TemplateBinding FontSize}"
+                        TextElement.Foreground="{TemplateBinding Foreground}" />
                 </Grid>
             </Border>
 
@@ -217,10 +169,6 @@
         </Grid>
 
         <ControlTemplate.Triggers>
-            <Trigger Property="IsTextScaled" Value="True">
-                <Setter TargetName="NormalHost" Property="Visibility" Value="Collapsed" />
-                <Setter TargetName="ScaledHost" Property="Visibility" Value="Visible" />
-            </Trigger>
             <!--  ShowShadow=False 时清掉常态阴影（DP 默认即 false）；需要浮起感的实例显式设 True，触发器不命中即保留阴影  -->
             <Trigger Property="ShowShadow" Value="False">
                 <Setter TargetName="ContentBorder" Property="Effect" Value="{x:Null}" />
@@ -242,7 +190,7 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
-    <!--  官方 Button 无边框模板：固定字号  -->
+    <!--  官方 Button 无边框模板  -->
     <ControlTemplate x:Key="NoBorderButtonTemplate" TargetType="Button">
         <Border
             x:Name="ContentBorder"
@@ -297,7 +245,7 @@
         <Setter Property="Template" Value="{StaticResource ButtonTemplate}" />
     </Style>
 
-    <!--  jv:Button 专属样式：切换到等比缩放模板  -->
+    <!--  jv:Button 专属样式：使用背景/内容拆分模板（ShowShadow 与状态层）  -->
     <Style
         x:Key="JvButtonStyle"
         BasedOn="{StaticResource DefaultButtonStyle}"
@@ -317,7 +265,7 @@
     <!--  隐式样式（官方类型）：App 合并字典后 <Button> 自动生效  -->
     <Style BasedOn="{StaticResource DefaultButtonStyle}" TargetType="Button" />
 
-    <!--  隐式样式（派生类型）：jv:Button 使用等比缩放模板  -->
+    <!--  隐式样式（派生类型）：jv:Button 使用拆分模板  -->
     <Style BasedOn="{StaticResource JvButtonStyle}" TargetType="{x:Type local:Button}" />
 
 </ResourceDictionary>

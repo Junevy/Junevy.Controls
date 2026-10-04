@@ -16,6 +16,10 @@
         带背景标签模板（Error/Success/Warning/Neutral 共用）：
         背景跟随 Background，由样式按 DisplayMode 注入状态色；
         图标由 atc:Icon.Icon 提供（样式触发器注入各模式的默认图标，用户可用局部值覆盖），为空时折叠图标区域。
+        图标与文字的 5px 间距全部由图标右侧 Margin 承载（图标折叠后不留残余间距），
+        Padding 负责左右 7px 呼吸位——有图标/无图标两种形态下内容块均相对边缘对称；
+        水平对齐经 StackPanel 落实 HorizontalContentAlignment（垂直对齐仍由内容项各自绑定）。
+        图标字号/颜色经 atc:Icon.IconSize / atc:Icon.IconForeground 注入（样式给各模式默认值，用户可局部覆盖）。
     -->
     <ControlTemplate x:Key="BoxedLabelTemplate" TargetType="{x:Type local:Label}">
         <Border
@@ -24,18 +28,19 @@
             Background="{TemplateBinding Background}"
             CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
             SnapsToDevicePixels="True">
-            <StackPanel Orientation="Horizontal">
+            <StackPanel
+                Orientation="Horizontal"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
                 <ContentControl
                     x:Name="IconPresenter"
-                    Margin="5,0,5,0"
-                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                    Content="{Binding RelativeSource={RelativeSource AncestorType=local:Label}, Path=(atc:Icon.Icon)}"
-                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:Label}, Path=(atc:Icon.FontFamily)}"
-                    FontSize="{TemplateBinding FontSize}"
-                    Foreground="{TemplateBinding Foreground}"
-                    Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:Label}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
-                <ContentPresenter
                     Margin="0,0,5,0"
+                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                    Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.Icon)}"
+                    FontFamily="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.FontFamily)}"
+                    FontSize="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconSize)}"
+                    Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconForeground)}"
+                    Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
+                <ContentPresenter
                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                     RecognizesAccessKey="True" />
             </StackPanel>
@@ -45,20 +50,22 @@
     <!--
         无边框标签模板（BorderlessError/BorderlessWarning/BorderlessNotice 共用）：
         无背景色块，图标由 atc:Icon.Icon 提供（样式触发器注入默认图标，用户可覆盖），内容由 Content 提供。
+        间距策略与带背景模板一致：5px 图文间距全由图标右侧 Margin 承载。
     -->
     <ControlTemplate x:Key="PlainLabelTemplate" TargetType="{x:Type local:Label}">
-        <StackPanel Orientation="Horizontal">
+        <StackPanel
+            Orientation="Horizontal"
+            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
             <ContentControl
                 x:Name="IconPresenter"
-                Margin="5,0,5,0"
+                Margin="0,0,5,0"
                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                Content="{Binding RelativeSource={RelativeSource AncestorType=local:Label}, Path=(atc:Icon.Icon)}"
-                FontFamily="{Binding RelativeSource={RelativeSource AncestorType=local:Label}, Path=(atc:Icon.FontFamily)}"
-                FontSize="{TemplateBinding FontSize}"
-                Foreground="{TemplateBinding Foreground}"
-                Visibility="{Binding RelativeSource={RelativeSource AncestorType=local:Label}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
+                Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.Icon)}"
+                FontFamily="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.FontFamily)}"
+                FontSize="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconSize)}"
+                Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.IconForeground)}"
+                Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(atc:Icon.Icon), Converter={StaticResource NullToVisibility}}" />
             <ContentPresenter
-                Margin="0"
                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                 RecognizesAccessKey="True" />
         </StackPanel>
@@ -69,8 +76,10 @@
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.OnAccent}" />
         <Setter Property="FontSize" Value="8" />
         <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Padding" Value="2,2" />
+        <Setter Property="Padding" Value="7,2" />
         <Setter Property="FontFamily" Value="Arial" />
+        <Setter Property="atc:Icon.IconSize" Value="8" />
+        <Setter Property="atc:Icon.IconForeground" Value="{DynamicResource Theme.Brush.Text.OnAccent}" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template" Value="{StaticResource BoxedLabelTemplate}" />
@@ -111,10 +120,25 @@
                 <Setter Property="Background" Value="{DynamicResource Theme.Brush.Status.WarningHover}" />
             </MultiTrigger>
 
+            <!--  Neutral：默认中性灰底（Theme.Brush.Status.Neutral），用户可用局部 Background 覆盖（局部值优先于触发器，
+                  悬停变色随覆盖自然失效）；前景保持 OnAccent，局部改底色的既有用法不受影响。Neutral 无默认图标。  -->
+            <Trigger Property="DisplayMode" Value="Neutral">
+                <Setter Property="Background" Value="{DynamicResource Theme.Brush.Status.Neutral}" />
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="DisplayMode" Value="Neutral" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource Theme.Brush.Status.NeutralHover}" />
+            </MultiTrigger>
+
             <Trigger Property="DisplayMode" Value="BorderlessError">
                 <Setter Property="Template" Value="{StaticResource PlainLabelTemplate}" />
                 <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Status.Danger}" />
                 <Setter Property="atc:Icon.Icon" Value="&#xe61a;" />
+                <Setter Property="atc:Icon.IconSize" Value="14" />
+                <Setter Property="atc:Icon.IconForeground" Value="{DynamicResource Theme.Brush.Status.Danger}" />
                 <Setter Property="Margin" Value="0" />
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="VerticalAlignment" Value="Center" />
@@ -125,6 +149,8 @@
                 <Setter Property="Template" Value="{StaticResource PlainLabelTemplate}" />
                 <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Status.Warning}" />
                 <Setter Property="atc:Icon.Icon" Value="&#xe932;" />
+                <Setter Property="atc:Icon.IconSize" Value="14" />
+                <Setter Property="atc:Icon.IconForeground" Value="{DynamicResource Theme.Brush.Status.Warning}" />
                 <Setter Property="Margin" Value="0" />
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="VerticalAlignment" Value="Center" />
@@ -135,21 +161,15 @@
                 <Setter Property="Template" Value="{StaticResource PlainLabelTemplate}" />
                 <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
                 <Setter Property="atc:Icon.Icon" Value="&#xe651;" />
+                <Setter Property="atc:Icon.IconSize" Value="14" />
+                <Setter Property="atc:Icon.IconForeground" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
                 <Setter Property="Margin" Value="0" />
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="FontSize" Value="14" />
             </Trigger>
 
-            <MultiTrigger>
-                <MultiTrigger.Conditions>
-                    <Condition Property="DisplayMode" Value="Neutral" />
-                    <Condition Property="IsMouseOver" Value="True" />
-                </MultiTrigger.Conditions>
-                <Setter Property="Background" Value="{DynamicResource Theme.Brush.Accent.PrimaryHover}" />
-            </MultiTrigger>
-
-            <!--  Disabled：整体弱化（最后声明，保证覆盖所有状态）  -->
+            <!--  Disabled：整体弱化。  -->
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.5" />
             </Trigger>

@@ -168,8 +168,6 @@ public sealed class Toolbox : ItemsControl
         SetValue(ActiveItemPropertyKey, null);
     }
 
-    internal Action? RepositionRequested { get; set; }
-
     internal bool IsDragInProgress => _dragOwner is not null;
 
     internal void RequestOpen(ToolboxItem item)
@@ -525,7 +523,6 @@ public sealed class Toolbox : ItemsControl
         if (_activeItem is not null)
         {
             _activeItem.RepositionPopup();
-            RepositionRequested?.Invoke();
         }
     }
 

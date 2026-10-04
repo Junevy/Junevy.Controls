@@ -151,6 +151,39 @@
                     </jv:DataGrid>
                 </demo:DemoSection>
 
+                <demo:DemoSection
+                    Title="分页（atc:PagingAssist + 内置页脚 DataPager）"
+                    Description="附加属性 PageSize 启用客户端分页：每页条数限制 + 底部自动出现页码栏（首页/滑窗页码/末页/每页条数选择器/总数）。页码栏方位经 Placement 切换 Bottom/Top/Left/Right（左/右为竖排页码栏）；排序（列头点击）发生在分页之前，为全局排序语义；PageSize 置 0 恢复不分页。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.PagingDemo}">
+                    <StackPanel>
+                        <jv:DataGrid
+                            Height="260"
+                            AutoGenerateColumns="False"
+                            IsReadOnly="True"
+                            ItemsSource="{Binding PagedRows, Source={x:Static sample:SampleData.Instance}}"
+                            atc:PagingAssist.PageSize="10"
+                            atc:PagingAssist.Placement="Bottom">
+                            <jv:DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Name}" Header="名称" />
+                            </jv:DataGrid.Columns>
+                        </jv:DataGrid>
+                        <TextBlock
+                            Margin="0,10,0,4"
+                            Text="Placement=Left（竖排页码栏停靠左侧）："
+                            Foreground="{DynamicResource Theme.Brush.Text.Secondary}" />
+                        <!--  注意：两个分页控件不可共享同一数据源（默认视图按数据源单例，
+                              会争抢同一过滤器）；演示中的 ListBox 使用独立的集合  -->
+                        <jv:ListBox
+                            Width="220"
+                            Height="280"
+                            HorizontalAlignment="Left"
+                            ItemsSource="{Binding ListBoxPagedRows, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            DisplayMemberPath="Name"
+                            atc:PagingAssist.PageSize="5"
+                            atc:PagingAssist.Placement="Left" />
+                    </StackPanel>
+                </demo:DemoSection>
+
             </StackPanel>
         </ScrollViewer>
     </Border>

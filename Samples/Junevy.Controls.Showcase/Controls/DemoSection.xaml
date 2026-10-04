@@ -74,14 +74,12 @@
                                             x:Name="ToggleCodeButton"
                                             Content="收起代码"
                                             FontSize="12"
-                                            IsTextScaled="False"
                                             Command="{Binding ToggleCodeCommand, RelativeSource={RelativeSource TemplatedParent}}" />
                                         <jv:Button
                                             x:Name="CopyCodeButton"
                                             Margin="8,0,0,0"
                                             Content="复制代码"
                                             FontSize="12"
-                                            IsTextScaled="False"
                                             Command="{Binding CopyCodeCommand, RelativeSource={RelativeSource TemplatedParent}}" />
                                     </StackPanel>
                                 </Grid>
