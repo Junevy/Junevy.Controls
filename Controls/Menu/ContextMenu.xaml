@@ -124,16 +124,17 @@
                     </Popup>
                     </Grid>
                     <ControlTemplate.Triggers>
-                        <!--  悬停画刷经 AncestorType=MenuBase 读取宿主注入的 MenuAssist.ItemHoverBackground：
-                              jv:ContextMenu 与 JunevyMenuBarStyle 的原生 Menu 都注入同一附加属性，
-                              条目模板只有一份，两类宿主的下拉条目悬停都生效。  -->
+                        <!--  悬停画刷读条目自身的 MenuAssist.ItemHoverBackground（可继承附加属性）：
+                              值由宿主注入（jv:ContextMenu 样式 / JunevyMenuBarStyle 均设在 MenuBase 上），
+                              经逻辑树继承流入弹层条目——原生 Menu 的下拉 Popup 会隔断视觉树，
+                              AncestorType=MenuBase 在其中不可达，故必须走继承而非祖先查找。  -->
                         <Trigger Property="IsHighlighted" Value="True">
-                            <Setter Property="Background" Value="{Binding Path=(atc:MenuAssist.ItemHoverBackground), RelativeSource={RelativeSource AncestorType={x:Type primitives:MenuBase}}}" />
-                            <Setter TargetName="Root" Property="Background" Value="{Binding Path=(atc:MenuAssist.ItemHoverBackground), RelativeSource={RelativeSource AncestorType={x:Type primitives:MenuBase}}}" />
+                            <Setter Property="Background" Value="{Binding Path=(atc:MenuAssist.ItemHoverBackground), RelativeSource={RelativeSource Self}}" />
+                            <Setter TargetName="Root" Property="Background" Value="{Binding Path=(atc:MenuAssist.ItemHoverBackground), RelativeSource={RelativeSource Self}}" />
                         </Trigger>
                         <Trigger Property="IsSubmenuOpen" Value="True">
-                            <Setter Property="Background" Value="{Binding Path=(atc:MenuAssist.ItemHoverBackground), RelativeSource={RelativeSource AncestorType={x:Type primitives:MenuBase}}}" />
-                            <Setter TargetName="Root" Property="Background" Value="{Binding Path=(atc:MenuAssist.ItemHoverBackground), RelativeSource={RelativeSource AncestorType={x:Type primitives:MenuBase}}}" />
+                            <Setter Property="Background" Value="{Binding Path=(atc:MenuAssist.ItemHoverBackground), RelativeSource={RelativeSource Self}}" />
+                            <Setter TargetName="Root" Property="Background" Value="{Binding Path=(atc:MenuAssist.ItemHoverBackground), RelativeSource={RelativeSource Self}}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Pressed}" />

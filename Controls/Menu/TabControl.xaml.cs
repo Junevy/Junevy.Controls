@@ -89,9 +89,11 @@ namespace Junevy.Controls.Controls.Menu
                 new PropertyMetadata(new CornerRadius(8)));
 
         /// <summary>
-        /// 关闭「直接声明在 XAML 里的页签」（页签自身即数据项）时，是否清空其 <c>Content</c>/<c>DataContext</c>，
-        /// 并对内容本身及其 <c>DataContext</c> 实现 <see cref="IDisposable"/> 的部分调用 Dispose。
-        /// 默认 <see cref="DisposeContentOnClose"/> = false：页签内容原样保留，同一页签可被重新加回。
+        /// 关闭页签时的内容释放开关（默认 false = 库不做任何清理，生命周期由调用方管理）。开启后：
+        /// - **直接声明页签**（页签自身即数据项）：清空其 <c>Content</c>/<c>DataContext</c>，并对内容本身及其
+        ///   <c>DataContext</c> 实现 <see cref="IDisposable"/> 的部分调用 Dispose（仅默认关闭态下同一页签可重新加回）；
+        /// - **<c>ItemsSource</c> 条目**（条目即数据模型）：模型本身或条目元素 <c>DataContext</c>
+        ///   实现 <see cref="IDisposable"/> 时调用 Dispose（容器随条目移除一并丢弃，无重新加回语义）。
         /// </summary>
         public static readonly DependencyProperty DisposeContentOnCloseProperty =
             DependencyProperty.Register(nameof(DisposeContentOnClose), typeof(bool), typeof(TabControl), new PropertyMetadata(false));
@@ -290,6 +292,14 @@ namespace Junevy.Controls.Controls.Menu
             }
 
             bool removedSelfAsItem = ReferenceEquals(itemToRemove, tabItem);
+
+            // ItemsSource 条目的释放必须在 RemoveItem 之前：条目移除时生成器会「反准备」容器、
+            // 清掉其 Content，之后将读不到条目对象（自容器路径的 Content 是宿主自设的，无此问题）。
+            if (DisposeContentOnClose && !removedSelfAsItem)
+            {
+                CleanupItemContent(tabItem);
+            }
+
             RemoveItem(itemToRemove);
 
             if (removedSelfAsItem && DisposeContentOnClose)
@@ -421,6 +431,25 @@ namespace Junevy.Controls.Controls.Menu
 
             tabItem.Content = null;
             tabItem.DataContext = null;
+        }
+
+        /// <summary>
+        /// <c>ItemsSource</c> 条目的释放（<see cref="DisposeContentOnClose"/> = true）：条目即数据模型，
+        /// 模型本身实现 <see cref="IDisposable"/> 时调用 Dispose；条目为元素时对其
+        /// <c>DataContext</c> 中实现 <see cref="IDisposable"/> 的部分调用 Dispose。
+        /// 容器随条目移除一并丢弃，不清空引用（无自容器「重新加回」语义）。
+        /// </summary>
+        private static void CleanupItemContent(TabControlItem tabItem)
+        {
+            if (tabItem.Content is FrameworkElement { DataContext: IDisposable dataContext })
+            {
+                dataContext.Dispose();
+            }
+
+            if (tabItem.Content is IDisposable content)
+            {
+                content.Dispose();
+            }
         }
     }
 

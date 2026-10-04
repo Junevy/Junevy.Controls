@@ -13,25 +13,28 @@ namespace Junevy.Controls.Showcase.Pages
     /// <summary>菜单与导航展示页：SideMenu / 原生 Menu 菜单栏样式 / ContextMenu / TreeView / TabControl。</summary>
     public partial class MenusPage : UserControl
     {
-        /// <summary>NavigateCommand 收到的叶节点激活反馈（参数为叶节点的数据对象）。</summary>
-        private readonly ParameterRelayCommand navigateLeafCommand = new(
-            p => MessageBarService.Show("TreeView", $"激活叶节点：{(p as TreeMenuItem)?.Title ?? p}"));
+        /// <summary>NavigateCommand 为选中驱动：选中节点变化即执行（参数=数据项，分组/叶子都会发）。</summary>
+        private readonly ParameterRelayCommand navigateCommand = new(
+            p => MessageBarService.Show("TreeView", $"导航到：{(p as TreeMenuItem)?.Title ?? p}"));
 
         public MenusPage()
         {
             InitializeComponent();
 
             MainTree.ItemsSource = new[] { BuildStationTree() };
-            MainTree.NavigateCommand = navigateLeafCommand;
+            MainTree.NavigateCommand = navigateCommand;
+            // 双击驱动（打开/编辑类意图）：ItemDoubleClick 携带数据项（e.Item），双击展开箭头不触发
+            MainTree.ItemDoubleClick += (_, e) =>
+                MessageBarService.Show("TreeView", $"双击打开：{(e.Item as TreeMenuItem)?.Title ?? e.Item}");
 
             IndicatorTree.ItemsSource = new[] { BuildStationTree() };
 
-            // 官方 <TreeView>：扩展能力全部经 atc:TreeViewAssist 附加属性提供
+            // 官方 <TreeView>：扩展能力全部经 atc:TreeViewAssist 附加属性提供（命令为叶激活旧语义）
             NativeTree.ItemsSource = new[] { BuildStationTree() };
-            TreeViewAssist.SetNavigateCommand(NativeTree, navigateLeafCommand);
+            TreeViewAssist.SetNavigateCommand(NativeTree, navigateCommand);
 
             ControlledTree.ItemsSource = new[] { BuildStationTree() };
-            ControlledTree.NavigateCommand = navigateLeafCommand;
+            ControlledTree.NavigateCommand = navigateCommand;
         }
 
         private void OnSideMenuSelectionChanged(object sender, SelectionChangedEventArgs e)

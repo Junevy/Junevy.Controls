@@ -21,6 +21,11 @@
             <Style
                 BasedOn="{StaticResource JunevyContextMenuSeparatorStyle}"
                 TargetType="{x:Type Separator}" />
+            <!--  下拉条目兜底：ItemContainerStyleSelector 对「自带容器」（XAML 直接声明的
+                  MenuItem）不被咨询，二级条目会回落官方 Aero2 模板（蓝色系统高亮）。
+                  隐式样式经资源链覆盖所有深度的下拉条目；顶层条目由 Menu.ItemContainerStyle
+                  显式指定本样式，优先级高于隐式样式，不受影响。  -->
+            <Style BasedOn="{StaticResource JunevyContextMenuItemStyle}" TargetType="{x:Type MenuItem}" />
         </Style.Resources>
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />

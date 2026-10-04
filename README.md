@@ -1164,7 +1164,7 @@ node.IsSelected = true;
 | --- | --- |
 | `CanCloseLastTab` | 是否允许关闭最后一个页签，默认 `true` |
 | `CanRename` | 控件级双击重命名开关，默认 **`false`**（默认不开放双击改名，需显式设 `True`）；能否进入重命名由两级开关共同决定——控件级 `TabControl.CanRename` 与条目级 `TabControlItem.CanRename` **同时为 `true`** 才允许 |
-| `DisposeContentOnClose` | 关闭「直接声明在 XAML 里的页签」（页签容器自身即数据项）时，是否清空其 `Content` / `DataContext`，并对内容本身及内容元素的 `DataContext` 中实现 `IDisposable` 的部分调用 `Dispose()`，默认 `false`——默认关闭时库**不做任何清理**，内容与 `DataContext` 原样保留，同一自容器页签可被重新加回 `Items` 并正常渲染；生命周期由调用方管理 |
+| `DisposeContentOnClose` | 关闭页签时的内容释放开关，默认 `false`（库**不做任何清理**，生命周期由调用方管理）。开启后两类路径都释放：**直接声明页签**（页签自身即数据项）清空 `Content` / `DataContext` 并对内容本身与内容元素 `DataContext` 中实现 `IDisposable` 的部分调用 `Dispose()`（默认关闭态下同一自容器页签可重新加回 `Items`）；**`ItemsSource` 条目**（条目即数据模型）对模型本身或条目元素 `DataContext` 中实现 `IDisposable` 的部分调用 `Dispose()`（容器随条目移除一并丢弃；释放发生在从集合移除之前——条目移除时生成器会清掉容器 `Content`） |
 | `HeaderCornerRadius` | 页签头圆角，默认 `4`。**只接受上两角**：模板经筛选器丢弃下两角（与内容区衔接），因此 `HeaderCornerRadius="5,5,0,0"` 有效、`="0,0,5,5"` 会得到直角。**附加属性**：既可写在 `jv:TabControl` 上（`HeaderCornerRadius="6"`，C# 实例属性同名不变），也可写在官方 `<TabControl>` 上（`jv:TabControl.HeaderCornerRadius="6"`） |
 | `ContentCornerRadius` | 内容区域圆角，默认 `8`。**只接受下两角**（上两角被丢弃），四角写法 `ContentCornerRadius="0,0,5,5"` 与 `"5"` 等价，`="0,0,3,9"` 可让左下 `9`、右下 `3` 分别生效；附加写法同上 |
 | `IsClosable` | 是否显示关闭按钮，默认 `true`（仅影响外观，页签仍可通过 `CloseTab` / `CloseTabCommand` 关闭） |

@@ -13,7 +13,7 @@ namespace Junevy.Controls.AttachedProperties
     {
         /// <summary>菜单条目悬停/子菜单打开背景画刷。由宿主样式注入默认值（Surface.Hover），可逐实例覆盖。</summary>
         public static readonly DependencyProperty ItemHoverBackgroundProperty =
-            DependencyProperty.RegisterAttached("ItemHoverBackground", typeof(Brush), typeof(MenuAssist), new PropertyMetadata(null));
+            DependencyProperty.RegisterAttached("ItemHoverBackground", typeof(Brush), typeof(MenuAssist), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Inherits));
 
         public static Brush? GetItemHoverBackground(DependencyObject obj)
         {

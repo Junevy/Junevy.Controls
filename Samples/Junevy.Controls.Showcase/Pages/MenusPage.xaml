@@ -107,7 +107,7 @@
 
                 <demo:DemoSection
                     Title="jv:TreeView + TreeMenuItem（数据模型驱动）"
-                    Description="TreeMenuItem 为 POCO 数据模型（Title/Icon/Children），由默认 HierarchicalDataTemplate 渲染，可在任意线程构建；TreeViewItem 容器不复用（框架默认 Standard），展开/选中状态保存在 TreeMenuItem 数据模型上。默认容器样式已启用 atc:ExpanderBehavior.Enable：双击/Enter 切换分支展开；NavigateCommand 为选中驱动——选中节点即执行（本页以 MessageBar 反馈节点标题），双击另有 ItemDoubleClick 事件（携带数据项，双击展开箭头不触发）；展开图标为 ExpanderPanel 同款旋转箭头。"
+                    Description="TreeMenuItem 为 POCO 数据模型（Title/Icon/Children），由默认 HierarchicalDataTemplate 渲染，可在任意线程构建；TreeViewItem 容器不复用（框架默认 Standard），展开/选中状态保存在 TreeMenuItem 数据模型上。默认容器样式已启用 atc:ExpanderBehavior.Enable：双击/Enter 切换分支展开；NavigateCommand 为选中驱动——选中节点即执行（本页以 MessageBar 反馈导航目标），双击另有 ItemDoubleClick 事件（本页以 MessageBar 反馈双击打开，携带数据项 e.Item，双击展开箭头不触发）；展开图标为 ExpanderPanel 同款旋转箭头。"
                     XamlCode="{x:Static sample:ShowcaseSnippets.TreeViewDemo}">
                     <jv:TreeView
                         x:Name="MainTree"

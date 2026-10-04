@@ -1,3 +1,22 @@
+## 修复原生 `Menu` 菜单栏下拉条目使用官方 Aero2 蓝色高亮（样式选择器对自带容器失效 + 弹层内 MenuBase 祖先不可达双重根因）
+
+### 本次更新（`3.2.0`：用户反馈 Showcase「菜单与导航」页 JunevyMenuBarStyle 演示中，下拉条目选中/悬停仍是官方默认的蓝色半透明高亮（附图）。离屏探针实证双重根因——① 条目样式经 `ItemContainerStyleSelector` 分发，但 WPF 对「自带容器」（XAML 直接声明的 `<MenuItem>`，自身即容器）不咨询选择器：二级条目 `Style=null` → 回落官方 Aero2 模板 → 系统蓝高亮（jv:ContextMenu 一直正常是因为其隐式样式的 Style.Resources 里带了隐式 MenuItem 样式兜底，JunevyMenuBarStyle 缺这一层）；② 即使条目拿到本库样式，模板触发器经 `AncestorType=MenuBase` 读悬停画刷在原生 Menu 下拉中不可达——下拉 Popup 属顶层 MenuItem 模板，其 PopupRoot 隔断视觉树（探针实测「MenuBase 视觉祖先：不可达」）；jv:ContextMenu 能通只因它自身就是 MenuBase。修复三处：① `JunevyMenuBarItemStyle.Style.Resources` 补隐式 MenuItem 样式（BasedOn JunevyContextMenuItemStyle）——资源链覆盖全部深度的下拉条目（自带容器走隐式样式、ItemsSource 生成的容器仍走选择器，两机制并存），顶层条目由 Menu.ItemContainerStyle 显式指定、优先级高于隐式样式不受影响；② `MenuAssist.ItemHoverBackground` 注册为可继承附加属性（FrameworkPropertyMetadataOptions.Inherits）——值由宿主（JunevyMenuBarStyle / jv:ContextMenu 样式均设在 MenuBase 上）沿逻辑树继承流入弹层条目，属性继承跨 Popup 边界；③ 条目模板的 4 处悬停/展开触发器由 AncestorType 查找改为读取条目自身继承值（RelativeSource Self）——不再依赖视觉祖先可达性，两类宿主统一）— 2026-10-04
+
+- **改动点**：`Controls/Menu/MenuBar.xaml`（JunevyMenuBarItemStyle.Style.Resources 增隐式 MenuItem 样式 + 注释说明两机制并存的原因）；`AttachedProperties/MenuAssist.cs`（ItemHoverBackground 改 `FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Inherits)`）；`Controls/Menu/ContextMenu.xaml`（IsHighlighted / IsSubmenuOpen 触发器 4 处绑定改 `RelativeSource Self`，注释改为继承机制说明）。`MenuAssist` / `JunevyMenuItemStyleSelector` 属并行会话进行中的未跟踪文件，本修复在其机制上收尾。
+- **验证**：离屏探针 `.workbuddy/tmp/MenuStyleProbe/`（修复前后对照）——修复前二级条目 `Style=null`、模板无 Root 部件（官方 Aero2）；修复后弹层打开（强制 `PART_Popup.IsOpen`）时二级条目挂本库派生样式、模板实例化（`Border(Root=True)`），悬停「打开」后条目与 Root 背景同步变为 `#FFF6F6F6`（Surface.Hover），并将弹层内容渲染为 PNG 目检：白色主题弹层 + 悬停行浅灰圆角高亮，无蓝色残留。`Theme.Color.Surface.Hover` 颜色键存在性已核对（条目样式内 SystemColors.HighlightBrushKey 覆盖仍有效，作为防御层保留）。库双 TFM + Showcase 构建 **0 错误**；探针工程验收后已清理。
+- **文档**：无 README 变更（MenuBar 为样式字典，无独立章节；Showcase 演示描述与实际行为一致）。
+- **版本号**：目标 `3.2.0`（未发布），并入当前迭代，csproj 未改动。
+
+## `TabControl.DisposeContentOnClose` 覆盖 `ItemsSource` 条目：关闭即释放模型/条目元素的 `IDisposable`
+
+### 本次更新（`3.2.1`：第三方宿主诉求——`ItemsSource` 模式关闭页签时对实现 `IDisposable` 的条目模型自动释放。此前 `DisposeContentOnClose` 的清理只覆盖「直接声明页签」（`CleanupTabItem` 仅在条目即容器时执行），`ItemsSource` 条目即使开关打开也不释放；现两路径对称覆盖：开关开启时 `ItemsSource` 条目在从集合移除**之前**，对条目模型本身或条目元素 `DataContext` 中实现 `IDisposable` 的部分调用 `Dispose()`；默认 `false` 行为不变（不做任何清理））— 2026-10-05
+
+- **新增（`Controls/Menu/TabControl.xaml.cs`）**：`CleanupItemContent(TabControlItem)`——`ItemsSource` 条目的释放：条目（即数据模型）本身实现 `IDisposable` 时调用 Dispose；条目为元素时对其 `DataContext` 中实现 `IDisposable` 的部分调用 Dispose；不清空引用（容器随条目移除一并丢弃，无自容器「重新加回」语义）。`PerformClose` 的调用分支：`DisposeContentOnClose` 开启时，自容器条目走原 `CleanupTabItem`（移除后执行，行为不变）、`ItemsSource` 条目走 `CleanupItemContent`。
+- **实现要点（时序，探针实测抓出）**：`ItemsSource` 条目的释放必须发生在 `RemoveItem` **之前**——条目从集合移除时 `ItemContainerGenerator` 会「反准备」（unprepare）容器并清掉其 `Content`，移除之后 `tabItem.Content` 已读不到条目对象（首版放在移除后，探针 D7/D8 即失败；自容器路径的 `Content` 是宿主自设的，不受反准备影响，故原位置有效）。
+- **行为矩阵（探针 11/11）**：默认 `false`（直接页签 / `ItemsSource` 条目）→ 不 Dispose 也不清引用（原样保留，自容器可重新加回）；开关 `true`（直接页签）→ `DataContext` 与 `Content` 本身的 `IDisposable` 均 Dispose + 引用清空；开关 `true`（`ItemsSource` 条目模型 `IDisposable`）→ Dispose；开关 `true`（`ItemsSource` 条目为元素、其 `DataContext` 实现 `IDisposable`）→ Dispose。`TabClosed` 事件在释放之后派发（处理程序里看到的模型已释放）。
+- **注意**：`ItemsSource` 模式下容器即弃、无「重新加回」语义（与直接声明页签的默认态不同）；`ContentTemplate` 生成的视图由 WPF 丢弃，不参与 Dispose——需要释放的资源请挂在条目模型（`Content`）或条目元素（元素直接作条目）上。
+- **版本号**：`3.2.1`（csproj 现值，并入当前迭代）。
+
 ## TreeView 导航 MVVM 化：`NavigateCommand` 改选中驱动 + 新增 `ItemDoubleClick` 路由事件（行为变更 + 新增）
 
 ### 本次更新（`3.2.0`：按第三方宿主诉求把 TreeView 导航从 code-behind 桥接收回库内、以 MVVM 原语暴露——① **行为变更**：`jv:TreeView.NavigateCommand` 由「叶节点双击/Enter 激活」改为**选中驱动**（选中项变化即执行，参数=新选中的数据项，非容器）；② **新增** `ItemDoubleClick` 冒泡路由事件与 `TreeItemEventArgs`（`Item` 数据项 + `Container` 容器），双击驱动「打开/编辑」类意图；③ **新增** 整树收起/展开期间的导航抑制——`CollapseAll()`/`ExpandAll()` 引起的选中上提与还原不触发命令（防误导航）；④ 双击展开箭头不触发 `ItemDoubleClick`（两次切换净效果为零）— 2026-10-05
