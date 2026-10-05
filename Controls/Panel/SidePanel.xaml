@@ -10,6 +10,7 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="12" />
         <Setter Property="BackdropBrush" Value="{DynamicResource Theme.Brush.Overlay.Backdrop}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Theme.ControlCornerRadius}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -28,13 +29,17 @@
                             Background="{TemplateBinding BackdropBrush}"
                             Opacity="0"
                             Visibility="Collapsed" />
+                        <!--
+                            CornerRadius 由控件的 CornerRadius 依赖属性驱动（默认值取自主题令牌，见上方 Setter）；
+                            TemplateBinding 两端同为 CornerRadius，不存在类型不匹配导致的静默失效。
+                        -->
                         <Border
                             x:Name="PART_Content"
                             Padding="{TemplateBinding Padding}"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{DynamicResource Theme.ControlCornerRadius}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
                             Effect="{DynamicResource Theme.PopupShadow}">
                             <Border.RenderTransform>
                                 <TranslateTransform x:Name="PART_Translate" />

@@ -77,6 +77,26 @@ public class SidePanel : ContentControl
             typeof(SidePanel),
             new PropertyMetadata(null));
 
+    /// <summary>
+    /// 面板本体的圆角，四个角可分别设置。
+    /// 默认值为主题令牌 <c>Theme.ControlCornerRadius</c>（由样式 Setter 以 <c>DynamicResource</c> 注入，
+    /// 随明暗主题切换）；注册时给出的 6 只是宿主整体替换样式后的兜底值。
+    /// </summary>
+    /// <remarks>
+    /// 依赖属性的四个值按 <c>左上,右上,右下,左下</c> 顺序解析（注意第 3 位是右下、第 4 位是左下），
+    /// 单值写法 <c>CornerRadius="12"</c> 等价于 <c>"12,12,12,12"</c>。
+    /// 四个角完全自由：不按 <see cref="Side"/> 对贴住父容器的一侧做归零筛选，设多少就渲染多少。
+    /// 任一角为负数或非有限值时在赋值处抛 <see cref="ArgumentException"/>，
+    /// 不留到布局阶段由 <c>Border</c> 抛出难以定位的异常。
+    /// </remarks>
+    public static readonly DependencyProperty CornerRadiusProperty =
+        DependencyProperty.Register(
+            nameof(CornerRadius),
+            typeof(CornerRadius),
+            typeof(SidePanel),
+            new PropertyMetadata(new CornerRadius(6d)),
+            IsValidCornerRadius);
+
     public static readonly DependencyProperty CloseOnOutsideClickProperty =
         DependencyProperty.Register(
             nameof(CloseOnOutsideClick),
@@ -144,6 +164,16 @@ public class SidePanel : ContentControl
     {
         get => (Brush?)GetValue(BackdropBrushProperty);
         set => SetValue(BackdropBrushProperty, value);
+    }
+
+    /// <summary>
+    /// 面板本体的圆角，可写 <c>CornerRadius="4,4,4,4"</c> 分别设置四个角（顺序为左上、右上、右下、左下）。
+    /// 默认取主题令牌 <c>Theme.ControlCornerRadius</c>，随明暗主题切换；显式设置后不再被主题覆盖。
+    /// </summary>
+    public CornerRadius CornerRadius
+    {
+        get => (CornerRadius)GetValue(CornerRadiusProperty);
+        set => SetValue(CornerRadiusProperty, value);
     }
 
     /// <summary>
@@ -419,6 +449,25 @@ public class SidePanel : ContentControl
     private static bool IsValidAnimationDuration(object value)
     {
         return value is Duration duration && duration.HasTimeSpan && duration.TimeSpan >= TimeSpan.Zero;
+    }
+
+    /// <summary>圆角四个分量都必须是非负的有限值；负值会让模板内的 <c>Border</c> 在布局阶段抛出难以定位的异常。</summary>
+    private static bool IsValidCornerRadius(object value)
+    {
+        if (value is not CornerRadius radius)
+        {
+            return false;
+        }
+
+        return IsFiniteNonNegative(radius.TopLeft)
+            && IsFiniteNonNegative(radius.TopRight)
+            && IsFiniteNonNegative(radius.BottomRight)
+            && IsFiniteNonNegative(radius.BottomLeft);
+    }
+
+    private static bool IsFiniteNonNegative(double value)
+    {
+        return !double.IsNaN(value) && !double.IsInfinity(value) && value >= 0d;
     }
 
     /// <summary>

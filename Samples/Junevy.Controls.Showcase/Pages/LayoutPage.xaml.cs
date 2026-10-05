@@ -21,10 +21,22 @@ namespace Junevy.Controls.Showcase.Pages
             RightPanel.IsOpen = true;
         }
 
+        private void OnSquarePanelClick(object sender, RoutedEventArgs e)
+        {
+            SquarePanel.IsOpen = true;
+        }
+
+        private void OnFlushPanelClick(object sender, RoutedEventArgs e)
+        {
+            FlushPanel.IsOpen = true;
+        }
+
         private void OnClosePanelClick(object sender, RoutedEventArgs e)
         {
             LeftPanel.IsOpen = false;
             RightPanel.IsOpen = false;
+            SquarePanel.IsOpen = false;
+            FlushPanel.IsOpen = false;
         }
     }
 }

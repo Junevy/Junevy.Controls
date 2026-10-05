@@ -19,7 +19,7 @@
                 <TextBlock Style="{StaticResource DemoPageTitle}" Text="布局控件" />
                 <TextBlock
                     Style="{StaticResource DemoPageSubtitle}"
-                    Text="jv:ExpanderPanel（四方向展开 + 动画）/ jv:SidePanel（滑出面板）/ Border.CornerRadius 附加用法。GroupBox 已归入「输入与选择」演示页。" />
+                    Text="jv:ExpanderPanel（四方向展开 + 动画）/ jv:SidePanel（滑出面板，CornerRadius 可逐角设圆角）/ Border.CornerRadius 附加用法。GroupBox 已归入「输入与选择」演示页。" />
 
                 <demo:DemoSection
                     Title="jv:ExpanderPanel（四方向展开 + 过渡动画）"
@@ -118,13 +118,15 @@
                 </demo:DemoSection>
 
                 <demo:DemoSection
-                    Title="jv:SidePanel（滑出面板）"
-                    Description="作为浮层放入 Grid 等布局容器，经 IsOpen / Toggle() 控制滑出收回，Side 指定停靠边（Left / Right / Top / Bottom）；收起时不占布局空间，展开时叠加在兄弟内容上方。CloseOnOutsideClick 默认开启（点击面板外部、宿主窗口失焦或最小化时自动收回），IsBackdropEnabled=True 显示半透明遮罩；Opened / Closed 事件可感知开合。主窗口右上角齿轮打开的设置抽屉即本控件。"
+                    Title="jv:SidePanel（滑出面板 + CornerRadius 四角圆角）"
+                    Description="作为浮层放入 Grid 等布局容器，经 IsOpen / Toggle() 控制滑出收回，Side 指定停靠边（Left / Right / Top / Bottom）；收起时不占布局空间，展开时叠加在兄弟内容上方。CloseOnOutsideClick 默认开启（点击面板外部、宿主窗口失焦或最小化时自动收回），IsBackdropEnabled=True 显示半透明遮罩；Opened / Closed 事件可感知开合。CornerRadius 可写 4,4,4,4 逐角设置（顺序为左上、右上、右下、左下），默认取主题圆角、不设即为原样。主窗口右上角齿轮打开的设置抽屉即本控件。"
                     XamlCode="{x:Static sample:ShowcaseSnippets.SidePanelDemo}">
                     <StackPanel>
                         <WrapPanel>
                             <jv:Button Click="OnLeftPanelClick" Content="从左侧滑出" />
                             <jv:Button Margin="12,0,0,0" Click="OnRightPanelClick" Content="从右侧滑出（带遮罩）" />
+                            <jv:Button Margin="12,0,0,0" Click="OnSquarePanelClick" Content="顶部滑出（CornerRadius=0）" />
+                            <jv:Button Margin="12,0,0,0" Click="OnFlushPanelClick" Content="右侧滑出（18,0,0,18 贴边直角）" />
                         </WrapPanel>
                         <Grid Height="220" Margin="0,12,0,0">
                             <Border
@@ -164,6 +166,52 @@
                                         FontSize="12"
                                         Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
                                         Text="IsBackdropEnabled=True 时显示半透明遮罩，点击遮罩同样收回。"
+                                        TextWrapping="Wrap" />
+                                    <jv:Button
+                                        HorizontalAlignment="Left"
+                                        Click="OnClosePanelClick"
+                                        Content="关闭面板" />
+                                </StackPanel>
+                            </jv:SidePanel>
+                            <!--  CornerRadius=0：浮层贴边时不做圆角，四角全直角  -->
+                            <jv:SidePanel
+                                x:Name="SquarePanel"
+                                Side="Top"
+                                CornerRadius="0">
+                                <StackPanel
+                                    Height="56"
+                                    Margin="20,0"
+                                    Orientation="Horizontal">
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontWeight="Bold"
+                                        Text="CornerRadius=&quot;0&quot;" />
+                                    <TextBlock
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="12"
+                                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                                        Text="四角全直角（顶栏式抽屉）" />
+                                    <jv:Button
+                                        Margin="16,0,0,0"
+                                        VerticalAlignment="Center"
+                                        Click="OnClosePanelClick"
+                                        Content="关闭" />
+                                </StackPanel>
+                            </jv:SidePanel>
+                            <!--  18,0,0,18 = 左上 18 / 右上 0 / 右下 0 / 左下 18：停靠边（右侧）两角直角，自由边大圆角  -->
+                            <jv:SidePanel
+                                x:Name="FlushPanel"
+                                Side="Right"
+                                CornerRadius="18,0,0,18"
+                                IsBackdropEnabled="True">
+                                <StackPanel Width="240" Margin="20,16">
+                                    <TextBlock FontWeight="Bold" Text="CornerRadius=&quot;18,0,0,18&quot;" />
+                                    <TextBlock
+                                        Margin="0,6,0,12"
+                                        FontSize="12"
+                                        Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                                        Text="四角顺序为左上、右上、右下、左下：Side=Right 时把贴住容器右侧的两个角设为 0，面板就像从边缘切出来的一块。"
                                         TextWrapping="Wrap" />
                                     <jv:Button
                                         HorizontalAlignment="Left"

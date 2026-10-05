@@ -1665,6 +1665,7 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 | `AnimationDuration` | `250 ms` | 滑出/收回过渡动画时长；`Automatic` 或 `Forever` 视为无效，`0` 表示无过渡动画直接切换（事件仍会触发） |
 | `IsBackdropEnabled` | `true` | 是否启用遮罩层；展开时在面板背后显示半透明遮罩 |
 | `BackdropBrush` | 主题 `Theme.Brush.Overlay.Backdrop` | 遮罩层画刷 |
+| `CornerRadius` | 主题 `Theme.ControlCornerRadius`（浅/深色均为 `6`） | 面板本体圆角，四个角可分别设置：`CornerRadius="4,4,4,4"` 按 **左上、右上、右下、左下** 顺序取值（第 3 位是右下、第 4 位是左下，与 `Border.CornerRadius` 一致）；单值 `"12"` 等价 `"12,12,12,12"`；`"0"` 为四角直角；`Side="Right"` 配 `"18,0,0,18"` 得到「贴住容器右侧的两角直角、自由边大圆角」。四角完全自由，不按 `Side` 筛选。行内属性可直接书写（不同于 `Border.CornerRadius` 必须走样式 Setter）；不设置时跟随主题令牌并随主题刷新，显式设置后不再被令牌覆盖；任一角为负数或 `NaN`/`Infinity` 时在赋值处抛 `ArgumentException` |
 | `CloseOnOutsideClick` | `true` | 展开时是否启用"点击外部即收回"：面板本体以外的点击（在鼠标抬起时判定，与宿主的切换按钮命令不冲突）、宿主窗口失焦、宿主窗口最小化都会收回面板；置为 `false` 后收回完全由宿主通过 `IsOpen`/`Toggle()` 控制 |
 | `Toggle()` | - | 切换滑出/收回状态 |
 | `Opened` / `Closed` | - | 滑出/收回动画完成后触发的冒泡路由事件；动画时长为 `0` 时随状态切换立即触发 |
@@ -1686,10 +1687,17 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
             <TextBlock Text="侧滑面板内容" />
         </StackPanel>
     </jv:SidePanel>
+
+    <!--  圆角逐角设置，顺序是左上,右上,右下,左下：这里让贴住容器左边的两角成直角、自由边 18 圆角  -->
+    <jv:SidePanel IsOpen="{Binding IsPanelOpen, Mode=TwoWay}" Side="Left" CornerRadius="0,18,18,0">
+        <StackPanel Width="300" Margin="8">
+            <TextBlock Text="自定义圆角的侧滑面板" />
+        </StackPanel>
+    </jv:SidePanel>
 </Grid>
 ```
 
-实现说明：收起时面板内容通过 `TranslateTransform` 完全平移出父容器并被裁剪，同时以透明度 0 兜底，根 Grid 的 `Background` 为空保证鼠标命中测试穿透到下层内容；展开时遮罩层淡入，命中测试由遮罩与面板正常接管。面板表面使用主题 `Surface.Raised`、`Theme.PopupShadow` 阴影与主题圆角。滑出/收回动画采用 `SineEase`（`EaseInOut`）曲线：`250 ms` 内约 15 帧的采样下，`CubicEase` 的峰值速度达平均速度的 1.875 倍，中段单帧位移接近 68 DIP（约 85 物理像素）而首尾两帧几乎不动，观感上就是"起步一顿、中间一跳"；`SineEase` 的峰值/均值比为 π/2 ≈ 1.57，同帧数下峰值位移降到约 38 DIP 且首帧即有位移，实测帧间隔与硬件渲染档位（`RenderCapability.Tier=2`）均无变化，属于曲线分布而非性能问题。
+实现说明：收起时面板内容通过 `TranslateTransform` 完全平移出父容器并被裁剪，同时以透明度 0 兜底，根 Grid 的 `Background` 为空保证鼠标命中测试穿透到下层内容；展开时遮罩层淡入，命中测试由遮罩与面板正常接管。面板表面使用主题 `Surface.Raised`、`Theme.PopupShadow` 阴影与 `CornerRadius` 圆角：圆角默认值由样式 Setter 以 `DynamicResource` 注入 `Theme.ControlCornerRadius`（宿主覆盖该令牌或切换明暗主题都会刷新），宿主显式赋值后本地值优先、不再被令牌顶掉；模板把它绑到 `PART_Content` 的 `CornerRadius`，`DropShadowEffect` 按该几何投影，改圆角时阴影自适应，无需额外处理。滑出/收回动画采用 `SineEase`（`EaseInOut`）曲线：`250 ms` 内约 15 帧的采样下，`CubicEase` 的峰值速度达平均速度的 1.875 倍，中段单帧位移接近 68 DIP（约 85 物理像素）而首尾两帧几乎不动，观感上就是"起步一顿、中间一跳"；`SineEase` 的峰值/均值比为 π/2 ≈ 1.57，同帧数下峰值位移降到约 38 DIP 且首帧即有位移，实测帧间隔与硬件渲染档位（`RenderCapability.Tier=2`）均无变化，属于曲线分布而非性能问题。
 
 自动收回（`CloseOnOutsideClick=true`）在宿主窗口上分两阶段完成：`AddHandler(Mouse.PreviewMouseDownEvent, …, handledEventsToo: true)` 只记录"本次按下起于面板本体之外、且当时已展开"，`AddHandler(Mouse.MouseUpEvent, …, handledEventsToo: true)` 再执行收回。抬起阶段按钮的 `Click` 已由 `ButtonBase` 触发完毕（它早于事件冒泡到窗口），因此「按钮 + `IsOpen` 双向绑定 + 命令把布尔值取反」这一最常见写法不会互相打架：命令已把面板收回时控件不再重复写值，按下时还是收起态（本次点击负责展开）时也不会刚展开就被同一次抬起收回去。接管已处理事件（`handledEventsToo`）保证兄弟控件把鼠标事件标记为 `Handled` 也不漏判，处理过程自身不设置 `Handled`，面板以外的控件照常响应。点击是否落在面板本体上按"祖先链命中 `PART_Content` 或按下点位于 `PART_Content` 范围内"判定，因此遮罩本身的点击属于"外部"，多个抽屉叠放时也不会把压在别人遮罩下的本体误判为外部点击；内/外结论以按下位置为准，按下后拖出或拖入本体不改变本次判定。面板内的 `ComboBox`、`ContextMenu` 等弹层内容位于独立的 `PopupRoot` 顶层窗口，宿主窗口级处理收不到其中的点击，故不会误收回。宿主窗口 `Deactivated` 与 `StateChanged`（最小化）同样触发收回，语义与 `Toolbox` 一致；收回通过 `SetCurrentValue` 写回 `IsOpen`，双向绑定时数据源同步更新。面板卸载或属性置为 `false` 时，宿主窗口上的两个鼠标句柄与失焦/状态句柄会被完整摘除。
 
@@ -1936,7 +1944,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ToolItem` | WPF `Button` 命令管线、`DefaultToolItemStyle`、WPF `DragDrop` | `Icon.FontFamily`、`Icon.IconSize`、`Icon.IconForeground` |
 | `ImageViewer` | WPF `Image`、`MatrixTransform`、`BitmapSource`、`SaveFileDialog` | 无 |
 | `ExpanderPanel` | WPF `HeaderedContentControl`、`ToggleButton`、`LayoutTransform` 过渡动画、主题资源 | 无 |
-| `SidePanel` | WPF `ContentControl`、`TranslateTransform` 滑动动画（`SineEase`）、遮罩与主题阴影令牌（`Theme.Brush.Overlay.Backdrop`、`Theme.PopupShadow`）、宿主窗口级点击/失焦/最小化自动收回 | 无 |
+| `SidePanel` | WPF `ContentControl`、`TranslateTransform` 滑动动画（`SineEase`）、遮罩与主题阴影/圆角令牌（`Theme.Brush.Overlay.Backdrop`、`Theme.PopupShadow`、`Theme.ControlCornerRadius`）、宿主窗口级点击/失焦/最小化自动收回 | 无 |
 | `GroupBox` | WPF `GroupBox`、主题资源（卡片、悬停、状态令牌） | `Border.CornerRadius` |
 
 ## 示例程序（Showcase）

@@ -717,7 +717,8 @@ namespace Junevy.Controls.Showcase
             """;
         public const string SidePanelDemo = """
             <!-- 作为浮层放入 Grid（不指定 Row/Column 自动跨满）；IsOpen/Toggle() 控制开合，
-                 Side 指定停靠边；CloseOnOutsideClick 默认开启，IsBackdropEnabled 显示遮罩 -->
+                 Side 指定停靠边；CloseOnOutsideClick 默认开启，IsBackdropEnabled 显示遮罩；
+                 CornerRadius 逐角设置圆角，顺序为左上,右上,右下,左下，不设则取主题圆角 -->
             <Grid Height="220">
                 <Border Background="{DynamicResource Theme.Brush.Surface.Base}" /> <!-- 页面内容示意 -->
 
@@ -731,6 +732,20 @@ namespace Junevy.Controls.Showcase
                 <jv:SidePanel x:Name="RightPanel" Side="Right" IsBackdropEnabled="True">
                     <StackPanel Width="240" Margin="20,16">
                         <TextBlock FontWeight="Bold" Text="右侧面板（带遮罩）" />
+                    </StackPanel>
+                </jv:SidePanel>
+
+                <!-- 顶栏式抽屉：四角全直角 -->
+                <jv:SidePanel x:Name="SquarePanel" Side="Top" CornerRadius="0">
+                    <StackPanel Height="56" Margin="20,0" Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="CornerRadius=&quot;0&quot;" />
+                    </StackPanel>
+                </jv:SidePanel>
+
+                <!-- Side=Right 时把贴住容器右侧的两角设为 0，自由边大圆角 -->
+                <jv:SidePanel x:Name="FlushPanel" Side="Right" CornerRadius="18,0,0,18" IsBackdropEnabled="True">
+                    <StackPanel Width="240" Margin="20,16">
+                        <TextBlock FontWeight="Bold" Text="CornerRadius=&quot;18,0,0,18&quot;" />
                     </StackPanel>
                 </jv:SidePanel>
             </Grid>

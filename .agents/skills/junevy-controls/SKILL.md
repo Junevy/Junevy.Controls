@@ -96,7 +96,7 @@ ThemeManager.ToggleTheme();
 | 集合 | `jv:ListBox` / `jv:ListView`（`Orientation="Horizontal"` 横向带状滑动；ListView 设了 `View`/GridView 时该属性失效）；`DataGrid`（官方写法即可；默认关闭新增/删除行、整行单选）；`jv:DataPager`（独立分页栏，可与 PagingAssist 显式绑定） |
 | 文本/状态 | `jv:Label`（状态标签：`DisplayMode` 枚举 Error/Success/Warning/Borderless*/Neutral）；`jv:TextBlock`（左 `Content` 右 `Text` 的标题组合，非 WPF TextBlock） |
 | 菜单/导航 | `jv:ContextMenu` + `jv:ContextMenuItem`（上下文菜单用这两个）；**`jv:MenuItem` 是 SideMenu 的导航数据控件，不是 WPF MenuItem——不要放进 ContextMenu**；`jv:SideMenu`（侧边导航，继承 WPF ListBox，绑 `SelectedItem`）；`jv:TreeView` + `jv:TreeMenuItem`（见下）；`jv:TabControl`（页签多时横向滚动不换行、不支持 `TabStripPlacement` 四方向；圆角是附加属性 `jv:TabControl.HeaderCornerRadius`/`.ContentCornerRadius`，官方 TabControl 也能用；关闭流程走 `TabClosing` 路由事件，可 `e.Cancel=true`）；`jv:ToolBar`/`jv:ToolBarItem`；`jv:Toolbox`/`jv:ToolboxItem`/`jv:ToolItem`（悬浮工具箱 + 拖放，数据格式 `"Junevy.Controls.Tool"`） |
-| 布局 | `jv:ExpanderPanel`（`DisplayMode` Classic/Card、`ExpandDirection` 四方向、`HeaderExtra` 扩展槽）；`jv:SidePanel`（浮层侧滑面板：`IsOpen`/`Side`，放入 Grid 不指定 Row/Column 自动跨满） |
+| 布局 | `jv:ExpanderPanel`（`DisplayMode` Classic/Card、`ExpandDirection` 四方向、`HeaderExtra` 扩展槽）；`jv:SidePanel`（浮层侧滑面板：`IsOpen`/`Side`/`CornerRadius` 四角可分别设置，放入 Grid 不指定 Row/Column 自动跨满） |
 | 通知 | `jv:Badge`（角标：`Count`/`MaxCount`/`IsDot`/`Corner`）；`jv:MessageBar` + `MessageBarService`（注册一次 `SetPresenter` 后任意处 `Show`，非 UI 线程可调；用 `IsShown` 控制显隐，不要直接设 Visibility/Opacity）；`ToolTip`（官方写法自动主题化） |
 | 窗口/图像 | `jv:DialogWindow`（无边框对话框宿主，无默认宽高按内容收缩，Prism 场景派生补 `IDialogWindow`）；`jv:ImageViewer`（滚轮缩放、拖动平移、`FitToWindow()`/`ActualSize()`、右键保存）；`jv:AppBar`（无边框标题栏：`Mode` Default/MenuBar/Expandable，配合宿主 WindowChrome，系统按钮命令自动补齐）；`jv:InfoBar`（用户信息条 + 弹出菜单，`MenuContent` 可放任意面板） |
 
@@ -115,7 +115,7 @@ ThemeManager.ToggleTheme();
 
 ## 7. 高频陷阱清单
 
-- `Border.CornerRadius` 是借用 WPF Border 的附加写法：**逐实例 attribute 写法 `<jv:Button Border.CornerRadius="8">` 编译报错 MC3015**，必须用样式 Setter 或代码 `SetValue`。且开关（ToggleButton）不读它，形状由模板决定。
+- `Border.CornerRadius` 是借用 WPF Border 的附加写法：**逐实例 attribute 写法 `<jv:Button Border.CornerRadius="8">` 编译报错 MC3015**，必须用样式 Setter 或代码 `SetValue`。且开关（ToggleButton）不读它，形状由模板决定。例外：`jv:SidePanel` 与 `jv:DialogWindow` 有自己的 `CornerRadius` 依赖属性，行内 `CornerRadius="4,4,4,4"` 直接可用（顺序为左上、右上、右下、左下）。
 - `jv:CodeEditor` 的语法语言属性叫 `SyntaxLanguage`（不叫 `Language`，刻意避开 `FrameworkElement.Language`）。
 - 深色主题下窗口仍是白底黑字 → 忘了给 Window 设 `Background`/`TextElement.Foreground`（见第 1 节）。
 - 切主题后颜色不变 → 某处用了 `StaticResource` 绑主题令牌。
