@@ -335,20 +335,23 @@ namespace Junevy.Controls.Showcase
             """;
 
         public const string TextBlockDemo = """
-            <!-- ContentTemplate 提供左侧图标，Text 为右侧文本；超宽自动省略 -->
-            <DataTemplate x:Key="IconTemplate">
-                <Border Width="30" Height="30"
-                        Background="{DynamicResource Theme.Brush.Accent.Primary}" CornerRadius="6">
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                               FontFamily="{DynamicResource IconFont}" FontSize="16"
-                               Foreground="{DynamicResource Theme.Brush.Text.OnAccent}" Text="&#xE66B;" />
-                </Border>
-            </DataTemplate>
-
-            <jv:TextBlock Width="320" FontSize="16"
-                          ContentTemplate="{StaticResource IconTemplate}" Text="Inspection Station" />
-            <jv:TextBlock Width="320" FontSize="14"
-                          ContentTemplate="{StaticResource IconTemplate}" Text="标题超宽时以省略号截断显示 Inspect" />
+            <!-- 左侧图标一律走 atc:Icon.* 附加属性（控件本身不承载 Content）：
+                 atc:Icon.Icon 可为图标字体字符，也可为 Border/Image/Path 等任意元素；
+                 为空时图标区整体折叠，且不留图文间距（5px 间距由图标右侧承载）。
+                 图标字号走 atc:Icon.IconSize（库级默认 14，不随 FontSize 自动放大），着色走 atc:Icon.IconForeground。 -->
+            <jv:TextBlock Width="320" FontSize="20" Text="Inspection Station"
+                          atc:Icon.Icon="&#xE66B;" atc:Icon.IconSize="20" />
+            <jv:TextBlock Width="320" FontSize="14" Text="无图标时标题不留残余缩进" />
+            <jv:TextBlock Width="320" FontSize="16" Text="图标槽可放任意内容">
+                <atc:Icon.Icon>
+                    <Border Width="30" Height="30"
+                            Background="{DynamicResource Theme.Brush.Accent.Primary}" CornerRadius="6">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   FontFamily="{DynamicResource IconFont}" FontSize="16"
+                                   Foreground="{DynamicResource Theme.Brush.Text.OnAccent}" Text="&#xE66B;" />
+                    </Border>
+                </atc:Icon.Icon>
+            </jv:TextBlock>
             """;
 
         public const string CodeEditorDemo = """
@@ -475,6 +478,39 @@ namespace Junevy.Controls.Showcase
                 </jv:TabControlItem>
                 <jv:TabControlItem Header="保护页">
                     <TextBlock Margin="16" Text="尝试关闭此页签：TabClosing 会取消并弹出提示。" />
+                </jv:TabControlItem>
+            </jv:TabControl>
+            """;
+
+        public const string TabControlWrapDemo = """
+            <!-- 页签条是 WrapPanel 且不套滚动容器：超出宽度自动换行，行数不设上限。
+                 换行与横向滚动互斥（ScrollViewer 的 HorizontalScrollBarVisibility=Auto 会给面板无限宽度，
+                 WrapPanel 在无限宽度下永远只排一行），所以这里没有横向滚动条。
+                 要限制头部占用：给控件 Height/MaxHeight，或外层再套宿主自己的 ScrollViewer -->
+            <jv:TabControl Width="420" Height="200" IsClosable="False">
+                <jv:TabControlItem Header="总览">
+                    <TextBlock Margin="16" Text="总览页签内容。" />
+                </jv:TabControlItem>
+                <jv:TabControlItem Header="设备">
+                    <TextBlock Margin="16" Text="设备页签内容。" />
+                </jv:TabControlItem>
+                <jv:TabControlItem Header="告警">
+                    <TextBlock Margin="16" Text="告警页签内容。" />
+                </jv:TabControlItem>
+                <jv:TabControlItem Header="录像">
+                    <TextBlock Margin="16" Text="录像页签内容。" />
+                </jv:TabControlItem>
+                <jv:TabControlItem Header="门禁">
+                    <TextBlock Margin="16" Text="门禁页签内容。" />
+                </jv:TabControlItem>
+                <jv:TabControlItem Header="网络">
+                    <TextBlock Margin="16" Text="网络页签内容。" />
+                </jv:TabControlItem>
+                <jv:TabControlItem Header="存储">
+                    <TextBlock Margin="16" Text="存储页签内容。" />
+                </jv:TabControlItem>
+                <jv:TabControlItem Header="系统">
+                    <TextBlock Margin="16" Text="系统页签内容。" />
                 </jv:TabControlItem>
             </jv:TabControl>
             """;
@@ -652,7 +688,7 @@ namespace Junevy.Controls.Showcase
                         SettingsClick="OnInfoBarSettingsClick" />
 
             <!-- 面板模式:MenuContent 放任意内容(ListBox / UserControl / 复杂布局),
-                 MenuWidth 覆盖等宽约束,MenuMaxHeight 限制弹层高度 -->
+                 宽度默认随内容自适应(不受控件尺寸约束),MenuWidth 可显式定宽,MenuMaxHeight 限制弹层高度 -->
             <jv:InfoBar Width="280" UserName="操作面板" MenuWidth="360" MenuMaxHeight="240"
                         SettingsClick="OnInfoBarSettingsClick">
                 <jv:InfoBar.MenuContent>

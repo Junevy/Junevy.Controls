@@ -45,12 +45,27 @@
                 </demo:DemoSection>
 
                 <demo:DemoSection
-                    Title="jv:TextBlock（左内容 + 右文本）"
-                    Description="ContentTemplate 提供左侧任意内容（此处为图标方块），Text 为右侧文本；宽度受限时文本自动省略截断。"
+                    Title="jv:TextBlock（左图标 + 右文本）"
+                    Description="控件不承载 Content：左侧图标一律经 atc:Icon.Icon 附加属性提供（图标字体字符，或 Border/Image/Path 等任意元素），图标为空时整块折叠且不留图文间距；字号走 atc:Icon.IconSize、着色走 atc:Icon.IconForeground（默认跟随标题主色令牌）。右侧 Text 为标题，宽度受限时自动省略截断。"
                     XamlCode="{x:Static sample:ShowcaseSnippets.TextBlockDemo}">
                     <StackPanel>
-                        <StackPanel.Resources>
-                            <DataTemplate x:Key="IconTemplate">
+                        <jv:TextBlock
+                            Width="320"
+                            FontSize="20"
+                            Text="Inspection Station"
+                            atc:Icon.Icon="&#xE66B;"
+                            atc:Icon.IconSize="20" />
+                        <jv:TextBlock
+                            Width="320"
+                            Margin="0,8,0,0"
+                            FontSize="14"
+                            Text="无图标时标题不留残余缩进 Inspect" />
+                        <jv:TextBlock
+                            Width="320"
+                            Margin="0,8,0,0"
+                            FontSize="16"
+                            Text="图标槽可放任意内容">
+                            <atc:Icon.Icon>
                                 <Border
                                     Width="30"
                                     Height="30"
@@ -64,19 +79,8 @@
                                         Foreground="{DynamicResource Theme.Brush.Text.OnAccent}"
                                         Text="&#xE66B;" />
                                 </Border>
-                            </DataTemplate>
-                        </StackPanel.Resources>
-                        <jv:TextBlock
-                            Width="320"
-                            ContentTemplate="{StaticResource IconTemplate}"
-                            Text="Inspection Station"
-                            FontSize="16" />
-                        <jv:TextBlock
-                            Width="320"
-                            Margin="0,8,0,0"
-                            ContentTemplate="{StaticResource IconTemplate}"
-                            Text="标题超宽时以省略号截断显示 Inspect"
-                            FontSize="14" />
+                            </atc:Icon.Icon>
+                        </jv:TextBlock>
                     </StackPanel>
                 </demo:DemoSection>
 

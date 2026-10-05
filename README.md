@@ -1154,7 +1154,7 @@ node.IsSelected = true;
 
 ### TabControl 与 TabControlItem
 
-`jv:TabControl` 继承 WPF `TabControl`，`jv:TabControlItem` 继承 WPF `TabItem`。它遵循标准的 `ItemsSource`、`ItemTemplate`、`ContentTemplate` 和容器生成规则；点击页签标题会切换对应内容。页签条是 `ScrollViewer`（`HorizontalScrollBarVisibility=Auto`）内的一行横向 `StackPanel`——**页签过多时横向滚动，不会自动换行**（滚动容器给面板无限宽度，换行永远不会发生），且页签条固定在顶部，因此**不支持 `TabStripPlacement` 的 Left/Bottom/Right 方向**（官方 `TabPanel` 能力未包含）。
+`jv:TabControl` 继承 WPF `TabControl`，`jv:TabControlItem` 继承 WPF `TabItem`。它遵循标准的 `ItemsSource`、`ItemTemplate`、`ContentTemplate` 和容器生成规则；点击页签标题会切换对应内容。页签条是 `WrapPanel` 且**不套滚动容器**——**页签超出可用宽度时自动换行**，行数不设上限：页签行随行数变高，内容区被相应压缩，控件总高不变。换行与横向滚动互斥（`ScrollViewer` 的 `HorizontalScrollBarVisibility=Auto` 会给面板无限宽度，`WrapPanel` 在无限宽度下永远只排一行），所以页签条不再横向滚动；需要限制头部占用的空间，由宿主给控件设 `Height`/`MaxHeight`，或把整台控件包进宿主自己的 `ScrollViewer`。页签条固定在顶部，因此**不支持 `TabStripPlacement` 的 Left/Bottom/Right 方向**（官方 `TabPanel` 能力未包含）。多行时「选中页签去底边框、与内容区连成一体」只发生在**最后一行**（那里才有内容区上边线）；非末行的选中页签底边同样不描边，会在该行下沿留下 1px 缺口——离屏实测：选中页签底边像素 `#FFFFFF`（页签自身背景），同排未选页签同一位置是 `#DADEE2`（`Theme.Brush.Border.Default`）。这是刻意保留的取舍：改成「选中态一律四边描边」会破坏单行时页签与内容区衔接的观感，改成「只有末行去底边」需要在排列之后回写行归属标记（布局反馈环风险），两者都不划算。
 
 **官方类型接管**：库字典中提供了官方 `TabControl` 的隐式样式（与 `ListBox` / `ComboBox` 等同一约定）。宿主把 `Themes/Generic.xaml` 合并进 `Application.Resources` 后，**原生 `<TabControl>` 无需任何前缀与配置即被库主题接管**：外壳、页签行与悬停/选中态与 `jv:TabControl` 一致，页签容器为原生 `TabItem`（`DefaultTabItemStyle`）。两个圆角属性注册为**附加属性**，因此官方 `<TabControl>` 同样可自定义：`jv:TabControl.HeaderCornerRadius="6"`、`jv:TabControl.ContentCornerRadius="0,0,12,12"`（未赋值时取默认值；官方类型下不再产生绑定失败跟踪——此前那条 `Warning 40` 只在宿主开启 `PresentationTraceSources.DataBindingSource` 跟踪时可见，默认 `Level=Off`）。`IsClosable`、`CloseTabCommand`、页签重命名与 `ItemHoverBackground` / `SelectedItemBackground` 仍是 `jv:TabControl` 的派生能力，官方 `<TabControl>` 不具备——需要这些能力请使用 `jv:TabControl` 与 `jv:TabControlItem`（原 `TabMenu` / `TabMenuItem` 自 3.1.0 起更名）。
 
@@ -1545,7 +1545,7 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 
 ### InfoBar
 
-`jv:InfoBar` 用户信息条：左侧头像（`AvatarSource` 图片，圆形裁切；未设置时显示 `UserName` 首字符的圆形字标），`Text` 布局（默认）在头像右侧显示名称与可选的设置按钮，`AvatarOnly` 布局仅显示头像、悬停经 ToolTip 显示名称。两种布局点击都会弹出**与控件等宽**的菜单：菜单项可在 XAML 中直接编写（作为控件的 `Items`），也可经 `ItemsSource` 绑定一个列表（项外观用 `ItemTemplate` 定制）；菜单经 `Popup` 悬浮，默认向上展开（适合侧栏 / 标题栏底部，`MenuPlacement` 可换），点菜单外部或再次点击收起；`AutoCloseOnMenuClick="True"`（默认）时点击菜单内的按钮项自动收起。菜单在**鼠标抬起**时弹出（按下阶段开 Popup 会与点击手势冲突）。设置按钮点击冒泡 `SettingsClick` 路由事件；`AvatarOnly` 布局指定宽度时头像居中显示。**数据项容器**：经 `ItemsSource` 绑定的字符串 / 模型项自动包装为整行 `Button`（全宽左对齐、悬停纱色，可用 `ItemContainerStyle` 覆盖），点击冒泡 `ButtonBase.Click`（同时触发自动收起，宿主可在 InfoBar 上经 `OriginalSource.DataContext` 区分菜单项）；XAML 中直接编写的元素（`jv:Button`、分隔线等）按原样使用、不再包装。
+`jv:InfoBar` 用户信息条：左侧头像（`AvatarSource` 图片，圆形裁切；未设置时显示 `UserName` 首字符的圆形字标），`Text` 布局（默认）在头像右侧显示名称与可选的设置按钮，`AvatarOnly` 布局仅显示头像、悬停经 ToolTip 显示名称。两种布局点击都会弹出菜单：菜单项可在 XAML 中直接编写（作为控件的 `Items`），也可经 `ItemsSource` 绑定一个列表（项外观用 `ItemTemplate` 定制），菜单项模式**与控件等宽**；菜单经 `Popup` 悬浮，默认向上展开（适合侧栏 / 标题栏底部，`MenuPlacement` 可换），点菜单外部或再次点击收起；`AutoCloseOnMenuClick="True"`（默认）时点击菜单内的按钮项自动收起。菜单在**鼠标抬起**时弹出（按下阶段开 Popup 会与点击手势冲突）。设置按钮点击冒泡 `SettingsClick` 路由事件；`AvatarOnly` 布局指定宽度时头像居中显示。**数据项容器**：经 `ItemsSource` 绑定的字符串 / 模型项自动包装为整行 `Button`（全宽左对齐、悬停纱色，可用 `ItemContainerStyle` 覆盖），点击冒泡 `ButtonBase.Click`（同时触发自动收起，宿主可在 InfoBar 上经 `OriginalSource.DataContext` 区分菜单项）；XAML 中直接编写的元素（`jv:Button`、分隔线等）按原样使用、不再包装。
 
 | 属性 | 默认值 | 效果 |
 | --- | --- | --- |
@@ -1557,8 +1557,8 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 | `MenuPlacement` | `Top` | 菜单弹出方位（`PlacementMode`） |
 | `AutoCloseOnMenuClick` | `true` | 点击菜单内的按钮项（Click 冒泡到菜单宿主）时自动收起菜单 |
 | `Items` / `ItemsSource` / `ItemTemplate` | — | 继承自 `ItemsControl`：菜单项 XAML 编写或列表绑定 |
-| `MenuContent` | `null` | 弹层改为任意面板内容（`ListBox`、`UserControl`、复杂布局均可），设置后替代菜单项列表；内容与 InfoBar 共享 `DataContext` |
-| `MenuWidth` | `NaN` | 弹层宽度；`NaN` 时与控件等宽，设置后覆盖等宽约束 |
+| `MenuContent` | `null` | 弹层改为任意面板内容（`ListBox`、`UserControl`、复杂布局均可），设置后替代菜单项列表；宽度随内容自适应（Popup 窗口语义，不受父容器 / 控件尺寸约束）；内容与 InfoBar 共享 `DataContext` |
+| `MenuWidth` | `NaN` | 弹层宽度；`NaN` 时菜单项模式与控件等宽、`MenuContent` 面板模式随内容自适应，显式设置后两种模式都定宽 |
 | `MenuMaxHeight` | `NaN` | 弹层最大高度；列表项较多时建议设置，避免超出屏幕 |
 
 ```xml
@@ -1593,7 +1593,7 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 </jv:InfoBar>
 ```
 
-面板内容与 InfoBar 共享 `DataContext`，内部按钮点击冒泡 `ButtonBase.Click`（`AutoCloseOnMenuClick=true` 时自动收起菜单）。`AppBar Mode="Expandable"` 的抽屉（`Drawer` 属性）本就接受任意面板内容，两者一致。
+面板内容与 InfoBar 共享 `DataContext`，内部按钮点击冒泡 `ButtonBase.Click`（`AutoCloseOnMenuClick=true` 时自动收起菜单）。面板宽度默认随内容自适应（如 50×50 仅头像布局也能弹出大尺寸面板），示例中的 `MenuWidth="360"` 演示需要定宽时的显式覆盖。`AppBar Mode="Expandable"` 的抽屉（`Drawer` 属性）本就接受任意面板内容，两者一致。
 
 ## 布局控件
 

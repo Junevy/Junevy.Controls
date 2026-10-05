@@ -191,6 +191,41 @@
                     </jv:TabControl>
                 </demo:DemoSection>
 
+                <demo:DemoSection
+                    Title="jv:TabControl（页签自动换行）"
+                    Description="页签条是 WrapPanel 且不套滚动容器：页签超出可用宽度时自动换行，行数不设上限。换行后页签行变高、内容区被压缩，控件总高不变；要限制头部占用，给控件设 Height/MaxHeight 或由宿主外层再套 ScrollViewer。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.TabControlWrapDemo}">
+                    <jv:TabControl
+                        Width="420"
+                        Height="200"
+                        IsClosable="False">
+                        <jv:TabControlItem Header="总览">
+                            <TextBlock Margin="16" Text="总览页签内容。" />
+                        </jv:TabControlItem>
+                        <jv:TabControlItem Header="设备">
+                            <TextBlock Margin="16" Text="设备页签内容。" />
+                        </jv:TabControlItem>
+                        <jv:TabControlItem Header="告警">
+                            <TextBlock Margin="16" Text="告警页签内容。" />
+                        </jv:TabControlItem>
+                        <jv:TabControlItem Header="录像">
+                            <TextBlock Margin="16" Text="录像页签内容。" />
+                        </jv:TabControlItem>
+                        <jv:TabControlItem Header="门禁">
+                            <TextBlock Margin="16" Text="门禁页签内容。" />
+                        </jv:TabControlItem>
+                        <jv:TabControlItem Header="网络">
+                            <TextBlock Margin="16" Text="网络页签内容。" />
+                        </jv:TabControlItem>
+                        <jv:TabControlItem Header="存储">
+                            <TextBlock Margin="16" Text="存储页签内容。" />
+                        </jv:TabControlItem>
+                        <jv:TabControlItem Header="系统">
+                            <TextBlock Margin="16" Text="系统页签内容。" />
+                        </jv:TabControlItem>
+                    </jv:TabControl>
+                </demo:DemoSection>
+
             </StackPanel>
         </ScrollViewer>
     </Border>

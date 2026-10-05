@@ -128,7 +128,7 @@
 
                 <demo:DemoSection
                     Title="jv:InfoBar（用户信息条：头像 + 名称 / 仅头像，点击弹出菜单或面板）"
-                    Description="Text 布局：头像（AvatarSource 图片，或名称首字符字标）+ 名称 + 可选设置按钮（SettingsClick 路由事件）；AvatarOnly 布局：仅头像（指定宽度时居中），悬停经 ToolTip 显示名称。点击弹出与控件等宽的菜单：菜单项可在 XAML 中直接编写（作为 Items），也可经 ItemsSource 绑定列表（项外观用 ItemTemplate 定制）；设 MenuContent 后弹层变为任意面板内容（ListBox / UserControl / 复杂布局），宽度用 MenuWidth 指定、高度用 MenuMaxHeight 限制。默认向上展开（MenuPlacement 可换），点菜单外部或再次点击收起，AutoCloseOnMenuClick=True 时点击菜单内按钮项自动收起。"
+                    Description="Text 布局：头像（AvatarSource 图片，或名称首字符字标）+ 名称 + 可选设置按钮（SettingsClick 路由事件）；AvatarOnly 布局：仅头像（指定宽度时居中），悬停经 ToolTip 显示名称。点击弹出与控件等宽的菜单：菜单项可在 XAML 中直接编写（作为 Items），也可经 ItemsSource 绑定列表（项外观用 ItemTemplate 定制）；设 MenuContent 后弹层变为任意面板内容（ListBox / UserControl / 复杂布局），宽度默认随内容自适应（Popup 窗口语义，不受控件尺寸约束），需要定宽时用 MenuWidth 指定、高度用 MenuMaxHeight 限制。默认向上展开（MenuPlacement 可换），点菜单外部或再次点击收起，AutoCloseOnMenuClick=True 时点击菜单内按钮项自动收起。"
                     XamlCode="{x:Static sample:ShowcaseSnippets.InfoBarDemo}">
                     <StackPanel>
                         <jv:InfoBar
@@ -170,7 +170,7 @@
                             MenuMaxHeight="240"
                             SettingsClick="OnInfoBarSettingsClick">
                             <!--  MenuContent:任意面板内容(ListBox / UserControl / 复杂布局),
-                                  等宽约束被 MenuWidth 覆盖;AutoCloseOnMenuClick 只对按钮项生效  -->
+                                  宽度默认随内容自适应;AutoCloseOnMenuClick 只对按钮项生效  -->
                             <jv:InfoBar.MenuContent>
                                 <StackPanel>
                                     <TextBlock

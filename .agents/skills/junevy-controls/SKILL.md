@@ -95,7 +95,7 @@ ThemeManager.ToggleTheme();
 | 输入 | `jv:TextBox`（`ShowClear` 清空按钮；`ShowCommandButton`+`CommandButtonCommand` 内嵌命令按钮，与清空按钮互斥）；`jv:PasswordBox`（`Password` 可绑定、`RevealMode`、`IsError` 泛红）；`jv:ComboBox`（单击主体切换下拉）；`jv:GroupBox`（点标题折叠：`IsCollapsible`/`IsCollapsed`）；`DatePicker`（官方写法即可）；`jv:Slider`（数值框三属性） |
 | 集合 | `jv:ListBox` / `jv:ListView`（`Orientation="Horizontal"` 横向带状滑动；ListView 设了 `View`/GridView 时该属性失效）；`DataGrid`（官方写法即可；默认关闭新增/删除行、整行单选）；`jv:DataPager`（独立分页栏，可与 PagingAssist 显式绑定） |
 | 文本/状态 | `jv:Label`（状态标签：`DisplayMode` 枚举 Error/Success/Warning/Borderless*/Neutral）；`jv:TextBlock`（左 `Content` 右 `Text` 的标题组合，非 WPF TextBlock） |
-| 菜单/导航 | `jv:ContextMenu` + `jv:ContextMenuItem`（上下文菜单用这两个）；**`jv:MenuItem` 是 SideMenu 的导航数据控件，不是 WPF MenuItem——不要放进 ContextMenu**；`jv:SideMenu`（侧边导航，继承 WPF ListBox，绑 `SelectedItem`）；`jv:TreeView` + `jv:TreeMenuItem`（见下）；`jv:TabControl`（页签多时横向滚动不换行、不支持 `TabStripPlacement` 四方向；圆角是附加属性 `jv:TabControl.HeaderCornerRadius`/`.ContentCornerRadius`，官方 TabControl 也能用；关闭流程走 `TabClosing` 路由事件，可 `e.Cancel=true`）；`jv:ToolBar`/`jv:ToolBarItem`；`jv:Toolbox`/`jv:ToolboxItem`/`jv:ToolItem`（悬浮工具箱 + 拖放，数据格式 `"Junevy.Controls.Tool"`） |
+| 菜单/导航 | `jv:ContextMenu` + `jv:ContextMenuItem`（上下文菜单用这两个）；**`jv:MenuItem` 是 SideMenu 的导航数据控件，不是 WPF MenuItem——不要放进 ContextMenu**；`jv:SideMenu`（侧边导航，继承 WPF ListBox，绑 `SelectedItem`）；`jv:TreeView` + `jv:TreeMenuItem`（见下）；`jv:TabControl`（页签超出宽度时**自动换行**，行高随行数增长、不横向滚动，也不限行数；不支持 `TabStripPlacement` 四方向；圆角是附加属性 `jv:TabControl.HeaderCornerRadius`/`.ContentCornerRadius`，官方 TabControl 也能用；关闭流程走 `TabClosing` 路由事件，可 `e.Cancel=true`）；`jv:ToolBar`/`jv:ToolBarItem`；`jv:Toolbox`/`jv:ToolboxItem`/`jv:ToolItem`（悬浮工具箱 + 拖放，数据格式 `"Junevy.Controls.Tool"`） |
 | 布局 | `jv:ExpanderPanel`（`DisplayMode` Classic/Card、`ExpandDirection` 四方向、`HeaderExtra` 扩展槽）；`jv:SidePanel`（浮层侧滑面板：`IsOpen`/`Side`/`CornerRadius` 四角可分别设置，放入 Grid 不指定 Row/Column 自动跨满） |
 | 通知 | `jv:Badge`（角标：`Count`/`MaxCount`/`IsDot`/`Corner`）；`jv:MessageBar` + `MessageBarService`（注册一次 `SetPresenter` 后任意处 `Show`，非 UI 线程可调；用 `IsShown` 控制显隐，不要直接设 Visibility/Opacity）；`ToolTip`（官方写法自动主题化） |
 | 窗口/图像 | `jv:DialogWindow`（无边框对话框宿主，无默认宽高按内容收缩，Prism 场景派生补 `IDialogWindow`）；`jv:ImageViewer`（滚轮缩放、拖动平移、`FitToWindow()`/`ActualSize()`、右键保存）；`jv:AppBar`（无边框标题栏：`Mode` Default/MenuBar/Expandable，配合宿主 WindowChrome，系统按钮命令自动补齐）；`jv:InfoBar`（用户信息条 + 弹出菜单，`MenuContent` 可放任意面板） |
@@ -124,6 +124,7 @@ ThemeManager.ToggleTheme();
 - 分页不生效 → 数据是 XAML 直接声明子条目而非 `ItemsSource`；或两个控件共享了同一数据源。
 - MessageBar 直接设 `Visibility`/`Opacity`/`RenderTransform` 失效 → 这三个属性由控件随 `IsShown` 管理。
 - `TabControl` 写了 `DisplayMode`/`TabStripPlacement` 报错或无效 → 前者已在 3.2.0 删除（写 XAML 会编译失败），后者不支持四方向。
+- `jv:TabControl` 换行后「非末行的选中页签底边缺 1px 描边」→ 已知取舍（去底边框只对末行有意义，那里才有内容区上边线），不要为此改回四边描边或加行归属测量；要限制头部占用由宿主定高或外层套 `ScrollViewer`。
 - 自定义模板时必须保留 WPF 标准部件名（`PART_ContentHost`、`PART_ScrollViewer`、`ItemsPresenter` 等）——本库多处行为（平滑滚动、滚轮折算）依赖 `PART_ScrollViewer` 命名。
 
 ## 8. 深入阅读地图（写代码前按需查阅）

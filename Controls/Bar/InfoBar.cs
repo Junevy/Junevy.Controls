@@ -172,7 +172,8 @@ namespace Junevy.Controls.Controls.Bar
 
         /// <summary>
         /// 弹出面板的任意内容（<see cref="ListBox"/>、<see cref="UserControl"/>、复杂布局等），
-        /// 设置后弹层以它替代菜单项列表呈现（与控件等宽或 <see cref="MenuWidth"/> 指定宽度）。
+        /// 设置后弹层以它替代菜单项列表呈现，宽度随内容自适应（Popup 窗口语义，
+        /// 不受父容器与控件自身尺寸约束），需要定宽时显式设置 <see cref="MenuWidth"/>。
         /// 为 <see langword="null"/> 时弹层呈现 <c>Items</c> / <c>ItemsSource</c> 的菜单项。
         /// </summary>
         public object? MenuContent
@@ -186,10 +187,11 @@ namespace Junevy.Controls.Controls.Bar
                 nameof(MenuContent),
                 typeof(object),
                 typeof(InfoBar),
-                new PropertyMetadata(null));
+                new PropertyMetadata(null, OnMenuSizeChanged));
 
         /// <summary>
-        /// 弹层宽度（DIP）；<see cref="double.NaN"/>（默认）时与控件等宽。
+        /// 弹层宽度（DIP）；<see cref="double.NaN"/>（默认）时，菜单项模式与控件等宽，
+        /// <see cref="MenuContent"/> 面板模式随内容自适应。
         /// </summary>
         public double MenuWidth
         {
@@ -293,7 +295,12 @@ namespace Junevy.Controls.Controls.Bar
             ((InfoBar)d).UpdateMenuSize();
         }
 
-        /// <summary>按 MenuWidth / MenuMaxHeight 同步弹层宿主尺寸；NaN 时回退为与控件等宽 / 不限高。</summary>
+        /// <summary>
+        /// 按 MenuWidth / MenuMaxHeight 同步弹层宿主尺寸：
+        /// MenuWidth 显式设置时定宽；NaN 时菜单项模式回退为与控件等宽，
+        /// MenuContent 面板模式保持 NaN（随内容自适应，Popup 窗口语义，
+        /// 弹层经 PlacementTarget 定位、尺寸不受父容器约束）。
+        /// </summary>
         private void UpdateMenuSize()
         {
             if (_menuHost == null)
@@ -301,7 +308,9 @@ namespace Junevy.Controls.Controls.Bar
                 return;
             }
 
-            _menuHost.Width = double.IsNaN(MenuWidth) ? ActualWidth : MenuWidth;
+            _menuHost.Width = !double.IsNaN(MenuWidth)
+                ? MenuWidth
+                : MenuContent != null ? double.NaN : ActualWidth;
             _menuHost.MaxHeight = double.IsNaN(MenuMaxHeight) ? double.PositiveInfinity : MenuMaxHeight;
         }
 

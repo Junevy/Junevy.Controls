@@ -4,11 +4,12 @@ using System.Windows.Controls;
 namespace Junevy.Controls.Controls.Text
 {
     /// <summary>
-    /// 文本块控件：左侧显示 <see cref="Content"/>（图标、图片等任意内容），
-    /// 右侧显示 <see cref="Text"/>，适合"图标 + 标题"的组合。
+    /// 标题文本控件：左侧显示图标，右侧显示 <see cref="Text"/>，适合"图标 + 标题"的组合。
+    /// 图标统一由 <see cref="AttachedProperties.Icon"/> 附加属性提供（<c>atc:Icon.Icon</c> 可为图标字体字符、
+    /// <c>Image</c>、<c>Path</c> 等任意内容，为空时图标区域整体折叠），本控件不再承载内容。
     /// 作为纯显示控件，默认不可聚焦、不参与 Tab 导航。
     /// </summary>
-    public class TextBlock : ContentControl
+    public class TextBlock : Control
     {
         static TextBlock()
         {

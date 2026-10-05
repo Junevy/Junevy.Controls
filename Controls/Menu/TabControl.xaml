@@ -246,13 +246,14 @@
 
         <Setter Property="ItemContainerStyle" Value="{StaticResource DefaultTabItemStyle}" />
 
-        <!--  标签头排列方式：单行 + 横向滚动。不可用 WrapPanel——页签行 ScrollViewer 的
-              HorizontalScrollBarVisibility=Auto 会给面板无限宽度，WrapPanel 永远只排一行，
-              「自动换行」实际不会发生（此前正是这一组合让换行承诺落空）。  -->
+        <!--  标签头排列方式：自动换行（WrapPanel），页签行不套滚动容器。
+              根因看守：ScrollViewer 的 HorizontalScrollBarVisibility=Auto 会给面板无限宽度，
+              WrapPanel 在无限宽度下永远只排一行，「自动换行」不会发生——所以换行与横向滚动
+              二者只能取其一，此处取换行并把 ScrollViewer 整层删掉（不是留着改成 Disabled）。  -->
         <Setter Property="ItemsPanel">
             <Setter.Value>
                 <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" />
+                    <WrapPanel />
                 </ItemsPanelTemplate>
             </Setter.Value>
         </Setter>
@@ -284,12 +285,9 @@
                                 ContentSource="SelectedContent" />
                         </Border>
 
-                        <!--  标签头（绘制在内容区上边框线之上）。StackPanel 不实现 IScrollInfo，
-                              故不设 CanContentScroll：竖向滚动天然为像素级，横向溢出由滚动条承接。  -->
-                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                      VerticalScrollBarVisibility="Disabled">
-                            <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" />
-                        </ScrollViewer>
+                        <!--  标签头（绘制在内容区上边框线之上）：不套 ScrollViewer，
+                              横向溢出由 WrapPanel 换行承接（换行与横向滚动互斥，见 ItemsPanel 注释）。  -->
+                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

@@ -1,3 +1,26 @@
+## `TabControl` 页签行由「横向滚动」改为「自动换行」（删掉页签行的 `ScrollViewer`，行数不设上限）
+
+### 本次更新（`3.2.1`：先按用户提问实测确认「页签过多时是滚动、不换行」，随后按要求改为自动换行。两项取舍经确认：① 纯换行、不设行数上限（不加新依赖属性，需要限制占用的宿主自行定高或外层套 `ScrollViewer`）；② 本轮不动页签模板，先出截图判断多行时「选中页签去底边框」的接缝是否可见）— 2026-10-05
+
+- **改动点（`Controls/Menu/TabControl.xaml`）**：`DefaultTabControlStyle` 的 `ItemsPanel` 由 `<StackPanel Orientation="Horizontal" />` 改为 `<WrapPanel />`；模板中包住 `ItemsPresenter` 的整层 `ScrollViewer`（`HorizontalScrollBarVisibility=Auto` / `Vertical=Disabled`）删除，`KeyboardNavigation.DirectionalNavigation="Cycle"` 保留在 `ItemsPresenter` 上（探针 K1 看守，防止它随 `ScrollViewer` 一起被删）。**根因**：`ScrollViewer` 的横向 `Auto` 以无限宽度测量子面板，`WrapPanel` 在无限宽度下永远只排一行——换行与横向滚动互斥，只换 `ItemsPanel` 而不删滚动容器等于什么都没改，故整层删除而非改成 `Disabled`。
+- **行为变更**：既有宿主从「页签超出宽度出现横向滚动条」变为「页签换行、页签行随行数变高、内容区被压缩（控件总高不变）」，且行数无上限——页签极多时头部会一直长高。`3.2.0` 条目 ⑦ 把 `WrapPanel` 改成横向 `StackPanel` 是为了「让文档承诺与实现一致」（当时的 `WrapPanel` 被滚动容器架空、从未换行）；本轮反向改回 `WrapPanel`，并按用户要求第一次把导致换行失效的滚动容器根因移除，换行是实测生效的行为而非注释里的承诺。
+- **已知外观缺口（实测，非本轮引入的回归；经维护者确认保持现状）**：多行时只有**最后一行**的选中页签与内容区上边线衔接；非末行的选中页签底边同样不描边，会在该行下沿留 1px 缺口。像素证据（96dpi、1 DIU=1px）：选中页签底边为 `#FFFFFF`（页签自身背景），同排未选页签同坐标为 `#DADEE2`（`Theme.Brush.Border.Default`）。备选方案「选中态一律四边描边」会破坏单行时与内容区连成一体的既有观感（`3.2.0` 特意做的），「仅末行去底边」需要在 `ArrangeOverride` 之后回写行归属标记、有布局反馈环风险——两条都不划算，故本轮不动模板，缺口按事实写进 README。
+- **Showcase**：`Pages/MenusPage.xaml`「菜单与导航」页新增演示块「jv:TabControl（页签自动换行）」（`Width=420` + 8 个页签 + `IsClosable=False`），`ShowcaseSnippets.TabControlWrapDemo` 同步；原「可关闭页签 + TabClosing 拦截」演示块保持不动。
+- **验证（临时探测工程 `.workbuddy/tmp/TabWrapProbe/`，不入库，验收后已删除，数字取自删除前最后一次全量运行）**：**41 条断言全部通过**，官方 `<TabControl>` 与 `jv:TabControl` 双路各覆盖——S1 页签面板为 `WrapPanel`、S2 页签行到控件之间无 `ScrollViewer`、S3 夹具自检（容器未被二次包装、标题直接呈现）、W1 9 个页签实测行 Y = `[0 / 26 / 52]`（官方 `[0 / 20 / 40]`）即 3 行、W2 九个页签都在可视树里、W3 控件宽度未被页签撑破、W4 放得下时仍单行、H1/H2 页签行变高且内容区相应变矮、H3 控件总高不变、K1/K2 键盘方向导航 `Cycle` 契约仍在、P1–P5 选中态与截图自检、E1 页签标题有可用宽度、D1/D2 按 Showcase 演示块参数照抄后确实换行（页签自然宽 58 → 行 Y `[0 / 20]`）。渲染证据 4 张 PNG（单行 / 三行首行选中 / 三行末行选中 / 演示块）连同末次 `report.txt` 与该版 `Program.cs` 留在 `.workbuddy/tmp/TabWrap-shots-2026-10-05/`（`.gitignore` 内，不入库），出图统一按 96dpi（1 DIU=1px）——本机 125% 缩放下 1 逻辑像素 = 1.25 设备像素，1px 边框会跨两个设备像素并因取整错位，剖面读不出「哪条线断了」。
+- **探针自身返工（如实记录，首轮 25/25「全绿」里有两处假绿）**：① 夹具把裸 `TabItem` 塞进 `jv:TabControl`，而 `IsItemItsOwnContainerOverride` 只认 `TabControlItem`，条目被当数据项二次包装 → `SelectedItem = 容器` 在 `Items` 里查不到索引，选择静默停在 0，两张「首行选中 / 末行选中」截图 md5 完全相同；② 页签写死 `Width=90` 时关闭按钮的内边距把 `PART_HeaderPresenter` 挤到 10px，标题只剩一个字，证据图失去观感参考价值。现改用 `SelectedIndex` + `TabControlItem`，夹具尺寸改 360×116，并补 P1（两张截图必须不同）、P2–P4（选中态自检）、S3、E1 判别断言——同类假绿以后由探针自己拦下。
+- **变异反证（2 项，各触发 8 条 FAIL）**：M1 把 `ScrollViewer`（`Horizontal=Auto`）套回 `ItemsPresenter`、面板保持 `WrapPanel` → S2 双路 + W1 双路 + H1/H2 双路 FAIL，9 个页签的行 Y 退化为 `[0]`（单行）——「滚动容器让 `WrapPanel` 永不换行」由实测背书，不是口头解释；M2 `ItemsPanel` 退回横向 `StackPanel`（不套 `ScrollViewer`）→ S1 双路 + W1 + H1/H2 双路 FAIL。两项跑完已还原源码（`diff -q` 与备份一致）、库 `--no-incremental` 重建、探针复跑 41/41 全绿。库双 TFM（net48 / net8.0-windows）构建 **0 错误、24 警告**（与历史基线一致，无新增），Showcase **0 错误、1 警告**（Companion 的历史 CS8600，与本轮无关）。
+- **文档**：README「TabControl 与 TabControlItem」按换行改写（互斥根因、行数无上限、宿主限行方式、多行衔接缺口的像素口径）；仓库 skill（`.agents/skills/junevy-controls/SKILL.md`）的 `jv:TabControl` 能力行由「页签多时横向滚动不换行」改为「超出宽度自动换行、不横向滚动、不限行数」。
+- **版本号**：csproj 现值 `3.2.1`，按维护者指示本轮未代为递增；本条属行为变更，发布时是否升 `3.3.0` 由维护者决定。
+
+## `jv:InfoBar` 面板模式（`MenuContent`）弹层宽度改为随内容自适应（Popup 窗口语义，不再受父容器 / 控件尺寸约束）
+
+### 本次更新（`3.2.0`：用户反馈 AvatarOnly 50×50 的 InfoBar 设置 `MenuContent`（含 200×200 图片的 StackPanel）后，弹层内容被严格压进父容器尺寸内——根因是 `UpdateMenuSize()` 在 `MenuWidth=NaN`（默认）时把弹层宿主 Border 的 `Width` 固定为控件 `ActualWidth`，「与控件等宽」约束对任意面板内容同样生效。修复：`UpdateMenuSize` 按模式区分——`MenuWidth` 显式设置时两种模式都定宽；NaN 时菜单项模式保持与控件等宽（既有约定不回归），`MenuContent` 面板模式保持 NaN（清除显式宽度 → 弹层随内容自适应，Popup 为顶层窗口、测量不受 PlacementTarget/父容器约束，即「PopupWindow 感觉」，50×50 控件也能弹出任意大面板）。`MenuContentProperty` 元数据补 `OnMenuSizeChanged` 回调——运行时切换 `MenuContent`（null ↔ 面板）宿主宽度随之在「等宽 / 自适应」间切换，此前该变化无任何钩子）— 2026-10-04
+
+- **改动点（`Controls/Bar/InfoBar.cs`）**：① `UpdateMenuSize()` 宽度逻辑改为三分支（显式 MenuWidth → 定宽；NaN + MenuContent ≠ null → NaN 自适应；NaN + 菜单项模式 → ActualWidth 等宽），`MaxHeight` 逻辑不变；② `MenuContentProperty` 元数据从 `PropertyMetadata(null)` 改挂 `OnMenuSizeChanged`；③ `MenuContent` / `MenuWidth` 的 XML 注释与 README 属性表、面板模式示例说明、Showcase BarsPage 演示描述与行内注释、`ShowcaseSnippets.InfoBarDemo` 片段同步更新（「宽度用 MenuWidth 指定」→「默认随内容自适应，MenuWidth 显式定宽」）。
+- **行为变更**：`MenuContent` 模式且未设 `MenuWidth` 的既有宿主，弹层宽度从「控件等宽」变为「内容自适应」——之前依赖等宽约束的面板需显式设置 `MenuWidth` 恢复定宽；菜单项模式（`Items` / `ItemsSource`）与显式 `MenuWidth` 用法完全不变。
+- **验证**：离屏探针 `.workbuddy/tmp/InfoBarProbe/`（net8.0-windows，实测 `PART_MenuHost` 实际尺寸）**6/6 断言 PASS**——A：50×50 AvatarOnly + 200×200 面板内容，弹层 202×248.4 随内容自适应（不再压成 50）；B：显式 `MenuWidth=360` 仍定宽 360；C：菜单项模式保持与控件等宽（50）；D：运行时 `MenuContent` null→面板切换，宿主从等宽 50 变为自适应 202（回调生效）。库双 TFM + Showcase 构建 **0 错误**；探针工程验收后已清理。
+- **版本号**：目标 `3.2.0`（未发布），并入当前迭代，csproj 未改动。
+
 ## `SidePanel` 新增 `CornerRadius` 依赖属性：四个角可分别设置圆角（原先模板写死主题令牌）
 
 ### 本次更新（`3.2.1`：用户要求给 `jv:SidePanel` 增加圆角属性，可按 `4,4,4,4` 这种方式单独设置四个角。此前圆角硬编码在模板的 `PART_Content` 上（`CornerRadius="{DynamicResource Theme.ControlCornerRadius}"`，浅/深主题均为 6），宿主无法逐实例定制，只能整块替换 `Template`。现按库内 `jv:DialogWindow.CornerRadius` 的先例暴露**自有实例依赖属性**（不是 `Border.CornerRadius` 那套必须走样式 Setter 的写法，行内属性直接可用），并按用户选择**四角完全自由、不按 `Side` 做筛选**）— 2026-10-05
