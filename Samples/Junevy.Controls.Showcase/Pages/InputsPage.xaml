@@ -83,7 +83,7 @@
 
                 <demo:DemoSection
                     Title="jv:TextBox —— TitleAssist（输入框外侧标题）"
-                    Description="标题内容为 object（可直接设 iconfont 字形）；TitlePlacement 四方位、间距固定 4 DIP；字体族/字号未设置时继承控件自身值，颜色未设置时取主题次级文本色。TitleWidth 为标题区域固定宽度（默认 NaN 自适应）：表单式布局中统一设置后，不同长度的标题保持一致的标题—输入框间距，输入框整列对齐（左方位标题自动右对齐贴合输入框）。IsRequired 为 true 时标题旁显示必填图标：默认主题 Danger 色小圆点，IsRequiredIcon 可自定义内容（如星号「*」），IsRequiredIconPlacement 控制图标在标题左侧或右侧（默认右侧）；未设置 Title 时不显示必填标识。"
+                    Description="标题内容为 object（可直接设 iconfont 字形）；TitlePlacement 四方位、间距固定 4 DIP；字体族/字号未设置时继承控件自身值，颜色未设置时取主题次级文本色。TitleWidth 为标题区域固定宽度（默认 NaN 自适应）：表单式布局中统一设置后，不同长度的标题保持一致的标题—输入框间距，输入框整列对齐；标题在该区域内的水平位置由 TitleAlignment 控制（见下一节）。IsRequired 为 true 时标题旁显示必填图标：默认主题 Danger 色小圆点，IsRequiredIcon 可自定义内容（如星号「*」），IsRequiredIconPlacement 控制图标在标题左侧或右侧（默认右侧）；未设置 Title 时不显示必填标识。"
                     XamlCode="{x:Static sample:ShowcaseSnippets.TextBoxTitleAssist}">
                     <StackPanel>
                         <WrapPanel>
@@ -168,6 +168,72 @@
                                 atc:TitleAssist.Title="部门"
                                 atc:TitleAssist.TitlePlacement="Left"
                                 atc:TitleAssist.TitleWidth="110" />
+                        </StackPanel>
+                    </StackPanel>
+                </demo:DemoSection>
+
+                <demo:DemoSection
+                    Title="TitleAssist.TitleAlignment（标题在区域内的靠齐）"
+                    Description="TitleAlignment 决定「标题文字 + 必填标识」整组在标题区域内的水平靠齐：Left（默认）/ Right / Center。标题区域宽度由 TitleWidth 决定——上下方位未设 TitleWidth 时区域就是输入区整行宽，设 Right 即贴到输入框右端；左右方位未设 TitleWidth 时区域等于标题自身宽，靠齐不产生可见位移，需配合 TitleWidth 才看得出效果。同一附加属性在 jv:TextBox / jv:ComboBox / jv:PasswordBox 三份模板中行为一致；旧版「左方位标题自动贴合输入框」的观感，现在显式写 TitleAlignment=&quot;Right&quot; 即可还原。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.TitleAlignmentDemo}">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,6"
+                            Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                            Text="上下方位（未设 TitleWidth）：区域即输入区整行宽" />
+                        <WrapPanel>
+                            <jv:TextBox
+                                Margin="0,0,12,8"
+                                Width="220"
+                                atc:TitleAssist.Title="默认（Left）"
+                                atc:TitleAssist.TitleAlignment="Left" />
+                            <jv:TextBox
+                                Margin="0,0,12,8"
+                                Width="220"
+                                atc:TitleAssist.Title="Right：贴到输入框右端"
+                                atc:TitleAssist.TitleAlignment="Right" />
+                            <jv:TextBox
+                                Margin="0,0,12,8"
+                                Width="220"
+                                atc:TitleAssist.Title="Center"
+                                atc:TitleAssist.TitleAlignment="Center" />
+                            <jv:TextBox
+                                Margin="0,0,12,8"
+                                Width="220"
+                                atc:TitleAssist.IsRequired="True"
+                                atc:TitleAssist.Title="Right + 必填"
+                                atc:TitleAssist.TitleAlignment="Right"
+                                atc:TitleAssist.TitlePlacement="Bottom" />
+                        </WrapPanel>
+                        <TextBlock
+                            Margin="0,12,0,6"
+                            Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                            Text="左方位 + TitleWidth=180：三种靠齐都在这 180 之内" />
+                        <StackPanel>
+                            <jv:TextBox
+                                Width="280"
+                                Margin="0,0,0,8"
+                                HorizontalAlignment="Left"
+                                atc:TitleAssist.Title="Left"
+                                atc:TitleAssist.TitleAlignment="Left"
+                                atc:TitleAssist.TitlePlacement="Left"
+                                atc:TitleAssist.TitleWidth="180" />
+                            <jv:ComboBox
+                                Width="280"
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Left"
+                                atc:TitleAssist.Title="Right（ComboBox）"
+                                atc:TitleAssist.TitleAlignment="Right"
+                                atc:TitleAssist.TitlePlacement="Left"
+                                atc:TitleAssist.TitleWidth="180" />
+                            <jv:PasswordBox
+                                Width="280"
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Left"
+                                atc:TitleAssist.Title="Center（PasswordBox）"
+                                atc:TitleAssist.TitleAlignment="Center"
+                                atc:TitleAssist.TitlePlacement="Left"
+                                atc:TitleAssist.TitleWidth="180" />
                         </StackPanel>
                     </StackPanel>
                 </demo:DemoSection>

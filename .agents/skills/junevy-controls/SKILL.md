@@ -54,7 +54,7 @@ ThemeManager.ToggleTheme();
 `Button`、`CheckBox`、`TextBox`、`ComboBox`、`ListBox`、`ListView`、`DataGrid`、`DatePicker`、`Slider`、`TreeView`、`TabControl`、`ToolTip`（任意元素的 ToolTip 属性自动主题化）。
 
 **B. 必须 `jv:` 前缀**（样式触发器直接引用库自有依赖属性，官方实例拿不到）：
-`RadioButton`、`ToggleButton`、`Label`、`TextBlock`、`ProgressBar`、`PasswordBox`。注意 `jv:TextBlock` 不是 WPF TextBlock——它继承 ContentControl（左侧 `Content`、右侧 `Text`），WPF 原生 TextBlock 不会被重新着色。
+`RadioButton`、`ToggleButton`、`Label`、`TextBlock`、`ProgressBar`、`PasswordBox`。注意 `jv:TextBlock` 不是 WPF TextBlock——它继承 `Control`（左侧图标走 `atc:Icon.Icon`、右侧 `Text`），**不承载 `Content`**（`3.2.3` 破坏性移除），WPF 原生 TextBlock 不会被重新着色。
 
 **C. 专有能力只在 `jv:` 实例上有**：即使外观被接管，以下能力官方实例没有——
 `jv:ListBox`/`jv:ListView` 的 `Orientation="Horizontal"` 横向滑动；`jv:Slider` 的数值框（`ShowValueBox`/`ValueBoxSide`/`ValueFormatString`）；`jv:TabControl` 的关闭/重命名/`TabClosing` 事件；`jv:TreeView` 的 `ExpandAll()`/`CollapseAll()`；`jv:PasswordBox`（原生 PasswordBox 是密封类，无接管样式，而它 `Password` 依赖属性可双向绑定）。
@@ -77,7 +77,7 @@ ThemeManager.ToggleTheme();
 | --- | --- | --- |
 | `atc:Icon.Icon` / `.FontFamily` / `.IconSize` / `.IconForeground` | 控件统一图标 | `Icon` 可为图标字体字符（如 `&#xE60F;`）、`Image`、`Path` 等任意对象；为空时图标区自动折叠。字体默认就是内置 iconfont |
 | `atc:PlaceholderAssist.Placeholder` | TextBox / ComboBox 占位符 | 支持官方实例；`Tag` 不再被模板消费。`jv:ComboBox` 不设时默认 "Select an item..." |
-| `atc:TitleAssist.Title` 系列 | 输入框外侧标题 | `TitlePlacement`（Top/Bottom/Left/Right）、`TitleWidth`（表单对齐）、`IsRequired`（必填标识） |
+| `atc:TitleAssist.Title` 系列 | 输入框外侧标题（`jv:TextBox`/`jv:ComboBox`/`jv:PasswordBox` 及被接管的原生 `TextBox`/`ComboBox`） | `TitlePlacement`（Top/Bottom/Left/Right）、`TitleWidth`（标题区域固定宽度，表单对齐）、`TitleAlignment`（标题整组在区域内的靠齐：Left/Right/Center，默认 Left）、`IsRequired`（必填标识）。靠齐只发生在「标题区域」内部：设了 `TitleWidth` 时区域就是该宽度；未设时上/下方位区域=输入区整行宽（`Right` 即贴输入框右端），左/右方位区域=标题自身宽（靠齐无可见位移）。`TitlePlacement="Left"` + `TitleWidth` 想让标题贴合输入框要显式写 `TitleAlignment="Right"` |
 | `atc:DataGridAssist.EmptyText` | DataGrid 空态提示 | 官方实例可用 |
 | `atc:DatePickerAssist.PlaceHolder` | DatePicker 占位符 | 官方实例可用 |
 | `atc:TreeViewAssist.*` | TreeView 扩展 | `DisplayMode`（`Chevron`/`Indicator`）、`IndentSize`、`AutoExpandAncestors`、`NavigateCommand`——`jv:TreeView` 有同名实例属性，附加属性写法对官方 `<TreeView>` 同样生效 |
@@ -94,7 +94,7 @@ ThemeManager.ToggleTheme();
 | 按钮 | `jv:Button`（`ShowShadow` 浮起阴影）；`jv:CardButton`（指标卡：`Title`/`MainColor`）；`jv:ToggleButton`（开关：`SwitchSize`，形状由模板 `SwitchToggleButton_Radius`（胶囊）/`SwitchToggleButton_Rect`（圆角矩形）决定，**没有** DisplayMode 形状开关）；`jv:RadioButton`（`DisplayMode` Circular/Rectangular） |
 | 输入 | `jv:TextBox`（`ShowClear` 清空按钮；`ShowCommandButton`+`CommandButtonCommand` 内嵌命令按钮，与清空按钮互斥）；`jv:PasswordBox`（`Password` 可绑定、`RevealMode`、`IsError` 泛红）；`jv:ComboBox`（单击主体切换下拉）；`jv:GroupBox`（点标题折叠：`IsCollapsible`/`IsCollapsed`）；`DatePicker`（官方写法即可）；`jv:Slider`（数值框三属性） |
 | 集合 | `jv:ListBox` / `jv:ListView`（`Orientation="Horizontal"` 横向带状滑动；ListView 设了 `View`/GridView 时该属性失效）；`DataGrid`（官方写法即可；默认关闭新增/删除行、整行单选）；`jv:DataPager`（独立分页栏，可与 PagingAssist 显式绑定） |
-| 文本/状态 | `jv:Label`（状态标签：`DisplayMode` 枚举 Error/Success/Warning/Borderless*/Neutral）；`jv:TextBlock`（左 `Content` 右 `Text` 的标题组合，非 WPF TextBlock） |
+| 文本/状态 | `jv:Label`（状态标签：`DisplayMode` 枚举 Error/Success/Warning/Borderless*/Neutral）；`jv:TextBlock`（左 `atc:Icon.Icon` 右 `Text` 的标题组合，非 WPF TextBlock，没有 `Content`） |
 | 菜单/导航 | `jv:ContextMenu` + `jv:ContextMenuItem`（上下文菜单用这两个）；**`jv:MenuItem` 是 SideMenu 的导航数据控件，不是 WPF MenuItem——不要放进 ContextMenu**；`jv:SideMenu`（侧边导航，继承 WPF ListBox，绑 `SelectedItem`）；`jv:TreeView` + `jv:TreeMenuItem`（见下）；`jv:TabControl`（页签超出宽度时**自动换行**，行高随行数增长、不横向滚动，也不限行数；不支持 `TabStripPlacement` 四方向；圆角是附加属性 `jv:TabControl.HeaderCornerRadius`/`.ContentCornerRadius`，官方 TabControl 也能用；关闭流程走 `TabClosing` 路由事件，可 `e.Cancel=true`）；`jv:ToolBar`/`jv:ToolBarItem`；`jv:Toolbox`/`jv:ToolboxItem`/`jv:ToolItem`（悬浮工具箱 + 拖放，数据格式 `"Junevy.Controls.Tool"`） |
 | 布局 | `jv:ExpanderPanel`（`DisplayMode` Classic/Card、`ExpandDirection` 四方向、`HeaderExtra` 扩展槽）；`jv:SidePanel`（浮层侧滑面板：`IsOpen`/`Side`/`CornerRadius` 四角可分别设置，放入 Grid 不指定 Row/Column 自动跨满） |
 | 通知 | `jv:Badge`（角标：`Count`/`MaxCount`/`IsDot`/`Corner`）；`jv:MessageBar` + `MessageBarService`（注册一次 `SetPresenter` 后任意处 `Show`，非 UI 线程可调；用 `IsShown` 控制显隐，不要直接设 Visibility/Opacity）；`ToolTip`（官方写法自动主题化） |
@@ -117,12 +117,14 @@ ThemeManager.ToggleTheme();
 
 - `Border.CornerRadius` 是借用 WPF Border 的附加写法：**逐实例 attribute 写法 `<jv:Button Border.CornerRadius="8">` 编译报错 MC3015**，必须用样式 Setter 或代码 `SetValue`。且开关（ToggleButton）不读它，形状由模板决定。例外：`jv:SidePanel` 与 `jv:DialogWindow` 有自己的 `CornerRadius` 依赖属性，行内 `CornerRadius="4,4,4,4"` 直接可用（顺序为左上、右上、右下、左下）。
 - `jv:CodeEditor` 的语法语言属性叫 `SyntaxLanguage`（不叫 `Language`，刻意避开 `FrameworkElement.Language`）。
+- `jv:TextBlock` 写 `Content="…"` / `ContentTemplate="…"` / 直接塞子元素 → **XAML 加载期抛 `XamlParseException`**（`3.2.3` 起基类由 `ContentControl` 改 `Control`，内容管线整体移除）。图标一律写 `atc:Icon.Icon`；`atc:Icon.IconSize` 默认 `14` 且**不随标题 `FontSize` 放大**，标题更大时要同步设置。
 - 深色主题下窗口仍是白底黑字 → 忘了给 Window 设 `Background`/`TextElement.Foreground`（见第 1 节）。
 - 切主题后颜色不变 → 某处用了 `StaticResource` 绑主题令牌。
 - 覆盖令牌后被「永久记住」→ 用了 `Resources[key] = value` 而不是追加字典。
 - 图标不显示 → `atc:Icon.Icon` 为空时图标区整体折叠（这是设计行为）；或字符用了错误字体（需 `atc:Icon.FontFamily` 或默认 iconfont）。
 - 分页不生效 → 数据是 XAML 直接声明子条目而非 `ItemsSource`；或两个控件共享了同一数据源。
 - MessageBar 直接设 `Visibility`/`Opacity`/`RenderTransform` 失效 → 这三个属性由控件随 `IsShown` 管理。
+- `atc:TitleAssist.TitleAlignment` 设了却看不出差别 → 标题区域没有多余空间可移动：左/右方位未设 `TitleWidth` 时区域等于标题自身宽。靠齐只发生在区域内部，想让它起作用要么给 `TitleWidth`，要么用上/下方位（未设宽度时区域=输入区整行宽）。`TitlePlacement="Left"` + `TitleWidth` 想让标题贴合输入框需显式写 `TitleAlignment="Right"`（`3.2.3` 起默认 `Left`，旧观感不再自动出现）。
 - `TabControl` 写了 `DisplayMode`/`TabStripPlacement` 报错或无效 → 前者已在 3.2.0 删除（写 XAML 会编译失败），后者不支持四方向。
 - `jv:TabControl` 换行后「非末行的选中页签底边缺 1px 描边」→ 已知取舍（去底边框只对末行有意义，那里才有内容区上边线），不要为此改回四边描边或加行归属测量；要限制头部占用由宿主定高或外层套 `ScrollViewer`。
 - 自定义模板时必须保留 WPF 标准部件名（`PART_ContentHost`、`PART_ScrollViewer`、`ItemsPresenter` 等）——本库多处行为（平滑滚动、滚轮折算）依赖 `PART_ScrollViewer` 命名。

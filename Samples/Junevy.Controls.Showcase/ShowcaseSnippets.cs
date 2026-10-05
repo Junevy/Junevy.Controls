@@ -129,11 +129,38 @@ namespace Junevy.Controls.Showcase
             <jv:TextBox Width="220" atc:TitleAssist.Title="设备名称" atc:TitleAssist.IsRequired="True"
                         atc:TitleAssist.IsRequiredIconPlacement="Left" />
 
-            <!-- TitleWidth 固定标题区域宽度：表单式布局中不同长度的标题保持一致间距，整列对齐 -->
+            <!-- TitleWidth 固定标题区域宽度：表单式布局中不同长度的标题保持一致间距，整列对齐；
+                 区域内靠齐由 TitleAlignment 决定（默认 Left），想要标题贴合输入框写 TitleAlignment="Right" -->
             <jv:TextBox Width="260" HorizontalAlignment="Left"
                         atc:TitleAssist.Title="用户名" atc:TitleAssist.TitlePlacement="Left" atc:TitleAssist.TitleWidth="110" />
             <jv:ComboBox Width="260" HorizontalAlignment="Left"
                          atc:TitleAssist.Title="电子邮箱地址" atc:TitleAssist.TitlePlacement="Left" atc:TitleAssist.TitleWidth="110" />
+            """;
+
+        public const string TitleAlignmentDemo = """
+            <!-- 上下方位未设 TitleWidth：标题区域就是输入区整行宽，Right 即贴到输入框右端 -->
+            <jv:TextBox Width="220" atc:TitleAssist.Title="默认（Left）" atc:TitleAssist.TitleAlignment="Left" />
+            <jv:TextBox Width="220" atc:TitleAssist.Title="Right：贴到输入框右端" atc:TitleAssist.TitleAlignment="Right" />
+            <jv:TextBox Width="220" atc:TitleAssist.Title="Center" atc:TitleAssist.TitleAlignment="Center" />
+            <jv:TextBox Width="220" atc:TitleAssist.Title="Right + 必填" atc:TitleAssist.IsRequired="True"
+                        atc:TitleAssist.TitleAlignment="Right" atc:TitleAssist.TitlePlacement="Bottom" />
+
+            <!-- 左右方位未设 TitleWidth 时区域等于标题自身宽，靠齐无可见位移；配合 TitleWidth 才看得出三种靠齐。
+                 必填标识随标题整组一起移动；TextBox / ComboBox / PasswordBox 三份模板行为一致 -->
+            <jv:TextBox Width="280" HorizontalAlignment="Left"
+                        atc:TitleAssist.Title="Left" atc:TitleAssist.TitleAlignment="Left"
+                        atc:TitleAssist.TitlePlacement="Left" atc:TitleAssist.TitleWidth="180" />
+            <jv:ComboBox Width="280" HorizontalAlignment="Left"
+                         atc:TitleAssist.Title="Right（ComboBox）" atc:TitleAssist.TitleAlignment="Right"
+                         atc:TitleAssist.TitlePlacement="Left" atc:TitleAssist.TitleWidth="180" />
+            <jv:PasswordBox Width="280" HorizontalAlignment="Left"
+                            atc:TitleAssist.Title="Center（PasswordBox）" atc:TitleAssist.TitleAlignment="Center"
+                            atc:TitleAssist.TitlePlacement="Left" atc:TitleAssist.TitleWidth="180" />
+
+            <!-- 旧版「左方位标题自动右对齐贴合输入框」的观感：显式写 Right 即可还原 -->
+            <jv:TextBox Width="260" HorizontalAlignment="Left"
+                        atc:TitleAssist.Title="用户名" atc:TitleAssist.TitleAlignment="Right"
+                        atc:TitleAssist.TitlePlacement="Left" atc:TitleAssist.TitleWidth="110" />
             """;
 
         public const string PasswordBoxDemo = """

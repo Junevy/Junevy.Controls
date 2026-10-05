@@ -51,7 +51,7 @@ xmlns:atc="clr-namespace:Junevy.Controls.AttachedProperties;assembly=Junevy.Cont
 | `<TreeView>` | 外观 + 交互 | 完整等效（卡片容器、ExpanderPanel 同款旋转展开图标、悬停/选中态、层级缩进）；`DisplayMode`（`TreeViewDisplayMode`）/ `IndentSize` / `AutoExpandAncestors` / `NavigateCommand` / 悬停与选中画刷经 `atc:TreeViewAssist` 附加属性承载，原生实例同样可用（`jv:TreeView` 另提供同名实例属性）；整树 `ExpandAll()` / `CollapseAll()` 是本库实例方法，WPF 基类未提供，原生实例需逐节点递归；命令导航语义分宿主：`jv:TreeView` 为选中驱动 + `ItemDoubleClick` 事件，官方 `<TreeView>`（经 `atc:TreeViewAssist`）保留叶激活旧语义 |
 | `<ToolTip>` | 外观 | 完整等效，任意元素的 `ToolTip` 属性自动获得主题样式 |
 
-以下控件因依赖自有依赖属性（样式触发器直接引用），**必须使用 `jv:` 前缀**：`RadioButton`、`ToggleButton`（`SwitchSize`）、`Label`（`DisplayMode`）、`TextBlock`（`Text`/`TextAlignment`/`TextWrapping`）、`ProgressBar`（`ProgressText` 等）、`Slider`（`ShowValueBox`/`ValueBoxSide`/`ValueFormatString`，原生实例仅有外观）、`PasswordBox`（模板复合控件，原生 `PasswordBox` 为密封类不提供接管样式：`Password` 可绑定、`RevealMode`/`IsError` 等均为 `jv:` 实例属性）。
+以下控件因依赖自有依赖属性（样式触发器直接引用），**必须使用 `jv:` 前缀**：`RadioButton`、`ToggleButton`（`SwitchSize`）、`Label`（`DisplayMode`）、`TextBlock`（`Text`/`TextAlignment`/`TextWrapping`，`Control` 派生的独立控件而非 WPF `TextBlock`，左图标经 `atc:Icon.*`）、`ProgressBar`（`ProgressText` 等）、`Slider`（`ShowValueBox`/`ValueBoxSide`/`ValueFormatString`，原生实例仅有外观）、`PasswordBox`（模板复合控件，原生 `PasswordBox` 为密封类不提供接管样式：`Password` 可绑定、`RevealMode`/`IsError` 等均为 `jv:` 实例属性）。
 
 ## 主题
 
@@ -218,9 +218,9 @@ ThemeManager.ToggleTheme();
 | 附加属性 | 默认值 | 实际效果 |
 | --- | --- | --- |
 | `atc:Icon.Icon` | `null` | 设置图标内容。可以是图标字体字符，也可以是 `Image`、`Path` 或其他对象。模板支持的控件会在值为空时折叠图标本身；周围布局是否收缩由具体控件决定。 |
-| `atc:Icon.FontFamily` | 内置 `iconfont` | 设置图标字体。用于 `Button`、`CardButton`、`TextBox`、`Label`、`AppBar`、`SideMenu`、`TreeView`、`TabControl` 等控件。 |
-| `atc:Icon.IconSize` | `14` | 设置图标尺寸。`Button`、`AppBar`、`SideMenu` 和 `TreeView` 的模板会读取该值；`Label` 也读取（Boxed 模式样式默认 `8`、Borderless 模式默认 `14`，`3.2.0` 起支持）；`TreeView` 的节点图标字号在 `Chevron` 与 `Indicator` 两种行首观感下都生效（`3.2.0` 修复：此前只有 `Indicator` 读取，`Chevron` 完全忽略该值）。 |
-| `atc:Icon.IconForeground` | `Gray` | 设置图标颜色。`ToolboxItem` 和 `ToolItem` 的默认模板会读取该值；`Label` 也读取（样式按 `DisplayMode` 注入默认值，`3.2.0` 起支持局部覆盖）；其他控件是否支持取决于其模板。 |
+| `atc:Icon.FontFamily` | 内置 `iconfont` | 设置图标字体。用于 `Button`、`CardButton`、`TextBox`、`Label`、`TextBlock`、`AppBar`、`SideMenu`、`TreeView`、`TabControl` 等控件。 |
+| `atc:Icon.IconSize` | `14` | 设置图标尺寸。`Button`、`AppBar`、`SideMenu` 和 `TreeView` 的模板会读取该值；`Label` 也读取（Boxed 模式样式默认 `8`、Borderless 模式默认 `14`，`3.2.0` 起支持）；`TreeView` 的节点图标字号在 `Chevron` 与 `Indicator` 两种行首观感下都生效（`3.2.0` 修复：此前只有 `Indicator` 读取，`Chevron` 完全忽略该值）；`TextBlock` 的标题图标读取该值（`3.2.3` 起图标一律走 `atc:Icon.*`），默认 `14` 且**不随标题 `FontSize` 放大**。 |
+| `atc:Icon.IconForeground` | `Gray` | 设置图标颜色。`ToolboxItem` 和 `ToolItem` 的默认模板会读取该值；`Label` 也读取（样式按 `DisplayMode` 注入默认值，`3.2.0` 起支持局部覆盖）；`TextBlock` 由样式 Setter 注入 `Theme.Brush.Text.Primary`（图标与标题同色、跟随主题），局部值可覆盖；其他控件是否支持取决于其模板。 |
 
 `ToolboxItem` 和 `ToolItem` 的图标字体字符跟随 `IconForeground`，标题跟随 `Foreground`；其他控件的图标字体字符通常跟随 `Foreground`。`Image` 或带固定 `Fill` 的 `Path` 不会自动重新着色。
 
@@ -339,13 +339,14 @@ codeScroll.PreviewMouseWheel += (s, e) =>
 
 ### TitleAssist
 
-`atc:TitleAssist` 为 `TextBox` 和 `ComboBox` 在输入框外侧显示一个标题，提示该输入框的用途。标题内容为任意对象（`object`），可以直接设为 iconfont 字形文本。`TitleWidth` 可为标题区域指定固定宽度，用于表单式布局中输入框整列对齐。
+`atc:TitleAssist` 为 `TextBox`、`ComboBox`、`PasswordBox` 在输入框外侧显示一个标题，提示该输入框的用途。标题内容为任意对象（`object`），可以直接设为 iconfont 字形文本。`TitleWidth` 可为标题区域指定固定宽度，用于表单式布局中输入框整列对齐；`TitleAlignment` 决定标题在这段区域内部靠左、靠右还是居中。
 
 | 附加属性 | 默认值 | 实际效果 |
 | --- | --- | --- |
 | `atc:TitleAssist.Title` | `null` | 标题内容；为 `null` 时不显示标题，也不占用布局空间（必填标识同样不显示） |
 | `atc:TitleAssist.TitlePlacement` | `Top` | 标题位置：`Top` / `Bottom` / `Left` / `Right`，标题与输入框间距固定 4 DIP |
-| `atc:TitleAssist.TitleWidth` | `NaN` | 标题区域固定宽度（DIP），四个方位统一生效；`NaN` 时自适应标题内容。表单式布局中统一设置后，不同长度的标题保持一致的标题—输入框间距，输入框整列对齐（`Left` 方位标题自动右对齐贴合输入框） |
+| `atc:TitleAssist.TitleWidth` | `NaN` | 标题区域固定宽度（DIP），四个方位统一生效；`NaN` 时自适应标题内容。表单式布局中统一设置后，不同长度的标题保持一致的标题—输入框间距，输入框整列对齐。设了固定宽度时区域锚在行首（上/下方位）或所在列的起始处，`TitleAlignment` 的靠齐发生在这段宽度内部 |
+| `atc:TitleAssist.TitleAlignment` | `Left` | 标题（连同必填标识整组）在标题区域内的水平靠齐：`Left` / `Right` / `Center`。区域宽度即 `TitleWidth`；未设 `TitleWidth` 时，上/下方位的区域等于输入区整行宽（`Right` 即贴到输入框右端），左/右侧方位的区域等于标题自身宽（没有多余空间，靠齐不产生可见位移） |
 | `atc:TitleAssist.TitleFontFamily` | `null` | 标题字体族；为 `null` 时继承控件自身字体。标题为 iconfont 字形时需设置为 iconfont |
 | `atc:TitleAssist.TitleFontSize` | `NaN` | 标题字号；`NaN` 时继承控件自身字号 |
 | `atc:TitleAssist.TitleForeground` | `null` | 标题颜色；为 `null` 时由默认样式提供主题次级文本色 |
@@ -354,7 +355,7 @@ codeScroll.PreviewMouseWheel += (s, e) =>
 | `atc:TitleAssist.IsRequiredIcon` | `null` | 必填图标内容；为 `null` 时显示默认的主题 Danger 色小圆点，设置后替换默认圆点（如星号 `*`、iconfont 字形或任意 `object`，字体样式继承标题设置） |
 | `atc:TitleAssist.IsRequiredIconPlacement` | `Right` | 必填图标相对标题文字的位置：`Right`（标题右侧）/ `Left`（标题左侧），图标与标题间距固定 4 DIP |
 
-标题同时支持 `jv:TextBox` / `jv:ComboBox` 与原生 `<TextBox>` / `<ComboBox>` 借用默认外观的场景（附加属性经模板绑定生效）。
+标题同时支持 `jv:TextBox` / `jv:ComboBox` / `jv:PasswordBox`，以及借用库外观的原生 `<TextBox>` / `<ComboBox>`（附加属性经模板绑定生效）。原生 `<PasswordBox>` 不被库样式接管（密封类，见 [PasswordBox](#passwordbox)），只有 `jv:PasswordBox` 可用。
 
 ```xml
 <jv:TextBox
@@ -372,7 +373,7 @@ codeScroll.PreviewMouseWheel += (s, e) =>
     atc:TitleAssist.TitleFontWeight="Bold"
     atc:TitleAssist.TitleForeground="OrangeRed" />
 
-<!-- 固定宽度表单对齐：标题长短不一致时输入框仍整列对齐 -->
+<!-- 固定宽度表单对齐：标题长短不一致时输入框仍整列对齐（标题默认靠区域左侧） -->
 <jv:TextBox
     Width="260"
     atc:TitleAssist.Title="用户名"
@@ -383,6 +384,25 @@ codeScroll.PreviewMouseWheel += (s, e) =>
     atc:TitleAssist.Title="电子邮箱地址"
     atc:TitleAssist.TitlePlacement="Left"
     atc:TitleAssist.TitleWidth="110" />
+
+<!-- 同一区域内改为靠右：标题贴合输入框（3.2.3 之前 Left 方位的默认观感） -->
+<jv:TextBox
+    Width="260"
+    atc:TitleAssist.Title="用户名"
+    atc:TitleAssist.TitleAlignment="Right"
+    atc:TitleAssist.TitlePlacement="Left"
+    atc:TitleAssist.TitleWidth="110" />
+
+<!-- 未设 TitleWidth 时，上/下方位的标题区域就是输入区整行宽：Right 直接贴到输入框右端 -->
+<jv:TextBox
+    Width="260"
+    atc:TitleAssist.Title="采集周期"
+    atc:TitleAssist.TitleAlignment="Right" />
+<jv:PasswordBox
+    Width="260"
+    atc:TitleAssist.Title="确认密码"
+    atc:TitleAssist.TitleAlignment="Center"
+    atc:TitleAssist.TitlePlacement="Bottom" />
 
 <!-- 必填标识：默认在标题右侧显示主题 Danger 色小圆点 -->
 <jv:TextBox
@@ -570,7 +590,7 @@ codeScroll.PreviewMouseWheel += (s, e) =>
 | `CommandButtonCommand`（依赖属性） | 命令按钮点击时执行的命令（ICommand），可绑定 ViewModel 命令；按钮可用性随命令 `CanExecute` 自动启停 |
 | `CommandButtonCommandParameter`（依赖属性） | 传递给 `CommandButtonCommand` 的命令参数 |
 | `CommandButtonContent`（依赖属性） | 命令按钮内容（文本或 iconfont 字形），字体族跟随 `atc:Icon.FontFamily`，字号/颜色继承控件自身取值；为 `null` 时显示空白占位，建议显式设置 |
-| `atc:TitleAssist.Title` 系列（含 `TitleWidth` 固定宽度、`IsRequired` 必填标识） | 在输入框外侧显示用途标题，位置可选 `Top`/`Bottom`/`Left`/`Right`，支持 iconfont 与自定义字体样式，详见 [TitleAssist](#titleassist) |
+| `atc:TitleAssist.Title` 系列（含 `TitleWidth` 固定宽度、`TitleAlignment` 区域内靠齐、`IsRequired` 必填标识） | 在输入框外侧显示用途标题，位置可选 `Top`/`Bottom`/`Left`/`Right`，标题可在标题区域内靠左/靠右/居中，支持 iconfont 与自定义字体样式，详见 [TitleAssist](#titleassist) |
 
 ```xml
 <jv:TextBox
@@ -607,7 +627,7 @@ codeScroll.PreviewMouseWheel += (s, e) =>
 | `PasswordChar`（依赖属性） | 掩码字符，默认 `●` |
 | `MaxLength`（依赖属性） | 最大密码长度（0 不限制），同时作用于掩码框与明文框 |
 | `atc:PlaceholderAssist.Placeholder` | 占位文本（支持 iconfont 字形），密码为空、未持焦点且未显示明文时显示 |
-| `atc:Icon.Icon` / `atc:TitleAssist.Title` 系列 | 前置图标与外侧标题，语义同 `jv:TextBox`，详见 [Icon](#icon) / [TitleAssist](#titleassist) |
+| `atc:Icon.Icon` / `atc:TitleAssist.Title` 系列（含 `TitleWidth`、`TitleAlignment`） | 前置图标与外侧标题，语义同 `jv:TextBox`，详见 [Icon](#icon) / [TitleAssist](#titleassist) |
 
 ```xml
 <!-- 点击眼睛显示明文；Password 可绑定（原生 PasswordBox 做不到），错误泛红由业务绑定驱动 -->
@@ -628,7 +648,7 @@ codeScroll.PreviewMouseWheel += (s, e) =>
 
 `jv:ComboBox` 继承 WPF `ComboBox`，支持标准 `ItemsSource`、`ItemTemplate`、可编辑模式、键盘操作和选择绑定。不可编辑时，单击主体区域与单击箭头按钮等效：展开未打开的下拉，再次单击则折叠。`jv:ComboBoxItem` 是对应的公开容器类型；绑定数据时通常不需要手动创建它。
 
-占位符统一由附加属性 `atc:PlaceholderAssist.Placeholder` 提供（未选中项时显示；`jv:ComboBox` 未设置时默认显示 "Select an item..."），详见 [PlaceholderAssist](#placeholderassist)。`atc:TitleAssist.Title` 系列附加属性可在下拉框外侧显示用途标题，详见 [TitleAssist](#titleassist)。
+占位符统一由附加属性 `atc:PlaceholderAssist.Placeholder` 提供（未选中项时显示；`jv:ComboBox` 未设置时默认显示 "Select an item..."），详见 [PlaceholderAssist](#placeholderassist)。`atc:TitleAssist.Title` 系列附加属性（含 `TitleWidth`、`TitleAlignment`）可在下拉框外侧显示用途标题并控制其在标题区域内的靠齐，详见 [TitleAssist](#titleassist)。
 
 ```xml
 <jv:ComboBox
@@ -877,15 +897,35 @@ codeScroll.PreviewMouseWheel += (s, e) =>
 
 ### TextBlock
 
-`jv:TextBlock`（原 `TextTitle`）继承 WPF `ContentControl`，左侧显示 `Content`，右侧显示 `Text`，适合图标或图片加标题的组合。作为纯显示控件，默认 `Focusable=False`、`IsTabStop=False`。
+`jv:TextBlock`（原 `TextTitle`）继承 WPF `Control`，左侧显示图标、右侧显示 `Text`，是「图标 + 标题」的纯显示组合。图标统一走库内 `atc:Icon.*` 附加属性通道，控件本身**不承载内容**——`Content` / `ContentTemplate` 等内容管线属性已在 `3.2.3` 移除（它们是继承自 `ContentControl` 的历史遗留，与 `atc:Icon.Icon` 语义重复）。作为纯显示控件，默认 `Focusable=False`、`IsTabStop=False`。
 
 ```xml
-<jv:TextBlock Text="Inspection Station" FontSize="20">
-    <Image Width="32" Height="32" Source="/Resources;component/PNG/inspector.png" />
+<!-- 图标字体字符：字号走 atc:Icon.IconSize，不随标题 FontSize 缩放 -->
+<jv:TextBlock Width="320" FontSize="20" Text="Inspection Station"
+              atc:Icon.Icon="&#xE66B;" atc:Icon.IconSize="20" />
+
+<!-- 任意元素作图标（属性元素写法） -->
+<jv:TextBlock Width="320" FontSize="16" Text="图标槽可放任意内容">
+    <atc:Icon.Icon>
+        <Border Width="30" Height="30" CornerRadius="6"
+                Background="{DynamicResource Theme.Brush.Accent.Primary}">
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                       FontFamily="{DynamicResource IconFont}" FontSize="16"
+                       Foreground="{DynamicResource Theme.Brush.Text.OnAccent}" Text="&#xE66B;" />
+        </Border>
+    </atc:Icon.Icon>
 </jv:TextBlock>
 ```
 
-依赖：标准 `Content`/`ContentTemplate` 管线和 `Text`、`TextAlignment`、`TextWrapping` 依赖属性，无专用附加属性。标题文本超宽时以省略号截断（`TextTrimming`），可通过对齐/内边距属性覆盖模板默认值。
+| 依赖属性 | 说明 | 默认值 |
+| --- | --- | --- |
+| `Text` | 右侧标题文本，超宽时以省略号截断（`TextTrimming`） | `""` |
+| `TextAlignment` | 标题水平对齐 | `Left` |
+| `TextWrapping` | 标题换行方式 | `NoWrap` |
+
+图标侧使用附加属性（详见「附加属性 → Icon」）：`atc:Icon.Icon`（图标字体字符、`Image`、`Path`、`Border` 等任意内容；为 null 或纯空白时图标整块折叠）、`atc:Icon.IconSize`（库级默认 `14`，**不跟随标题 `FontSize`**，标题更大时需同步设置）、`atc:Icon.FontFamily`（默认内置 iconfont，可换 `{DynamicResource IconFontFilled}`）、`atc:Icon.IconForeground`（样式默认注入 `Theme.Brush.Text.Primary`，即图标与标题同色且跟随主题切换）。图文 5px 间距全部由图标右侧 `Margin` 承载——图标折叠后标题贴回左边缘，不留残余缩进。对齐与内边距走 `HorizontalContentAlignment` / `VerticalContentAlignment` / `Padding`。
+
+**迁移（`3.2.3` 破坏性变更）**：把原本写进 `Content` 的图标改写成 `atc:Icon.Icon` 即可。下列三种旧写法现在会在 XAML 加载期直接抛 `XamlParseException`（不再静默呈现），升级时需一并清掉：`Content="…"`、`ContentTemplate="…"`（含 `ContentTemplateSelector`、`ContentStringFormat`）、以及把元素写成 `<jv:TextBlock>…</jv:TextBlock>` 的子内容。
 
 ### CodeEditor
 
@@ -1914,8 +1954,8 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `ToggleButton` | WPF `ToggleButton`、胶囊/圆角矩形两套开关模板（`SwitchToggleButton_Radius` / `SwitchToggleButton_Rect`）、`Theme.SmallCornerRadius` 与派生属性 `TrackCornerRadius` / `ThumbCornerRadius` | 无（开关圆角不走 `Border.CornerRadius`；形状扩展用的 `DisplayMode` 自 `3.2.0` 起删除） |
 | `RadioButton` | WPF `RadioButton`、`ShapeMode`、焦点资源 | `Icon.FontFamily` 用于选中符号 |
 | `CheckBox` | WPF `CheckBox`、焦点资源 | `Icon.FontFamily`、`Border.CornerRadius` |
-| `TextBox` | WPF `TextBox`、`jv:Button` 清空按钮、`jv:Button` 命令按钮 | `Icon.Icon`、`Icon.FontFamily`、`ShowClear`（依赖属性）、`ShowCommandButton`/`CommandButtonCommand`/`CommandButtonCommandParameter`/`CommandButtonContent`（依赖属性）、`PlaceholderAssist.Placeholder`、`TitleAssist.Title` 系列（含 `IsRequired` 必填标识）、`Border.CornerRadius` |
-| `ComboBox` | WPF `ComboBox`、`ComboBoxItem`、`jv:ToggleButton` | `PlaceholderAssist.Placeholder`、`TitleAssist.Title` 系列（含 `IsRequired` 必填标识）、`Border.CornerRadius` |
+| `TextBox` | WPF `TextBox`、`jv:Button` 清空按钮、`jv:Button` 命令按钮 | `Icon.Icon`、`Icon.FontFamily`、`ShowClear`（依赖属性）、`ShowCommandButton`/`CommandButtonCommand`/`CommandButtonCommandParameter`/`CommandButtonContent`（依赖属性）、`PlaceholderAssist.Placeholder`、`TitleAssist.Title` 系列（含 `TitleWidth`、`TitleAlignment` 靠齐、`IsRequired` 必填标识）、`Border.CornerRadius` |
+| `ComboBox` | WPF `ComboBox`、`ComboBoxItem`、`jv:ToggleButton` | `PlaceholderAssist.Placeholder`、`TitleAssist.Title` 系列（含 `TitleWidth`、`TitleAlignment` 靠齐、`IsRequired` 必填标识）、`Border.CornerRadius` |
 | `ComboBoxItem` | WPF `ComboBoxItem`、`DefaultComboBoxItemStyle` | 无 |
 | `ListBox` | WPF `ListBox`、`ListBoxItem`、虚拟化和滚动资源 | 无 |
 | `ListView` | WPF `ListView`、`GridView`、虚拟化和转换器 | `Border.CornerRadius` |
@@ -1924,7 +1964,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `Slider` | WPF `Slider`/`Track`/`Thumb`/`RepeatButton`/`TickBar` 部件契约、`DefaultTextBoxStyle`（数值框）、主色与下沉面等主题令牌、`DefaultControlFocusVisualStyle` | `ShowClear`（数值框显式关闭清空按钮） |
 | `ToolTip` | WPF `ToolTip`、主题资源 | 无 |
 | `Label` | WPF `Label`、状态和图标资源 | `Icon.Icon`、`Icon.FontFamily`、`Icon.IconSize`、`Icon.IconForeground`（均经相应模板） |
-| `TextBlock` | WPF `ContentControl`、`ContentPresenter`、标准内容模板管线 | 无 |
+| `TextBlock` | WPF `Control`（模板 + 排印属性；自 `3.2.3` 起不再继承 `ContentControl`，无内容管线） | `Icon.Icon`、`Icon.FontFamily`、`Icon.IconSize`、`Icon.IconForeground`（左侧图标槽，由模板消费） |
 | `Badge` | WPF `ContentControl`、`TranslateTransform` 停靠偏移、主题状态色令牌（`Theme.Brush.Status.Danger`、`Theme.Brush.Text.OnAccent`） | 无 |
 | `MessageBar` | WPF `ContentControl`、`DispatcherTimer`、`jv:Button` 关闭按钮、主题资源 | `Icon.FontFamily`、`Icon.IconSize` |
 | `MessageBarPresenter` | WPF `ContentControl`、承载 `MessageBar`，配合 `MessageBarService` | 无 |

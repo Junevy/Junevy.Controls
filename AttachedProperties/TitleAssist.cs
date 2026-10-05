@@ -10,7 +10,8 @@ namespace Junevy.Controls.AttachedProperties
     /// 标题内容为任意 <see cref="object"/>，设为 iconfont 字形文本时需同时指定
     /// <see cref="TitleFontFamily"/>；标题位置由 <see cref="TitlePlacement"/> 控制，
     /// 字体样式可通过配套附加属性自定义，未设置的样式项自动继承控件自身取值。
-    /// 通过 <see cref="TitleWidth"/> 可为标题区域指定固定宽度，用于表单式布局中输入框整列对齐。
+    /// 通过 <see cref="TitleWidth"/> 可为标题区域指定固定宽度，用于表单式布局中输入框整列对齐；
+    /// 标题在该区域内的水平位置由 <see cref="TitleAlignment"/> 控制（左/右/居中，默认左）。
     /// <para>
     /// 必填标识：<see cref="IsRequired"/> 为 <see langword="true"/> 时在标题旁显示一个必填图标，
     /// 图标位置由 <see cref="IsRequiredIconPlacement"/> 控制（标题左/右侧，默认右侧）；
@@ -49,6 +50,14 @@ namespace Junevy.Controls.AttachedProperties
         /// </summary>
         public static readonly DependencyProperty TitleWidthProperty =
             DependencyProperty.RegisterAttached("TitleWidth", typeof(double), typeof(TitleAssist), new PropertyMetadata(double.NaN));
+
+        /// <summary>
+        /// 标识 <see cref="GetTitleAlignment"/>/<see cref="SetTitleAlignment"/> 的附加属性。
+        /// 默认 <see cref="TitleAlignment.Left"/>：上下方位与历史表现逐位一致，
+        /// 左方位 + <see cref="TitleWidth"/> 的历史观感（标题贴合输入框）需显式写 <see cref="TitleAlignment.Right"/>。
+        /// </summary>
+        public static readonly DependencyProperty TitleAlignmentProperty =
+            DependencyProperty.RegisterAttached("TitleAlignment", typeof(TitleAlignment), typeof(TitleAssist), new PropertyMetadata(TitleAlignment.Left));
 
         /// <summary>
         /// 标识 <see cref="GetTitleForeground"/>/<see cref="SetTitleForeground"/> 的附加属性。
@@ -159,6 +168,25 @@ namespace Junevy.Controls.AttachedProperties
         public static void SetTitleWidth(DependencyObject obj, double value)
         {
             obj.SetValue(TitleWidthProperty, value);
+        }
+
+        /// <summary>
+        /// 读取标题在「标题区域」内的水平靠齐方式，默认 <see cref="TitleAlignment.Left"/>。
+        /// 区域的可移动空间见 <see cref="TitleWidth"/>：设了固定宽度时区域就是该宽度并锚在行首，
+        /// 靠齐发生在这段宽度内部；未设时，标题在控件上/下方等于输入区整行宽（靠右即贴输入框右端），
+        /// 在左/右侧等于标题自身宽（没有多余空间，靠齐不产生可见位移）。
+        /// </summary>
+        public static TitleAlignment GetTitleAlignment(DependencyObject obj)
+        {
+            return (TitleAlignment)obj.GetValue(TitleAlignmentProperty);
+        }
+
+        /// <summary>
+        /// 在指定控件上设置标题的水平靠齐方式（左/右/居中）；必填标识随标题整组一起移动。
+        /// </summary>
+        public static void SetTitleAlignment(DependencyObject obj, TitleAlignment value)
+        {
+            obj.SetValue(TitleAlignmentProperty, value);
         }
 
         /// <summary>
