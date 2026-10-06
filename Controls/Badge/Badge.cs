@@ -179,8 +179,11 @@ public class Badge : ContentControl
             _text.Text = Count > MaxCount ? $"{MaxCount}+" : Count.ToString();
         }
 
-        // 从折叠切回可见时布局可能尚未重排，先强制刷新拿到角标实际尺寸再计算偏移。
-        _badge.UpdateLayout();
+        // 这里读到的角标尺寸可能还是上一帧的（角标刚从折叠切回可见，本轮布局尚未跑），
+        // 算出的偏移会偏小。不再为此强制 UpdateLayout——那会在属性变更回调里同步跑一次全局布局，
+        // 重入正在变更中的集合，让虚拟化 ItemsControl 抛「某个 ItemsControl 与它的项源不一致」。
+        // 改由 OnBadgeSizeChanged 在本轮布局中修正：SizeChanged 是在布局 pass 内、早于渲染抛出的，
+        // 因此同一帧就能纠正，用户看不到中间偏移。
         UpdateBadgeTransform();
     }
 

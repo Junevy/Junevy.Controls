@@ -849,6 +849,24 @@ namespace Junevy.Controls.Showcase
                  dialog.ShowDialog(); -->
             """;
 
+        public const string ConfirmDialogDemo = """
+            <!-- ConfirmDialogService：静态入口，一行弹出一个模态确认框并拿到操作结果。
+                 Owner 按当前活动窗口自动推断、后台线程调用会自动切回 UI 线程。
+                 关闭语义：点「确定」= Confirm；点「取消」或 Esc / ✕ / Alt+F4 一律 = Cancel -->
+            <jv:Button Click="OnConfirmOkCancelClick" Content="确定 + 取消（默认）" />
+            <jv:Button Click="OnConfirmOkClick" Content="仅确定（Ok）" />
+            <jv:Button Click="OnConfirmCancelClick" Content="仅取消（Cancel）" />
+
+            <!-- 代码：
+            // 默认「确定 + 取消」
+            ConfirmDialogResult result = await ConfirmDialogService.ShowAsync("删除确认", "确定要删除选中的 3 条记录吗？");
+            if (result == ConfirmDialogResult.Confirm) { /* 继续删除 */ }
+
+            // 指定按钮组合
+            await ConfirmDialogService.ShowAsync("操作完成", "3 条记录已删除。", ConfirmDialogButtons.Ok);
+            await ConfirmDialogService.ShowAsync("放弃编辑", "确定放弃本次编辑吗？", ConfirmDialogButtons.Cancel); -->
+            """;
+
         public const string ProgressBarWindowDemo = """
             <!-- ProgressBarWindow 为纯 C# API（进度对话框，默认环形、无边框可拖动）：
                  var dialog = new ProgressBarWindow { Title = "固件部署", Message = "正在部署固件…", Owner = this };

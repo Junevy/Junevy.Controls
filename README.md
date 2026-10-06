@@ -1799,6 +1799,8 @@ private void Canvas_OnDrop(object sender, DragEventArgs e)
 
 停靠说明：角标以自身中心对准内容（视觉边界）的角落，自动补偿内容自身的 `Margin`；包裹层按内容自然尺寸收紧（默认 Left/Top，可通过 `HorizontalContentAlignment`/`VerticalContentAlignment` 调整），父容器拉伸包裹层不会导致角标脱离内容角落。角标为 16x16 胶囊（`Status.Danger` 背景 + `Text.OnAccent` 文字），需要自定义外观时重写模板即可。
 
+停靠偏移的落定时机：改 `Count` 等属性时控件**不会**同步强制布局，而是在随后的布局过程中经角标部件的 `SizeChanged` 重算偏移。`SizeChanged` 在布局 pass 内、早于渲染抛出，因此同一帧即完成纠正，**视觉上察觉不到中间偏移**。这条约束是有意为之：属性变更回调里同步 `UpdateLayout()` 会重入「正在变更中的集合」，使虚拟化 `ItemsControl` 抛 `InvalidOperationException`（某个 ItemsControl 与它的项源不一致）。因此宿主若在 `CollectionChanged` 处理程序里改绑定的角标计数是安全的；反之，库内任何控件都不会因为一个属性赋值而把整棵树的布局提前跑完。
+
 ### MessageBar、MessageBarPresenter 与 MessageBarService
 
 `jv:MessageBar` 是参考 WPF-UI `Snackbar` 的应用内通知条：以卡片形式滑入显示标题、正文和状态图标，支持超时自动关闭、手动关闭和显示/隐藏生命周期事件。`jv:MessageBarPresenter` 是通知条的宿主容器；`MessageBarService` 是静态服务，注册宿主后可在任意位置弹出通知。
@@ -1926,6 +1928,77 @@ _dialogService.ShowDialog(nameof(DeviceSettingView), parameters, result =>
 
 依赖：WPF `Window`、`WindowChrome`、`SystemCommands`、`RectangleGeometry` 圆角裁剪、主题资源；不依赖任何第三方包。
 
+### ConfirmDialogWindow 与 ConfirmDialogService
+
+操作前的确认对话框：消息正文 + 页脚按钮行，**返回操作结果**。窗框（圆角、投影、主题化标题栏、拖拽、Esc 关闭、圆角裁剪）全部继承 `jv:DialogWindow`，只多占一个模板页脚插槽，**窗框模板没有复制第二份**。
+
+最简用法是静态入口，一行拿到结果：
+
+```csharp
+using Junevy.Controls.Common;                                   // ConfirmDialogResult / ConfirmDialogButtons
+using Junevy.Controls.Controls.Dialog;                         // ConfirmDialogService
+
+ConfirmDialogResult result = await ConfirmDialogService.ShowAsync(
+    "删除确认",
+    "确定要删除选中的 3 条记录吗？此操作不可撤销。");
+
+if (result == ConfirmDialogResult.Confirm)
+{
+    // 继续删除
+}
+```
+
+| ConfirmDialogService 方法 | 说明 |
+| --- | --- |
+| `ShowAsync(string message)` | 只有消息，标题为空，按钮组合取默认 `OkCancel` |
+| `ShowAsync(string title, string message)` | 带标题 |
+| `ShowAsync(string title, string message, ConfirmDialogButtons buttons)` | 指定按钮组合 |
+
+**关闭语义（没有第三种结果）**：点「确定」→ `ConfirmDialogResult.Confirm`；点「取消」、标题栏 ✕、`Esc`、`Alt+F4` → `ConfirmDialogResult.Cancel`（它是 `Result` 的默认值，窗口一关就是它）。
+
+| 枚举 | 取值 | 用途 |
+| --- | --- | --- |
+| `ConfirmDialogButtons` | `Ok` / `OkCancel`（默认） / `Cancel` | 「仅确定」告知一个必须知晓的结果；「确定+取消」操作前确认；「仅取消」二次确认放弃 |
+| `ConfirmDialogResult` | `Confirm` / `Cancel` | 操作结果 |
+| `ConfirmDialogDefaultButton` | `Confirm`（默认） / `Cancel` | 响应 `Enter` 的那颗按钮；**仅 `OkCancel` 有意义**，单按钮组合下唯一那颗天然是默认按钮。破坏性操作建议取 `Cancel`，避免误触回车 |
+
+| ConfirmDialogWindow 属性 | 效果 |
+| --- | --- |
+| `Message` | 消息正文。字符串自动包成自动换行的 `TextBlock`；传 UI 元素原样呈现；**宿主已设过 `Content` 时以 `Content` 为准**，不会被覆盖 |
+| `Buttons` | 按钮组合，默认 `OkCancel` |
+| `DefaultButton` | 默认按钮，默认 `Confirm` |
+| `Result` | 只读操作结果，默认 `Cancel` |
+| `MinWidth` / `MaxWidth` | `360` / `520`：短消息仍自适应，长消息折行而不是把窗口拉成一整行屏宽 |
+
+**服务负责的两件事，实例都不管**：
+
+- **Owner 自动推断**：优先当前活动窗口，取不到退回第一个可见的顶层窗口（按 `Owner is null` 判定顶层，跳过对话框自身），因此**不像 `MessageBarService` 那样需要先 `SetPresenter` 注册**——对话框是独立顶层窗口，没有必须挂在布局里的宿主元素。
+- **线程**：`ShowAsync` 可从任意线程调用，内部切回 UI 线程显示；`ConfirmDialogWindow.ShowAsync()` 实例方法则要求在 UI 线程调用（会明确抛异常提示改走服务）。
+
+需要自己摆窗口时用实例方法（每��确认新建实例，同一实例只能显示一次）：
+
+```csharp
+ConfirmDialogWindow dialog = new()
+{
+    Title = "删除确认",
+    Message = "确定要删除选中的 3 条记录吗？",
+    Buttons = ConfirmDialogButtons.OkCancel,
+    Owner = Window.GetWindow(this)
+};
+
+ConfirmDialogResult result = await dialog.ShowAsync();
+```
+
+**实现要点（改这个控件前要知道）**：
+
+- 窗框复用靠 `DefaultStyleKeyProperty.OverrideMetadata(typeof(ConfirmDialogWindow), new FrameworkPropertyMetadata(typeof(DialogWindow)))`——`DefaultStyleKey` 指到**基类类型**，直接命中 `DialogWindow.xaml` 里 `TargetType` 为 `DialogWindow` 的隐式样式。
+- 页脚走基类模板里的 `PART_FooterHost` 插槽（`ContentControl`，`DialogWindow` 新增，基类自身不注入内容、该行高度为 0，对既有宿主零影响）。样式 `ConfirmDialogFooterTemplate` 与两个按钮样式在 `ConfirmDialogWindow.xaml`，按需合并，不进 `DefaultStyleKey`。
+- **给插槽赋 `Template` 后必须立刻 `ApplyTemplate()` 再 `FindName`**：赋值只是挂上模板，实例化要等布局 passes；不强制应用就取部件，按钮引用会是 null——表现为「点确定没反应、模态窗口关不掉」。
+- 取消按钮刻意**不**设 `IsCancel`：基类已在 `PreviewKeyDown` 统一处理 `Esc`，两处都处理会让一次按键走两条关闭路径。
+- `DialogResult` 只在走本控件模态入口（`ShowAsync`）时写：非模态 `Show()` 的窗口上设 `DialogResult` 会抛 `InvalidOperationException`。宿主直接调 `ShowDialog()` 时 `Result` 依然正确，只是 `DialogResult` 保持 `null`。
+
+依赖：WPF `Window`（经 `jv:DialogWindow`）、`ContentControl`、主题资源；不依赖任何第三方包。
+
 ## 图像控件
 
 ### ImageViewer
@@ -1968,7 +2041,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | 集合/数据 | `ListBox`、`ListView`、`DataGrid` |
 | 文本/状态 | `Label`、`TextBlock` |
 | 通知 | `Badge`、`MessageBar`、`MessageBarPresenter`、`MessageBarService`、`ToolTip` |
-| 窗口 | `DialogWindow` |
+| 窗口 | `DialogWindow`、`ConfirmDialogWindow`、`ConfirmDialogService` |
 | 布局 | `ExpanderPanel`、`SidePanel`、`GroupBox` |
 | 菜单/导航 | `ContextMenu`、`ContextMenuItem`、`MenuItem`、`SideMenu`、`TreeView`、`TreeMenuItem`、`TabControl`、`TabControlItem`、`ToolBar`、`ToolBarItem`、`Toolbox`、`ToolboxItem`、`ToolItem` |
 | 图像 | `ImageViewer` |
@@ -2000,6 +2073,8 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `MessageBar` | WPF `ContentControl`、`DispatcherTimer`、`jv:Button` 关闭按钮、主题资源 | `Icon.FontFamily`、`Icon.IconSize` |
 | `MessageBarPresenter` | WPF `ContentControl`、承载 `MessageBar`，配合 `MessageBarService` | 无 |
 | `DialogWindow` | WPF `Window`、`WindowChrome`、`SystemCommands`、主题资源（含阴影/圆角令牌） | 无 |
+| `ConfirmDialogWindow` | WPF `Window`（经 `jv:DialogWindow`）、`ContentControl`（页脚插槽）、`TaskCompletionSource`、主题资源 | 无 |
+| `ConfirmDialogService` | 静态服务：`Application.Current.Windows` 推断 Owner、`Dispatcher` 线程切换；每次调用新建 `ConfirmDialogWindow` | 无 |
 | `ContextMenu` | WPF `ContextMenu`、`MenuItem`、`Separator`、Popup/阴影资源 | 无 |
 | `ContextMenuItem` | WPF `MenuItem`、`JunevyContextMenuItemStyle` | 无 |
 | `MenuItem` | WPF `ContentControl`；作为 `SideMenu` 的导航数据 | 无 |

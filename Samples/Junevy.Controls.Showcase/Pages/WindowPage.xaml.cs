@@ -79,6 +79,34 @@ namespace Junevy.Controls.Showcase.Pages
             dialog.ShowDialog();
         }
 
+        private async void OnConfirmOkCancelClick(object sender, RoutedEventArgs e)
+        {
+            ConfirmDialogResult result = await ConfirmDialogService.ShowAsync(
+                "删除确认",
+                "确定要删除选中的 3 条记录吗？此操作不可撤销。");
+
+            MessageBarService.Show(
+                result == ConfirmDialogResult.Confirm
+                    ? MessageBarAppearance.Warning
+                    : MessageBarAppearance.Informational,
+                "结果",
+                result == ConfirmDialogResult.Confirm ? "点了「确定」" : "点了「取消」（或 Esc / ✕）");
+        }
+
+        private async void OnConfirmOkClick(object sender, RoutedEventArgs e)
+        {
+            ConfirmDialogResult result = await ConfirmDialogService.ShowAsync(
+                "操作完成", "3 条记录已删除。", ConfirmDialogButtons.Ok);
+            MessageBarService.Show(MessageBarAppearance.Success, "结果", $"Ok 单按钮组合，结果：{result}");
+        }
+
+        private async void OnConfirmCancelClick(object sender, RoutedEventArgs e)
+        {
+            ConfirmDialogResult result = await ConfirmDialogService.ShowAsync(
+                "放弃编辑", "确定放弃本次编辑吗？未保存的内容将丢失。", ConfirmDialogButtons.Cancel);
+            MessageBarService.Show(MessageBarAppearance.Informational, "结果", $"Cancel 单按钮组合，结果：{result}");
+        }
+
         private async void OnDeployWindowClick(object sender, RoutedEventArgs e)
         {
             var dialog = new ProgressBarWindow

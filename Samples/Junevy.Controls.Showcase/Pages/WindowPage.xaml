@@ -18,7 +18,7 @@
                 <TextBlock Style="{StaticResource DemoPageTitle}" Text="窗口与对话框" />
                 <TextBlock
                     Style="{StaticResource DemoPageSubtitle}"
-                    Text="jv:DialogWindow（无边框圆角对话框宿主）/ ProgressBarWindow（进度对话框，线程安全汇报与取消）。两者都经代码实例化弹出。" />
+                    Text="jv:DialogWindow（无边框圆角对话框宿主）/ ConfirmDialogService（静态确认对话框，直接拿到操作结果）/ ProgressBarWindow（进度对话框，线程安全汇报与取消）。三者都经代码弹出。" />
 
                 <demo:DemoSection
                     Title="jv:DialogWindow（代码实例化弹出）"
@@ -28,6 +28,17 @@
                         HorizontalAlignment="Left"
                         Click="OnOpenDialogClick"
                         Content="打开对话框（无边框、圆角、主题化标题栏）" />
+                </demo:DemoSection>
+
+                <demo:DemoSection
+                    Title="ConfirmDialogService（静态确认对话框，返回操作结果）"
+                    Description="await ConfirmDialogService.ShowAsync(...) 一行弹出模态确认框并拿到 ConfirmDialogResult：点确定为 Confirm，点取消或按 Esc / ✕ / Alt+F4 一律为 Cancel。Owner 按当前活动窗口自动推断、后台线程调用会自动切回 UI 线程。Buttons 可选 Ok（仅确定）/ OkCancel（确定+取消，默认）/ Cancel（仅取消）。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.ConfirmDialogDemo}">
+                    <WrapPanel>
+                        <jv:Button Click="OnConfirmOkCancelClick" Content="确定 + 取消（默认）" />
+                        <jv:Button Margin="12,0,0,0" Click="OnConfirmOkClick" Content="仅确定（Ok）" />
+                        <jv:Button Margin="12,0,0,0" Click="OnConfirmCancelClick" Content="仅取消（Cancel）" />
+                    </WrapPanel>
                 </demo:DemoSection>
 
                 <demo:DemoSection

@@ -98,7 +98,7 @@ ThemeManager.ToggleTheme();
 | 菜单/导航 | `jv:ContextMenu` + `jv:ContextMenuItem`（上下文菜单用这两个）；**`jv:MenuItem` 是 SideMenu 的导航数据控件，不是 WPF MenuItem——不要放进 ContextMenu**；`jv:SideMenu`（侧边导航，继承 WPF ListBox，绑 `SelectedItem`）；`jv:TreeView` + `jv:TreeMenuItem`（见下）；`jv:TabControl`（页签超出宽度时**自动换行**，行高随行数增长、不横向滚动，也不限行数；不支持 `TabStripPlacement` 四方向；圆角是附加属性 `jv:TabControl.HeaderCornerRadius`/`.ContentCornerRadius`，官方 TabControl 也能用；关闭流程走 `TabClosing`·`TabClosed` 路由事件（`RoutingStrategy.Direct`），可 `e.Cancel=true`，`e.Item` 取被关数据项；固定页签写 `TabControlItem.CanClose="False"`；重命名双击标题或 F2，需 `CanRename="True"`（控件级默认 False）且 `Header` 是字符串；宿主定制请 `BasedOn` 键式 `DefaultDerivedTabControlStyle`，别写不带 `BasedOn` 的 `Style`——那会连模板一起丢掉）；`jv:ToolBar`/`jv:ToolBarItem`；`jv:Toolbox`/`jv:ToolboxItem`/`jv:ToolItem`（悬浮工具箱 + 拖放，数据格式 `"Junevy.Controls.Tool"`） |
 | 布局 | `jv:ExpanderPanel`（`DisplayMode` Classic/Card、`ExpandDirection` 四方向、`HeaderExtra` 扩展槽）；`jv:SidePanel`（浮层侧滑面板：`IsOpen`/`Side`/`CornerRadius` 四角可分别设置，放入 Grid 不指定 Row/Column 自动跨满） |
 | 通知 | `jv:Badge`（角标：`Count`/`MaxCount`/`IsDot`/`Corner`）；`jv:MessageBar` + `MessageBarService`（注册一次 `SetPresenter` 后任意处 `Show`，非 UI 线程可调；用 `IsShown` 控制显隐，不要直接设 Visibility/Opacity）；`ToolTip`（官方写法自动主题化） |
-| 窗口/图像 | `jv:DialogWindow`（无边框对话框宿主，无默认宽高按内容收缩，Prism 场景派生补 `IDialogWindow`）；`jv:ImageViewer`（滚轮缩放、拖动平移、`FitToWindow()`/`ActualSize()`、右键保存）；`jv:AppBar`（无边框标题栏：`Mode` Default/MenuBar/Expandable，配合宿主 WindowChrome，系统按钮命令自动补齐）；`jv:InfoBar`（用户信息条 + 弹出菜单，`MenuContent` 可放任意面板） |
+| 窗口/图像 | `jv:DialogWindow`（无边框对话框宿主，无默认宽高按内容收缩，Prism 场景派生补 `IDialogWindow`）；**操作前确认弹窗直接用静态服务** `ConfirmDialogService.ShowAsync(...)`（对标 `MessageBarService`，但**无需 `SetPresenter` 注册**——Owner 按当前活动窗口自动推断、任意线程可调，返回 `ConfirmDialogResult.Confirm`/`Cancel`；按钮组合 `ConfirmDialogButtons.Ok`/`OkCancel`（默认）/`Cancel`，✕ 与 Esc 一律算 Cancel）；`jv:ImageViewer`（滚轮缩放、拖动平移、`FitToWindow()`/`ActualSize()`、右键保存）；`jv:AppBar`（无边框标题栏：`Mode` Default/MenuBar/Expandable，配合宿主 WindowChrome，系统按钮命令自动补齐）；`jv:InfoBar`（用户信息条 + 弹出菜单，`MenuContent` 可放任意面板） |
 
 **TreeView 专项**（最容易用错）：
 - 数据模型是 `jv:TreeMenuItem`（普通 POCO，`Title`/`Icon`/`Children`/`IsExpanded`/`IsSelected`，非控件）。整树展开/收起用实例方法 `NavTree.ExpandAll()` / `CollapseAll()`。
@@ -131,6 +131,8 @@ ThemeManager.ToggleTheme();
 - `ItemsSource` + `ItemTemplate` 的页签双击/F2 改不了名 → 重命名要求 `Header` 是字符串，这种用法标题由 `ItemTemplate` 渲染，得改用模型 `INotifyPropertyChanged` 标题 + 宿主自绘编辑 UI。
 - `jv:TabControl` 写了显式 `Style` 后控件整个变白/无模板 → 隐式样式在有显式样式时不参与，必须 `BasedOn="{StaticResource DefaultDerivedTabControlStyle}"`。
 - 自定义模板时必须保留 WPF 标准部件名（`PART_ContentHost`、`PART_ScrollViewer`、`ItemsPresenter` 等）——本库多处行为（平滑滚动、滚轮折算）依赖 `PART_ScrollViewer` 命名。
+- 确认弹窗的按钮点不动、窗口关不掉 → `jv:ConfirmDialogWindow` 给页脚插槽赋 `Template` 后**必须立刻 `ApplyTemplate()` 再 `FindName`**（赋值只是挂模板，实例化要等布局 passes，不强制应用则部件引用为 null）。改这个控件前先读 README「ConfirmDialogWindow 与 ConfirmDialogService」的实现要点。
+- **库内控件不要在属性变更回调里调 `UpdateLayout()`** → 会重入「正在变更中的集合」，虚拟化 `ItemsControl` 抛「某个 ItemsControl 与它的项源不一致」（`Badge` 曾因此在宿主日志面板批量投递时崩溃，`3.2.5` 已修）。需要按实际尺寸算位置时走 `SizeChanged`／`LayoutUpdated` 这类布局期回调——它们在同一帧内、早于渲染，纠正来得及且不额外跑布局。宿主侧相应地：在 `CollectionChanged` 处理程序里改绑定属性是安全的。
 
 ## 8. 深入阅读地图（写代码前按需查阅）
 
@@ -144,6 +146,7 @@ README.md（仓库根目录；下游项目见 GitHub 仓库同名文件）约 20
 | TreeView 数据模型与行为边界 | 「TreeView 与 TreeMenuItem」+「ExpanderBehavior」 |
 | TabControl 关闭/固定页签/重命名/绑定写法 | 「TabControl 与 TabControlItem」 |
 | 无边框窗口 + AppBar 搭配 | 「AppBar」→「与 WindowChrome 搭配」 |
+| 操作前确认弹窗（返回值 / 按钮组合 / Owner / 线程） | 「ConfirmDialogWindow 与 ConfirmDialogService」 |
 | Toolbox 拖放消费端写法 | 「Toolbox、ToolboxItem 与 ToolItem」 |
 | ItemsSource / 容器规则 | 「ItemsSource 使用约定」 |
 

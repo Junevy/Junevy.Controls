@@ -30,9 +30,16 @@ namespace Junevy.Controls.Controls.Dialog
     /// 窗口没有默认宽高：启用 <c>SizeToContent = WidthAndHeight</c>，尺寸完全由
     /// 注入的内容（如 UserControl）决定；需要固定尺寸时给内容设置显式宽高即可。
     /// </summary>
+    [TemplatePart(Name = PartFooterHost, Type = typeof(ContentControl))]
     public class DialogWindow : Window
     {
         private const string PartClipGrid = "PART_ClipGrid";
+
+        /// <summary>
+        /// 模板里的页脚插槽部件名（<c>PART_FooterHost</c>）。基类自身不往里放任何内容，
+        /// 派生对话框可在此挂按钮区模板，避免为派生类型复制一份窗框模板。
+        /// </summary>
+        internal const string PartFooterHost = "PART_FooterHost";
 
         private WindowChrome? _chrome;
         private FrameworkElement? _clipElement;

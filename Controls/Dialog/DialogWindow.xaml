@@ -122,6 +122,7 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
 
                                 <!--  标题栏  -->
@@ -182,6 +183,11 @@
 
                                 <!--  对话框内容（由宿主注入，如 Prism DialogService）  -->
                                 <ContentPresenter Grid.Row="1" x:Name="PART_ContentHost" Content="{TemplateBinding Content}" />
+
+                                <!--  页脚插槽：基类自身不注入内容，该行高度为 0，对既有宿主零影响；
+                                      派生对话框（如 jv:ConfirmDialogWindow）给本部件挂模板即可，无需复制窗框模板。
+                                      用 ContentControl 而非 ContentPresenter：前者才有公开的 Template 可供代码赋值。  -->
+                                <ContentControl Grid.Row="2" x:Name="PART_FooterHost" />
                             </Grid>
                         </Border>
                     </Grid>
