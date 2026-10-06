@@ -494,9 +494,14 @@ namespace Junevy.Controls.Showcase
             """;
 
         public const string TabControlDemo = """
-            <!-- 可关闭页签：IsClosable 控制关闭按钮（默认 True）；双击标题可重命名（控件级 CanRename 默认 False，需显式开启）；
+            <!-- 可关闭页签：IsClosable 控制关闭按钮（默认 True）；
+                 TabControlItem.CanClose=False 为固定页签——无关闭按钮，CloseTab/CloseTabCommand 也关不掉；
+                 双击标题或按 F2 可重命名（控件级 CanRename 默认 False，需显式开启；空白标题失焦不提交）；
                  CanCloseLastTab=False 保护最后一个页签；TabClosing 事件可取消关闭 -->
             <jv:TabControl Height="220" CanRename="True" CanCloseLastTab="False" TabClosing="OnTabClosing">
+                <jv:TabControlItem Header="首页" CanClose="False" Icon="&#xE66B;">
+                    <TextBlock Margin="16" Text="固定页签：CanClose=False，关不掉。" />
+                </jv:TabControlItem>
                 <jv:TabControlItem Header="相机 1" Icon="&#xE66B;">
                     <TextBlock Margin="16" Text="相机 1 的内容区域。" />
                 </jv:TabControlItem>

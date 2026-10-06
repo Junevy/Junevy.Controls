@@ -7,7 +7,8 @@ namespace Junevy.Controls.Controls.Menu
 {
     /// <summary>
     /// TabControl 的页签容器，继承 WPF <see cref="TabItem"/>。
-    /// 提供图标、关闭按钮（经 <see cref="TabControl.CloseTabCommand"/> 关闭）与双击标题重命名（<see cref="CanRename"/>）。
+    /// 提供图标、关闭按钮（经 <see cref="TabControl.CloseTabCommand"/> 关闭；<see cref="CanClose"/> 为 false 时是固定页签）、
+    /// 重命名（双击标题或按 F2，经 <see cref="CanRename"/>；空白标题不提交）与页签图标 <see cref="Icon"/>。
     /// </summary>
     [TemplatePart(Name = PART_EditHeaderTextBox, Type = typeof(TextBox))]
     [TemplatePart(Name = PART_CloseButton, Type = typeof(System.Windows.Controls.Button))]
@@ -20,6 +21,9 @@ namespace Junevy.Controls.Controls.Menu
 
         private TextBox? headerTextBox;
         private System.Windows.Controls.Button? closeButton;
+
+        /// <summary>进入编辑态时的原标题：空白标题提交时据此还原（见 <see cref="TextBox_LostFocus"/>）。</summary>
+        private string? headerBeforeEdit;
 
         static TabControlItem()
         {
@@ -36,20 +40,10 @@ namespace Junevy.Controls.Controls.Menu
                 headerTextBox.PreviewKeyDown -= HeaderTextBox_PreviewKeyDown;
             }
 
-            if (closeButton != null)
-            {
-                closeButton.MouseDoubleClick -= CloseButton_MouseDoubleClick;
-            }
-
             base.OnApplyTemplate();
 
             headerTextBox = GetTemplateChild(PART_EditHeaderTextBox) as TextBox;
             closeButton = GetTemplateChild(PART_CloseButton) as System.Windows.Controls.Button;
-            if (closeButton != null)
-            {
-                closeButton.MouseDoubleClick += CloseButton_MouseDoubleClick;
-            }
-
             if (headerTextBox == null)
             {
                 return;
@@ -62,29 +56,59 @@ namespace Junevy.Controls.Controls.Menu
         protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
         {
             // 双击必须确由本页签自身的可视子树（页签头区域）发起才进入重命名：
-            // MouseLeftButtonDown / MouseDoubleClick 都是冒泡路由，内容区、嵌套控件等
-            // 其他子树的双击也可能投递到本容器，来源校验避免「内容双击误触更名」。
+            // MouseLeftButtonDown / MouseDoubleClick 都会投递到本容器，内容区、嵌套控件等
+            // 其他子树的双击也可能到达本容器，来源校验避免「内容双击误触更名」。
+            // 关闭按钮在本页签子树内，需单独排除。
+            // 注意 MouseDoubleClick 是 RoutingStrategy.Direct 的路由事件，不沿可视树路由，
+            // 置 Handled 拦不住任何东西——承重的守卫是下面两条子树校验。
             if (!e.Handled
-                && CanRename
-                && HostAllowsRename()
-                && !IsEditing
-                && Header is string
-                && headerTextBox is TextBox editBox
                 && TabControl.IsWithinSubtree(e.OriginalSource as DependencyObject, this)
-                && !TabControl.IsWithinSubtree(e.OriginalSource as DependencyObject, closeButton))
+                && !TabControl.IsWithinSubtree(e.OriginalSource as DependencyObject, closeButton)
+                && TryBeginEdit())
             {
-                e.Handled = true;
-                SetValue(IsEditingPropertyKey, true);
-
-                // 捕获本次的编辑框实例：延迟派发期间模板可能重建并把字段置空
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    editBox.Focus();
-                    editBox.SelectAll();
-                }), DispatcherPriority.Input);
+                // 无需处理 Handled：Direct 事件不路由到祖先容器
             }
 
             base.OnMouseDoubleClick(e);
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            // F2 是编辑类控件的通用重命名入口，给纯鼠标的双击补一条键盘路径
+            if (!e.Handled && e.Key == Key.F2 && TryBeginEdit())
+            {
+                e.Handled = true;
+            }
+
+            base.OnKeyDown(e);
+        }
+
+        /// <summary>
+        /// 进入页签标题编辑态：先过全部闸门（条目级 / 控件级开关、未在编辑、标题是字符串、编辑框已就位），
+        /// 再延迟取焦并全选。双击与 F2 共用本方法，两条入口的闸门因此不会走样。
+        /// </summary>
+        private bool TryBeginEdit()
+        {
+            if (!CanRename
+                || !HostAllowsRename()
+                || IsEditing
+                || Header is not string
+                || headerTextBox is not TextBox editBox)
+            {
+                return false;
+            }
+
+            SetValue(IsEditingPropertyKey, true);
+            headerBeforeEdit = Header as string;
+
+            // 捕获本次的编辑框实例：延迟派发期间模板可能重建并把字段置空
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                editBox.Focus();
+                editBox.SelectAll();
+            }), DispatcherPriority.Input);
+
+            return true;
         }
 
         /// <summary>控件级重命名开关查询：所在 TabControl 的 CanRename；不在 TabControl 内时视为允许。</summary>
@@ -93,14 +117,20 @@ namespace Junevy.Controls.Controls.Menu
             return (ItemsControl.ItemsControlFromItemContainer(this) as TabControl)?.CanRename ?? true;
         }
 
-        private void CloseButton_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            e.Handled = true;
-        }
-
         private void TextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             SetValue(IsEditingPropertyKey, false);
+
+            // 空白标题不予提交：本次编辑视为放弃，标题回落进入编辑态前的原值。
+            // 还原写在 LostFocus 里而不是 LostKeyboardFocus：编辑框的绑定（UpdateSourceTrigger=LostFocus）
+            // 先于本处理程序把文本写回 Header，此处必须显式写回一次，不能依赖两个焦点事件的先后顺序。
+            TextBox textBox = (TextBox)sender;
+            if (headerBeforeEdit is not null && string.IsNullOrWhiteSpace(textBox.Text))
+            {
+                SetCurrentValue(HeaderProperty, headerBeforeEdit);
+            }
+
+            headerBeforeEdit = null;
         }
 
         private void HeaderTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -157,6 +187,21 @@ namespace Junevy.Controls.Controls.Menu
             {
                 item.SetValue(IsEditingPropertyKey, false);
             }
+        }
+
+        /// <summary>
+        /// 是否允许关闭本页签（条目级开关，默认允许）。用于「固定页签」——首页、固定监控页这类不允许被关掉的页签。
+        /// 设为 <c>false</c> 后：关闭按钮不再显示，<see cref="TabControl.CloseTab"/> 静默忽略，
+        /// <see cref="TabControl.CloseTabCommand"/> 的 CanExecute 为 <c>false</c>（关闭按钮随之禁用）。
+        /// 与 <see cref="TabControl.CanCloseLastTab"/> 正交：后者管数量下限（最后一个页签能不能关），本属性管单个页签。
+        /// </summary>
+        public static readonly DependencyProperty CanCloseProperty =
+            DependencyProperty.Register(nameof(CanClose), typeof(bool), typeof(TabControlItem), new PropertyMetadata(true));
+
+        public bool CanClose
+        {
+            get { return (bool)GetValue(CanCloseProperty); }
+            set { SetValue(CanCloseProperty, value); }
         }
 
         /// <summary>页签图标；通常为图标字体字形字符串，字体族取所在 <c>TabControl</c> 的 <c>atc:Icon.FontFamily</c>。</summary>

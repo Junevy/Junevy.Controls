@@ -171,16 +171,19 @@
                 </demo:DemoSection>
 
                 <demo:DemoSection
-                    Title="jv:TabControl（可关闭页签 + TabClosing 拦截）"
-                    Description="IsClosable 控制是否显示关闭按钮（默认 True）；双击文字标题可重命名（CanRename）；CanCloseLastTab=False 保护最后一个页签；TabClosing 事件可取消关闭。"
+                    Title="jv:TabControl（可关闭页签 + 固定页签 + TabClosing 拦截）"
+                    Description="IsClosable 控制是否显示关闭按钮（默认 True）；TabControlItem.CanClose=False 为固定页签——关闭按钮整颗折叠，CloseTab/CloseTabCommand 也关不掉；双击标题或按 F2 可重命名（控件级 CanRename 默认 False 需显式开启，清空或只填空格后失焦不会提交空标题）；CanCloseLastTab=False 保护最后一个页签；TabClosing 事件可取消关闭。"
                     XamlCode="{x:Static sample:ShowcaseSnippets.TabControlDemo}">
                     <jv:TabControl
                         Height="220"
                         CanCloseLastTab="False"
                         CanRename="True"
                         TabClosing="OnTabClosing">
+                        <jv:TabControlItem Header="首页" CanClose="False" Icon="&#xE66B;">
+                            <TextBlock Margin="16" Text="固定页签：CanClose=False，无关闭按钮，命令与代码也关不掉。" />
+                        </jv:TabControlItem>
                         <jv:TabControlItem Header="相机 1" Icon="&#xE66B;">
-                            <TextBlock Margin="16" Text="相机 1 的内容区域（虚拟数据演示页签内容）。" />
+                            <TextBlock Margin="16" Text="相机 1 的内容区域（虚拟数据演示页签内容）。双击标题或按 F2 改名。" />
                         </jv:TabControlItem>
                         <jv:TabControlItem Header="日志">
                             <TextBlock Margin="16" Text="日志页签内容。" />

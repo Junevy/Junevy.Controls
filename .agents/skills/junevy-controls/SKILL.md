@@ -1,6 +1,6 @@
 ---
 name: junevy-controls
-description: Junevy.Controls WPF 自定义控件库的使用指南（NuGet 包 Junevy.Controls / 本仓库）。凡是在 XAML 或 C# 中引用 Junevy.Controls、出现 jv: 或 atc: 前缀、使用 jv:Button / jv:TreeView / jv:TabControl 等控件、做 WPF 主题切换、图标字体（iconfont）或本库附加属性，或在本仓库（含 Samples/Junevy.Controls.Showcase）内工作——即使用户没有点名控件库，也应加载本 skill。
+description: Junevy.Controls WPF 自定义控件库的使用指南（NuGet 包 / 本仓库）。凡是在 XAML 或 C# 中引用 Junevy.Controls、出现 jv:、atc:前缀、使用 jv:Button / jv:TreeView / jv:TabControl 等控件、做 WPF 主题切换、图标字体（iconfont）或本库附加属性，或在本仓库（含 Showcase 示例）内工作——即使用户没有点名控件库，也应加载本 skill。
 ---
 
 # Junevy.Controls 使用指南
@@ -57,7 +57,7 @@ ThemeManager.ToggleTheme();
 `RadioButton`、`ToggleButton`、`Label`、`TextBlock`、`ProgressBar`、`PasswordBox`。注意 `jv:TextBlock` 不是 WPF TextBlock——它继承 `Control`（左侧图标走 `atc:Icon.Icon`、右侧 `Text`），**不承载 `Content`**（`3.2.3` 破坏性移除），WPF 原生 TextBlock 不会被重新着色。
 
 **C. 专有能力只在 `jv:` 实例上有**：即使外观被接管，以下能力官方实例没有——
-`jv:ListBox`/`jv:ListView` 的 `Orientation="Horizontal"` 横向滑动；`jv:Slider` 的数值框（`ShowValueBox`/`ValueBoxSide`/`ValueFormatString`）；`jv:TabControl` 的关闭/重命名/`TabClosing` 事件；`jv:TreeView` 的 `ExpandAll()`/`CollapseAll()`；`jv:PasswordBox`（原生 PasswordBox 是密封类，无接管样式，而它 `Password` 依赖属性可双向绑定）。
+`jv:ListBox`/`jv:ListView` 的 `Orientation="Horizontal"` 横向滑动；`jv:Slider` 的数值框（`ShowValueBox`/`ValueBoxSide`/`ValueFormatString`）；`jv:TabControl` 的关闭/固定页签（`TabControlItem.CanClose`）/重命名/`TabClosing`·`TabClosed` 事件；`jv:TreeView` 的 `ExpandAll()`/`CollapseAll()`；`jv:PasswordBox`（原生 PasswordBox 是密封类，无接管样式，而它 `Password` 依赖属性可双向绑定）。
 
 扩展能力（占位符、标题、空态提示、分页、平滑滚动等）以**附加属性**形式提供，官方实例同样可用——见第 4 节。
 
@@ -95,7 +95,7 @@ ThemeManager.ToggleTheme();
 | 输入 | `jv:TextBox`（`ShowClear` 清空按钮；`ShowCommandButton`+`CommandButtonCommand` 内嵌命令按钮，与清空按钮互斥）；`jv:PasswordBox`（`Password` 可绑定、`RevealMode`、`IsError` 泛红）；`jv:ComboBox`（单击主体切换下拉）；`jv:GroupBox`（点标题折叠：`IsCollapsible`/`IsCollapsed`）；`DatePicker`（官方写法即可）；`jv:Slider`（数值框三属性） |
 | 集合 | `jv:ListBox` / `jv:ListView`（`Orientation="Horizontal"` 横向带状滑动；ListView 设了 `View`/GridView 时该属性失效）；`DataGrid`（官方写法即可；默认关闭新增/删除行、整行单选）；`jv:DataPager`（独立分页栏，可与 PagingAssist 显式绑定） |
 | 文本/状态 | `jv:Label`（状态标签：`DisplayMode` 枚举 Error/Success/Warning/Borderless*/Neutral）；`jv:TextBlock`（左 `atc:Icon.Icon` 右 `Text` 的标题组合，非 WPF TextBlock，没有 `Content`） |
-| 菜单/导航 | `jv:ContextMenu` + `jv:ContextMenuItem`（上下文菜单用这两个）；**`jv:MenuItem` 是 SideMenu 的导航数据控件，不是 WPF MenuItem——不要放进 ContextMenu**；`jv:SideMenu`（侧边导航，继承 WPF ListBox，绑 `SelectedItem`）；`jv:TreeView` + `jv:TreeMenuItem`（见下）；`jv:TabControl`（页签超出宽度时**自动换行**，行高随行数增长、不横向滚动，也不限行数；不支持 `TabStripPlacement` 四方向；圆角是附加属性 `jv:TabControl.HeaderCornerRadius`/`.ContentCornerRadius`，官方 TabControl 也能用；关闭流程走 `TabClosing` 路由事件，可 `e.Cancel=true`）；`jv:ToolBar`/`jv:ToolBarItem`；`jv:Toolbox`/`jv:ToolboxItem`/`jv:ToolItem`（悬浮工具箱 + 拖放，数据格式 `"Junevy.Controls.Tool"`） |
+| 菜单/导航 | `jv:ContextMenu` + `jv:ContextMenuItem`（上下文菜单用这两个）；**`jv:MenuItem` 是 SideMenu 的导航数据控件，不是 WPF MenuItem——不要放进 ContextMenu**；`jv:SideMenu`（侧边导航，继承 WPF ListBox，绑 `SelectedItem`）；`jv:TreeView` + `jv:TreeMenuItem`（见下）；`jv:TabControl`（页签超出宽度时**自动换行**，行高随行数增长、不横向滚动，也不限行数；不支持 `TabStripPlacement` 四方向；圆角是附加属性 `jv:TabControl.HeaderCornerRadius`/`.ContentCornerRadius`，官方 TabControl 也能用；关闭流程走 `TabClosing`·`TabClosed` 路由事件（`RoutingStrategy.Direct`），可 `e.Cancel=true`，`e.Item` 取被关数据项；固定页签写 `TabControlItem.CanClose="False"`；重命名双击标题或 F2，需 `CanRename="True"`（控件级默认 False）且 `Header` 是字符串；宿主定制请 `BasedOn` 键式 `DefaultDerivedTabControlStyle`，别写不带 `BasedOn` 的 `Style`——那会连模板一起丢掉）；`jv:ToolBar`/`jv:ToolBarItem`；`jv:Toolbox`/`jv:ToolboxItem`/`jv:ToolItem`（悬浮工具箱 + 拖放，数据格式 `"Junevy.Controls.Tool"`） |
 | 布局 | `jv:ExpanderPanel`（`DisplayMode` Classic/Card、`ExpandDirection` 四方向、`HeaderExtra` 扩展槽）；`jv:SidePanel`（浮层侧滑面板：`IsOpen`/`Side`/`CornerRadius` 四角可分别设置，放入 Grid 不指定 Row/Column 自动跨满） |
 | 通知 | `jv:Badge`（角标：`Count`/`MaxCount`/`IsDot`/`Corner`）；`jv:MessageBar` + `MessageBarService`（注册一次 `SetPresenter` 后任意处 `Show`，非 UI 线程可调；用 `IsShown` 控制显隐，不要直接设 Visibility/Opacity）；`ToolTip`（官方写法自动主题化） |
 | 窗口/图像 | `jv:DialogWindow`（无边框对话框宿主，无默认宽高按内容收缩，Prism 场景派生补 `IDialogWindow`）；`jv:ImageViewer`（滚轮缩放、拖动平移、`FitToWindow()`/`ActualSize()`、右键保存）；`jv:AppBar`（无边框标题栏：`Mode` Default/MenuBar/Expandable，配合宿主 WindowChrome，系统按钮命令自动补齐）；`jv:InfoBar`（用户信息条 + 弹出菜单，`MenuContent` 可放任意面板） |
@@ -127,6 +127,9 @@ ThemeManager.ToggleTheme();
 - `atc:TitleAssist.TitleAlignment` 设了却看不出差别 → 标题区域没有多余空间可移动：左/右方位未设 `TitleWidth` 时区域等于标题自身宽。靠齐只发生在区域内部，想让它起作用要么给 `TitleWidth`，要么用上/下方位（未设宽度时区域=输入区整行宽）。`TitlePlacement="Left"` + `TitleWidth` 想让标题贴合输入框需显式写 `TitleAlignment="Right"`（`3.2.3` 起默认 `Left`，旧观感不再自动出现）。
 - `TabControl` 写了 `DisplayMode`/`TabStripPlacement` 报错或无效 → 前者已在 3.2.0 删除（写 XAML 会编译失败），后者不支持四方向。
 - `jv:TabControl` 换行后「非末行的选中页签底边缺 1px 描边」→ 已知取舍（去底边框只对末行有意义，那里才有内容区上边线），不要为此改回四边描边或加行归属测量；要限制头部占用由宿主定高或外层套 `ScrollViewer`。
+- `TabClosing`/`TabClosed` 在祖先元素 `AddHandler` 挂不上 → 两者是 `RoutingStrategy.Direct`（为隔离嵌套 TabControl 刻意选的），只在发起的那台控件上触发；需要多处响应就在视图模型里挂一个处理器转发。
+- `ItemsSource` + `ItemTemplate` 的页签双击/F2 改不了名 → 重命名要求 `Header` 是字符串，这种用法标题由 `ItemTemplate` 渲染，得改用模型 `INotifyPropertyChanged` 标题 + 宿主自绘编辑 UI。
+- `jv:TabControl` 写了显式 `Style` 后控件整个变白/无模板 → 隐式样式在有显式样式时不参与，必须 `BasedOn="{StaticResource DefaultDerivedTabControlStyle}"`。
 - 自定义模板时必须保留 WPF 标准部件名（`PART_ContentHost`、`PART_ScrollViewer`、`ItemsPresenter` 等）——本库多处行为（平滑滚动、滚轮折算）依赖 `PART_ScrollViewer` 命名。
 
 ## 8. 深入阅读地图（写代码前按需查阅）
@@ -139,7 +142,7 @@ README.md（仓库根目录；下游项目见 GitHub 仓库同名文件）约 20
 | 某个附加属性的完整参数表 | 「附加属性」下同名小节（Icon / PagingAssist / ExpanderBehavior / SmoothScrolling / TitleAssist / PlaceholderAssist） |
 | 某个控件的属性表与示例 | 「控件索引」列出的分类章节（如「按钮控件」「菜单与导航控件」） |
 | TreeView 数据模型与行为边界 | 「TreeView 与 TreeMenuItem」+「ExpanderBehavior」 |
-| TabControl 关闭/重命名/绑定写法 | 「TabControl 与 TabControlItem」 |
+| TabControl 关闭/固定页签/重命名/绑定写法 | 「TabControl 与 TabControlItem」 |
 | 无边框窗口 + AppBar 搭配 | 「AppBar」→「与 WindowChrome 搭配」 |
 | Toolbox 拖放消费端写法 | 「Toolbox、ToolboxItem 与 ToolItem」 |
 | ItemsSource / 容器规则 | 「ItemsSource 使用约定」 |

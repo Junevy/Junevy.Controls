@@ -1204,23 +1204,30 @@ node.IsSelected = true;
 | --- | --- |
 | `CanCloseLastTab` | 是否允许关闭最后一个页签，默认 `true` |
 | `CanRename` | 控件级双击重命名开关，默认 **`false`**（默认不开放双击改名，需显式设 `True`）；能否进入重命名由两级开关共同决定——控件级 `TabControl.CanRename` 与条目级 `TabControlItem.CanRename` **同时为 `true`** 才允许 |
-| `DisposeContentOnClose` | 关闭页签时的内容释放开关，默认 `false`（库**不做任何清理**，生命周期由调用方管理）。开启后两类路径都释放：**直接声明页签**（页签自身即数据项）清空 `Content` / `DataContext` 并对内容本身与内容元素 `DataContext` 中实现 `IDisposable` 的部分调用 `Dispose()`（默认关闭态下同一自容器页签可重新加回 `Items`）；**`ItemsSource` 条目**（条目即数据模型）对模型本身或条目元素 `DataContext` 中实现 `IDisposable` 的部分调用 `Dispose()`（容器随条目移除一并丢弃；释放发生在从集合移除之前——条目移除时生成器会清掉容器 `Content`） |
+| `DisposeContentOnClose` | 关闭页签时的内容释放开关，默认 `false`（库**不做任何清理**，生命周期由调用方管理）。开启后两类路径都释放：**直接声明页签**（页签自身即数据项）清空 `Content` / `DataContext` 并对内容本身与内容元素 `DataContext` 中实现 `IDisposable` 的部分调用 `Dispose()`（默认关闭态下同一自容器页签可重新加回 `Items`）；**`ItemsSource` 条目**（条目即数据模型）对模型本身或条目元素 `DataContext` 中实现 `IDisposable` 的部分调用 `Dispose()`（容器随条目移除一并丢弃；释放发生在从集合移除之前——条目移除时生成器会清掉容器 `Content`）。**⚠ 处置 `DataContext` 不区分本地值与继承值**：XAML 直接声明、且未本地设置 `DataContext` 的页签，其 `DataContext` 是从窗口继承来的视图模型——它一旦实现 `IDisposable`，关掉任意一个页签就会把它销毁。需要这个开关时请给页签显式设本地 `DataContext`，或确保视图模型不实现 `IDisposable` |
 | `HeaderCornerRadius` | 页签头圆角，默认 `4`。**只接受上两角**：模板经筛选器丢弃下两角（与内容区衔接），因此 `HeaderCornerRadius="5,5,0,0"` 有效、`="0,0,5,5"` 会得到直角。**附加属性**：既可写在 `jv:TabControl` 上（`HeaderCornerRadius="6"`，C# 实例属性同名不变），也可写在官方 `<TabControl>` 上（`jv:TabControl.HeaderCornerRadius="6"`） |
 | `ContentCornerRadius` | 内容区域圆角，默认 `8`。**只接受下两角**（上两角被丢弃），四角写法 `ContentCornerRadius="0,0,5,5"` 与 `"5"` 等价，`="0,0,3,9"` 可让左下 `9`、右下 `3` 分别生效；附加写法同上 |
 | `IsClosable` | 是否显示关闭按钮，默认 `true`（仅影响外观，页签仍可通过 `CloseTab` / `CloseTabCommand` 关闭） |
 | `TabClosing` | **路由事件**（`TabControl.TabClosingEvent`，`RoutingStrategy.Direct`，委托 `TabCloseEventHandler(object sender, TabCloseEventArgs e)`），关闭前派发；置 `TabCloseEventArgs.Cancel=true` 可取消 |
 | `TabClosed` | **路由事件**（`TabControl.TabClosedEvent`，同一委托），页签已关闭后派发；`Cancel` 在本事件中无效 |
-| `CloseTab(TabControlItem)` | 通过代码关闭指定页签（不属于本控件、或该页签处于编辑态时忽略） |
-| `CloseTabCommand` | `TabControl` 上的静态 `RoutedCommand`，页签关闭按钮即绑定它；`CommandParameter` 传入 `TabControlItem` 时**优先**于「经事件源 / 可视树向上查找」的页签定位方式——宿主可在内容区自行发起命令并指定要关闭哪个页签 |
+| `CloseTab(TabControlItem)` | 通过代码关闭指定页签（不属于本控件、`CanClose=False`、或该页签处于编辑态时忽略） |
+| `CloseTabCommand` | `TabControl` 上的静态 `RoutedCommand`，页签关闭按钮即绑定它；`CommandParameter` 传入 `TabControlItem` 时**优先**于「经事件源 / 可视树向上查找」的页签定位方式——宿主可在内容区自行发起命令并指定要关闭哪个页签。`CanExecute` 为 `false`（按钮随之禁用）的三种情形：页签定位不到、页签 `CanClose=False`、页签处于编辑态、`CanCloseLastTab=False` 且只剩这一个页签 |
 | `TabControlItem.Icon` | 页签图标 |
-| `TabControlItem.IsEditing` | 双击文字标题进入编辑时的只读状态 |
-| `TabControlItem.CanRename` | 条目级是否允许双击标题重命名，默认 `true`；设为 `false` 后双击不再进入编辑态，编辑中被禁用会立即退出编辑并保留当前文本。还需控件级 `TabControl.CanRename` 同为 `true` 才生效。双击仅在页签头自身的可视子树内触发重命名——内容区或嵌套控件的双击不会误触 |
+| `TabControlItem.IsEditing` | 双击标题或按 F2 进入编辑时的只读状态；编辑期间该页签拒绝关闭（命令 `CanExecute=false`，关闭按钮变灰） |
+| `TabControlItem.CanClose` | 条目级是否允许关闭本页签，默认 `true`。用于**固定页签**（首页、固定监控页这类关不掉的页签）：设为 `False` 后关闭按钮整颗折叠，`CloseTab` 静默忽略，`CloseTabCommand` 的 `CanExecute` 为 `false`——外观与行为同时封死，不存在「按钮没了但快捷键还能关」的漏洞。与 `TabControl.CanCloseLastTab` 正交：后者管数量下限（最后一个能不能关），本属性管单个页签 |
+| `TabControlItem.CanRename` | 条目级是否允许重命名标题，默认 `true`；设为 `false` 后双击与 F2 均不再进入编辑态，编辑中被禁用会立即退出编辑并保留当前文本。还需控件级 `TabControl.CanRename` 同为 `true` 才生效 |
+| `DefaultDerivedTabControlStyle` | 键式派生样式（`TargetType` 为 `jv:TabControl`，含圆角、悬停/选中背景与功能容器样式）。宿主自定义时 `BasedOn` 它、只覆盖要改的 Setter 即可——**不要写不带 `BasedOn` 的显式 `Style`**，那会连模板与 `ItemsPanel` 一起丢掉，控件直接不可用（隐式样式在存在显式样式时不参与解析） |
 
 关闭与选中行为：
 
 - **选中位置跟随浏览器习惯**：关闭中间页签时选中停在同一位置（后一个页签顶上来），关闭最后一个页签时退回前一个（实现为 `Math.Min(index, Items.Count - 2)`）；`CanCloseLastTab=True` 关掉仅剩页签后无选中页签。
-- **`TabClosing` / `TabClosed` 是可订阅的 WPF 路由事件**：经 `EventManager.RegisterRoutedEvent` 注册，`TabCloseEventArgs` 继承 `RoutedEventArgs`，因此 `e.Source`、`e.RoutedEvent` 均有值，也可用 `AddHandler` 在更上层挂接。路由策略刻意取 `Direct` 而非库内其他事件常用的 `Bubble`：关闭语义只属于发起页签所在的这台 `TabControl`，页签内容区里可嵌套另一台 `TabControl`，冒泡会让父级收到子级页签的关闭事件、父级的 `Cancel` 便可能误拦与它无关的关闭。
-- **`ItemsSource` 不可写时不再静默失败**：数据源无法移除项时（`IList.IsReadOnly` 或 `IList.IsFixedSize` 为真——数组属于后者：它的 `IsReadOnly` 返回 `false`，但 `Remove` 必抛 `NotSupportedException`），关闭会抛 `InvalidOperationException` 并给出可执行的提示，而不是什么都不发生。`ObservableCollection<T>` 等可写、非定长的 `IList` 源仍由控件直接移除数据项。需要自管移除时机（或数据源不可写）时，走 `TabClosing` + `Cancel` 模式：
+- **关闭后的焦点去向**：关闭持有键盘焦点的页签（含焦点落在它那颗关闭按钮上）时，焦点由 WPF 自身交给接管选中的页签——实测关末页签后焦点落在退回的那个页签上，**这是框架行为，库不再额外干预**（曾试过在 `PerformClose` 末尾显式 `Focus()`，变异反证证明删掉它断言全绿，即那行是无效代码，已按"清理冗余"删除）；关闭非焦点页签时焦点不动。
+- **固定页签**：`TabControlItem.CanClose="False"` 同时封死外观与行为——关闭按钮折叠，`CloseTab` 与 `CloseTabCommand` 一并拒绝。想按业务规则拦某一页签（如「有未保存改动」）时用 `TabClosing` + `Cancel`；想让它天生就关不掉时用 `CanClose`。
+- **重命名的两条入口与提交规则**：双击标题、**F2** 键（两条入口共用同一套闸门，`TabControl.CanRename` 与 `TabControlItem.CanRename` 需同时为 `True`）。**仅 `Header` 是字符串的页签可改名**——`ItemsSource` + `ItemTemplate` 用法的标题由 `ItemTemplate` 渲染、`Header` 并非字符串，双击与 F2 均不进入编辑态（此时应改用数据模型的 `INotifyPropertyChanged` 标题 + 宿主自绘编辑 UI）。提交口径：Enter 或点走焦点即提交，Esc 还原，**清空或只填空白字符后失焦视为放弃编辑**，标题保持原值（不会产生无名页签）。
+- **`TabClosing` / `TabClosed` 是可订阅的 WPF 路由事件**：经 `EventManager.RegisterRoutedEvent` 注册，`TabCloseEventArgs` 继承 `RoutedEventArgs`，因此 `e.Source`、`e.RoutedEvent` 均有值。路由策略刻意取 `Direct` 而非库内其他事件常用的 `Bubble`：关闭语义只属于发起页签所在的这台 `TabControl`，页签内容区里可嵌套另一台 `TabControl`，冒泡会让父级收到子级页签的关闭事件、父级的 `Cancel` 便可能误拦与它无关的关闭。**`Direct` 的代价：事件只在发起的那台 `TabControl` 上触发，祖先元素 `AddHandler` 挂不上**（要用 `Direct` 隔离嵌套，就得接受这一点）；需要"多处响应同一台控件的关闭"时，在宿主视图模型里挂一个处理器转发即可。
+- **`TabCloseEventArgs.Item` 取回被关闭的数据项**：`ItemsSource` 模式下条目移除后生成器会反准备容器，`Tab` 的 `Content` / `DataContext` 不再指向数据项（读回的是 WPF 的未设置占位）——`TabClosed` 里只能靠派发前取好的快照 `Item` 拿到那个集合元素（直接声明页签时 `Item` 与 `Tab` 是同一个对象）。宿主在 `TabClosed` 里做"写回脏数据""释放句柄"时用它，不必再靠 `DataContext` 兜底。
+- **宿主在 `TabClosing` 里自行移除数据项时**（未置 `Cancel`），控件发现页签已消失便不再二次移除，并补派一次 `TabClosed`——事件成对，不会漏通知。该判定除容器映射外还会直接问一次集合：数据源不发 `INotifyCollectionChanged` 通知时生成器会一直留着旧映射，只看它会把"条目其实已被移除"误判成仍在，进而抛出一条与实情不符的 `ItemsSource 不可写`。
+- **`ItemsSource` 不可写时不再静默失败**：数据源无法移除项时（`IList.IsReadOnly` 或 `IList.IsFixedSize` 为真——数组属于后者：它的 `IsReadOnly` 返回 `false`，但 `Remove` 必抛 `NotSupportedException`），关闭会抛 `InvalidOperationException` 并给出可执行的提示，而不是什么都不发生。抛出点在**任何状态变更之前**：`TabClosing` 处理程序若未取消，异常紧随其后抛出，`SelectedIndex` 不动、延迟派发不启动——不会出现"处理程序跑完了、选中也跳走了、最后才抛"的半途状态。`ObservableCollection<T>` 等可写、非定长的 `IList` 源仍由控件直接移除数据项。需要自管移除时机（或数据源不可写）时，走 `TabClosing` + `Cancel` 模式：
 
 ```xml
 <jv:TabControl ItemsSource="{Binding Editors}" TabClosing="OnTabClosing" />
@@ -1250,6 +1257,30 @@ private void OnTabClosing(object sender, TabCloseEventArgs e)
         <local:LogView />
     </jv:TabControlItem>
 </jv:TabControl>
+```
+
+首页这类固定页签写 `CanClose="False"`；`TabControlItem` 的其他容器属性（`CanClose` / `CanRename` / `Icon`）要绑 ViewModel 时经 `ItemContainerStyle` 派生：
+
+```xml
+<jv:TabControl ItemsSource="{Binding Editors}">
+    <jv:TabControl.ItemContainerStyle>
+        <Style BasedOn="{StaticResource DefaultTabControlItemStyle}" TargetType="{x:Type jv:TabControlItem}">
+            <Setter Property="Icon" Value="{Binding Icon}" />
+            <Setter Property="CanClose" Value="{Binding IsClosable}" />
+        </Style>
+    </jv:TabControl.ItemContainerStyle>
+</jv:TabControl>
+```
+
+需要整体定制控件本身（换圆角、改悬停/选中底色）时 `BasedOn` 键式派生样式，不要写不带 `BasedOn` 的 `Style`：
+
+```xml
+<Style x:Key="AppTabControlStyle"
+       BasedOn="{StaticResource DefaultDerivedTabControlStyle}"
+       TargetType="{x:Type jv:TabControl}">
+    <Setter Property="HeaderCornerRadius" Value="6" />
+    <Setter Property="IsClosable" Value="False" />
+</Style>
 ```
 
 绑定普通数据集合时，标准 `ItemTemplate` 控制页签标题，`ContentTemplate` 控制选中项内容：
@@ -1975,7 +2006,7 @@ Junevy.Controls 遵循 WPF 的项目容器规则：
 | `SideMenu` | WPF `ListBox`、`ListBoxItem`、导航数据模板 | `Icon.FontFamily`、`Icon.IconSize` |
 | `TreeView` | WPF `TreeView`、`TreeMenuItem`（数据模型）、`TreeViewDisplayMode`、单一 `HierarchicalDataTemplate`（`TreeViewItemTemplate`）与容器样式（`DefaultTreeViewStyle` / `TreeViewItemContainerStyle`）、`cvt:IndentSizeToMarginConverter`、主题资源（`Surface.Hover` / `Surface.Sunken` 回退触发器） | `Icon.FontFamily`、`Icon.IconSize`、`ExpanderBehavior.Enable`、`TreeViewAssist`（`DisplayMode` / `IndentSize` / `AutoExpandAncestors` / `NavigateCommand` / `ItemHoverBackground` / `SelectedItemBackground`） |
 | `TreeMenuItem` | 普通数据模型（`INotifyPropertyChanged`）、`ObservableCollection<TreeMenuItem>`；`ExpandAll()` / `CollapseAll()` 递归写模型；经所在 `TreeView` 使用图标附加属性 | 无 |
-| `TabControl` | WPF `TabControl`、`TabControlItem`、`jv:TextBox`、`jv:Button` | `IsClosable`（控件自身属性）、`Icon.FontFamily`、`TabControl.HeaderCornerRadius` / `TabControl.ContentCornerRadius`（圆角为**附加属性**，官方 `<TabControl>` 也可用 `jv:TabControl.*` 写法自定义） |
+| `TabControl` | WPF `TabControl`、`TabControlItem`、`jv:TextBox`、`jv:Button`、`DefaultDerivedTabControlStyle`（`jv:TabControl` 键式样式，宿主 `BasedOn` 它做定制） | `IsClosable`（控件自身属性）、`Icon.FontFamily`、`TabControl.HeaderCornerRadius` / `TabControl.ContentCornerRadius`（圆角为**附加属性**，官方 `<TabControl>` 也可用 `jv:TabControl.*` 写法自定义） |
 | `TabControlItem` | WPF `TabItem`、`DefaultTabControlItemStyle`、`TabControl.CloseTabCommand` | 继承所在 `TabControl` 的相关附加属性 |
 | `ToolBar` | WPF `ItemsControl`、`ToolBarItem`、虚拟化面板 | 无；图标由项目自身属性提供 |
 | `ToolBarItem` | WPF `Button`、`DefaultToolBarItemStyle` | 无 |

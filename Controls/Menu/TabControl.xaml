@@ -221,6 +221,10 @@
                             <!--  选中页签文字升为一级  -->
                             <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
                         </Trigger>
+                        <!--  固定页签（CanClose=False）：整颗关闭按钮折叠，模板触发器优先于模板内声明的取值  -->
+                        <Trigger Property="CanClose" Value="False">
+                            <Setter TargetName="PART_CloseButton" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
                         <Trigger Property="IsEditing" Value="True">
                             <Setter TargetName="PART_HeaderPresenter" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="PART_EditHeaderTextBox" Property="Visibility" Value="Visible" />
@@ -297,13 +301,21 @@
     <!--  隐式样式（官方类型）：App 合并字典后 <TabControl> 自动接管为库主题  -->
     <Style BasedOn="{StaticResource DefaultTabControlStyle}" TargetType="TabControl" />
 
-    <!--  隐式样式（派生类型）：jv:TabControl 叠加可自定义悬停/选中背景、圆角与功能页签容器  -->
-    <Style BasedOn="{StaticResource DefaultTabControlStyle}" TargetType="{x:Type local:TabControl}">
+    <!--  4. 键式派生样式（TargetType=jv:TabControl）：可自定义悬停/选中背景、圆角与功能页签容器的实体。
+              键式的意义是让宿主能 BasedOn 它后只覆盖要改的 Setter——否则宿主一旦写不带 BasedOn 的显式样式，
+              连模板带 ItemsPanel 会一起丢掉，控件直接不可用（隐式样式在有显式样式时不参与）。  -->
+    <Style
+        x:Key="DefaultDerivedTabControlStyle"
+        BasedOn="{StaticResource DefaultTabControlStyle}"
+        TargetType="{x:Type local:TabControl}">
         <Setter Property="ItemHoverBackground" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
         <Setter Property="SelectedItemBackground" Value="{DynamicResource Theme.Brush.Background.App}" />
         <Setter Property="HeaderCornerRadius" Value="{DynamicResource Theme.SmallCornerRadius}" />
         <Setter Property="ContentCornerRadius" Value="{DynamicResource Theme.LargeCornerRadius}" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource DefaultTabControlItemStyle}" />
     </Style>
+
+    <!--  隐式样式（派生类型）：默认宿主什么都不写即取上面的键式派生样式  -->
+    <Style BasedOn="{StaticResource DefaultDerivedTabControlStyle}" TargetType="{x:Type local:TabControl}" />
 
 </ResourceDictionary>

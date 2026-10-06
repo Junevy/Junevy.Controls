@@ -94,6 +94,10 @@ namespace Junevy.Controls.Controls.Menu
         ///   <c>DataContext</c> 实现 <see cref="IDisposable"/> 的部分调用 Dispose（仅默认关闭态下同一页签可重新加回）；
         /// - **<c>ItemsSource</c> 条目**（条目即数据模型）：模型本身或条目元素 <c>DataContext</c>
         ///   实现 <see cref="IDisposable"/> 时调用 Dispose（容器随条目移除一并丢弃，无重新加回语义）。
+        /// <para><b>处置 <c>DataContext</c> 不区分本地值与继承值</b>：未本地设置 <c>DataContext</c> 的直接声明页签，
+        /// 其 <c>DataContext</c> 是从窗口继承来的视图模型——它一旦实现 <see cref="IDisposable"/>，
+        /// 关掉任意一个页签就会把它销毁。需要本开关时，请给页签显式设本地 <c>DataContext</c>，
+        /// 或确保视图模型不实现 <see cref="IDisposable"/>。</para>
         /// </summary>
         public static readonly DependencyProperty DisposeContentOnCloseProperty =
             DependencyProperty.Register(nameof(DisposeContentOnClose), typeof(bool), typeof(TabControl), new PropertyMetadata(false));
@@ -195,7 +199,8 @@ namespace Junevy.Controls.Controls.Menu
         }
 
         /// <summary>
-        /// 关闭指定页签。页签不属于本控件时静默忽略；<see cref="TabClosing"/> 被取消时不移除。
+        /// 关闭指定页签。页签不属于本控件、或 <see cref="TabControlItem.CanClose"/> 为 <c>false</c> 时静默忽略；
+        /// <see cref="TabClosing"/> 被取消时不移除。
         /// 编辑态（<see cref="TabControlItem.IsEditing"/>）的页签由命令路径拒绝关闭，本方法同样拒绝。
         /// </summary>
         public void CloseTab(TabControlItem? tabItem)
@@ -205,7 +210,7 @@ namespace Junevy.Controls.Controls.Menu
                 throw new ArgumentNullException(nameof(tabItem));
             }
 
-            if (!ContainsTab(tabItem) || tabItem.IsEditing)
+            if (!ContainsTab(tabItem) || tabItem.IsEditing || !tabItem.CanClose)
             {
                 return;
             }
@@ -217,6 +222,7 @@ namespace Junevy.Controls.Controls.Menu
         {
             TabControlItem? tabItem = ResolveTabItem(e);
             e.CanExecute = tabItem is not null
+                && tabItem.CanClose
                 && !tabItem.IsEditing
                 && (CanCloseLastTab || Items.Count > 1);
         }
@@ -244,37 +250,54 @@ namespace Junevy.Controls.Controls.Menu
                 return;
             }
 
-            if (!ContainsTab(tabItem))
+            if (!ContainsTab(tabItem) || !tabItem.CanClose)
             {
                 return;
             }
 
-            TabCloseEventArgs closing = new(TabClosingEvent, this, tabItem);
+            // 数据项快照：ItemsSource 路径下条目移除后生成器会反准备容器，其 Content / DataContext
+            // 不再指向数据项（读回的是 WPF 的未设置占位），之后 TabClosed 再也取不到条目本身，故先取住。
+            object item = GetItemForTab(tabItem);
+
+            TabCloseEventArgs closing = new(TabClosingEvent, this, tabItem, item);
             RaiseEvent(closing);
             if (closing.Cancel)
             {
                 return;
             }
 
-            if (ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
+            // 宿主可能在 TabClosing 里自行移除了数据项而未置 Cancel：页签此时已消失，补派 TabClosed 收尾。
+            // 判定不只看容器映射——生成器只在数据源发 INotifyCollectionChanged 通知后才更新映射，
+            // 非通知型数据源（如只读 IList 包装）上它并不知道条目已走，故同时问一次集合本身。
+            if (!TabStillPresent(tabItem, item))
             {
-                PerformClose(tabItem);
-            }
-            else
-            {
-                Dispatcher.BeginInvoke(new Action(() => PerformClose(tabItem)), DispatcherPriority.Background);
-            }
-        }
-
-        private void PerformClose(TabControlItem tabItem)
-        {
-            // 延迟派发期间页签可能已被移除，执行前需重新校验
-            if (!ContainsTab(tabItem))
-            {
+                RaiseEvent(new TabCloseEventArgs(TabClosedEvent, this, tabItem, item));
                 return;
             }
 
-            object itemToRemove = GetItemForTab(tabItem);
+            // 可写性必须赶在任何状态变更（选中转移）与延迟派发之前校验：否则不可写源会先跑完
+            // TabClosing 处理程序、改掉选中，最后才抛异常；走延迟路径时异常还会抛在 Dispatcher 回调里，
+            // 变成无人处理的应用程序级异常。此处抛出不影响「TabClosing + Cancel」自管集合模式——
+            // 那种模式在上面的 Cancel 分支已经返回。
+            EnsureRemovable();
+
+            if (ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
+            {
+                PerformClose(tabItem, item);
+            }
+            else
+            {
+                Dispatcher.BeginInvoke(new Action(() => PerformClose(tabItem, item)), DispatcherPriority.Background);
+            }
+        }
+
+        private void PerformClose(TabControlItem tabItem, object itemToRemove)
+        {
+            // 延迟派发期间页签可能已被移除，执行前需重新校验
+            if (!TabStillPresent(tabItem, itemToRemove))
+            {
+                return;
+            }
 
             if (tabItem.IsSelected && Items.Count > 1)
             {
@@ -293,8 +316,8 @@ namespace Junevy.Controls.Controls.Menu
 
             bool removedSelfAsItem = ReferenceEquals(itemToRemove, tabItem);
 
-            // ItemsSource 条目的释放必须在 RemoveItem 之前：条目移除时生成器会「反准备」容器、
-            // 清掉其 Content，之后将读不到条目对象（自容器路径的 Content 是宿主自设的，无此问题）。
+            // ItemsSource 条目的释放必须在 RemoveItem 之前：条目移除时生成器会「反准备」容器，
+            // 其 Content / DataContext 不再指向条目对象，之后将读不到条目（自容器路径的 Content 是宿主自设的，无此问题）。
             if (DisposeContentOnClose && !removedSelfAsItem)
             {
                 CleanupItemContent(tabItem);
@@ -307,7 +330,7 @@ namespace Junevy.Controls.Controls.Menu
                 CleanupTabItem(tabItem);
             }
 
-            RaiseEvent(new TabCloseEventArgs(TabClosedEvent, this, tabItem));
+            RaiseEvent(new TabCloseEventArgs(TabClosedEvent, this, tabItem, itemToRemove));
         }
 
         private static TabControlItem? ResolveTabItem(RoutedEventArgs e)
@@ -384,6 +407,15 @@ namespace Junevy.Controls.Controls.Menu
                 || Items.Contains(tabItem);
         }
 
+        /// <summary>
+        /// 页签容器与其数据项是否都还在。除容器映射外再问一次集合：数据源不发集合变更通知时
+        /// 生成器会一直留着旧映射，只看它会把「条目其实已被宿主移除」误判成仍在。
+        /// </summary>
+        private bool TabStillPresent(TabControlItem tabItem, object item)
+        {
+            return ContainsTab(tabItem) && Items.Contains(item);
+        }
+
         private object GetItemForTab(TabControlItem tabItem)
         {
             object item = ItemContainerGenerator.ItemFromContainer(tabItem);
@@ -391,8 +423,8 @@ namespace Junevy.Controls.Controls.Menu
         }
 
         /// <summary>
-        /// 从数据源移除页签。不可写的 <c>ItemsSource</c>（数组、LINQ 投影等）抛出可定位的异常，
-        /// 而不是静默失败——需要自管集合的宿主应在 <see cref="TabClosing"/> 里移除数据项并置 Cancel。
+        /// 从数据源移除页签。自容器声明（<c>ItemsSource</c> 为 null）直接移除页签本身；
+        /// <c>ItemsSource</c> 路径需数据源可写，由 <see cref="EnsureRemovable"/> 校验。
         /// </summary>
         private void RemoveItem(object item)
         {
@@ -402,15 +434,23 @@ namespace Junevy.Controls.Controls.Menu
                 return;
             }
 
-            if (ItemsSource is IList { IsReadOnly: false, IsFixedSize: false } list)
-            {
-                list.Remove(item);
-                return;
-            }
+            // 延迟派发期间 ItemsSource 可能被换成不可写集合，移除前再校验一次
+            EnsureRemovable();
+            ((IList)ItemsSource).Remove(item);
+        }
 
-            throw new InvalidOperationException(
-                "无法关闭页签：ItemsSource 不可写。请改绑 ObservableCollection<T>，" +
-                "或在 TabClosing 处理程序中从自己的集合移除数据项并置 e.Cancel = true。");
+        /// <summary>
+        /// 校验 <c>ItemsSource</c> 可被控件直接移除。不可写源（数组、只读包装、LINQ 投影等）抛出可定位的异常，
+        /// 而不是静默失败——需要自管集合的宿主走 <see cref="TabClosing"/> + <c>Cancel</c> 模式，那条路径不经过此校验。
+        /// </summary>
+        private void EnsureRemovable()
+        {
+            if (ItemsSource is not null && ItemsSource is not IList { IsReadOnly: false, IsFixedSize: false })
+            {
+                throw new InvalidOperationException(
+                    "无法关闭页签：ItemsSource 不可写。请改绑 ObservableCollection<T>，" +
+                    "或在 TabClosing 处理程序中从自己的集合移除数据项并置 e.Cancel = true。");
+            }
         }
 
         /// <summary>
@@ -456,15 +496,33 @@ namespace Junevy.Controls.Controls.Menu
     /// <summary>页签关闭相关路由事件的委托。</summary>
     public delegate void TabCloseEventHandler(object sender, TabCloseEventArgs e);
 
+    /// <summary><see cref="TabControl.TabClosing"/> / <see cref="TabControl.TabClosed"/> 的事件参数。</summary>
     public class TabCloseEventArgs : RoutedEventArgs
     {
+        /// <summary>构造事件参数，<see cref="Item"/> 取 <paramref name="tab"/>（仅适用于直接声明页签的用法）。</summary>
         public TabCloseEventArgs(RoutedEvent routedEvent, object source, TabControlItem tab)
+            : this(routedEvent, source, tab, tab)
+        {
+        }
+
+        /// <summary>构造事件参数。</summary>
+        public TabCloseEventArgs(RoutedEvent routedEvent, object source, TabControlItem tab, object item)
             : base(routedEvent, source)
         {
             Tab = tab ?? throw new ArgumentNullException(nameof(tab));
+            Item = item ?? throw new ArgumentNullException(nameof(item));
         }
 
+        /// <summary>页签容器。</summary>
         public TabControlItem Tab { get; }
+
+        /// <summary>
+        /// 被关闭的数据项（派发前的快照）。<c>ItemsSource</c> 模式下即被移除的集合元素：条目移除后生成器会
+        /// 反准备容器，<see cref="Tab"/> 的 <c>Content</c> 与 <c>DataContext</c> 不再指向数据项（读回的是
+        /// WPF 的未设置占位 <c>NamedObject</c>），只有这份快照能在 <see cref="TabControl.TabClosed"/>
+        /// 里取回数据项本身。直接声明页签时数据项即容器，与 <see cref="Tab"/> 相同。
+        /// </summary>
+        public object Item { get; }
 
         /// <summary>在 <see cref="TabControl.TabClosingEvent"/> 中置 <c>true</c> 可阻止关闭；在 Closed 中忽略。</summary>
         public bool Cancel { get; set; }
