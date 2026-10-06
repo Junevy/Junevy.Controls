@@ -133,6 +133,7 @@ ThemeManager.ToggleTheme();
 - 自定义模板时必须保留 WPF 标准部件名（`PART_ContentHost`、`PART_ScrollViewer`、`ItemsPresenter` 等）——本库多处行为（平滑滚动、滚轮折算）依赖 `PART_ScrollViewer` 命名。
 - 确认弹窗的按钮点不动、窗口关不掉 → `jv:ConfirmDialogWindow` 给页脚插槽赋 `Template` 后**必须立刻 `ApplyTemplate()` 再 `FindName`**（赋值只是挂模板，实例化要等布局 passes，不强制应用则部件引用为 null）。改这个控件前先读 README「ConfirmDialogWindow 与 ConfirmDialogService」的实现要点。
 - **库内控件不要在属性变更回调里调 `UpdateLayout()`** → 会重入「正在变更中的集合」，虚拟化 `ItemsControl` 抛「某个 ItemsControl 与它的项源不一致」（`Badge` 曾因此在宿主日志面板批量投递时崩溃，`3.2.5` 已修）。需要按实际尺寸算位置时走 `SizeChanged`／`LayoutUpdated` 这类布局期回调——它们在同一帧内、早于渲染，纠正来得及且不额外跑布局。宿主侧相应地：在 `CollectionChanged` 处理程序里改绑定属性是安全的。
+- 按钮上设了 `Background` + 浅色 `Foreground`，禁用后白底白字看不见 → `3.2.5` 已修（禁用态改用 `State.DisabledSurface`/`DisabledBorder`/`DisabledForeground` 三色，且**接管**前景）。**同类模板改动务必记住**：模板触发器里 `<Setter Property="Foreground">`（不带 `TargetName`）优先级**低于**宿主本地值，压不住；必须写内容呈现器的 `TextElement.Foreground`（给子元素写局部值才能盖过 `TemplateBinding`），图标槽 `IconPresenter` 也要一并改。彩色底配文字用 `Theme.Brush.Text.OnAccent`。
 
 ## 8. 深入阅读地图（写代码前按需查阅）
 

@@ -89,9 +89,14 @@
                 <Setter TargetName="StateLayer" Property="Background" Value="{DynamicResource Theme.Brush.State.PressedScrim}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="ContentBorder" Property="Opacity" Value="{StaticResource Button.Disabled.Opacity}" />
-                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
+                <!--  禁用态：用齐 State.DisabledSurface / DisabledBorder / DisabledForeground 三色，
+                      不再用整体 Opacity 冲淡（冲淡会把自定义底色连同文字一起洗白）。
+                      前景直接改到内容呈现器上：触发器若给 Button 本体的 Foreground 赋值，优先级低于宿主
+                      本地设的 Foreground，压不住「彩色底 + 浅色字」这类配对，改呈现器才生效。  -->
+                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
                 <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
+                <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
+                <Setter TargetName="IconPresenter" Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -182,9 +187,12 @@
                 <Setter TargetName="ContentBorder" Property="Effect" Value="{x:Null}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="RootHost" Property="Opacity" Value="{StaticResource Button.Disabled.Opacity}" />
-                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Base}" />
+                <!--  禁用态：同 ButtonTemplate——用齐 Disabled* 三色、去掉整体 Opacity；
+                      前景改到两个呈现器上，才能压住宿主本地设的 Foreground。  -->
+                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource Theme.Brush.State.DisabledSurface}" />
                 <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.State.DisabledBorder}" />
+                <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
+                <Setter TargetName="IconPresenter" Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
                 <Setter TargetName="ContentBorder" Property="Effect" Value="{x:Null}" />
             </Trigger>
         </ControlTemplate.Triggers>

@@ -1,3 +1,18 @@
+## `Button` 禁用态改用 `Disabled*` 三色并接管前景：修掉「自定义底色按钮禁用后白底白字」
+
+### 本次更新（`3.2.5`：宿主反馈——`jv:Button` 设了 `Background=Status.Success` + `Foreground=Text.Inverse` 后，**禁用态在浅色主题下白底白字、按钮整个看不见**。诊断为库缺陷而非用法错误：禁用态触发器把模板部件 `ContentBorder.Background` 覆盖成 `Surface.Base`（浅色即纯白）、**完全不碰 `Foreground`**，再乘 `Opacity=0.5` 把整体冲淡 ⇒ 合成后底色与文字同为 `#FFFFFF`，对比度 1.0:1。**深色主题同样坏**（底 `Slate.75` 配墨色 `Text.Inverse`，约 1:1），只是不易被察觉。经确认按「用齐 `Disabled*` 三色、去掉 `Opacity`」修复，`ButtonTemplate`（原生 `<Button>`）与 `JvButtonTemplate` 一并改）— 2026-10-06
+
+- **改动点（`Controls/Button/Button.xaml`，两处禁用态触发器）**：`ButtonTemplate` 与 `JvButtonTemplate` 的 `IsEnabled=False` 触发器由「`Opacity=0.5` + `Background=Surface.Base` + `BorderBrush=DisabledBorder`」改为「`Background=State.DisabledSurface` + `BorderBrush=State.DisabledBorder` + **内容呈现器与图标呈现器的 `TextElement.Foreground=State.DisabledForeground`**」，并删掉 `Opacity` 赋值（`Button.Disabled.Opacity` 资源仍被 `NoBorderButtonTemplate` 使用，未变成死资源）。
+- **为什么前景必须写在呈现器上（本轮最关键的一处机制）**：`<Setter Property="Foreground" ...>` 不带 `TargetName` 时写的是 **Button 本体**，而模板触发器的优先级**低于宿主本地值**——宿主在按钮上写的 `Foreground` 会赢，改了等于没改（变异 T2 实测：那样改回去后 `A-浅色b`/`A-深色b`/`D2` 转红，且**深色主题的对比度断言 `A-深色c` 也转红**，即那种写法在深色下直接不可见）。改成写内容呈现器上的 `TextElement.Foreground` 才对：这是给模板子元素写局部值，优先级高于把宿主 `Foreground` 送进来的 `TemplateBinding`——与该模板处理 `ContentBorder.Background` 的手法一致。两个模板各有 `ContentPresenter` 与 `IconPresenter` 两个呈现器（图标槽单独一个），**两处都要改**，漏掉图标槽会被变异 T3 逮到。
+- **实测对比度（从真实渲染结果取样：背景取四角中位色、文字取与背景亮度差最大的像素，按 WCAG 公式算）**：修复前 1.00:1（完全不可见）→ 修复后浅色 **1.87:1**、深色 **1.79:1**；默认 `jv:Button` 与原生 `<Button>` 同值。启用态未受影响：绿底白字浅色 5.16:1、深色 7.04:1，默认按钮 8.27:1 / 7.31:1。
+- **顺带查明一件容易误判的事**：`Theme.Brush.Text.Inverse` 在这个场景**并没有用错**——它浅色为白、深色为墨，恰好与随主题翻转的 `Status.Success`（浅色深绿 / 深色浅绿）配对，两种主题的启用态都是对的。README 仍建议改用 `Theme.Brush.Text.OnAccent`（语义更准，深色下不会因写死白字而错配），但**这不是本次问题的成因**，成因只在禁用态。
+- **变异反证（4 项，捕获形态各异）**：T1 整体退回旧实现 → **8 条转红**（`A-浅色a`/`A-浅色b`/`A-深色b`/`A-深色c`/`B-浅色a`/`B-深色b`/`D1`）；T2 前景改回写 Button 本体 → `A-浅色b`/`A-深色b`/`A-深色c`/`D2` 转红；T3 漏改 `IconPresenter` → `D4` 转红；T4 底色退回 `Surface.Base` → `A-浅色a`/`B-浅色a`/`D1` 转红。**T4 单独值得记**：那一版对比度反而更高（2.04:1，白底比浅灰底亮），单看对比度抓不住——所以探针同时做**色值断言**与**对比度断言**两件事。
+- **探针自身返工（三处）**：① `Near()` 最初拿测得的**相对亮度**去比令牌的 sRGB 通道值，13 条断言集体假红；改为把令牌色也换算成相对亮度再比。② 「禁用态文字取 `DisabledForeground`」最初也用像素采样判定，但取到的是字形**抗锯齿边缘**像素、够不到字形核心，浅色主题下 3 条稳定失败；改为**读呈现器上真正生效的 `TextElement.Foreground`**（确定性取值），像素采样只负责它擅长的对比度。③ `D4` 最初断言的是「模板里存在 `IconPresenter`」——恒真、无判别力（T3 变异下仍绿），改为断言禁用态下它的前景真被接管，T3 才捕获。另：判分脚本里 T2/T4 的期望清单被我后改错，导致汇总行显示 2/4，而两者实际转红的断言 id 已如实记录在上。
+- **验证（临时探测工程 `.workbuddy/tmp/ButtonProbe/`，不入库，验收后已删除，数字取自删除前最后一次全量运行）**：**26 条断言全部通过**，4 组——A 宿主原始写法（自定义底色按钮禁用态，浅/深各 4 条）；B 默认 `jv:Button` 禁用态（底色/前景令牌、`RootHost.Opacity==1`、对比度，浅/深各 4 条）；C 启用态未变差（浅/深各 4 条）；D 原生 `<Button>` 禁用态与图标槽前景（4 条）。
+- **行为变更 / 影响面**：**所有按钮的禁用态观感都会变**——底色由纯白改为 `DisabledSurface`（浅色下极浅灰）、文字不再整体半透明而是取 `DisabledForeground`。这是有意的：`Opacity` 冲淡会把自定义底色连同文字一起洗白，与「彩色底按钮」这一用法天然冲突。`NoBorderButtonStyle`（幽灵按钮）未改，仍是整体半透明——它没有底色可换，半透明对其语义正确。
+- **文档**：README「Button」章节的悬停/按压段补一段「禁用态」，写明三色令牌、禁用态前景由库接管（宿主本地 `Foreground` 不参与）、以及彩色底建议用 `Text.OnAccent`；CHANGELOG 本条。
+- **版本号**：csproj 现值 `3.2.5`（本条含禁用态观感变更，未代为递增；发布时是否升 `3.3.0` 由维护者决定）。
+
 ## `Badge` 移除属性回调里的强制 `UpdateLayout()`：修掉「某个 ItemsControl 与它的项源不一致」崩溃
 
 ### 本次更新（`3.2.5`：第三方宿主反馈——日志面板批量投递时崩溃，异常为 `InvalidOperationException: 某个 ItemsControl 与它的项源不一致`（`ItemContainerGenerator.Verify()` 检出「生成的容器数量与实际项数不符」）。**先独立复现再定论，未采信转述**：以「虚拟化 `ListBox` + `ObservableCollection` 逐条 `Add` + `CollectionChanged` 链首改 `Badge.Count`」构造最小夹具，拿到与宿主报告**逐帧一致**的栈；再用变异反证双向确认（加回那行→崩溃重现，删掉那行→500+100 条投递全绿）。经确认按方案 A 修复：**删掉 `ApplyBadgeState()` 里的 `_badge.UpdateLayout()`**，偏移重算交给本来就存在的 `OnBadgeSizeChanged`）— 2026-10-06

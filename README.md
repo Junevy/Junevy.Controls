@@ -473,7 +473,9 @@ codeScroll.PreviewMouseWheel += (s, e) =>
 </StackPanel>
 ```
 
-悬停/按压采用**状态层（state layer）**反馈：不替换固定底色、也不降低整体透明度，而是在任意背景上叠一层固定透明度的纱——`Theme.Brush.State.HoverScrim`（浅色 8% 墨 `#14070B10` / 深色 8% 白 `#14FFFFFF`）与 `Theme.Brush.State.PressedScrim`（两主题各 15%：`#26070B10` / `#26FFFFFF`）。文字与图标全程保持实色，反馈比旧版整体变淡明显得多；鲜艳背景（如红色按钮）悬停/按压时只是「同色相加深一档」（深色主题反向提亮），不会跳到灰色系产生割裂，用户自定义背景同样成立。禁用态仍为整体 0.5 透明度 + 禁用表面。`NoBorderButtonStyle` 透明背景（幽灵按钮）的悬停/按压为纱色填充出圆角色块。
+悬停/按压采用**状态层（state layer）**反馈：不替换固定底色、也不降低整体透明度，而是在任意背景上叠一层固定透明度的纱——`Theme.Brush.State.HoverScrim`（浅色 8% 墨 `#14070B10` / 深色 8% 白 `#14FFFFFF`）与 `Theme.Brush.State.PressedScrim`（两主题各 15%：`#26070B10` / `#26FFFFFF`）。文字与图标全程保持实色，反馈比旧版整体变淡明显得多；鲜艳背景（如红色按钮）悬停/按压时只是「同色相加深一档」（深色主题反向提亮），不会跳到灰色系产生割裂，用户自定义背景同样成立。`NoBorderButtonStyle` 透明背景（幽灵按钮）的悬停/按压为纱色填充出圆角色块。
+
+**禁用态**（`ButtonTemplate` 与 `JvButtonTemplate` 同一套）：底色换成 `Theme.Brush.State.DisabledSurface`、边框换成 `State.DisabledBorder`、**文字与图标换成 `State.DisabledForeground`**，三色成套，**不再用整体 `Opacity` 冲淡**（`NoBorderButtonStyle` 的幽灵按钮仍是整体半透明，它没有底色可换）。关键点：禁用态的前景由库**接管**——宿主在按钮上设的 `Foreground` 在禁用时不参与，因此「彩色底 + 浅色字」的按钮禁用后不会退化成白底白字。彩色底配文字仍建议用 `Theme.Brush.Text.OnAccent`（深色主题下它是墨色而非写死白字），`Theme.Brush.Text.Inverse` 在跟随主题翻转的语义色上等价，但 `OnAccent` 语义更准确。
 
 同一反馈方案已推广至其余可交互控件：**背景可自定义的按钮/卡片类**（`CardButton`、`ToolBarItem`、`ToolboxItem`、`ToolItem`）与**内部图标小按钮**（`MessageBar` / `ProgressBarWindow` 关闭按钮、`ImageViewer` 工具栏按钮、`DialogWindow` 标题栏按钮、`DatePicker` 日历导航/头部/下拉按钮）悬停/按压均为状态层纱色；`MenuBar` / `ContextMenu` / `TabControl` / `SideMenu` / `TreeView`、`ListBox` / `ListView` / `DataGrid`、`GroupBox` / `ExpanderPanel` 等中性表面上的列表/菜单项仍保留 `Surface.Hover` 灰底悬停高亮（行首箭头同理：`TreeView` 的展开箭头与 `ExpanderPanel` 的头部按钮用 `Surface.Hover` 灰底，`ComboBox` 的下拉箭头只做字形加深，三者都不叠状态层纱色）。两个纱色为 `DynamicResource` 主题令牌（`Themes/AppColors.*.xaml` 生成，守卫脚本断言其对卡片的 ΔL\* 落在可感知区间），宿主可整体覆盖。
 
