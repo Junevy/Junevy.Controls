@@ -13,6 +13,7 @@
     </ResourceDictionary.MergedDictionaries>
 
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+    <cvt:IncreaseFontsizeConverter x:Key="IncreaseFontSize" />
     <cvt:NullToCollapsedConverter x:Key="NullToCollapsed" />
     <cvt:NullToUnsetValueConverter x:Key="NullToUnsetValue" />
     <cvt:TitleAlignmentToHorizontalAlignmentConverter x:Key="TitleAlignmentToHorizontalAlignment" />
@@ -44,6 +45,17 @@
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Focusable" Value="False" />
+        <!--  图标字形默认用 Tertiary（比正文轻一档），悬停加深到 Secondary（与正文同色）；
+              字形前景由按钮 Foreground 经 ContentPresenter 下发，不再跟随 TextBox 前景  -->
+        <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Tertiary}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.State.DisabledForeground}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <ControlTemplate x:Key="DefaultTextBoxTemplate" TargetType="TextBox">
@@ -371,8 +383,7 @@
                         Visibility="{Binding Path=(local:TextBox.ShowClear), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibility}}">
                         <TextBlock
                             FontFamily="{TemplateBinding atc:Icon.FontFamily}"
-                            FontSize="{TemplateBinding FontSize}"
-                            Foreground="{TemplateBinding Foreground}"
+                            FontSize="{Binding Path=FontSize, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource IncreaseFontSize}, ConverterParameter=-4}"
                             Text="&#xe639;"
                             TextAlignment="Center" />
                     </bt:Button>
@@ -392,8 +403,7 @@
                         Content="{Binding Path=(local:TextBox.CommandButtonContent), RelativeSource={RelativeSource TemplatedParent}}"
                         Style="{StaticResource TextBoxCloseButtonStyle}"
                         TextElement.FontFamily="{TemplateBinding atc:Icon.FontFamily}"
-                        TextElement.FontSize="{TemplateBinding FontSize}"
-                        TextElement.Foreground="{TemplateBinding Foreground}"
+                        TextElement.FontSize="{Binding Path=FontSize, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource IncreaseFontSize}, ConverterParameter=-4}"
                         Visibility="{Binding Path=(local:TextBox.ShowCommandButton), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibility}}" />
                 </Grid>
             </Border>

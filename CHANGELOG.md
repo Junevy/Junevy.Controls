@@ -3,6 +3,8 @@
 ### 本次更新（`3.2.5`：命令按钮原与清空按钮共用第 3 列、且被 `ShowClear=False` 互斥，导致「默认样式下 `ShowClear=True` 时命令按钮根本不显示」。改为命令按钮独占最右列，两者独立控制）— 2026-10-09
 
 - **改动点（`Controls/Text/TextBox.xaml`）**：内部 Grid 由 3 列增为 4 列（图标 / 内容 / 清空按钮 / 命令按钮）；`PART_CommandButton` 移到第 3 列（最右侧），`PART_ClearButton` 保持第 2 列在其左侧；命令按钮 `Visibility` 改为直接绑定 `ShowCommandButton`（`BoolToVisibility`），删除原「`ShowCommandButton=True` 且 `ShowClear=False`」的 `MultiTrigger`。
+- **图标字形减重（同日追加）**：`TextBoxCloseButtonStyle` 增设 `Foreground=Text.Tertiary`（比正文轻一档），悬停 → `Text.Secondary`（与正文同色），禁用 → `State.DisabledForeground`；清空按钮字形 `TextBlock` 与命令按钮的前景绑定删除，改由按钮前景经 `ContentPresenter` 下发。此前字形直接取 TextBox 前景（`Text.Secondary`），与正文同色，观感偏重。**影响**：宿主在 TextBox 上单独设 `Foreground` 不再同步染色两个按钮图标。
+- **图标字号减小（同日追加）**：清空按钮与命令按钮的字形字号由「等于 TextBox `FontSize`」改为「`FontSize - 4`」（默认 14 → 10；先调为 -2 即 12，随后按要求再减小），复用现有 `IncreaseFontsizeConverter`（`ConverterParameter=-4`），随 TextBox 字号等比联动；按钮宽度（26）与悬停色块尺寸未变。
 - **行为变更 / 影响面**：**不再互斥**。此前为只要命令按钮而设 `ShowClear="False"` 的写法仍然有效（只显示命令按钮）；此前设了 `ShowCommandButton="True"` 却因默认 `ShowClear=True` 而看不到命令按钮的实例，升级后会**多出命令按钮**。
 - **文档/示例**：README「TextBox」属性表与示例、`TextBox.xaml.cs` 的 XML 注释、仓库 skill 的 `jv:TextBox` 行、Showcase「Inputs」页（新增「清空 + 命令按钮同时显示」与「仅命令按钮」两例）及对应 XAML 片段同步更新。
 
