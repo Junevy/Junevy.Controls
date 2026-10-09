@@ -1,3 +1,11 @@
+## `TextBox` 命令按钮移到最右侧，并可与清空按钮同时显示
+
+### 本次更新（`3.2.5`：命令按钮原与清空按钮共用第 3 列、且被 `ShowClear=False` 互斥，导致「默认样式下 `ShowClear=True` 时命令按钮根本不显示」。改为命令按钮独占最右列，两者独立控制）— 2026-10-09
+
+- **改动点（`Controls/Text/TextBox.xaml`）**：内部 Grid 由 3 列增为 4 列（图标 / 内容 / 清空按钮 / 命令按钮）；`PART_CommandButton` 移到第 3 列（最右侧），`PART_ClearButton` 保持第 2 列在其左侧；命令按钮 `Visibility` 改为直接绑定 `ShowCommandButton`（`BoolToVisibility`），删除原「`ShowCommandButton=True` 且 `ShowClear=False`」的 `MultiTrigger`。
+- **行为变更 / 影响面**：**不再互斥**。此前为只要命令按钮而设 `ShowClear="False"` 的写法仍然有效（只显示命令按钮）；此前设了 `ShowCommandButton="True"` 却因默认 `ShowClear=True` 而看不到命令按钮的实例，升级后会**多出命令按钮**。
+- **文档/示例**：README「TextBox」属性表与示例、`TextBox.xaml.cs` 的 XML 注释、仓库 skill 的 `jv:TextBox` 行、Showcase「Inputs」页（新增「清空 + 命令按钮同时显示」与「仅命令按钮」两例）及对应 XAML 片段同步更新。
+
 ## `Button` 禁用态改用 `Disabled*` 三色并接管前景：修掉「自定义底色按钮禁用后白底白字」
 
 ### 本次更新（`3.2.5`：宿主反馈——`jv:Button` 设了 `Background=Status.Success` + `Foreground=Text.Inverse` 后，**禁用态在浅色主题下白底白字、按钮整个看不见**。诊断为库缺陷而非用法错误：禁用态触发器把模板部件 `ContentBorder.Background` 覆盖成 `Surface.Base`（浅色即纯白）、**完全不碰 `Foreground`**，再乘 `Opacity=0.5` 把整体冲淡 ⇒ 合成后底色与文字同为 `#FFFFFF`，对比度 1.0:1。**深色主题同样坏**（底 `Slate.75` 配墨色 `Text.Inverse`，约 1:1），只是不易被察觉。经确认按「用齐 `Disabled*` 三色、去掉 `Opacity`」修复，`ButtonTemplate`（原生 `<Button>`）与 `JvButtonTemplate` 一并改）— 2026-10-06

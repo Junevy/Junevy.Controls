@@ -35,7 +35,7 @@
 
                 <demo:DemoSection
                     Title="jv:TextBox —— PlaceholderAssist / Icon / ShowClear / CommandButton"
-                    Description="占位符仅在控件无值时显示（TextBox：文本为空且未聚焦）；占位内容为 object，iconfont 字形时字体族跟随 atc:Icon.FontFamily；原生 TextBox 经附加属性同样生效；Tag 不再被模板消费。命令按钮与清空按钮互斥。"
+                    Description="占位符仅在控件无值时显示（TextBox：文本为空且未聚焦）；占位内容为 object，iconfont 字形时字体族跟随 atc:Icon.FontFamily；原生 TextBox 经附加属性同样生效；Tag 不再被模板消费。命令按钮固定在最右侧，可与清空按钮同时显示。"
                     XamlCode="{x:Static sample:ShowcaseSnippets.TextBoxAssist}">
                     <WrapPanel>
                         <jv:TextBox
@@ -67,7 +67,16 @@
                             Margin="0,0,12,8"
                             Width="240"
                             atc:Icon.FontFamily="{DynamicResource IconFont}"
-                            atc:PlaceholderAssist.Placeholder="命令按钮（与清空互斥）"
+                            atc:PlaceholderAssist.Placeholder="清空 + 命令按钮（同时显示）"
+                            ShowCommandButton="True"
+                            CommandButtonContent="&#xE611;"
+                            CommandButtonCommand="{Binding TextBoxCommandButtonCommand}"
+                            CommandButtonCommandParameter="来自 TextBox 命令按钮" />
+                        <jv:TextBox
+                            Margin="0,0,12,8"
+                            Width="240"
+                            atc:Icon.FontFamily="{DynamicResource IconFont}"
+                            atc:PlaceholderAssist.Placeholder="仅命令按钮（ShowClear=False）"
                             ShowClear="False"
                             ShowCommandButton="True"
                             CommandButtonContent="&#xE611;"

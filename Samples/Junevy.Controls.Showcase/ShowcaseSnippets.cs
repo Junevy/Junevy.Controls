@@ -100,9 +100,8 @@ namespace Junevy.Controls.Showcase
                         atc:Icon.Icon="&#xE60F;"
                         atc:PlaceholderAssist.Placeholder="&#xE60F; 检索设备（iconfont 占位符）" />
 
-            <!-- 命令按钮（与清空互斥：ShowCommandButton=True 时需 ShowClear=False） -->
+            <!-- 命令按钮：固定在最右侧，可与清空按钮同时显示；不要清空时加 ShowClear="False" -->
             <jv:TextBox Width="240"
-                        ShowClear="False"
                         ShowCommandButton="True"
                         CommandButtonContent="&#xE611;"
                         CommandButtonCommand="{Binding TextBoxCommandButtonCommand}"

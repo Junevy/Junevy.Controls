@@ -51,11 +51,11 @@ namespace Junevy.Controls.Controls.Text
             DependencyProperty.Register(nameof(ShowCommandButton), typeof(bool), typeof(TextBox), new PropertyMetadata(false));
 
         /// <summary>
-        /// 是否显示内部命令按钮：按钮显示在文本框内右侧（与清空按钮同位），点击时执行
+        /// 是否显示内部命令按钮：按钮固定显示在文本框内最右侧，点击时执行
         /// <see cref="CommandButtonCommand"/>，命令可用性（CanExecute）自动控制按钮启停。
         /// <para>
-        /// 与清空按钮互斥：<see cref="ShowClear"/> 为 <see langword="true"/>（清空按钮显示）时
-        /// 本按钮强制隐藏；需要显示命令按钮时应将 <see cref="ShowClear"/> 设为 <see langword="false"/>。
+        /// 与清空按钮互不影响：<see cref="ShowClear"/> 为 <see langword="true"/> 时两者可同时显示，
+        /// 清空按钮位于命令按钮左侧。
         /// </para>
         /// </summary>
         public bool ShowCommandButton

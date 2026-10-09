@@ -588,7 +588,7 @@ codeScroll.PreviewMouseWheel += (s, e) =>
 | `atc:Icon.Icon` | 前置图标；为空时图标区域折叠 |
 | `atc:Icon.FontFamily` | 图标、清空按钮和占位符字体 |
 | `ShowClear`（依赖属性） | 是否显示清空按钮，默认样式为 `true`。复用 TextBox 外观又不需要清空按钮的场景（如 `Slider` 数值框）会显式设为 `false`；原生 `<TextBox>` 借用默认外观时，可在样式内以 `txt:TextBox.ShowClear` 限定形式设置 |
-| `ShowCommandButton`（依赖属性） | 是否显示内部命令按钮，默认 `false`。**与清空按钮互斥**：`ShowClear="True"`（清空按钮显示）时命令按钮强制隐藏，需组合 `ShowClear="False"` + `ShowCommandButton="True"` 使用 |
+| `ShowCommandButton`（依赖属性） | 是否显示内部命令按钮，默认 `false`。命令按钮固定在输入框**最右侧**，与清空按钮互不影响、可同时显示（清空按钮在其左侧）；只要命令按钮时把 `ShowClear` 设为 `false` |
 | `CommandButtonCommand`（依赖属性） | 命令按钮点击时执行的命令（ICommand），可绑定 ViewModel 命令；按钮可用性随命令 `CanExecute` 自动启停 |
 | `CommandButtonCommandParameter`（依赖属性） | 传递给 `CommandButtonCommand` 的命令参数 |
 | `CommandButtonContent`（依赖属性） | 命令按钮内容（文本或 iconfont 字形），字体族跟随 `atc:Icon.FontFamily`，字号/颜色继承控件自身取值；为 `null` 时显示空白占位，建议显式设置 |
@@ -603,12 +603,11 @@ codeScroll.PreviewMouseWheel += (s, e) =>
     Text="{Binding CameraName, UpdateSourceTrigger=PropertyChanged}" />
 ```
 
-命令按钮示例（与清空按钮互斥，需 `ShowClear="False"`）：
+命令按钮示例（位于最右侧；清空按钮默认同时显示，不需要时加 `ShowClear="False"`）：
 
 ```xml
 <jv:TextBox
     Width="260"
-    ShowClear="False"
     ShowCommandButton="True"
     CommandButtonContent="&#xE611;"
     CommandButtonCommand="{Binding SearchCommand}"
