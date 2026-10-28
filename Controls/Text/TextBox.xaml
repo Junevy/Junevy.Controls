@@ -383,7 +383,7 @@
                         Visibility="{Binding Path=(local:TextBox.ShowClear), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibility}}">
                         <TextBlock
                             FontFamily="{TemplateBinding atc:Icon.FontFamily}"
-                            FontSize="{Binding Path=FontSize, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource IncreaseFontSize}, ConverterParameter=-4}"
+                            FontSize="{Binding Path=FontSize, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource IncreaseFontSize}, ConverterParameter=-2}"
                             Text="&#xe639;"
                             TextAlignment="Center" />
                     </bt:Button>
@@ -403,7 +403,7 @@
                         Content="{Binding Path=(local:TextBox.CommandButtonContent), RelativeSource={RelativeSource TemplatedParent}}"
                         Style="{StaticResource TextBoxCloseButtonStyle}"
                         TextElement.FontFamily="{TemplateBinding atc:Icon.FontFamily}"
-                        TextElement.FontSize="{Binding Path=FontSize, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource IncreaseFontSize}, ConverterParameter=-4}"
+                        TextElement.FontSize="{TemplateBinding FontSize}"
                         Visibility="{Binding Path=(local:TextBox.ShowCommandButton), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibility}}" />
                 </Grid>
             </Border>

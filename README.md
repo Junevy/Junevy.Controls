@@ -591,7 +591,7 @@ codeScroll.PreviewMouseWheel += (s, e) =>
 | `ShowCommandButton`（依赖属性） | 是否显示内部命令按钮，默认 `false`。命令按钮固定在输入框**最右侧**，与清空按钮互不影响、可同时显示（清空按钮在其左侧）；只要命令按钮时把 `ShowClear` 设为 `false` |
 | `CommandButtonCommand`（依赖属性） | 命令按钮点击时执行的命令（ICommand），可绑定 ViewModel 命令；按钮可用性随命令 `CanExecute` 自动启停 |
 | `CommandButtonCommandParameter`（依赖属性） | 传递给 `CommandButtonCommand` 的命令参数 |
-| `CommandButtonContent`（依赖属性） | 命令按钮内容（文本或 iconfont 字形），字体族跟随 `atc:Icon.FontFamily`，字号为控件 `FontSize - 4`（默认 10）；颜色与清空按钮一致（默认 `Text.Tertiary`，悬停 `Text.Secondary`，不跟随 TextBox 的 `Foreground`）；为 `null` 时显示空白占位，建议显式设置 |
+| `CommandButtonContent`（依赖属性） | 命令按钮内容（文本或 iconfont 字形），字体族跟随 `atc:Icon.FontFamily`，字号等于控件 `FontSize`（清空按钮为 `FontSize - 2`）；颜色与清空按钮一致（默认 `Text.Tertiary`，悬停 `Text.Secondary`，不跟随 TextBox 的 `Foreground`）；为 `null` 时显示空白占位，建议显式设置 |
 | `atc:TitleAssist.Title` 系列（含 `TitleWidth` 固定宽度、`TitleAlignment` 区域内靠齐、`IsRequired` 必填标识） | 在输入框外侧显示用途标题，位置可选 `Top`/`Bottom`/`Left`/`Right`，标题可在标题区域内靠左/靠右/居中，支持 iconfont 与自定义字体样式，详见 [TitleAssist](#titleassist) |
 
 ```xml
