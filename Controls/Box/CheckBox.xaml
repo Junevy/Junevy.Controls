@@ -17,8 +17,8 @@
                     Width="18"
                     Height="18"
                     Background="Transparent"
-                    BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                    BorderThickness="1.5"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
                     CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
 
                     <!--  勾选标记：矢量对勾，几何包围盒恰好等于元素盒（0,0 起算 + 显式宽高），居中时不会因笔画或坐标偏移而偏心  -->
@@ -104,6 +104,14 @@
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+        <!--  勾选框外框的默认色与粗细：模板内改为 TemplateBinding 消费，默认观感不变，
+              但宿主写 BorderBrush="Transparent" 或 BorderThickness="0" 能真的去掉勾选框描边。
+              Border.CornerRadius 保留不动：勾选框模板不读它（圆角另有字面量令牌），但通用焦点环
+              Generic/Style/DefaultFocusStyle.xaml 经 TemplatedParent 读它，而焦点环在离屏探针里挂不上
+              AdornerLayer（WPF 要等真实输入才显示焦点提示），无法目测。删掉它只可能把环的圆角从 4 变成 0、
+              不可能改善任何观感——按「默认观感不变」保守保留，与 Button/TextBox/ComboBox 等盒子控件一致。  -->
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="1.5" />
         <Setter Property="Border.CornerRadius" Value="{DynamicResource Theme.SmallCornerRadius}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template" Value="{StaticResource DefaultCheckBoxTemplate}" />

@@ -448,8 +448,8 @@
                     MinWidth="180"
                     Margin="0,2,10,10"
                     Background="{DynamicResource Theme.Brush.Surface.Base}"
-                    BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                    BorderThickness="1"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
                     CornerRadius="{DynamicResource Theme.ControlCornerRadius}"
                     Effect="{DynamicResource Theme.PopupShadow}">
                     <ContentPresenter
@@ -466,6 +466,12 @@
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <!--
+            这两项只管 ExpandableAppBar 抽屉浮层的描边（标题栏自身的分隔线是内部结构，不开放）。
+            模板改为 TemplateBinding 后必须由 Setter 补回默认值，少了 Setter 抽屉会静默无边框。
+        -->
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template" Value="{StaticResource DefaultAppBar}" />
         <Setter Property="atc:Icon.FontFamily" Value="{StaticResource IconFont}" />
         <Style.Triggers>

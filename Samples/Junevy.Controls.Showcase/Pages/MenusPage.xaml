@@ -229,6 +229,108 @@
                     </jv:TabControl>
                 </demo:DemoSection>
 
+                <demo:DemoSection
+                    Title="外框可覆盖（BorderBrush 管静息态 / BorderThickness 管全状态）"
+                    Description="这两项过去在 jv:TreeView 与 jv:TabControl 上是写死在模板里的，宿主设 Transparent 没有任何反应。现在默认值改由样式 Setter 提供（Setter 优先级低于实例本地值），所以默认观感不变、宿主写什么就生效什么。约定是：状态触发器仍然写死「颜色」（悬停/聚焦/禁用一律跟随主题，全库一致），但不再写死「厚度」——所以 BorderThickness=&quot;0&quot; 是全状态开关，进了任何状态都不会把边框画回来。jv:TabControl 内容区上移量随自己的厚度取负上边（1→-1、0→不再上移、2→-2）；页签边框归页签自己的 BorderThickness（默认 1，要改经 ItemContainerStyle），选中页签的去底边随它推导（1→1,1,1,0、0→全 0、2→2,2,2,0）。把内容区厚度设成 0，页签行那条分割线随之一起消失。同一契约覆盖 TextBox / PasswordBox / ComboBox 主体 / CheckBox 与 RadioButton 的勾选标记框 / Menu 菜单栏 / MessageBar / InfoBar 与 AppBar 的浮层 / ImageViewer / DialogWindow / ProgressBarWindow 及官方同名控件；ComboBox 的下拉浮层与各处弹出面板刻意保持写死——浮层没有投影时再让描边归零，展开就是一块没有轮廓的白板。菜单栏本身是例外，它本来就没有边框，默认厚度为 0。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.BorderOverrideDemo}">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,6"
+                            FontSize="12"
+                            Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                            Text="jv:TreeView" />
+                        <WrapPanel>
+                            <StackPanel Margin="0,0,16,12">
+                                <TextBlock FontSize="11" Text="默认" />
+                                <jv:TreeView
+                                    Width="200"
+                                    Height="130"
+                                    atc:Icon.IconSize="14">
+                                    <jv:TreeMenuItem Title="控制中心" IsExpanded="True" />
+                                    <jv:TreeMenuItem Title="设备分组" />
+                                    <jv:TreeMenuItem Title="告警策略" />
+                                </jv:TreeView>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,16,12">
+                                <TextBlock FontSize="11" Text="BorderBrush=Transparent" />
+                                <jv:TreeView
+                                    Width="200"
+                                    Height="130"
+                                    BorderBrush="Transparent"
+                                    atc:Icon.IconSize="14">
+                                    <jv:TreeMenuItem Title="控制中心" IsExpanded="True" />
+                                    <jv:TreeMenuItem Title="设备分组" />
+                                    <jv:TreeMenuItem Title="告警策略" />
+                                </jv:TreeView>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,16,12">
+                                <TextBlock FontSize="11" Text="BorderThickness=0" />
+                                <jv:TreeView
+                                    Width="200"
+                                    Height="130"
+                                    BorderThickness="0"
+                                    atc:Icon.IconSize="14">
+                                    <jv:TreeMenuItem Title="控制中心" IsExpanded="True" />
+                                    <jv:TreeMenuItem Title="设备分组" />
+                                    <jv:TreeMenuItem Title="告警策略" />
+                                </jv:TreeView>
+                            </StackPanel>
+                        </WrapPanel>
+
+                        <TextBlock
+                            Margin="0,6,0,6"
+                            FontSize="12"
+                            Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                            Text="jv:TabControl（注意内容区上沿那条页签分割线的联动）" />
+                        <WrapPanel>
+                            <StackPanel Margin="0,0,16,12">
+                                <TextBlock FontSize="11" Text="默认" />
+                                <jv:TabControl
+                                    Width="230"
+                                    Height="110"
+                                    IsClosable="False">
+                                    <jv:TabControlItem Header="总览">
+                                        <TextBlock Margin="10" Text="总览页签内容。" />
+                                    </jv:TabControlItem>
+                                    <jv:TabControlItem Header="设备">
+                                        <TextBlock Margin="10" Text="设备页签内容。" />
+                                    </jv:TabControlItem>
+                                </jv:TabControl>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,16,12">
+                                <TextBlock FontSize="11" Text="BorderThickness=0" />
+                                <jv:TabControl
+                                    Width="230"
+                                    Height="110"
+                                    BorderThickness="0"
+                                    IsClosable="False">
+                                    <jv:TabControlItem Header="总览">
+                                        <TextBlock Margin="10" Text="总览页签内容。" />
+                                    </jv:TabControlItem>
+                                    <jv:TabControlItem Header="设备">
+                                        <TextBlock Margin="10" Text="设备页签内容。" />
+                                    </jv:TabControlItem>
+                                </jv:TabControl>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,16,12">
+                                <TextBlock FontSize="11" Text="BorderThickness=2" />
+                                <jv:TabControl
+                                    Width="230"
+                                    Height="110"
+                                    BorderThickness="2"
+                                    IsClosable="False">
+                                    <jv:TabControlItem Header="总览">
+                                        <TextBlock Margin="10" Text="总览页签内容。" />
+                                    </jv:TabControlItem>
+                                    <jv:TabControlItem Header="设备">
+                                        <TextBlock Margin="10" Text="设备页签内容。" />
+                                    </jv:TabControlItem>
+                                </jv:TabControl>
+                            </StackPanel>
+                        </WrapPanel>
+                    </StackPanel>
+                </demo:DemoSection>
+
             </StackPanel>
         </ScrollViewer>
     </Border>

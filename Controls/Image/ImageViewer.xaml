@@ -73,13 +73,16 @@
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Background.App}" />
         <Setter Property="CheckerboardBrush" Value="{DynamicResource TransparentBackground}" />
         <Setter Property="Focusable" Value="True" />
+        <!--  根外框默认值：模板改为 TemplateBinding 消费后必须由 Setter 补回，否则静默无边框  -->
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ImageViewer}">
                     <Border
                         Background="{TemplateBinding Background}"
-                        BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                        BorderThickness="1"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
                         ClipToBounds="True"
                         CornerRadius="{DynamicResource Theme.LargeCornerRadius}">
                         <Grid>

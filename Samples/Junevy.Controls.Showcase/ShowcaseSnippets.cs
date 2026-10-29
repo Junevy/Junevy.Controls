@@ -344,6 +344,63 @@ namespace Junevy.Controls.Showcase
             """;
 
 
+        // ---------------- 集合与数据（DataPage）· 筛选 + 分页共存 ----------------
+
+        public const string FilterPagingDemo = """
+            <!-- 库不提供筛选谓词：匹配逻辑由宿主决定。两个 CollectionViewSource 指向同一份数据，
+                 但各自持有独立视图（各有 Filter 槽位与分页协调器），故筛选与页码互不污染 -->
+            <UserControl.Resources>
+                <CollectionViewSource x:Key="DeviceFilterView" Source="{Binding FilterDevices}" />
+                <CollectionViewSource x:Key="DeviceSideView" Source="{Binding FilterDevices}" />
+            </UserControl.Resources>
+
+            <jv:TextBox x:Name="SearchBox" ShowClear="True"
+                        atc:PlaceholderAssist.Placeholder="搜索名称 / IP"
+                        TextChanged="OnSearchTextChanged" />
+            <jv:ComboBox x:Name="StatusBox" SelectedIndex="0"
+                         ItemsSource="{Binding StatusOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                         SelectionChanged="OnStatusSelectionChanged" />
+
+            <!-- 绑视图而非绑集合；EmptyText 覆盖「筛选无结果」的空态 -->
+            <jv:DataGrid x:Name="FilterGrid"
+                         ItemsSource="{Binding Source={StaticResource DeviceFilterView}}"
+                         atc:PagingAssist.PageSize="10"
+                         atc:DataGridAssist.EmptyText="无匹配设备" />
+
+            <!-- 实时读分页状态：筛选后 TotalCount / PageCount 自动收缩，换页不丢筛选条件 -->
+            <TextBlock>
+                <Run Text="{Binding Path=(atc:PagingAssist.TotalCount), ElementName=FilterGrid, Mode=OneWay}" />
+                <Run Text="{Binding Path=(atc:PagingAssist.PageCount), ElementName=FilterGrid, Mode=OneWay}" />
+            </TextBlock>
+
+            <!-- 同源第二台：独立视图 + 自己的筛选与分页，互不污染。
+                 窄列用竖排页码栏 Placement=Left：横向页码栏是不换行的 StackPanel，
+                 页数多时「每页条数 + 总数」会溢出裁切；竖排自动折叠这两项 -->
+            <jv:CheckBox x:Name="OnlineOnlyBox" Content="只看在线"
+                         Checked="OnOnlineOnlyChanged" Unchecked="OnOnlineOnlyChanged" />
+            <jv:ListBox ItemsSource="{Binding Source={StaticResource DeviceSideView}}"
+                        DisplayMemberPath="Name"
+                        atc:PagingAssist.PageSize="15"
+                        atc:PagingAssist.Placement="Left" />
+
+            <!-- code-behind：谓词只挂一次，之后改条件只需 Refresh()
+                 （协调器每轮重读 view.Filter，所以换页与改筛选条件互不覆盖）
+
+                 _deviceFilterView = (CollectionViewSource)Resources["DeviceFilterView"];
+                 _deviceSideView   = (CollectionViewSource)Resources["DeviceSideView"];
+                 _deviceFilterView.View.Filter = MatchDevice;      // 读 SearchBox.Text / StatusBox.SelectedItem
+                 _deviceSideView.View.Filter   = MatchSideDevice;  // 读 OnlineOnlyBox.IsChecked
+
+                 private void OnSearchTextChanged(object s, TextChangedEventArgs e)
+                     => _deviceFilterView?.View?.Refresh();
+                 private void OnOnlineOnlyChanged(object s, RoutedEventArgs e)
+                     => _deviceSideView?.View?.Refresh();
+
+                 InitializeComponent 期间 SelectedIndex="0" 就会触发 SelectionChanged，
+                 此时视图字段尚未赋值，故用 null 条件运算。 -->
+            """;
+
+
         // ---------------- 文本与状态（TextStatePage） ----------------
 
         public const string LabelDemo = """
@@ -609,6 +666,35 @@ namespace Junevy.Controls.Showcase
                  所以宿主沿自己查到的路径先展开祖先、再写选中：
                  for (var i = 0; i < path.Count - 1; i++) path[i].IsExpanded = true;
                  path[^1].IsSelected = true; -->
+            """;
+
+
+        // ---------------- 边框可覆盖性（跨控件契约，见「菜单与导航」页末块） ----------------
+
+        public const string BorderOverrideDemo = """
+            <!-- 契约：BorderBrush 管静息态、BorderThickness 管全状态。
+                 默认值由样式 Setter 提供（Setter 优先级低于实例本地值），所以默认观感不变，
+                 而宿主写什么就真的生效什么。 -->
+
+            <!-- 默认：取主题令牌 Theme.Brush.Border.Default，1px -->
+            <jv:TreeView Width="220" Height="150" />
+
+            <!-- 只去色、保留占位：边框位置不变，线看不见 -->
+            <jv:TreeView Width="220" Height="150" BorderBrush="Transparent" />
+
+            <!-- 去形：BorderThickness=0 是全状态开关，悬停/聚焦/选中都不会把它画回来 -->
+            <jv:TabControl Width="260" Height="120" BorderThickness="0" />
+
+            <!-- 改成自己的粗细也成立：内容区四边随 TabControl 的厚度，上移量取它的负上边（1→-1、0→0、2→-2）。
+                 页签那一行的边框归「页签自己」的 BorderThickness（默认 1，经 ItemContainerStyle 覆盖），
+                 选中页签的去底边随它推导：1→1,1,1,0、0→全 0、2→2,2,2,0——两处都要放大就两处一起设。 -->
+            <jv:TabControl Width="260" Height="120" BorderThickness="2" />
+
+            <!-- 同一契约覆盖：jv:TreeView / jv:TabControl（内容区 + 页签）/ TextBox / PasswordBox /
+                 ComboBox（主体；下拉浮层刻意保持写死）/ CheckBox / RadioButton（勾选标记框）/ Menu 菜单栏 /
+                 jv:MessageBar / jv:InfoBar（弹出菜单层）/ jv:AppBar（抽屉层）/ jv:ImageViewer /
+                 jv:DialogWindow / jv:ProgressBarWindow，以及官方同名控件。
+                 注意 Menu 菜单栏默认厚度是 0（本来就没有边框），要边框得自己写 BorderThickness="1"。 -->
             """;
 
 

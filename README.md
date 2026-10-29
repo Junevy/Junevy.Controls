@@ -191,6 +191,41 @@ ThemeManager.ToggleTheme();
 
 覆盖主题令牌只能**追加字典**（`Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = … })`），不要用 `Application.Current.Resources["Theme.Brush.Surface.Sunken"] = …` 直接写：这类本层条目优先级高于 `MergedDictionaries`，会**永久遮蔽**主题字典，`ApplyTheme` 之后该令牌仍返回旧主题的画刷（深色主题下选中行退回浅色底、浅色字因此不可读，探针实测）。测试里用完也要 `Remove` 而不是「写回原值」——写回同样留下本层条目。
 
+### 控件外框：`BorderBrush` 管静息态，`BorderThickness` 管全状态
+
+`BorderBrush` / `BorderThickness` 是 WPF `Control` 自带的属性，本库让它们在**所有画得出外框的控件上真正可用**——包括官方同名控件（`<TreeView>`、`<TabControl>`、`<TextBox>`、`<ComboBox>`、`<CheckBox>` 等）。此前多处把值写死在模板里，宿主设 `BorderBrush="Transparent"` 毫无反应；现在默认值改由样式 `Setter` 提供，而 `Setter` 的优先级低于实例本地值，于是默认观感不变、宿主写什么就生效什么。唯一需要宿主点名的一处：`Menu` 菜单栏没有隐式样式，要显式套 `Style="{StaticResource JunevyMenuBarStyle}"`，套上之后这两项同样可覆盖。
+
+```xml
+<!-- 只去掉颜色，边框占位不变（1px 位置仍在，只是看不见线） -->
+<jv:TreeView BorderBrush="Transparent" />
+
+<!-- 去掉边框本身：全状态生效，悬停/聚焦/选中都不会把它画回来 -->
+<jv:TreeView BorderThickness="0" />
+
+<!-- 改粗细同样成立：内容区四边与它的上移量一起跟着走（见下） -->
+<jv:TabControl BorderThickness="2" />
+```
+
+契约的两半：
+
+- **`BorderBrush` 只管静息态。** 状态触发器（`IsMouseOver` / `IsFocused` / `IsEnabled` / `IsChecked` …）仍然写死颜色，一律取主题令牌。这是有意的：悬停加深、聚焦转 accent、禁用转 `Disabled*` 是全库一致的反馈，不该被逐实例关掉。要静息态无框就设 `Transparent`。
+- **`BorderThickness` 管全状态。** 触发器里不再出现任何写死的厚度绝对值；需要「部分边」的场合（选中页签要去掉底边才能和内容区衔接）改为**随该元素自己的宿主厚度推导**。所以 `0` 是一个可靠的开关，`2` 会得到几何一致的放大版。
+
+`jv:TabControl` 是唯一有推导关系的一处，而且是**两条独立的属性各管各的表面**：内容区边框与它的上移量取 `TabControl.BorderThickness`（默认 `1` → 上移 `-1`；设 `0` → 不再上移；设 `2` → `-2`）；页签边框取**页签自己的** `BorderThickness`（默认 `1` 由 `DefaultTabItemStyle` 提供，要改请走 `ItemContainerStyle`），选中页签的「去底边」随它推导（`1` → `1,1,1,0`、`0` → 全 `0`、`2` → `2,2,2,0`）。把内容区边框设成 `Transparent` 或 `0`，页签行与内容区之间那条分割线会**一起消失**，不会留下一条孤线；想让整组几何一起变粗，两处一起设。
+
+例外与注意：
+
+- **`Menu` 菜单栏默认厚度是 `0`**——它本来就没有边框，开放后仍保持无边框观感；想要边框请显式写 `BorderThickness="1"`（颜色已指向 `Theme.Brush.Border.Default`）。
+- **`jv:CheckBox` / `jv:RadioButton` 的这两项管的是勾选标记框**（默认 `1.5`），不是控件整体。
+- **`jv:InfoBar` / `jv:AppBar` 管的是弹出层**（`InfoBar` 的菜单浮层、`AppBar` 的抽屉浮层）；这两个控件本体没有外框可改。
+
+**不在契约内的描边**：
+
+- **内部分隔线与强调描边**按令牌命名区分——`Theme.Brush.Border.Subtle` 与 `.Divider` 是内部分隔线（`AppBar` 标题下的那条、分页页脚与列表之间的那条、`DataGridCell` 格线），`Theme.Brush.Border.Strong` 是悬停/强调色（`Slider` 轨道）。它们不消费控件的 `BorderThickness`，保持写死。
+- **浮层面板的描边**保持写死：`jv:ContextMenu` 与 `Menu` 的二级子菜单、`jv:Toolbox` 的悬浮面板、`CodeEditor` 的补全列表、`ComboBox` 的下拉层。前几处的宿主属性位已被各自的本体或条目边框占用，合并会造成一处设置同时改两个表面；`ComboBox` 的下拉层是反过来——它没有投影、底色又与窗口相同，若跟着主体的 `BorderThickness="0"` 归零，展开后就是一块**没有轮廓的白板**，所以刻意不让主体属性管到它。
+- **焦点指示**（聚焦时才出现的那一圈）不随外框开关消失：全库共用的 `DefaultControlFocusVisualStyle` 焦点环、`ComboBox` 的 `FocusBorder` 光晕都是可达性提示，不是装饰，`BorderThickness="0"` 之后依然会画。环的圆角取控件自己的 `Border.CornerRadius` 附加属性（盒子控件的样式都配了这一项）， thickness 恒为 `1`。
+- **`jv:ExpanderPanel`** 只在 `DisplayMode="Card"` 下由样式触发器供出 `BorderBrush`/`BorderThickness`（默认 `Classic` 无框）。行内本地值仍然赢过样式触发器，所以 `BorderThickness="0"` 有效；但 `BasedOn` 派生样式里的 Setter 赢不过那条触发器——要整族改粗细请改触发器所在样式的副本。
+
 ### 透明背景棋盘格 `TransparentBackground`
 
 用于表示「图像/颜色本身是透明的」那种棋盘格底纹，常见于图片查看器、颜色选择器、图层面板。三个键都是 `DrawingBrush`（矢量绘制、`TileMode=Tile`），方格尺寸由资源自身决定，**不会随控件尺寸拉伸**；配色取自当前主题，切换主题后自动换色。
@@ -270,13 +305,54 @@ Showcase 的「图标字体」页提供全部 67 个图标的总览，支持线�
     atc:PagingAssist.Placement="Bottom" />
 ```
 
+宿主过滤 + 分页共存（`3.3.0` 起；匹配逻辑由宿主决定，库只负责管道）：
+
+```xml
+<UserControl.Resources>
+    <!--  CVS 独立视图：同源多控件时为其一建一个，筛选与页码互不污染  -->
+    <CollectionViewSource x:Key="FilteredView" Source="{Binding Rows}" />
+</UserControl.Resources>
+
+<jv:TextBox x:Name="SearchBox" TextChanged="OnSearchTextChanged"
+            atc:PlaceholderAssist.Placeholder="搜索名称" />
+<jv:DataGrid x:Name="Grid"
+             ItemsSource="{Binding Source={StaticResource FilteredView}}"
+             atc:PagingAssist.PageSize="10"
+             atc:DataGridAssist.EmptyText="无匹配项" />
+<!--  实时读「宿主过滤后、分页前」的总数  -->
+<TextBlock Text="{Binding Path=(atc:PagingAssist.TotalCount), ElementName=Grid, Mode=OneWay}" />
+```
+
+```csharp
+private CollectionViewSource _view = null!;
+
+public MyPage()
+{
+    InitializeComponent();
+    DataContext = viewModel;
+    _view = (CollectionViewSource)Resources["FilteredView"];
+    // Resources 里 CVS 的 Source 靠 DataContext 继承，构造函数里 View 仍为 null，
+    // 入视觉树后才解析——谓词必须挂到 Loaded，不能挂在构造函数。
+    Loaded += (_, _) => _view.View.Filter = Match;
+}
+
+// 谓词只挂一次；之后改条件只需 Refresh()，换页不会冲掉筛选条件。
+private void OnSearchTextChanged(object s, TextChangedEventArgs e) => _view.View.Refresh();
+
+private bool Match(object o) => ((Row)o).Name.Contains(SearchBox.Text, StringComparison.OrdinalIgnoreCase);
+```
+
+完整可运行演示见 Showcase「集合与数据」页的「筛选 + 分页共存」节（搜索 + 状态筛选 + 同源独立视图对照）。
+
 机制与约定：
 
-- **客户端分页**：数据需整体在内存中；实现为数据源默认视图上的组合过滤器（保留宿主已有过滤 + 当前页成员），排序发生在分页之前——DataGrid 列头点击排序为「全局排序后再分页」的正确语义。
-- **两个启用分页的控件不可共享同一数据源**：默认视图按数据源单例，共享会争抢同一过滤器；需要同源多控件时用 `CollectionViewSource` 为其一建立独立视图，或各持一份集合。
+- **客户端分页**：数据需整体在内存中；视图 `Filter` 槽位由库内协调器独占，按「宿主过滤器 + 当前页成员」组合，排序发生在过滤之前——DataGrid 列头点击排序为「全局排序后再分页」的正确语义。
+- **宿主过滤与分页可以共存**：宿主过滤器每轮重读，因此在分页启用**之后**更换 `ICollectionView.Filter`、或用 `CollectionViewSource` + `Refresh()` 驱动筛选，都会正确反映到控件与 `TotalCount` / `PageCount`（`3.3.0` 起；此前这两种写法会被静默还原）。`TotalCount` 的含义是「宿主过滤后、分页前」的条目数。
+- **两个启用分页的控件不可共享同一视图**：默认视图按数据源单例，两台都绑同一个集合（或同一个 `ICollectionView`）就会争抢同一个 `Filter` 槽位，**可见数**会被另一台污染（实测 `PageSize=20` 的那台只显示 10 条）；`TotalCount` 不受污染，两台读到的都是宿主过滤后的真实条目数。需要同源多控件时，**用 `CollectionViewSource` 为其一建立独立视图**即可——两个视图各有自己的槽位，实测两台分别 10/10 与 20/20、`TotalCount` 均为 100；或各持一份集合。
+- **丢弃启用分页的控件前请先设 `PageSize=0`**：卸载（`Unloaded`）只解除 `ItemsSource` 订阅、不释放视图上的分页接管——这是「卸载期间增删、重进视觉树再补算」的刻意设计。因此控件被直接丢弃（例如导航换页，而集合仍活在长生命周期的视图模型里）时，它的页窗口会留在共享视图上，之后同一数据源上的新控件会显示**空列表**，被丢弃的控件也无法回收。此为既有限制，后续版本再决定生命周期方案。
 - **仅支持经 `ItemsSource` 提供的数据**：在 XAML 里以子条目方式直接声明内容的 `ItemsControl`（未设 `ItemsSource`）不会分页（页码栏也不出现）；此类场景请改为绑定集合。`PageSize` 接受大于等于 0 的整数，负数会被拒绝。
-- 翻页/数据变化触发视图刷新：滚动位置复位；数据增删时页码自动钳制。
-- 页码栏（`jv:DataPager`）含首页/上一页/滑窗页码/下一页/末页、每页条数选择器与总数文本；候选值经 `jv:DataPager.PageSizeOptions`（默认 "10,20,50,100"）配置，当前 `PageSize` 不在候选中时自动并入。
+- 翻页/数据变化触发视图刷新：滚动偏移按条目索引保留，不会跳回顶部；数据增删时页码自动钳制。
+- 页码栏（`jv:DataPager`）含首页/上一页/滑窗页码/下一页/末页、每页条数选择器与总数文本；候选值经 `jv:DataPager.PageSizeOptions`（默认 "10,20,50,100"）配置，当前 `PageSize` 不在候选中时自动并入。**窄容器注意**：横向页码栏是不换行的 `StackPanel`，页数多时「每页条数选择器 + 总数」会超出容器被裁切；窄列请改用 `Placement="Left"` / `"Right"`（竖排自动折叠这两项，总数可另行绑定 `TotalCount` 展示）。
 
 ### ExpanderBehavior
 
@@ -1086,6 +1162,8 @@ editor.CompletionProvider = provider;
 
 两种行首观感共用这同一份条目模板——`DisplayMode` 只决定行首画箭头还是画指示条，**不再切换模板**（自 `3.2.0` 起 `TreeViewNormalItemTemplate` / `TreeViewIconItemTemplate` 合并为 `TreeViewItemTemplate`，两个旧键已不存在）。
 
+**外框可覆盖**：默认描边为 `Theme.Brush.Border.Default` + 厚度 `1`，由样式 Setter 提供，因此行内 `BorderBrush="Transparent"` 或 `BorderThickness="0"` 都能生效（后者是全状态开关，任何交互态都不会重新长出边框），口径见「控件外框」一节。背景 `Background` 不在本轮开放范围内，仍是模板内固定的 `Theme.Brush.Surface.Base`。
+
 合并 `Themes/Generic.xaml` 后，官方 `<TreeView>`（无 `jv:` 前缀）自动获得同一外观与交互；`jv` 专有能力经 `atc:TreeViewAssist` 附加属性承载，两类实例通用：
 
 | 属性（`jv:TreeView` 实例 / `atc:TreeViewAssist` 附加） | 效果 |
@@ -1196,6 +1274,8 @@ node.IsSelected = true;
 ### TabControl 与 TabControlItem
 
 `jv:TabControl` 继承 WPF `TabControl`，`jv:TabControlItem` 继承 WPF `TabItem`。它遵循标准的 `ItemsSource`、`ItemTemplate`、`ContentTemplate` 和容器生成规则；点击页签标题会切换对应内容。页签条是 `WrapPanel` 且**不套滚动容器**——**页签超出可用宽度时自动换行**，行数不设上限：页签行随行数变高，内容区被相应压缩，控件总高不变。换行与横向滚动互斥（`ScrollViewer` 的 `HorizontalScrollBarVisibility=Auto` 会给面板无限宽度，`WrapPanel` 在无限宽度下永远只排一行），所以页签条不再横向滚动；需要限制头部占用的空间，由宿主给控件设 `Height`/`MaxHeight`，或把整台控件包进宿主自己的 `ScrollViewer`。页签条固定在顶部，因此**不支持 `TabStripPlacement` 的 Left/Bottom/Right 方向**（官方 `TabPanel` 能力未包含）。多行时「选中页签去底边框、与内容区连成一体」只发生在**最后一行**（那里才有内容区上边线）；非末行的选中页签底边同样不描边，会在该行下沿留下 1px 缺口——离屏实测：选中页签底边像素 `#FFFFFF`（页签自身背景），同排未选页签同一位置是 `#DADEE2`（`Theme.Brush.Border.Default`）。这是刻意保留的取舍：改成「选中态一律四边描边」会破坏单行时页签与内容区衔接的观感，改成「只有末行去底边」需要在排列之后回写行归属标记（布局反馈环风险），两者都不划算。
+
+**外框与那条分割线**：内容区边框默认取 `Theme.Brush.Border.Default` + 厚度 `1`（样式 Setter 提供，行内可覆盖），内容区上移量随它取负上边。`BorderThickness="0"` 时页签行与内容区之间那条分割线**一起消失**——这是刻意的耦合，库不再单独开放分割线开关；页签自身的边框归**页签的** `BorderThickness`（默认 `1`，经 `ItemContainerStyle` 覆盖），选中页签「去底边」随它推导（`1`→`1,1,1,0`、`0`→全 `0`、`2`→`2,2,2,0`）。完整口径见「控件外框」一节。
 
 **官方类型接管**：库字典中提供了官方 `TabControl` 的隐式样式（与 `ListBox` / `ComboBox` 等同一约定）。宿主把 `Themes/Generic.xaml` 合并进 `Application.Resources` 后，**原生 `<TabControl>` 无需任何前缀与配置即被库主题接管**：外壳、页签行与悬停/选中态与 `jv:TabControl` 一致，页签容器为原生 `TabItem`（`DefaultTabItemStyle`）。两个圆角属性注册为**附加属性**，因此官方 `<TabControl>` 同样可自定义：`jv:TabControl.HeaderCornerRadius="6"`、`jv:TabControl.ContentCornerRadius="0,0,12,12"`（未赋值时取默认值；官方类型下不再产生绑定失败跟踪——此前那条 `Warning 40` 只在宿主开启 `PresentationTraceSources.DataBindingSource` 跟踪时可见，默认 `Level=Off`）。`IsClosable`、`CloseTabCommand`、页签重命名与 `ItemHoverBackground` / `SelectedItemBackground` 仍是 `jv:TabControl` 的派生能力，官方 `<TabControl>` 不具备——需要这些能力请使用 `jv:TabControl` 与 `jv:TabControlItem`（原 `TabMenu` / `TabMenuItem` 自 3.1.0 起更名）。
 

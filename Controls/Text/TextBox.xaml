@@ -473,7 +473,7 @@
             <!--  鐒︾偣鏃惰竟妗嗛珮浜紙鐜颁唬鎰燂級  -->
             <Trigger Property="IsFocused" Value="True">
                 <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
-                <Setter TargetName="Border" Property="BorderThickness" Value="1" />
+                <!--  聚焦只换色不加粗：这里曾写死 BorderThickness=1，会让宿主设 BorderThickness="0" 后一聚焦又长出边框  -->
                 <Setter TargetName="Border" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Focused}" />
             </Trigger>
 
@@ -498,21 +498,6 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
-
-    <ControlTemplate x:Key="NoBorderTextBoxTemplate" TargetType="{x:Type local:TextBox}">
-        <Border
-            x:Name="TextBoxHost"
-            BorderBrush="{DynamicResource Theme.Brush.Accent.Primary}"
-            BorderThickness="0">
-            <ScrollViewer
-                x:Name="PART_ContentHost"
-                Grid.Column="1"
-                Margin="0"
-                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                HorizontalScrollBarVisibility="Hidden"
-                VerticalScrollBarVisibility="Hidden" />
-        </Border>
-    </ControlTemplate>
 
     <ControlTemplate x:Key="NoBorderTextBoxTemplate_WPF" TargetType="TextBox">
         <Border

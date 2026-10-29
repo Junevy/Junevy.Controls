@@ -255,6 +255,11 @@
     <Style x:Key="DefaultTreeViewStyle" TargetType="{x:Type TreeView}">
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
+        <!--  外框默认值放在样式 Setter 而不是模板字面量里：Setter 优先级低于实例本地值，
+              于是默认观感不变（仍取主题令牌、随主题切换），宿主写 BorderBrush="Transparent"
+              或 BorderThickness="0" 又真的能覆盖。模板内已改为 TemplateBinding 消费这两项。  -->
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="atc:TreeViewAssist.ItemHoverBackground" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
         <Setter Property="atc:TreeViewAssist.SelectedItemBackground" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
         <Setter Property="FontSize" Value="12" />
@@ -278,8 +283,8 @@
                         VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
                         <Border
                             Background="{DynamicResource Theme.Brush.Surface.Base}"
-                            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                            BorderThickness="1"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
                             ClipToBounds="True"
                             CornerRadius="{DynamicResource Theme.ControlCornerRadius}">
                             <ItemsPresenter />

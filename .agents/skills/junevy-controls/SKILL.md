@@ -71,6 +71,17 @@ ThemeManager.ToggleTheme();
 - 两个颜色陷阱：`Theme.Brush.Text.OnAccent` 在深色主题下是**墨色不是白色**，状态色块上的文字走这个键、不要写死 `#FFFFFF`；浅色主题的 `Status.Warning` 是真黄（白卡上对比度仅 1.7:1），黄底上不要放白字或深灰小字，用「`Status.WarningSubtle` 淡底 + `Text.Primary` 深色前景」。
 - 布局令牌：`Theme.ControlCornerRadius`（控件圆角）、`Theme.ControlPadding`、`Theme.PopupShadow`、`Theme.ButtonShadow`。
 
+### 控件外框契约（`3.3.0` 起全库统一）
+
+`BorderBrush` / `BorderThickness` 是 WPF `Control` 自带属性，本库让它们在**所有画得出外框的控件上真正可用**（含官方同名写法 `<TreeView>` `<TabControl>` `<TextBox>` `<ComboBox>` `<CheckBox>` `<Menu>`）。契约两半：
+
+- **`BorderBrush` 只管静息态**：状态触发器（hover/focus/selected/disabled）仍写死主题令牌色——悬停加深、聚焦转 accent 是全库一致的反馈，不该被逐实例关掉。要静息态无框就设 `Transparent`（1px 占位仍在，只是看不见线）。
+- **`BorderThickness` 管全状态**：触发器里不再有写死的厚度绝对值，需要「部分边」的场合随该元素自己的宿主厚度推导。所以 `0` 是可靠的「任何状态都不画框」开关，`2` 得到几何一致的放大版。
+- 默认值由样式 `Setter` 提供（不是模板字面量），故宿主写什么生效什么；宿主派生样式要 `BasedOn`，否则连同默认 Setter 一起丢掉。
+- **不归它管的描边**：内部分隔线 `Theme.Brush.Border.Subtle`/`.Divider`、强调描边 `.Strong`、焦点环、以及浮层轮廓（`jv:ContextMenu`、二级子菜单、`jv:ComboBox` 下拉、`jv:Toolbox` 悬浮面板、`CodeEditor` 补全列表）保持写死——浮层与本体共用开关会让 `BorderThickness="0"` 的下拉变成无轮廓白板。
+- 三处例外/注意：`Menu` 菜单栏默认厚度是 `0`（本无边框），且样式是 keyed `JunevyMenuBarStyle`（官方 `<Menu>` 不自动带外框默认值）；`jv:CheckBox`/`jv:RadioButton` 的这两项管**勾选标记框**（默认 `1.5`）不是控件整体；`jv:InfoBar`/`jv:AppBar` 管的是弹出层，本体无外框。
+- `jv:TabControl` 是**两个独立表面、各自读自己的属性**：内容区边框 + 上移量（页签行分割线随它一起消失）取 `TabControl.BorderThickness`；页签盒取 `TabItem` 自己的（走 `ItemContainerStyle`）。`jv:TabControl BorderThickness="2"` 不会把页签也变成 `2,2,2,0`，两处都要放大就两处一起设。
+
 ## 4. 附加属性速查（`atc:` 命名空间）
 
 | 附加属性 | 用途 | 关键点 |
@@ -83,7 +94,7 @@ ThemeManager.ToggleTheme();
 | `atc:TreeViewAssist.*` | TreeView 扩展 | `DisplayMode`（`Chevron`/`Indicator`）、`IndentSize`、`AutoExpandAncestors`、`NavigateCommand`——`jv:TreeView` 有同名实例属性，附加属性写法对官方 `<TreeView>` 同样生效 |
 | `atc:ExpanderBehavior.Enable` | TreeViewItem 双击展开 / Enter 激活 | 默认容器样式已启用，通常无需手动设 |
 | `atc:SmoothScrolling.IsEnabled` / `.Step` | 平滑滚轮 | 库内 ListBox/ListView/DataGrid/ComboBox/SideMenu 默认已开启；可设到任意 ScrollViewer |
-| `atc:PagingAssist.PageSize` / `.CurrentPage` / `.Placement` | 客户端分页 | 设 `PageSize` 后 ListBox/ListView/DataGrid 模板内自动出现页码栏（`jv:DataPager`）。仅支持 `ItemsSource`；两个启用分页的控件不可共享同一数据源 |
+| `atc:PagingAssist.PageSize` / `.CurrentPage` / `.Placement` | 客户端分页 | 设 `PageSize` 后 ListBox/ListView/DataGrid 模板内自动出现页码栏（`jv:DataPager`）。仅支持 `ItemsSource`；宿主过滤与分页可共存（`3.3.0` 起，分页启用后改 `view.Filter` 或用 CVS + `Refresh()` 都生效）；两个启用分页的控件不可共享同一视图（可见数会被另一台污染，`TotalCount` 不受影响；同源多控件用 `CollectionViewSource` 为其一建独立视图即可）；控件丢弃前先设 `PageSize=0`，否则页窗口会留在共享视图上让后续控件显示空列表 |
 
 **图标字体**：`{DynamicResource IconFont}`（线性，默认）/ `{DynamicResource IconFontFilled}`（面性），码点完全一致（67 个图标），同一字符换 FontFamily 即整套切换风格。图标字符着色走 `Foreground`；`Image` 和固定 `Fill` 的 `Path` 不会自动重新着色。
 
@@ -122,7 +133,9 @@ ThemeManager.ToggleTheme();
 - 切主题后颜色不变 → 某处用了 `StaticResource` 绑主题令牌。
 - 覆盖令牌后被「永久记住」→ 用了 `Resources[key] = value` 而不是追加字典。
 - 图标不显示 → `atc:Icon.Icon` 为空时图标区整体折叠（这是设计行为）；或字符用了错误字体（需 `atc:Icon.FontFamily` 或默认 iconfont）。
-- 分页不生效 → 数据是 XAML 直接声明子条目而非 `ItemsSource`；或两个控件共享了同一数据源。
+- 分页不生效 → 数据是 XAML 直接声明子条目而非 `ItemsSource`；或两个控件共享了同一视图（可见数被另一台污染，同源时用 `CollectionViewSource` 为其一建独立视图即可）。换页后新控件显示空列表 → 上一台启用分页的控件被丢弃前没设 `PageSize=0`，页窗口留在了共享视图上。
+- 在 `Resources` 里声明 `CollectionViewSource Source="{Binding X}"` 后，构造函数里 `cvs.Source` 与 `cvs.View` **都还是 null**（`Source` 靠 DataContext 继承绑定，要等元素入视觉树 + 一次 dispatcher pump 才解析）→ 宿主筛选谓词必须挂在 `Loaded` 里，写构造函数会 `NullReferenceException`。可运行示例见 Showcase「数据展示」页「筛选 + 分页共存」节。
+- 窄列里页码栏被裁切（「共 N 条」显示不全）→ 横向页码栏是**不换行的 `StackPanel`**（页码按钮 + 每页条数选择器 + 总数文本），列宽不够就溢出。改用 `atc:PagingAssist.Placement="Left"` / `"Right"`：竖排模板自动折叠后两项，总数可另行绑 `PagingAssist.TotalCount` 展示。
 - MessageBar 直接设 `Visibility`/`Opacity`/`RenderTransform` 失效 → 这三个属性由控件随 `IsShown` 管理。
 - `atc:TitleAssist.TitleAlignment` 设了却看不出差别 → 标题区域没有多余空间可移动：左/右方位未设 `TitleWidth` 时区域等于标题自身宽。靠齐只发生在区域内部，想让它起作用要么给 `TitleWidth`，要么用上/下方位（未设宽度时区域=输入区整行宽）。`TitlePlacement="Left"` + `TitleWidth` 想让标题贴合输入框需显式写 `TitleAlignment="Right"`（`3.2.3` 起默认 `Left`，旧观感不再自动出现）。
 - `TabControl` 写了 `DisplayMode`/`TabStripPlacement` 报错或无效 → 前者已在 3.2.0 删除（写 XAML 会编译失败），后者不支持四方向。
@@ -131,6 +144,9 @@ ThemeManager.ToggleTheme();
 - `ItemsSource` + `ItemTemplate` 的页签双击/F2 改不了名 → 重命名要求 `Header` 是字符串，这种用法标题由 `ItemTemplate` 渲染，得改用模型 `INotifyPropertyChanged` 标题 + 宿主自绘编辑 UI。
 - `jv:TabControl` 写了显式 `Style` 后控件整个变白/无模板 → 隐式样式在有显式样式时不参与，必须 `BasedOn="{StaticResource DefaultDerivedTabControlStyle}"`。
 - 自定义模板时必须保留 WPF 标准部件名（`PART_ContentHost`、`PART_ScrollViewer`、`ItemsPresenter` 等）——本库多处行为（平滑滚动、滚轮折算）依赖 `PART_ScrollViewer` 命名。
+- 设了 `BorderBrush="Transparent"` 感觉「框还在」→ 它只去掉**静息态**的颜色（1px 占位仍在），悬停/聚焦会按主题令牌把线画回来。想要彻底无边框用 `BorderThickness="0"`（全状态生效）。反过来：`BorderBrush` 不会因触发器写死而失效，是 `BorderThickness` 才管全状态——见第 3 节契约。
+- **改「外框可覆盖性」的两个优先级陷阱**（本仓库开发控件时必读）：模板 `Border` 上写字面量 `BorderBrush`/`BorderThickness` = 给子元素写局部值，永远压过宿主写在控件上的值，必须改 `{TemplateBinding}`；同时默认值要搬到样式 `Setter`（`Control.BorderBrush` 元数据默认 `null`、`BorderThickness` 默认 `0`）。只做前者不补 Setter 会**静默无边框**——编译通过、宿主覆盖测试仍全绿、默认观感没了。`ControlTemplate.Triggers` 里带 `TargetName` 的 `BorderThickness` Setter 同样是子元素局部值，所以契约禁止触发器写厚度绝对值；需要「部分边」时用 `RelativeSource={RelativeSource TemplatedParent}` + 转换器从宿主厚度推导（触发器的 `Setter.Value` 允许 TemplatedParent 绑定，这与 `DataTrigger` 的 **Binding 条件**里拿不到 TemplatedParent 是两回事）。
+- 焦点环（`Generic/Style/DefaultFocusStyle.xaml`，经 `SystemParameters.FocusVisualStyleKey` 全局接管）在离屏/无头探针里**挂不上 `AdornerLayer`**——WPF 要等真实输入到达进程才显示焦点提示，即便 `IsActive` + `IsKeyboardFocused=True` +  pumping 到 `ContextIdle` 仍是 0 个子项。所以涉及焦点视觉或 `Border.CornerRadius` 的改动不能靠探针下「无影响」结论：要么真实桌面按 Tab 目测，要么保守保留（`3.3.0` 就因此保留 CheckBox/RadioButton 的 `Border.CornerRadius` Setter）。
 - 确认弹窗的按钮点不动、窗口关不掉 → `jv:ConfirmDialogWindow` 给页脚插槽赋 `Template` 后**必须立刻 `ApplyTemplate()` 再 `FindName`**（赋值只是挂模板，实例化要等布局 passes，不强制应用则部件引用为 null）。改这个控件前先读 README「ConfirmDialogWindow 与 ConfirmDialogService」的实现要点。
 - **库内控件不要在属性变更回调里调 `UpdateLayout()`** → 会重入「正在变更中的集合」，虚拟化 `ItemsControl` 抛「某个 ItemsControl 与它的项源不一致」（`Badge` 曾因此在宿主日志面板批量投递时崩溃，`3.2.5` 已修）。需要按实际尺寸算位置时走 `SizeChanged`／`LayoutUpdated` 这类布局期回调——它们在同一帧内、早于渲染，纠正来得及且不额外跑布局。宿主侧相应地：在 `CollectionChanged` 处理程序里改绑定属性是安全的。
 - 按钮上设了 `Background` + 浅色 `Foreground`，禁用后白底白字看不见 → `3.2.5` 已修（禁用态改用 `State.DisabledSurface`/`DisabledBorder`/`DisabledForeground` 三色，且**接管**前景）。**同类模板改动务必记住**：模板触发器里 `<Setter Property="Foreground">`（不带 `TargetName`）优先级**低于**宿主本地值，压不住；必须写内容呈现器的 `TextElement.Foreground`（给子元素写局部值才能盖过 `TemplateBinding`），图标槽 `IconPresenter` 也要一并改。彩色底配文字用 `Theme.Brush.Text.OnAccent`。
@@ -142,6 +158,7 @@ README.md（仓库根目录；下游项目见 GitHub 仓库同名文件）约 20
 | 需要什么 | 看 README 哪一节 |
 | --- | --- |
 | 主题令牌全表（浅/深色值 + 用途） | 「主题」→「角色令牌全表」 |
+| 控件外框 `BorderBrush`/`BorderThickness` 能改什么、哪些描边不归它管 | 「主题」→「控件外框：`BorderBrush` 管静息态，`BorderThickness` 管全状态」 |
 | 某个附加属性的完整参数表 | 「附加属性」下同名小节（Icon / PagingAssist / ExpanderBehavior / SmoothScrolling / TitleAssist / PlaceholderAssist） |
 | 某个控件的属性表与示例 | 「控件索引」列出的分类章节（如「按钮控件」「菜单与导航控件」） |
 | TreeView 数据模型与行为边界 | 「TreeView 与 TreeMenuItem」+「ExpanderBehavior」 |

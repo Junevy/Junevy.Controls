@@ -116,6 +116,13 @@
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="Padding" Value="0" />
+        <!--
+            根 Border 改为 TemplateBinding 消费描边后补上的默认值。厚度必须是 0：
+            菜单栏原先根本没有边框，给成 1 会让所有现有宿主凭空多出一条线。
+            宿主想要边框时写 BorderThickness="1" 即可（色值已指向主题边框令牌）。
+        -->
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="0" />
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
         <!--  下拉条目的悬停画刷：条目模板经 AncestorType=MenuBase 读取该附加属性（与 jv:ContextMenu 同一读取路径）  -->
         <Setter Property="atc:MenuAssist.ItemHoverBackground" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
@@ -126,6 +133,8 @@
                     <Border
                         Padding="{TemplateBinding Padding}"
                         Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
                         SnapsToDevicePixels="True">
                         <ItemsPresenter />
                     </Border>

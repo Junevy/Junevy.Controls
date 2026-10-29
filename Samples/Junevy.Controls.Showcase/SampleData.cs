@@ -48,6 +48,13 @@ namespace Junevy.Controls.Showcase
         /// <summary>分页演示数据（53 条，供 PagingAssist/DataPager 演示）。</summary>
         public ObservableCollection<PagedRowItem> PagedRows { get; }
 
+        /// <summary>
+        /// 筛选演示数据（60 条，供「宿主过滤 + 分页共存」演示）。刻意让两个筛选维度互相交叉：
+        /// 名称含 "Camera" 的 15 条、状态 "在线" 的 20 条、两者同时满足的只有 5 条，
+        /// 三个数都不是 PageSize=10 的整数倍，便于同时观察 TotalCount 与 PageCount 收缩。
+        /// </summary>
+        public ObservableCollection<DeviceItem> FilterDevices { get; }
+
         /// <summary>ExpanderPanel ToggleCommand 演示：切换时经 MessageBarService 弹出通知。</summary>
         public RelayCommand PanelToggleCommand { get; }
 
@@ -112,6 +119,22 @@ namespace Junevy.Controls.Showcase
             for (int i = 1; i <= 53; i++)
             {
                 PagedRows.Add(new PagedRowItem { Name = $"条目 {i:000}" });
+            }
+
+            FilterDevices = [];
+            string[] kinds = ["Camera", "PLC", "Robot", "Sensor"];
+            string[] states = ["在线", "离线", "告警"];
+            int[] kindCounters = new int[kinds.Length];
+            for (int i = 1; i <= 60; i++)
+            {
+                int kind = i % kinds.Length;
+                kindCounters[kind]++;
+                FilterDevices.Add(new DeviceItem
+                {
+                    Name = $"{kinds[kind]}-{kindCounters[kind]:00}",
+                    Status = states[i % states.Length],
+                    IP = $"192.168.1.{100 + i}"
+                });
             }
         }
 

@@ -62,8 +62,8 @@
         <Border
             x:Name="RootBorder"
             Background="{DynamicResource Theme.Brush.Surface.Base}"
-            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-            BorderThickness="1"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}"
             CornerRadius="{DynamicResource Theme.ControlCornerRadius}"
             Effect="{DynamicResource Theme.PopupShadow}"
             SnapsToDevicePixels="True">
@@ -157,6 +157,9 @@
     <Style TargetType="{x:Type local:MessageBar}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="MaxWidth" Value="560" />
+        <!--  根外框默认值：模板改为 TemplateBinding 消费后必须由 Setter 补回，否则静默无边框  -->
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template" Value="{StaticResource DefaultMessageBarTemplate}" />
         <Setter Property="atc:Icon.FontFamily" Value="{StaticResource IconFont}" />
         <Setter Property="atc:Icon.IconSize" Value="16" />

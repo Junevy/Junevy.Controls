@@ -19,6 +19,8 @@
     <cvt:BoolToVisibilityConverter x:Key="BoolToVisibility" />
     <cvt:CornerRadiusFilterConverter x:Key="TopCornerRadius" Mode="Top" />
     <cvt:CornerRadiusFilterConverter x:Key="BottomCornerRadius" Mode="Bottom" />
+    <cvt:ThicknessFilterConverter x:Key="NoBottomThickness" Mode="NoBottom" />
+    <cvt:ThicknessFilterConverter x:Key="NegativeTopMargin" Mode="NegativeTop" />
 
     <!--  1. 原生 TabItem 容器样式（官方 <TabControl> 的页签容器是原生 TabItem，无法使用 TabControlItem 样式）。
               悬停/选中背景直接引用主题画刷：ItemHoverBackground / SelectedItemBackground 是派生
@@ -27,7 +29,10 @@
               宿主可写 jv:TabControl.HeaderCornerRadius="..." 自定义，不会产生绑定失败跟踪。  -->
     <Style x:Key="DefaultTabItemStyle" TargetType="TabItem">
         <Setter Property="Padding" Value="0" />
-        <Setter Property="BorderThickness" Value="0" />
+        <!--  这里原本写 BorderThickness=0，是被模板字面量 1,1,1,1 压住的死值。模板改为 TemplateBinding 后
+              这条 Setter 才真正生效，故必须给 1（等于既有观感），否则页签默认就没了描边。  -->
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="MinHeight" Value="20" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <!--  Stretch使页签底边始终对齐页签行底部，与内容区上边框无缝衔接  -->
@@ -51,8 +56,8 @@
                         x:Name="border"
                         Margin="0,0,2,0"
                         Background="{TemplateBinding Background}"
-                        BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                        BorderThickness="1,1,1,1"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="{Binding RelativeSource={RelativeSource AncestorType={x:Type TabControl}}, Path=(local:TabControl.HeaderCornerRadius), Converter={StaticResource TopCornerRadius}}">
 
                         <Grid>
@@ -97,7 +102,7 @@
                         <Trigger Property="IsSelected" Value="True">
                             <!--  背景与内容区一致、去掉底边框，使选中页签与内容区视觉一体  -->
                             <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.Background.App}" />
-                            <Setter TargetName="border" Property="BorderThickness" Value="1,1,1,0" />
+                            <Setter TargetName="border" Property="BorderThickness" Value="{Binding BorderThickness, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NoBottomThickness}}" />
                             <!--  选中页签文字升为一级  -->
                             <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
                         </Trigger>
@@ -124,8 +129,8 @@
                         x:Name="border"
                         Margin="0,0,2,0"
                         Background="{TemplateBinding Background}"
-                        BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                        BorderThickness="1,1,1,1"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="{Binding RelativeSource={RelativeSource AncestorType={x:Type TabControl}}, Path=(local:TabControl.HeaderCornerRadius), Converter={StaticResource TopCornerRadius}}">
 
                         <Grid>
@@ -217,7 +222,7 @@
                         <Trigger Property="IsSelected" Value="True">
                             <!--  背景与内容区一致、去掉底边框，使选中页签与内容区视觉一体  -->
                             <Setter TargetName="border" Property="Background" Value="{Binding SelectedItemBackground, RelativeSource={RelativeSource AncestorType=local:TabControl}}" />
-                            <Setter TargetName="border" Property="BorderThickness" Value="1,1,1,0" />
+                            <Setter TargetName="border" Property="BorderThickness" Value="{Binding BorderThickness, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NoBottomThickness}}" />
                             <!--  选中页签文字升为一级  -->
                             <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
                         </Trigger>
@@ -247,6 +252,11 @@
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Background.App}" />
+        <!--  内容区外框默认值经样式 Setter 注入（Setter 优先级低于实例本地值）：
+              默认仍取主题令牌且随主题切换，宿主写 BorderBrush="Transparent" / BorderThickness="0" 可覆盖。
+              注意 BorderBrush 只驱动内容区那一圈，页签描边归 TabItem 自己（WPF 原生语义，二者不联动）。  -->
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="1" />
 
         <Setter Property="ItemContainerStyle" Value="{StaticResource DefaultTabItemStyle}" />
 
@@ -272,16 +282,19 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <!--  内容：上移1px，使上边框线延伸到页签行底部，作为页签之间的分割线。
-                              声明在页签行之前，页签行绘制在其上层——选中页签无底边框即可盖住分割线，与内容区连为一体。
+                        <!--  内容区上移自身上边线的厚度（默认 1px），使该线延伸到页签行底部、充当页签之间的分割线。
+                              上移量必须跟着 BorderThickness 走：写死 -1 的话宿主把厚度设 0 会白留 1px 位移、
+                              设 3 则只有 1px 进入页签行、观感不一致。
+                              声明在页签行之前，页签行绘制在其上层——选中页签去底边即可盖住分割线，与内容区连为一体。
+                              宿主把 BorderBrush 设 Transparent 时这条分割线一并消失（同一根线，已裁决不拆独立元素）。
                               PART_SelectedContentHost 为 TabControl 官方模板部件契约：
                               选中内容经 TabControl 直接更新，容器增删时由 TabControl 释放内容呈现器引用  -->
                         <Border
                             Grid.Row="1"
-                            Margin="0,-1,0,0"
+                            Margin="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=BorderThickness, Converter={StaticResource NegativeTopMargin}}"
                             Background="{DynamicResource Theme.Brush.Background.App}"
-                            BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                            BorderThickness="1,1,1,1"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:TabControl.ContentCornerRadius), Converter={StaticResource BottomCornerRadius}}">
                             <ContentPresenter
                                 x:Name="PART_SelectedContentHost"

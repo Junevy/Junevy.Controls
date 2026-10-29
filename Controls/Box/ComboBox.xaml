@@ -443,6 +443,10 @@
                     MaxHeight="{TemplateBinding MaxDropDownHeight}"
                     SnapsToDevicePixels="True">
 
+                    <!--  下拉层刻意写死描边，不消费宿主的 BorderBrush/BorderThickness：这颗浮层没有投影、
+                          底色又是 Background.App，跟本体共用一个开关会让 BorderThickness="0" 的 combos
+                          在展开时变成一块没有轮廓的白板（与 ContextMenu / 子菜单 / Toolbox 悬浮面板 /
+                          补全列表同一类处理——浮层轮廓不归宿主的外框属性管）。  -->
                     <Border
                         x:Name="DropDownBorder"
                         Margin="0,4,0,0"

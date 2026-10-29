@@ -31,8 +31,8 @@
                     Width="18"
                     Height="18"
                     Background="Transparent"
-                    BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                    BorderThickness="1.5"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
                     CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
 
                     <!--  选中标记：矢量圆点，几何中心即元素中心，不像字形那样受 em 盒留白影响  -->
@@ -128,8 +128,8 @@
                     Width="18"
                     Height="18"
                     Background="Transparent"
-                    BorderBrush="{DynamicResource Theme.Brush.Border.Default}"
-                    BorderThickness="1.5"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
                     CornerRadius="45">
 
                     <!--  选中标记：矢量圆点，几何中心即元素中心，不像字形那样受 em 盒留白影响  -->
@@ -215,6 +215,12 @@
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+        <!--  选中标记外框的默认色与粗细：两种 DisplayMode 的模板都改为 TemplateBinding 消费这两项。
+              默认观感不变，宿主写 BorderBrush="Transparent" / BorderThickness="0" 可去掉标记描边。
+              Border.CornerRadius 保留不动，理由与 CheckBox.xaml 同款注释一致：标记模板不读它，
+              通用焦点环读它但离屏探针目测不到，删掉只可能把环的圆角从 4 变成 0。  -->
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
+        <Setter Property="BorderThickness" Value="1.5" />
         <Setter Property="Border.CornerRadius" Value="{DynamicResource Theme.SmallCornerRadius}" />
         <Setter Property="ContentTemplate" Value="{StaticResource DefaultRadioButtonDataTemplate}" />
 

@@ -7,6 +7,15 @@
     xmlns:jv="github.com.junevy"
     xmlns:sample="clr-namespace:Junevy.Controls.Showcase">
 
+    <!--  两个 CollectionViewSource 指向同一份 FilterDevices，但各自持有独立视图：
+          每个视图有自己的 Filter 槽位与分页协调器，因此筛选条件与页码互不污染。
+          若直接绑同一个集合（或同一个 ICollectionView），两台启用分页的控件会争抢
+          默认视图的过滤器——可见数被另一台改写，TotalCount 不受影响。  -->
+    <UserControl.Resources>
+        <CollectionViewSource x:Key="DeviceFilterView" Source="{Binding FilterDevices}" />
+        <CollectionViewSource x:Key="DeviceSideView" Source="{Binding FilterDevices}" />
+    </UserControl.Resources>
+
     <Border
         Padding="10"
         Background="{DynamicResource Theme.Brush.Background.App}"
@@ -171,8 +180,9 @@
                             Margin="0,10,0,4"
                             Text="Placement=Left（竖排页码栏停靠左侧）："
                             Foreground="{DynamicResource Theme.Brush.Text.Secondary}" />
-                        <!--  注意：两个分页控件不可共享同一数据源（默认视图按数据源单例，
-                              会争抢同一过滤器）；演示中的 ListBox 使用独立的集合  -->
+                        <!--  注意：两个分页控件不可共享同一「视图」（默认视图按数据源单例，
+                              会争抢同一过滤器）。此处 ListBox 用独立集合；同源多控件也可用
+                              CollectionViewSource 为其一建独立视图，见下方「筛选 + 分页共存」节  -->
                         <jv:ListBox
                             Width="220"
                             Height="280"
@@ -182,6 +192,85 @@
                             atc:PagingAssist.PageSize="5"
                             atc:PagingAssist.Placement="Left" />
                     </StackPanel>
+                </demo:DemoSection>
+
+                <demo:DemoSection
+                    Title="筛选 + 分页共存（宿主 ICollectionView.Filter + atc:PagingAssist）"
+                    Description="库不提供筛选谓词——匹配逻辑由宿主决定；3.3.0 起宿主过滤器与分页可共存。搜索框与状态下拉改写判定条件后调 view.Refresh()，分页协调器每轮重读宿主过滤器，因此 TotalCount / PageCount 随筛选结果收缩，换页也不会丢掉筛选条件；排序仍在过滤之前。右侧 ListBox 与左侧 DataGrid 绑同一份数据，但各持一个 CollectionViewSource 独立视图，故筛选与页码互不污染。试着搜 Camera（15 条）再选「在线」（交集 5 条）。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.FilterPagingDemo}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="110" />
+                                </Grid.ColumnDefinitions>
+                                <jv:TextBox
+                                    x:Name="SearchBox"
+                                    Grid.Column="0"
+                                    atc:PlaceholderAssist.Placeholder="搜索名称 / IP（如 Camera）"
+                                    ShowClear="True"
+                                    TextChanged="OnSearchTextChanged" />
+                                <jv:ComboBox
+                                    x:Name="StatusBox"
+                                    Grid.Column="2"
+                                    ItemsSource="{Binding StatusOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    SelectedIndex="0"
+                                    SelectionChanged="OnStatusSelectionChanged" />
+                            </Grid>
+                            <jv:DataGrid
+                                x:Name="FilterGrid"
+                                Height="260"
+                                AutoGenerateColumns="False"
+                                IsReadOnly="True"
+                                ItemsSource="{Binding Source={StaticResource DeviceFilterView}}"
+                                atc:DataGridAssist.EmptyText="无匹配设备（试着清空搜索框）"
+                                atc:PagingAssist.PageSize="10">
+                                <jv:DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding Name}" Header="设备" />
+                                    <DataGridTextColumn Binding="{Binding Status}" Header="状态" />
+                                    <DataGridTextColumn Binding="{Binding IP}" Header="IP 地址" />
+                                </jv:DataGrid.Columns>
+                            </jv:DataGrid>
+                            <TextBlock Margin="0,8,0,0" Foreground="{DynamicResource Theme.Brush.Text.Secondary}">
+                                <Run Text="TotalCount=" />
+                                <Run Text="{Binding Path=(atc:PagingAssist.TotalCount), ElementName=FilterGrid, Mode=OneWay}" />
+                                <Run Text="  PageCount=" />
+                                <Run Text="{Binding Path=(atc:PagingAssist.PageCount), ElementName=FilterGrid, Mode=OneWay}" />
+                                <Run Text="  CurrentPage=" />
+                                <Run Text="{Binding Path=(atc:PagingAssist.CurrentPage), ElementName=FilterGrid, Mode=OneWay}" />
+                            </TextBlock>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <jv:CheckBox
+                                x:Name="OnlineOnlyBox"
+                                Margin="0,0,0,8"
+                                Checked="OnOnlineOnlyChanged"
+                                Content="只看在线（独立视图）"
+                                Unchecked="OnOnlineOnlyChanged" />
+                            <jv:ListBox
+                                x:Name="SideList"
+                                Height="260"
+                                DisplayMemberPath="Name"
+                                ItemsSource="{Binding Source={StaticResource DeviceSideView}}"
+                                atc:PagingAssist.PageSize="15"
+                                atc:PagingAssist.Placement="Left" />
+                            <TextBlock Margin="0,8,0,0" Foreground="{DynamicResource Theme.Brush.Text.Secondary}">
+                                <Run Text="TotalCount=" />
+                                <Run Text="{Binding Path=(atc:PagingAssist.TotalCount), ElementName=SideList, Mode=OneWay}" />
+                                <Run Text="  PageCount=" />
+                                <Run Text="{Binding Path=(atc:PagingAssist.PageCount), ElementName=SideList, Mode=OneWay}" />
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
                 </demo:DemoSection>
 
             </StackPanel>
