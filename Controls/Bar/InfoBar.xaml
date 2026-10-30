@@ -29,7 +29,7 @@
             <Border
                 x:Name="PART_Root"
                 Padding="6,4"
-                Background="Transparent"
+                Background="{TemplateBinding Background}"
                 CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
                 Cursor="Hand"
                 shell:WindowChrome.IsHitTestVisibleInChrome="True"
@@ -96,6 +96,15 @@
                         Style="{StaticResource NoBorderButtonStyle}"
                         ToolTip="Settings"
                         Visibility="{TemplateBinding ShowSettingsButton, Converter={StaticResource InfoBarBoolToVisibility}}" />
+
+                    <!--  悬停纱色画在这一层（与 Button 的 StateLayer 同方案）：PART_Root 的底色已由宿主 Background
+                          决定，纱色若仍画在 PART_Root 上会在悬停时抹掉宿主底色，画在内容之上则两者都保住。  -->
+                    <Border
+                        x:Name="StateLayer"
+                        Grid.ColumnSpan="3"
+                        Background="Transparent"
+                        CornerRadius="{DynamicResource Theme.SmallCornerRadius}"
+                        IsHitTestVisible="False" />
                 </Grid>
             </Border>
 
@@ -152,9 +161,9 @@
         </Grid>
 
         <ControlTemplate.Triggers>
-                <!--  悬停：整行走状态层纱色  -->
+                <!--  悬停：整行走状态层纱色（画在 StateLayer 上，不覆盖 PART_Root 的宿主底色）  -->
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter TargetName="PART_Root" Property="Background" Value="{DynamicResource Theme.Brush.State.HoverScrim}" />
+                    <Setter TargetName="StateLayer" Property="Background" Value="{DynamicResource Theme.Brush.State.HoverScrim}" />
                 </Trigger>
                 <!--  AvatarOnly：仅头像（指定宽度时居中显示），名称经 ToolTip 显示  -->
                 <Trigger Property="DisplayMode" Value="AvatarOnly">
@@ -175,8 +184,9 @@
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <!--
-            这两项只管弹出菜单浮层（PART_MenuHost）的描边：InfoBar 本体是无框头像条，
-            PART_Root 恒为透明。模板改为 TemplateBinding 后必须由 Setter 补回默认值。
+            这两项只管弹出菜单浮层（PART_MenuHost）的描边：InfoBar 本体是无框头像条，PART_Root 不消费外框。
+            PART_Root 的底色走 TemplateBinding（默认由下面的 Background Setter 供 Transparent，宿主可覆盖），
+            悬停纱色画在独立状态层上；模板改为 TemplateBinding 消费外框的控件都必须由 Setter 补回默认值。
         -->
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="1" />

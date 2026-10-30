@@ -23,8 +23,9 @@
     <cvt:ThicknessFilterConverter x:Key="NegativeTopMargin" Mode="NegativeTop" />
 
     <!--  1. 原生 TabItem 容器样式（官方 <TabControl> 的页签容器是原生 TabItem，无法使用 TabControlItem 样式）。
-              悬停/选中背景直接引用主题画刷：ItemHoverBackground / SelectedItemBackground 是派生
-              jv:TabControl 上的 DP，原生 TabControl 不存在。页签无关闭/图标/重命名能力。
+              悬停背景直接引用主题画刷，选中背景取宿主 TabControl.Background（与内容区同一来源）：
+              ItemHoverBackground / SelectedItemBackground 是派生 jv:TabControl 上的 DP，原生 TabControl 不存在。
+              页签无关闭/图标/重命名能力。
               圆角读 local:TabControl 的附加属性：官方类型上未赋值时取 DP 默认（头 4 / 内容 8），
               宿主可写 jv:TabControl.HeaderCornerRadius="..." 自定义，不会产生绑定失败跟踪。  -->
     <Style x:Key="DefaultTabItemStyle" TargetType="TabItem">
@@ -100,8 +101,10 @@
                             <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <!--  背景与内容区一致、去掉底边框，使选中页签与内容区视觉一体  -->
-                            <Setter TargetName="border" Property="Background" Value="{DynamicResource Theme.Brush.Background.App}" />
+                            <!--  背景与内容区一致、去掉底边框，使选中页签与内容区视觉一体。
+                                  底色直接取宿主 TabControl.Background（不再钉死 App 令牌）：宿主换内容区颜色时
+                                  选中页签跟着一起换，不会在页签与内容区之间留出色差接缝。  -->
+                            <Setter TargetName="border" Property="Background" Value="{Binding Background, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}" />
                             <Setter TargetName="border" Property="BorderThickness" Value="{Binding BorderThickness, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NoBottomThickness}}" />
                             <!--  选中页签文字升为一级  -->
                             <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Primary}" />
@@ -246,15 +249,16 @@
 
     <!--  3. 键式 TabControl 样式（官方类型）：宿主合并本库字典后 <TabControl> 经隐式样式自动接管外观。
               页签容器为原生 TabItem（无关闭/重命名能力）；圆角读 local:TabControl 的附加属性，官方类型亦可用
-              jv:TabControl.HeaderCornerRadius / ContentCornerRadius 自定义；ItemHoverBackground /
-              SelectedItemBackground 仍是 jv:TabControl 专有的 DP，原生样式直接取主题画刷，不绑定它们。  -->
+              jv:TabControl.HeaderCornerRadius / ContentCornerRadius 自定义。ItemHoverBackground /
+              SelectedItemBackground 是 jv:TabControl 专有的 DP，原生样式不绑定它们：悬停取 Surface.Hover 令牌，
+              选中页签直接取宿主 TabControl.Background（与内容区同一来源，因此官方写法也不会出现色差接缝）。  -->
     <Style x:Key="DefaultTabControlStyle" TargetType="TabControl">
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
+        <!--  底色与外框默认值经样式 Setter 提供（Setter 优先级低于实例本地值），故宿主写什么生效什么：
+              Background 管整块——页签行后方与内容区两处表面都取它（与 WPF 原生 TabControl 语义一致）；
+              BorderBrush 只驱动内容区那一圈，页签描边归 TabItem 自己（WPF 原生语义，二者不联动）。  -->
         <Setter Property="Background" Value="{DynamicResource Theme.Brush.Background.App}" />
-        <!--  内容区外框默认值经样式 Setter 注入（Setter 优先级低于实例本地值）：
-              默认仍取主题令牌且随主题切换，宿主写 BorderBrush="Transparent" / BorderThickness="0" 可覆盖。
-              注意 BorderBrush 只驱动内容区那一圈，页签描边归 TabItem 自己（WPF 原生语义，二者不联动）。  -->
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="1" />
 
@@ -292,7 +296,7 @@
                         <Border
                             Grid.Row="1"
                             Margin="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=BorderThickness, Converter={StaticResource NegativeTopMargin}}"
-                            Background="{DynamicResource Theme.Brush.Background.App}"
+                            Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:TabControl.ContentCornerRadius), Converter={StaticResource BottomCornerRadius}}">
@@ -322,7 +326,9 @@
         BasedOn="{StaticResource DefaultTabControlStyle}"
         TargetType="{x:Type local:TabControl}">
         <Setter Property="ItemHoverBackground" Value="{DynamicResource Theme.Brush.Surface.Hover}" />
-        <Setter Property="SelectedItemBackground" Value="{DynamicResource Theme.Brush.Background.App}" />
+        <!--  选中页签默认跟随宿主 Background（不再钉死 App 令牌），故换了内容区底色不会出现色差接缝；
+              宿主显式设过 SelectedItemBackground 时本地值优先，仍可按页签单独指定。  -->
+        <Setter Property="SelectedItemBackground" Value="{Binding Background, RelativeSource={RelativeSource Self}}" />
         <Setter Property="HeaderCornerRadius" Value="{DynamicResource Theme.SmallCornerRadius}" />
         <Setter Property="ContentCornerRadius" Value="{DynamicResource Theme.LargeCornerRadius}" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource DefaultTabControlItemStyle}" />

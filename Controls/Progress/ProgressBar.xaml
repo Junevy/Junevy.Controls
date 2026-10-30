@@ -18,8 +18,9 @@
                 Height="6"
                 VerticalAlignment="Center"
                 ClipToBounds="True">
+                <!--  轨道底色 = 宿主 Background（与 WPF 原生 ProgressBar 同语义：Background 是轨道、填充归状态色）  -->
                 <Border
-                    Background="{DynamicResource Theme.Brush.Surface.Sunken}"
+                    Background="{TemplateBinding Background}"
                     CornerRadius="{TemplateBinding Border.CornerRadius}" />
                 <Border
                     x:Name="PART_Indicator"
@@ -58,9 +59,10 @@
     <!--  环形模板：确定模式绘制值圆弧，不确定模式旋转四分之一圆弧  -->
     <ControlTemplate x:Key="CircularProgressBarTemplate" TargetType="{x:Type local:ProgressBar}">
         <Grid Background="Transparent">
+            <!--  环形轨道底色同样取宿主 Background  -->
             <Path
                 x:Name="PART_RingTrack"
-                Stroke="{DynamicResource Theme.Brush.Surface.Sunken}"
+                Stroke="{TemplateBinding Background}"
                 StrokeThickness="{TemplateBinding RingThickness}"
                 StrokeStartLineCap="Round"
                 StrokeEndLineCap="Round" />
@@ -119,6 +121,9 @@
     </ControlTemplate>
 
     <Style TargetType="{x:Type local:ProgressBar}">
+        <!--  Background = 轨道底色（两种 ShapeMode 的模板都改为 TemplateBinding 消费），默认值必须由 Setter 补回，
+              否则静默变成「轨道看不见」；填充色仍归状态（线性取 Accent.Primary、环形取 Foreground）。  -->
+        <Setter Property="Background" Value="{DynamicResource Theme.Brush.Surface.Sunken}" />
         <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
         <Setter Property="Border.CornerRadius" Value="3" />

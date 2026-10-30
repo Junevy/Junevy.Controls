@@ -101,10 +101,10 @@
         <Setter Property="TitleBarHeight" Value="40" />
         <Setter Property="ShadowMargin" Value="16" />
         <Setter Property="CornerRadius" Value="{DynamicResource Theme.ControlCornerRadius}" />
-        <!--
-            根外框默认值必须由样式 Setter 补回来：模板已改为 TemplateBinding 消费这两项，
-            少了 Setter 会静默变成无边框；有了 Setter，默认观感不变，宿主仍可用本地值覆盖。
-        -->
+        <!--  外框默认值必须由样式 Setter 提供：模板改为 TemplateBinding 消费后，少了 Setter 会静默无边框。
+              Background 不在本轮契约内，模板里保持写死 Surface.Base —— Window.Background 是 HWND 的清除色，
+              会铺满整个客户区（含 ShadowMargin 的阴影留白），构造函数正是把它置为 Transparent 才让阴影透出。
+              因此它不能同时充当卡片底色：宿主写 Red 得到的是「红底卡片外加一圈 16px 红边」。  -->
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template">

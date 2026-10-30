@@ -226,6 +226,51 @@ ThemeManager.ToggleTheme();
 - **焦点指示**（聚焦时才出现的那一圈）不随外框开关消失：全库共用的 `DefaultControlFocusVisualStyle` 焦点环、`ComboBox` 的 `FocusBorder` 光晕都是可达性提示，不是装饰，`BorderThickness="0"` 之后依然会画。环的圆角取控件自己的 `Border.CornerRadius` 附加属性（盒子控件的样式都配了这一项）， thickness 恒为 `1`。
 - **`jv:ExpanderPanel`** 只在 `DisplayMode="Card"` 下由样式触发器供出 `BorderBrush`/`BorderThickness`（默认 `Classic` 无框）。行内本地值仍然赢过样式触发器，所以 `BorderThickness="0"` 有效；但 `BasedOn` 派生样式里的 Setter 赢不过那条触发器——要整族改粗细请改触发器所在样式的副本。
 
+### 底板底色：`Background` 管静息态，状态色仍归主题令牌
+
+`Background` 与上一节的 `BorderBrush` 是同一类问题：多处底色原本写死在模板里，宿主设 `Background="..."` 毫无反应（`<TreeView>` 的 `Surface.Base`、`<TabControl>` 内容区的 `Background.App` 都是）。治理办法完全相同——模板部件改为 `{TemplateBinding Background}` 消费，默认值搬进样式 `Setter`（Setter 优先级低于实例本地值），于是默认观感不变、宿主写什么生效什么。漏掉 Setter 这一半是**静默失败**：编译通过、覆盖测试照样绿，只是控件凭空失去底色。
+
+契约与外框一致：**`Background` 只管静息态**。选中条目、勾选/开启后的标记、禁用态、悬停纱色、进度与滑块的已填充段仍然写死主题令牌（`Surface.Sunken`、`Accent.Primary`、`State.DisabledSurface` …）——这些是状态反馈，不该被逐实例关掉。
+
+`Background` 具体管哪一块，逐控件列在下面（默认值都随主题切换重新解析；宿主写死实色画刷则切主题后仍是它自己）：
+
+| 控件 | `Background` 画的东西 | 默认值 |
+| --- | --- | --- |
+| `TreeView`（含官方写法） | 整块底板（条目之下） | `Surface.Base` |
+| `TabControl`（含官方写法） | **整块**：页签行后方 + 内容区 | `Background.App` |
+| `ListBox` / `ListView` / `DataGrid` | 本体，**分页页脚同源**（不留色差条） | `Surface.Base` |
+| `MessageBar` | 卡片底板 | `Surface.Base` |
+| `InfoBar` | 本体（悬停纱色改挂独立状态层，不占底色） | 透明 |
+| `CheckBox` / `RadioButton` | **勾选标记框**，不是整行 | 透明 |
+| `ToggleButton`（开关） | 轨道静息底色 | 不画 |
+| `Slider` | 未填充段轨道 | `Surface.Sunken` |
+| `ProgressBar` | 轨道（线性底色 / 环形 `Stroke`） | `Surface.Sunken` |
+| `Label` | 状态标签整块底色（`DisplayMode` 会注入对应状态色，宿主的局部值优先于它） | `Accent.Primary` |
+| `jv:TextBlock` | 标题组合的整块底板 | null（不画、不接管命中） |
+
+接缝处的两件事已经确认过口径，都不需要宿主额外操作：
+
+- **选中页签自动跟随**：`SelectedItemBackground` 的默认 Setter 绑定控件自己的 `Background`，所以选中页签与内容区永远同色、中间没有色差；显式给 `SelectedItemBackground` 赋值时以它为准（本地值优先）。
+- **分页页脚自动跟随**：`PagingFooter` 与列表本体读同一个 `Background`，换底色不会在页脚留一条色差带。
+
+三处例外，理由各自成立：
+
+- **`jv:DialogWindow` / `jv:ProgressBarWindow` 的卡片底色不吃 `Background`**，模板里写死 `Surface.Base`。`Window.Background` 是 HWND 清除色，会连 14px 阴影留白一起填色——这两个构造函数恰恰把它置为 `Transparent` 才让阴影透出来，让它兼作卡片底板等于自相矛盾。
+- **`jv:DataPager` 没有整块底板**（本体就是一排页码按钮 + 每页条数选择器 + 总数文本），`Background` 无从落点；要底色请套一层 `Border`。
+- **`jv:ExpanderPanel` 只在 `DisplayMode="Card"` 下消费 `Background`**；默认的 `Classic` 头部底色绑的是内层 ToggleButton，那是头部自己的交互表面。
+
+**浮层底色一律不跟随宿主**：`jv:ComboBox` 的下拉、`jv:InfoBar` 的菜单浮层、`jv:ContextMenu`、`jv:Toolbox` 的悬浮面板、`CodeEditor` 的补全列表保持 `Surface.Base`（与上一节的浮层描边同一取舍——主体改了色，浮层还得能被认出是浮层）。
+
+```xml
+<!-- 整块换色：内容区 + 页签行后方 + 选中页签一起走 -->
+<jv:TabControl Background="{DynamicResource Theme.Brush.Surface.Sunken}" />
+
+<!-- 只换勾选标记框的静息底色（整行仍然透明） -->
+<jv:CheckBox Background="#22000000" />
+```
+
+宿主派生样式时**务必 `BasedOn`**——不带 `BasedOn` 的 `Style` 会连默认 Setter 一起丢掉，表现就是控件没了底色。
+
 ### 透明背景棋盘格 `TransparentBackground`
 
 用于表示「图像/颜色本身是透明的」那种棋盘格底纹，常见于图片查看器、颜色选择器、图层面板。三个键都是 `DrawingBrush`（矢量绘制、`TileMode=Tile`），方格尺寸由资源自身决定，**不会随控件尺寸拉伸**；配色取自当前主题，切换主题后自动换色。
@@ -1162,7 +1207,9 @@ editor.CompletionProvider = provider;
 
 两种行首观感共用这同一份条目模板——`DisplayMode` 只决定行首画箭头还是画指示条，**不再切换模板**（自 `3.2.0` 起 `TreeViewNormalItemTemplate` / `TreeViewIconItemTemplate` 合并为 `TreeViewItemTemplate`，两个旧键已不存在）。
 
-**外框可覆盖**：默认描边为 `Theme.Brush.Border.Default` + 厚度 `1`，由样式 Setter 提供，因此行内 `BorderBrush="Transparent"` 或 `BorderThickness="0"` 都能生效（后者是全状态开关，任何交互态都不会重新长出边框），口径见「控件外框」一节。背景 `Background` 不在本轮开放范围内，仍是模板内固定的 `Theme.Brush.Surface.Base`。
+**外框可覆盖**：默认描边为 `Theme.Brush.Border.Default` + 厚度 `1`，由样式 Setter 提供，因此行内 `BorderBrush="Transparent"` 或 `BorderThickness="0"` 都能生效（后者是全状态开关，任何交互态都不会重新长出边框），口径见「控件外框」一节。
+
+**底板底色可覆盖**：模板内那块底板改为消费 `Background`，默认值 `Theme.Brush.Surface.Base` 由样式 Setter 提供，所以行内 `Background="..."` 真的生效；选中条目仍取状态令牌 `Surface.Sunken`，不会被宿主底色顶掉。口径见「底板底色」一节。
 
 合并 `Themes/Generic.xaml` 后，官方 `<TreeView>`（无 `jv:` 前缀）自动获得同一外观与交互；`jv` 专有能力经 `atc:TreeViewAssist` 附加属性承载，两类实例通用：
 
@@ -1276,6 +1323,8 @@ node.IsSelected = true;
 `jv:TabControl` 继承 WPF `TabControl`，`jv:TabControlItem` 继承 WPF `TabItem`。它遵循标准的 `ItemsSource`、`ItemTemplate`、`ContentTemplate` 和容器生成规则；点击页签标题会切换对应内容。页签条是 `WrapPanel` 且**不套滚动容器**——**页签超出可用宽度时自动换行**，行数不设上限：页签行随行数变高，内容区被相应压缩，控件总高不变。换行与横向滚动互斥（`ScrollViewer` 的 `HorizontalScrollBarVisibility=Auto` 会给面板无限宽度，`WrapPanel` 在无限宽度下永远只排一行），所以页签条不再横向滚动；需要限制头部占用的空间，由宿主给控件设 `Height`/`MaxHeight`，或把整台控件包进宿主自己的 `ScrollViewer`。页签条固定在顶部，因此**不支持 `TabStripPlacement` 的 Left/Bottom/Right 方向**（官方 `TabPanel` 能力未包含）。多行时「选中页签去底边框、与内容区连成一体」只发生在**最后一行**（那里才有内容区上边线）；非末行的选中页签底边同样不描边，会在该行下沿留下 1px 缺口——离屏实测：选中页签底边像素 `#FFFFFF`（页签自身背景），同排未选页签同一位置是 `#DADEE2`（`Theme.Brush.Border.Default`）。这是刻意保留的取舍：改成「选中态一律四边描边」会破坏单行时页签与内容区衔接的观感，改成「只有末行去底边」需要在排列之后回写行归属标记（布局反馈环风险），两者都不划算。
 
 **外框与那条分割线**：内容区边框默认取 `Theme.Brush.Border.Default` + 厚度 `1`（样式 Setter 提供，行内可覆盖），内容区上移量随它取负上边。`BorderThickness="0"` 时页签行与内容区之间那条分割线**一起消失**——这是刻意的耦合，库不再单独开放分割线开关；页签自身的边框归**页签的** `BorderThickness`（默认 `1`，经 `ItemContainerStyle` 覆盖），选中页签「去底边」随它推导（`1`→`1,1,1,0`、`0`→全 `0`、`2`→`2,2,2,0`）。完整口径见「控件外框」一节。
+
+**底色管整块**：`Background` 同时管内容区底板与页签行后方那块区域（WPF 原生语义），默认 `Theme.Brush.Background.App` 由样式 Setter 提供。选中页签**自动跟随**——`DefaultTabItemStyle` 的选中触发器读的就是所属 `TabControl` 的 `Background`，所以页签与内容区之间不会有色差；要选中页签用别的颜色，显式设 `SelectedItemBackground`（本地值优先于那条默认绑定）。未选中的页签仍取自己的 `Surface.Base`，`jv:TabControl Background="Red"` 不会把整条页签行染红。官方 `<TabControl>` 走同一份样式，这两条同样成立。完整口径见「底板底色」一节。
 
 **官方类型接管**：库字典中提供了官方 `TabControl` 的隐式样式（与 `ListBox` / `ComboBox` 等同一约定）。宿主把 `Themes/Generic.xaml` 合并进 `Application.Resources` 后，**原生 `<TabControl>` 无需任何前缀与配置即被库主题接管**：外壳、页签行与悬停/选中态与 `jv:TabControl` 一致，页签容器为原生 `TabItem`（`DefaultTabItemStyle`）。两个圆角属性注册为**附加属性**，因此官方 `<TabControl>` 同样可自定义：`jv:TabControl.HeaderCornerRadius="6"`、`jv:TabControl.ContentCornerRadius="0,0,12,12"`（未赋值时取默认值；官方类型下不再产生绑定失败跟踪——此前那条 `Warning 40` 只在宿主开启 `PresentationTraceSources.DataBindingSource` 跟踪时可见，默认 `Level=Off`）。`IsClosable`、`CloseTabCommand`、页签重命名与 `ItemHoverBackground` / `SelectedItemBackground` 仍是 `jv:TabControl` 的派生能力，官方 `<TabControl>` 不具备——需要这些能力请使用 `jv:TabControl` 与 `jv:TabControlItem`（原 `TabMenu` / `TabMenuItem` 自 3.1.0 起更名）。
 

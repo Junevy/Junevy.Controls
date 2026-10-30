@@ -331,6 +331,144 @@
                     </StackPanel>
                 </demo:DemoSection>
 
+                <demo:DemoSection
+                    Title="底板底色可覆盖（Background 管静息态，状态色仍归主题令牌）"
+                    Description="与上一节同构：底色原本也写死在模板部件上（TreeView 的 Surface.Base、TabControl 内容区的 Background.App）——模板内的字面量是那块部件的本地值，压过宿主设在控件本体上的任何值。现在模板改为 TemplateBinding 消费、默认值搬进样式 Setter，于是默认观感不变、宿主写什么生效什么。约定：Background 只管静息态——选中条目仍是 Surface.Sunken、勾选后仍是 Accent.Primary、禁用仍是 State.DisabledSurface，这些状态反馈不随实例关闭。语义逐控件：TreeView 管整块底板；TabControl 管「整块」= 内容区 + 页签行后方，选中页签自动跟随（显式设 SelectedItemBackground 时本地值优先）、未选中页签仍取自身 Surface.Base；ListBox / ListView / DataGrid 的本体与分页页脚同源，换底色不会在页脚留出色差条；CheckBox / RadioButton 管勾选标记框而不是整行；Slider 管未填充段轨道、ProgressBar 管轨道（线性底色与环形 Stroke）；jv:TextBlock 默认 null 不画。三处例外：jv:DataPager 没有整块底板、jv:ExpanderPanel 的 Classic 模式（底板归 Card 模式）、jv:DialogWindow 与 jv:ProgressBarWindow 的卡片底板（Window.Background 是 HWND 清除色，会连阴影留白一起填色，构造函数正是把它置 Transparent 才让阴影透出来）。所有浮层底色保持 Surface.Base：ComboBox 下拉、InfoBar 菜单层、ContextMenu、Toolbox 悬浮面板、CodeEditor 补全列表。"
+                    XamlCode="{x:Static sample:ShowcaseSnippets.BackgroundOverrideDemo}">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,6"
+                            FontSize="12"
+                            Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                            Text="jv:TreeView（整块底板）" />
+                        <WrapPanel>
+                            <StackPanel Margin="0,0,16,12">
+                                <TextBlock FontSize="11" Text="默认 Surface.Base" />
+                                <jv:TreeView
+                                    Width="200"
+                                    Height="130"
+                                    atc:Icon.IconSize="14">
+                                    <jv:TreeMenuItem Title="控制中心" IsExpanded="True" />
+                                    <jv:TreeMenuItem Title="设备分组" />
+                                    <jv:TreeMenuItem Title="告警策略" />
+                                </jv:TreeView>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,16,12">
+                                <TextBlock FontSize="11" Text="Background=Surface.Sunken" />
+                                <jv:TreeView
+                                    Width="200"
+                                    Height="130"
+                                    Background="{DynamicResource Theme.Brush.Surface.Sunken}"
+                                    atc:Icon.IconSize="14">
+                                    <jv:TreeMenuItem Title="控制中心" IsExpanded="True" />
+                                    <jv:TreeMenuItem Title="设备分组" />
+                                    <jv:TreeMenuItem Title="告警策略" />
+                                </jv:TreeView>
+                            </StackPanel>
+                        </WrapPanel>
+
+                        <TextBlock
+                            Margin="0,6,0,6"
+                            FontSize="12"
+                            Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                            Text="jv:TabControl（整块：内容区 + 页签行后方；选中页签自动跟随，未选中页签不染）" />
+                        <WrapPanel>
+                            <StackPanel Margin="0,0,16,12">
+                                <TextBlock FontSize="11" Text="默认 Background.App" />
+                                <jv:TabControl
+                                    Width="230"
+                                    Height="110"
+                                    IsClosable="False">
+                                    <jv:TabControlItem Header="总览">
+                                        <TextBlock Margin="10" Text="总览页签内容。" />
+                                    </jv:TabControlItem>
+                                    <jv:TabControlItem Header="设备">
+                                        <TextBlock Margin="10" Text="设备页签内容。" />
+                                    </jv:TabControlItem>
+                                </jv:TabControl>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,16,12">
+                                <TextBlock FontSize="11" Text="Background=Surface.Sunken" />
+                                <jv:TabControl
+                                    Width="230"
+                                    Height="110"
+                                    Background="{DynamicResource Theme.Brush.Surface.Sunken}"
+                                    IsClosable="False">
+                                    <jv:TabControlItem Header="总览">
+                                        <TextBlock Margin="10" Text="总览页签内容。" />
+                                    </jv:TabControlItem>
+                                    <jv:TabControlItem Header="设备">
+                                        <TextBlock Margin="10" Text="设备页签内容。" />
+                                    </jv:TabControlItem>
+                                </jv:TabControl>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,16,12">
+                                <TextBlock FontSize="11" Text="另设 SelectedItemBackground（本地值优先）" />
+                                <jv:TabControl
+                                    Width="230"
+                                    Height="110"
+                                    Background="{DynamicResource Theme.Brush.Surface.Sunken}"
+                                    IsClosable="False"
+                                    SelectedItemBackground="{DynamicResource Theme.Brush.Accent.PrimarySubtle}">
+                                    <jv:TabControlItem Header="总览">
+                                        <TextBlock Margin="10" Text="总览页签内容。" />
+                                    </jv:TabControlItem>
+                                    <jv:TabControlItem Header="设备">
+                                        <TextBlock Margin="10" Text="设备页签内容。" />
+                                    </jv:TabControlItem>
+                                </jv:TabControl>
+                            </StackPanel>
+                        </WrapPanel>
+
+                        <TextBlock
+                            Margin="0,6,0,6"
+                            FontSize="12"
+                            Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                            Text="标记框 / 轨道（Background 不外溢到整行，也不顶掉已填充段的状态色）" />
+                        <WrapPanel>
+                            <StackPanel Margin="0,0,16,12">
+                                <TextBlock FontSize="11" Text="jv:CheckBox 默认" />
+                                <jv:CheckBox Content="启用点检" IsChecked="True" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,16,12">
+                                <TextBlock FontSize="11" Text="Background=Surface.Sunken（标记框）" />
+                                <jv:CheckBox
+                                    Background="{DynamicResource Theme.Brush.Surface.Sunken}"
+                                    Content="启用点检" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,16,12">
+                                <TextBlock FontSize="11" Text="jv:Slider 默认轨道" />
+                                <jv:Slider
+                                    Width="200"
+                                    ShowValueBox="False"
+                                    Value="40" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,16,12">
+                                <TextBlock FontSize="11" Text="Background=Accent.PrimarySubtle（填充段不变）" />
+                                <jv:Slider
+                                    Width="200"
+                                    Background="{DynamicResource Theme.Brush.Accent.PrimarySubtle}"
+                                    ShowValueBox="False"
+                                    Value="40" />
+                            </StackPanel>
+                        </WrapPanel>
+
+                        <TextBlock
+                            Margin="0,6,0,6"
+                            FontSize="12"
+                            Foreground="{DynamicResource Theme.Brush.Text.Secondary}"
+                            Text="例外：浮层底色不跟随（主体换了色，下拉层仍是 Surface.Base，才不会变成一块没有轮廓的白板）" />
+                        <jv:ComboBox
+                            Width="200"
+                            HorizontalAlignment="Left"
+                            Background="{DynamicResource Theme.Brush.Accent.PrimarySubtle}"
+                            SelectedIndex="0">
+                            <ComboBoxItem Content="采集通道" />
+                            <ComboBoxItem Content="告警通道" />
+                        </jv:ComboBox>
+                    </StackPanel>
+                </demo:DemoSection>
+
             </StackPanel>
         </ScrollViewer>
     </Border>

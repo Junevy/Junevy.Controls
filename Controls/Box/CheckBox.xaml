@@ -16,7 +16,7 @@
                     x:Name="CheckBorder"
                     Width="18"
                     Height="18"
-                    Background="Transparent"
+                    Background="{TemplateBinding Background}"
                     BorderBrush="{TemplateBinding BorderBrush}"
                     BorderThickness="{TemplateBinding BorderThickness}"
                     CornerRadius="{DynamicResource Theme.SmallCornerRadius}">
@@ -48,10 +48,10 @@
 
         <ControlTemplate.Triggers>
 
-            <!--  Hover  -->
+            <!--  Hover：只加深描边。原先这里还写了一条 Background=Transparent，
+                  它只是复述默认值，改为 TemplateBinding 后会抹掉宿主设的静息底色，故删除。  -->
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent.Primary}" />
-                <Setter TargetName="CheckBorder" Property="Background" Value="Transparent" />
             </Trigger>
 
             <!--  Checked  -->
@@ -104,18 +104,20 @@
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource DefaultControlFocusVisualStyle}" />
-        <!--  勾选框外框的默认色与粗细：模板内改为 TemplateBinding 消费，默认观感不变，
-              但宿主写 BorderBrush="Transparent" 或 BorderThickness="0" 能真的去掉勾选框描边。
+        <!--  勾选标记框的外观默认值（外框色/粗细 + 底色）都由这几条 Setter 供，模板改为 TemplateBinding 消费：
+              默认观感不变，宿主写 BorderBrush="Transparent"、BorderThickness="0" 或 Background="..." 能真的作用在
+              勾选框上（与 BorderBrush/BorderThickness 同一元素，不牵动整行）。勾选/按压/禁用仍走各自的
+              状态令牌，静息态才归宿主。
               Border.CornerRadius 保留不动：勾选框模板不读它（圆角另有字面量令牌），但通用焦点环
               Generic/Style/DefaultFocusStyle.xaml 经 TemplatedParent 读它，而焦点环在离屏探针里挂不上
               AdornerLayer（WPF 要等真实输入才显示焦点提示），无法目测。删掉它只可能把环的圆角从 4 变成 0、
               不可能改善任何观感——按「默认观感不变」保守保留，与 Button/TextBox/ComboBox 等盒子控件一致。  -->
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="1.5" />
         <Setter Property="Border.CornerRadius" Value="{DynamicResource Theme.SmallCornerRadius}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template" Value="{StaticResource DefaultCheckBoxTemplate}" />
-        <Setter Property="Background" Value="Transparent" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource Theme.Brush.Text.Secondary}" />
     </Style>
 

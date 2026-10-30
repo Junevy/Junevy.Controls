@@ -18,7 +18,10 @@
         标题文本超宽时以省略号截断，不硬裁剪。
     -->
     <ControlTemplate x:Key="DefaultTextBlockTemplate" TargetType="{x:Type local:TextBlock}">
-        <Grid Margin="{TemplateBinding Padding}">
+        <!--  Background 管标题组合的整块底板（与 Label 同口径）；默认未赋值即为 null，不画色也不接管命中  -->
+        <Grid
+            Margin="{TemplateBinding Padding}"
+            Background="{TemplateBinding Background}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />

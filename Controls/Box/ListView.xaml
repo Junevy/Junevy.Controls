@@ -179,12 +179,13 @@
             CornerRadius="{TemplateBinding Border.CornerRadius}"
             SnapsToDevicePixels="True">
             <DockPanel>
-                <!--  分页页脚：atc:PagingAssist.HasPager 为真时出现，方位随 atc:PagingAssist.Placement  -->
+                <!--  分页页脚：atc:PagingAssist.HasPager 为真时出现，方位随 atc:PagingAssist.Placement；
+                      底色取宿主 Background，与列表本体同一来源，宿主换底色不会在页脚留出色差条  -->
                 <Border
                     x:Name="PagingFooter"
                     DockPanel.Dock="Bottom"
                     Padding="4,3"
-                    Background="{DynamicResource Theme.Brush.Surface.Base}"
+                    Background="{TemplateBinding Background}"
                     BorderBrush="{DynamicResource Theme.Brush.Border.Divider}"
                     BorderThickness="0,1,0,0"
                     Visibility="Collapsed">
@@ -260,12 +261,13 @@
             CornerRadius="{TemplateBinding Border.CornerRadius}"
             SnapsToDevicePixels="True">
             <DockPanel>
-                <!--  分页页脚：atc:PagingAssist.HasPager 为真时出现，方位随 atc:PagingAssist.Placement  -->
+                <!--  分页页脚：atc:PagingAssist.HasPager 为真时出现，方位随 atc:PagingAssist.Placement；
+                      底色取宿主 Background，与列表本体同一来源，宿主换底色不会在页脚留出色差条  -->
                 <Border
                     x:Name="PagingFooter"
                     DockPanel.Dock="Bottom"
                     Padding="4,3"
-                    Background="{DynamicResource Theme.Brush.Surface.Base}"
+                    Background="{TemplateBinding Background}"
                     BorderBrush="{DynamicResource Theme.Brush.Border.Divider}"
                     BorderThickness="0,1,0,0"
                     Visibility="Collapsed">

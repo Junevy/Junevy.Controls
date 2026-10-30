@@ -62,7 +62,7 @@ namespace Junevy.Controls.Controls.Menu
         public static readonly DependencyProperty ItemHoverBackgroundProperty =
             DependencyProperty.Register(nameof(ItemHoverBackground), typeof(Brush), typeof(TabControl), new PropertyMetadata(null));
 
-        /// <summary>选中页签背景画刷（默认 Background.App——选中页签与内容区视觉一体；可自定义）。</summary>
+        /// <summary>选中页签背景画刷。默认经样式跟随控件自身的 <c>Background</c>（选中页签与内容区同色、无接缝）；显式赋值时以本属性为准。</summary>
         public static readonly DependencyProperty SelectedItemBackgroundProperty =
             DependencyProperty.Register(nameof(SelectedItemBackground), typeof(Brush), typeof(TabControl), new PropertyMetadata(null));
 

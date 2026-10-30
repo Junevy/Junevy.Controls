@@ -58,8 +58,9 @@
     </Style>
 
     <Style TargetType="{x:Type local:ProgressBarWindow}">
-        <Setter Property="Background" Value="Transparent" />
-        <!--  根外框默认值：模板改为 TemplateBinding 消费后必须由 Setter 补回，否则静默无边框  -->
+        <!--  外框默认值：模板改为 TemplateBinding 消费后必须由 Setter 补回，否则静默无边框。
+              Background 保持写死在模板里（见 DialogWindow 同款说明）：Window.Background 是 HWND 清除色，
+              会连 14px 阴影留白一起填色，构造函数把它置 Transparent 正是为了透出阴影。  -->
         <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Border.Default}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template">

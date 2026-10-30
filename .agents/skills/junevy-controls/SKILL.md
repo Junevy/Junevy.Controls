@@ -82,6 +82,25 @@ ThemeManager.ToggleTheme();
 - 三处例外/注意：`Menu` 菜单栏默认厚度是 `0`（本无边框），且样式是 keyed `JunevyMenuBarStyle`（官方 `<Menu>` 不自动带外框默认值）；`jv:CheckBox`/`jv:RadioButton` 的这两项管**勾选标记框**（默认 `1.5`）不是控件整体；`jv:InfoBar`/`jv:AppBar` 管的是弹出层，本体无外框。
 - `jv:TabControl` 是**两个独立表面、各自读自己的属性**：内容区边框 + 上移量（页签行分割线随它一起消失）取 `TabControl.BorderThickness`；页签盒取 `TabItem` 自己的（走 `ItemContainerStyle`）。`jv:TabControl BorderThickness="2"` 不会把页签也变成 `2,2,2,0`，两处都要放大就两处一起设。
 
+### 底板底色契约（`3.3.1` 起全库统一，与外框同一套做法）
+
+`Background` 过去也写死在模板部件上（`TreeView` 的 `Surface.Base`、`TabControl` 内容区的 `Background.App`），宿主设了没反应。现在模板改为 `{TemplateBinding Background}`、默认值搬到样式 `Setter`，**同样只管静息态**：选中条目 `Surface.Sunken`、勾选/开启后 `Accent.Primary`/`.PrimarySubtle`、禁用 `State.DisabledSurface`、悬停纱色、已填充段一律写死主题令牌，宿主关不掉。
+
+各控件画的是哪一块（写 XAML 前先看这张表）：
+
+| 控件 | `Background` 画的东西 | 默认 |
+| --- | --- | --- |
+| `TreeView`（含官方） | 整块底板 | `Surface.Base` |
+| `TabControl`（含官方） | **整块**＝内容区 + 页签行后方；选中页签**自动跟随**，未选中页签仍取自身 `Surface.Base` | `Background.App` |
+| `ListBox`/`ListView`/`DataGrid` | 本体 + **模板分页页脚同源** | `Surface.Base` |
+| `MessageBar` / `InfoBar` | 卡片底板 / 本体（InfoBar 悬停纱色在独立 `StateLayer`，不占底色） | `Surface.Base` / 透明 |
+| `CheckBox`/`RadioButton` | **勾选标记框**，不外溢到整行 | 透明 |
+| `ToggleButton`（开关） | 轨道静息底色 | 不画 |
+| `Slider` / `ProgressBar` | 未填充段轨道 / 轨道（线性底色、环形 `Stroke`）；填充段仍是 accent | `Surface.Sunken` |
+| `Label` / `jv:TextBlock` | 状态标签整块（`DisplayMode` 注入的状态色被宿主局部值压过）/ 标题组合底板 | `Accent.Primary` / null |
+
+接缝不需要宿主操心：`SelectedItemBackground` 的默认 Setter 绑控件自己的 `Background`（显式赋值才改用它的）；页脚读同一个 `Background`，不会留色差条。四处刻意不吃 `Background`：`jv:DataPager`（一排按钮，没有整块底板）、`jv:ExpanderPanel` 的 `Classic`（底板归 `Card` 模式）、`jv:DialogWindow`/`jv:ProgressBarWindow` 的卡片（**`Window.Background` 是 HWND 清除色，铺满客户区**，会连阴影留白一起填色——构造函数正是把它置 `Transparent` 才让阴影透出；要开放卡片色得加专用 DP）、以及**全部浮层底色**（`ComboBox` 下拉、`InfoBar` 菜单层、`ContextMenu`、`Toolbox` 悬浮面板、`CodeEditor` 补全列表保持 `Surface.Base`）。
+
 ## 4. 附加属性速查（`atc:` 命名空间）
 
 | 附加属性 | 用途 | 关键点 |
@@ -145,7 +164,8 @@ ThemeManager.ToggleTheme();
 - `jv:TabControl` 写了显式 `Style` 后控件整个变白/无模板 → 隐式样式在有显式样式时不参与，必须 `BasedOn="{StaticResource DefaultDerivedTabControlStyle}"`。
 - 自定义模板时必须保留 WPF 标准部件名（`PART_ContentHost`、`PART_ScrollViewer`、`ItemsPresenter` 等）——本库多处行为（平滑滚动、滚轮折算）依赖 `PART_ScrollViewer` 命名。
 - 设了 `BorderBrush="Transparent"` 感觉「框还在」→ 它只去掉**静息态**的颜色（1px 占位仍在），悬停/聚焦会按主题令牌把线画回来。想要彻底无边框用 `BorderThickness="0"`（全状态生效）。反过来：`BorderBrush` 不会因触发器写死而失效，是 `BorderThickness` 才管全状态——见第 3 节契约。
-- **改「外框可覆盖性」的两个优先级陷阱**（本仓库开发控件时必读）：模板 `Border` 上写字面量 `BorderBrush`/`BorderThickness` = 给子元素写局部值，永远压过宿主写在控件上的值，必须改 `{TemplateBinding}`；同时默认值要搬到样式 `Setter`（`Control.BorderBrush` 元数据默认 `null`、`BorderThickness` 默认 `0`）。只做前者不补 Setter 会**静默无边框**——编译通过、宿主覆盖测试仍全绿、默认观感没了。`ControlTemplate.Triggers` 里带 `TargetName` 的 `BorderThickness` Setter 同样是子元素局部值，所以契约禁止触发器写厚度绝对值；需要「部分边」时用 `RelativeSource={RelativeSource TemplatedParent}` + 转换器从宿主厚度推导（触发器的 `Setter.Value` 允许 TemplatedParent 绑定，这与 `DataTrigger` 的 **Binding 条件**里拿不到 TemplatedParent 是两回事）。
+- 设了 `Background` 没反应 → `3.3.1` 之前底色写死在模板里，升级后生效（含官方 `<TreeView>`/`<TabControl>`/`<ListBox>` 等）。反过来，若给控件写了**不带 `BasedOn`** 的自定义 `Style`，默认底色 Setter 会一起丢掉，表现是「底板/轨道凭空消失」——派生一律 `BasedOn`。`Window.Background`（`jv:DialogWindow`/`jv:ProgressBarWindow`）不归本契约管：它是 HWND 清除色，卡片底板刻意写死。
+- **改「外框/底色可覆盖性」的两个优先级陷阱**（本仓库开发控件时必读）：模板 `Border` 上写字面量 `BorderBrush`/`BorderThickness`/`Background` = 给子元素写局部值，永远压过宿主写在控件上的值，必须改 `{TemplateBinding}`；同时默认值要搬到样式 `Setter`（`Control.BorderBrush` 元数据默认 `null`、`BorderThickness` 默认 `0`、`Background` 默认 `null`）。只做前者不补 Setter 会**静默丢默认**——编译通过、宿主覆盖测试仍全绿、默认观感没了（边框那版是无框，底色那版是轨道/底板看不见）。`ControlTemplate.Triggers` 里带 `TargetName` 的 `BorderThickness` Setter 同样是子元素局部值，所以契约禁止触发器写厚度绝对值；需要「部分边」时用 `RelativeSource={RelativeSource TemplatedParent}` + 转换器从宿主厚度推导（触发器的 `Setter.Value` 允许 TemplatedParent 绑定，这与 `DataTrigger` 的 **Binding 条件**里拿不到 TemplatedParent 是两回事）。底色还有两条本轮实测踩到的坑：① 把 `Background` 开放给模板消费后，**触发器里「悬停设成 `Transparent`」这类复述性 Setter 必须删掉**（CheckBox/RadioButton 各一处）——底色恒为透明时它只是复述，开放后变成悬停瞬间把宿主写的静息底色擦掉；② **`Window.Background` 不是卡片色**，它是 HWND 清除色、铺满整个客户区，无边框窗口连阴影留白一起填色，所以 `DialogWindow`/`ProgressBarWindow` 的底板要保持写死、不能改 TemplateBinding。
 - 焦点环（`Generic/Style/DefaultFocusStyle.xaml`，经 `SystemParameters.FocusVisualStyleKey` 全局接管）在离屏/无头探针里**挂不上 `AdornerLayer`**——WPF 要等真实输入到达进程才显示焦点提示，即便 `IsActive` + `IsKeyboardFocused=True` +  pumping 到 `ContextIdle` 仍是 0 个子项。所以涉及焦点视觉或 `Border.CornerRadius` 的改动不能靠探针下「无影响」结论：要么真实桌面按 Tab 目测，要么保守保留（`3.3.0` 就因此保留 CheckBox/RadioButton 的 `Border.CornerRadius` Setter）。
 - 确认弹窗的按钮点不动、窗口关不掉 → `jv:ConfirmDialogWindow` 给页脚插槽赋 `Template` 后**必须立刻 `ApplyTemplate()` 再 `FindName`**（赋值只是挂模板，实例化要等布局 passes，不强制应用则部件引用为 null）。改这个控件前先读 README「ConfirmDialogWindow 与 ConfirmDialogService」的实现要点。
 - **库内控件不要在属性变更回调里调 `UpdateLayout()`** → 会重入「正在变更中的集合」，虚拟化 `ItemsControl` 抛「某个 ItemsControl 与它的项源不一致」（`Badge` 曾因此在宿主日志面板批量投递时崩溃，`3.2.5` 已修）。需要按实际尺寸算位置时走 `SizeChanged`／`LayoutUpdated` 这类布局期回调——它们在同一帧内、早于渲染，纠正来得及且不额外跑布局。宿主侧相应地：在 `CollectionChanged` 处理程序里改绑定属性是安全的。

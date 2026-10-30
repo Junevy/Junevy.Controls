@@ -698,6 +698,45 @@ namespace Junevy.Controls.Showcase
             """;
 
 
+        // ---------------- 底板底色可覆盖性（跨控件契约，见「菜单与导航」页末块） ----------------
+
+        public const string BackgroundOverrideDemo = """
+            <!-- 契约：Background 管静息态底色，状态色仍归主题令牌。
+                 与 BorderBrush 那一套同构——模板部件改为 TemplateBinding 消费，默认值搬进样式 Setter。
+                 派生样式务必 BasedOn，否则连默认 Setter 一起丢掉，控件就没有底色了。 -->
+
+            <!-- TreeView：整块底板（条目之下那一层） -->
+            <jv:TreeView Width="220" Height="150" />
+            <jv:TreeView Width="220" Height="150" Background="{DynamicResource Theme.Brush.Surface.Sunken}" />
+
+            <!-- TabControl：Background 管「整块」= 内容区 + 页签行后方。
+                 选中页签自动跟随（默认绑定控件自己的 Background），所以页签与内容区不会有色差；
+                 未选中页签仍取自己的 Surface.Base，整条页签行不会被染色。 -->
+            <jv:TabControl Width="260" Height="120" Background="{DynamicResource Theme.Brush.Surface.Sunken}" />
+
+            <!-- 想让选中页签用别的颜色，显式设 SelectedItemBackground（本地值优先于那条默认跟随） -->
+            <jv:TabControl Width="260" Height="120"
+                           Background="{DynamicResource Theme.Brush.Surface.Sunken}"
+                           SelectedItemBackground="{DynamicResource Theme.Brush.Accent.PrimarySubtle}" />
+
+            <!-- CheckBox / RadioButton：管勾选标记框，不外溢到整行（与 BorderBrush 契约同口径） -->
+            <jv:CheckBox Content="启用点检" Background="{DynamicResource Theme.Brush.Surface.Sunken}" />
+
+            <!-- Slider / ProgressBar：管轨道（未填充段）底色；已填充段仍是 Accent.Primary -->
+            <jv:Slider Width="220" Value="40" Background="{DynamicResource Theme.Brush.Accent.PrimarySubtle}" />
+
+            <!-- ListBox / ListView / DataGrid：本体与模板分页页脚同源，换底色不会在页脚留出色差条 -->
+
+            <!-- 刻意不吃 Background 的三处例外：
+                 jv:DataPager（本体是一排页码按钮，没有整块底板）、
+                 jv:ExpanderPanel 的 Classic 模式（整块底板归 Card 模式）、
+                 jv:DialogWindow / jv:ProgressBarWindow 的卡片底板（Window.Background 是 HWND 清除色，
+                 会连阴影留白一起填色——构造函数正是把它置 Transparent 才让阴影透出来）。
+                 另外所有浮层底色保持 Surface.Base：ComboBox 下拉、InfoBar 菜单层、ContextMenu、
+                 Toolbox 悬浮面板、CodeEditor 补全列表——主体改了色，浮层还得能被认出是浮层。 -->
+            """;
+
+
         // ---------------- 栏与工具（BarsPage） ----------------
 
         public const string ToolBarDemo = """
